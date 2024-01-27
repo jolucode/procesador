@@ -1,0 +1,40 @@
+package service.cloud.request.clientRequest.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import service.cloud.request.clientRequest.config.ApplicationProperties;
+import service.cloud.request.clientRequest.prueba.Client;
+import service.cloud.request.clientRequest.config.ClientProperties;
+
+import java.util.Optional;
+
+@Component
+public class ProviderProperties {
+
+    @Autowired
+    ApplicationProperties applicationProperties;
+
+    @Autowired
+    ClientProperties clientProperties;
+
+    public String getRutaBaseDoc() {
+        return applicationProperties.getRutaBaseDoc();
+    }
+
+    public String getUrlOnpremise(String ruc) {
+        return clientProperties.listaClientesOf(ruc).getUrlOnpremise();
+    }
+
+
+    public Client getClientProperties(String key) {
+        return Optional.ofNullable(clientProperties.listaClientesOf(key)).orElse(null);
+    }
+
+
+
+
+
+
+
+
+}

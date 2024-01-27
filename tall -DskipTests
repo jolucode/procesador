@@ -1,0 +1,2083 @@
+[33mcommit 7935eb18d619f71ae71ced2d87f9a7f292dc3c95[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/integracion-ose-jose[m[33m, [m[1;31morigin/feature/integracion-ose-jose[m[33m)[m
+Author: Jose Luis <mantproductos@vsperu.com>
+Date:   Fri Dec 1 18:41:12 2023 -0500
+
+    SPRINT 3
+
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001414.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001414.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c19e14a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001414.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001415.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001415.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..75caa2a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001415.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001416.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001416.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7476697[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001416.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001417.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001417.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..22f811e[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001417.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001418.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001418.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d9f33a6[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001418.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001419.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001419.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c9d2723[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001419.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001420.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001420.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f5a40c5[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001420.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001421.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001421.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e0c9494[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001421.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001422.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001422.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..efb666b[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001422.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001423.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001423.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ad51b20[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001423.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001424.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001424.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c56799f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001424.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001425.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001425.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3abab9a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001425.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001426.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001426.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c4e874d[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001426.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001427.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001427.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0ef0af5[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001427.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001428.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001428.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..42a6586[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001428.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001429.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001429.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9c5813d[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001429.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001430.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001430.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f4d8b66[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001430.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001431.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001431.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..49509f5[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001431.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001432.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001432.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..73ada55[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001432.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001433.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001433.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..149ecaa[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001433.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001434.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001434.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f019dcf[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001434.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001435.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001435.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f952c12[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001435.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001436.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001436.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a758010[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001436.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001437.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001437.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ce88213[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001437.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001438.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001438.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..8882cac[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001438.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001439.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001439.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..233ca22[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001439.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001440.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001440.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..383ebe5[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001440.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001441.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001441.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1948d9a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001441.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001442.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001442.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3af9a46[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001442.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001443.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001443.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9bcd884[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001443.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001444.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001444.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2b8dcbf[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001444.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001445.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001445.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3a28a0b[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001445.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001446.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001446.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..24dfdc2[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001446.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001447.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001447.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a325e70[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001447.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001448.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001448.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..869e77a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001448.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001449.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001449.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..cfbaefb[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001449.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001450.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001450.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..32b68e3[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001450.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001451.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001451.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3e7e8cf[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001451.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001452.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001452.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4090738[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001452.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001453.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001453.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d6270a3[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001453.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001454.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001454.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4bcb8a7[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001454.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001455.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001455.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d2a4509[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001455.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001456.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001456.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..63e75c6[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001456.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001457.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001457.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3548bf9[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001457.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001458.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001458.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f5a0a95[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001458.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001459.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001459.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9c0c9e1[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001459.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001460.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001460.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d9acbd2[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001460.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001461.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001461.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..354325c[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001461.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001462.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001462.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b32317f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001462.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001463.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001463.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d5ed205[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001463.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001464.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001464.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7ee5344[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001464.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001465.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001465.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..bea0664[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001465.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001466.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001466.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..5593634[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001466.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001467.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001467.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1f281f1[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001467.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001468.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001468.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9118921[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001468.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001469.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001469.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..17ed3ce[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001469.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001470.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001470.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..15b9660[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001470.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001471.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001471.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0c5cdce[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001471.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001472.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001472.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b7bb6b4[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001472.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001473.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001473.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..14d8d7a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001473.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001474.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001474.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7d3d9c4[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001474.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001475.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001475.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..14be439[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001475.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001476.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001476.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c8a50ba[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001476.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001477.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001477.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..83b315c[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001477.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001478.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001478.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..39854fd[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001478.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001479.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001479.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..8ab50d5[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001479.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001480.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001480.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0021f3a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001480.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001481.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001481.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4cf1fb6[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001481.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001482.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001482.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a2b8e27[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001482.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001483.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001483.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..8cfba93[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001483.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001484.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001484.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..639405f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001484.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001485.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001485.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..276adfd[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001485.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001486.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001486.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..cf7a978[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001486.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001487.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001487.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d47c138[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001487.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001488.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001488.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..983c357[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001488.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001489.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001489.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3f31c5c[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001489.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001490.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001490.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..fb26c98[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001490.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001491.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001491.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..93c95a3[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001491.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001492.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001492.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..83c63a2[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001492.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001493.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001493.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d620fc0[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001493.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001494.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001494.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..16e4c6f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001494.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001495.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001495.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..24af4b9[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001495.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001496.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001496.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..6761d55[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001496.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001497.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001497.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f9ec222[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001497.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001498.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001498.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e0528a3[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001498.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001499.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001499.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3bc3b88[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001499.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001500.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001500.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1337543[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001500.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001501.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001501.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..19b5bdd[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001501.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001502.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001502.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..bf1d769[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001502.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001503.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001503.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f0f34ab[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001503.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001504.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001504.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b42d74c[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001504.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001505.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001505.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ac78b17[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001505.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001506.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001506.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..02ac5c6[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001506.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001507.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001507.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ea726ec[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001507.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001508.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001508.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..6904e1d[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001508.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001509.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001509.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..78a77ea[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001509.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001510.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001510.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2418303[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001510.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001511.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001511.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ff80441[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001511.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001512.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001512.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9f22f19[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001512.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001513.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001513.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..57d45a2[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001513.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001514.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001514.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..feb5b52[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001514.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001515.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001515.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a6348f2[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001515.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001516.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001516.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..465841f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001516.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001517.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001517.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9d175f8[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001517.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001518.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001518.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..055ac5f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001518.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001519.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001519.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..670baef[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001519.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001520.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001520.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..62d1f1e[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001520.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001521.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001521.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3e868ed[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001521.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001525.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001525.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c3fc780[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001525.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001528.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001528.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..44656bb[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001528.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001531.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001531.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..bb422da[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001531.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001532.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001532.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..20061d2[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001532.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001533.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001533.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c8288ed[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001533.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001534.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001534.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..425c619[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001534.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001535.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001535.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d279fea[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001535.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001537.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001537.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..da42165[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001537.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001538.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001538.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4a2a80a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001538.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001539.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001539.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..dc60dea[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001539.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001414.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001414.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..44f6602[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001414.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001415.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001415.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..21a5d56[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001415.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001416.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001416.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d24814b[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001416.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001417.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001417.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..58b3515[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001417.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001418.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001418.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7a58d96[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001418.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001419.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001419.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c5f2ee7[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001419.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001420.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001420.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c9e790a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001420.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001421.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001421.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..5bcc130[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001421.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001422.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001422.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..67abff6[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001422.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001423.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001423.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7e75379[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001423.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001424.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001424.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3f63715[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001424.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001425.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001425.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0806255[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001425.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001426.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001426.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..449d5b7[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001426.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001427.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001427.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..86b6644[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001427.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001428.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001428.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..95b5720[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001428.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001429.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001429.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4f9b319[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001429.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001430.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001430.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a14a4c8[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001430.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001431.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001431.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7e89c7f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001431.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001432.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001432.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..aefbcaf[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001432.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001433.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001433.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..638ec49[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001433.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001434.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001434.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..786469b[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001434.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001435.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001435.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ac8d882[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001435.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001436.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001436.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..674c373[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001436.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001437.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001437.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9c69931[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001437.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001438.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001438.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9e0e991[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001438.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001439.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001439.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d4dd7a2[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001439.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001440.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001440.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9d7ae80[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001440.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001441.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001441.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..36da702[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001441.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001442.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001442.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..8ad8ee3[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001442.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001443.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001443.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1f00915[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001443.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001444.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001444.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a696cf0[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001444.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001445.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001445.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c6e0ee4[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001445.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001446.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001446.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..09bbe79[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001446.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001447.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001447.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c916e89[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001447.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001448.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001448.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0b07dba[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001448.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001449.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001449.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4a68d7b[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001449.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001450.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001450.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..bc1065e[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001450.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001451.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001451.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3ba4b12[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001451.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001452.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001452.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..251e749[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001452.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001453.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001453.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d86b3b8[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001453.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001454.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001454.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..fb787a6[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001454.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001455.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001455.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e7a9984[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001455.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001456.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001456.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..00ea07e[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001456.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001457.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001457.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..eb0bf4a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001457.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001458.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001458.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2c8b0ee[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001458.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001459.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001459.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f26ebf1[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001459.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001460.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001460.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..29e8200[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001460.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001461.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001461.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..11a828f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001461.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001462.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001462.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..01487bb[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001462.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001463.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001463.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e5b30dc[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001463.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001464.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001464.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..8606325[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001464.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001465.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001465.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..6712836[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001465.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001466.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001466.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9c25bab[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001466.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001467.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001467.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..826564e[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001467.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001468.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001468.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7b844d7[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001468.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001469.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001469.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..669b9bf[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001469.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001470.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001470.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..dc67310[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001470.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001471.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001471.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7aae84e[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001471.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001472.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001472.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..257668e[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001472.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001473.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001473.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..aa0f5b8[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001473.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001474.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001474.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..bef65e4[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001474.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001475.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001475.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0782efe[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001475.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001476.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001476.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a86fddf[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001476.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001477.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001477.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..5b6af1e[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001477.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001478.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001478.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0dd0fdf[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001478.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001479.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001479.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..abc1b2b[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001479.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001480.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001480.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..79217ec[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001480.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001481.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001481.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..09dcb09[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001481.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001482.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001482.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..093b488[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001482.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001483.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001483.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b710737[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001483.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001484.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001484.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..77f4644[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001484.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001485.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001485.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..47243fb[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001485.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001486.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001486.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..223500d[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001486.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001487.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001487.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f15ee3e[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001487.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001488.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001488.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1f4eaf0[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001488.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001489.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001489.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ea51c01[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001489.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001490.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001490.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..34ec760[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001490.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001491.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001491.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a1beb2d[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001491.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001492.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001492.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..013e611[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001492.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001493.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001493.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d4370fa[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001493.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001494.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001494.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3b65528[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001494.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001495.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001495.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..de2379c[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001495.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001496.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001496.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..629f19f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001496.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001497.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001497.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9fdc9cd[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001497.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001498.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001498.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..fdb57b3[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001498.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001499.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001499.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e0dbbc1[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001499.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001500.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001500.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..147220f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001500.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001501.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001501.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..afe5648[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001501.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001502.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001502.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7272f75[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001502.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001503.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001503.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..97fb8b4[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001503.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001504.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001504.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..915d2c8[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001504.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001505.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001505.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..49463ad[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001505.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001506.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001506.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e68ffee[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001506.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001507.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001507.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3698057[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001507.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001508.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001508.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0cf4b21[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001508.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001509.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001509.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..79c7d2c[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001509.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001510.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001510.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..93a6c65[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001510.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001511.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001511.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..32e82bc[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001511.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001512.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001512.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b4f3db9[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001512.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001513.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001513.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1902222[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001513.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001514.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001514.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..535405a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001514.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001515.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001515.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c5ad884[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001515.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001516.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001516.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c04b01f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001516.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001517.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001517.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b3ff820[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001517.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001518.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001518.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..49262a5[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001518.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001519.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001519.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9cfe7db[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001519.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001520.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001520.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0cecc21[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001520.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001521.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001521.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..8b8c17d[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001521.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001525.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001525.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0965755[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001525.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001528.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001528.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ab2a7d1[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001528.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001531.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001531.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e8b0c85[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001531.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001532.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001532.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1a4aa28[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001532.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001533.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001533.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9424bd3[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001533.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001534.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001534.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..fae36aa[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001534.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001535.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001535.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0ac330a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001535.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001537.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001537.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2eae751[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001537.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001538.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001538.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..68ff32f[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001538.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001539.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001539.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..5935b8a[m
+Binary files /dev/null and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001539.png differ
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001414_FormatoImpreso.pdf b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001414_FormatoImpreso.pdf[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e49bb59[m
+[1m--- /dev/null[m
+[1m+++ b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001414_FormatoImpreso.pdf[m
+[36m@@ -0,0 +1,41 @@[m
+[32m+[m[32m                               AVENIDA LA ENCALADA 1420 OFICINA 502        R.U.C. N° 2051091051[m
+[32m+[m[32m                               SANTIAGO DE SURCO                         FACTURA ELECTRÓNICA[m
+[32m+[m
+[32m+[m[32m                               MIRAFLORES LIMA LIMA                         Nro. FACU-00001414[m
+[32m+[m[32m                               TELÉFON : +51 5194700[m
+[32m+[m[32m                               FAX_TES :[m
+[32m+[m[32m                               PÁGINA WEB : https://www.ssab.com/es-mx[m
+[32m+[m[32m                               CORREO : EJEMPLO@SSAB.COM.PE[m
+[32m+[m
+[32m+[m[32mCLIENTE  : ZICSA CONTRATISTAS GENERALES S.A.                             FECHA DE EMISION                           : 01/12/2023[m
+[32m+[m[32m                                                                         CONDICION DE PAGO                          : CONTADO[m
+[32m+[m[32mDIRECCIÓN : JR. BOLOGNESI NRO. 125 INT. 201 - MIRAFLORES - LIMA - LIMA   ORDEN DE COMPRA                            : 577654457[m
+[32m+[m[32m                                                                         MONEDA                                     : NUEVOS SOLES[m
+[32m+[m[32mR.U.C    : 20100313899[m
+[32m+[m
+[32m+[m[32mG/REMISION : -[m
+[32m+[m
+[32m+[m[32m         1234                  texto_amplio aqui va el[m
+[32m+[m
+[32m+[m[32mITEM     COD         CANTIDAD  DESCRIPCIÓN                               V. UNITARIO SUB-TOTAL                      DESCUENTO  IMPORTE[m
+[32m+[m[32m  1                                                                                                                        0           100.00[m
+[32m+[m[32m         0030070017     1.000  CONTRATACION DEL SERVICIO DE TERAPIA      100.0000[m
+[32m+[m[32m                                     RESPIRATORIA A DOMICILIO PARA[m
+[32m+[m
+[32m+[m[32m                                PACIENTES ADULTOS - HNERM - ESSALUD[m
+[32m+[m[32m                                      PACIENTE : OLIDEN GIL VICTORIA[m
+[32m+[m
+[32m+[m[32mCOMENTARIOS:                                                                                         OP. EXONERADA  USD                0.00[m
+[32m+[m[32m                                                                                                     OP. INAFECTA   USD                0.00[m
+[32m+[m[32m SON: CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES                                                         OP. GRATUITA   USD                0.00[m
+[32m+[m[32m                                                                                                     OP. GRAVADA    USD             100.00[m
+[32m+[m[32m  REPRESENTACIÓN IMPRESA DE LA FACTURA ELECTRÓNICA                                                   ICBPER         USD[m
+[32m+[m[32m  AUTORIZADO MEDIANTE LA RESOLUCIÓN DE INTENDENCIA N° XXXXXXXXXXX/SUNAT                              IGV 18%        USD                    0[m
+[32m+[m[32m  IMPORTE EN LETRAS:                                                                                 IMPORTE TOTAL  USD              18.00[m
+[32m+[m[32m  CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES                                                             ANTICIPO                       118.00[m
+[32m+[m[32m  SI USTED DESEA VER SUS DOCUMENTOS ELECTRÓNICOS EMITIDOS, INGRESAR A:                                              USD[m
+[32m+[m[32m                                                                         "www.ventura.com"                                             0.00[m
+[32m+[m
+[32m+[m[32mOtras Leyendas:[m
+[32m+[m[32m- NINGUNA[m
+[32m+[m[32m[m
+\ No newline at end of file[m
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001414_SUNAT_CDR.zip b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001414_SUNAT_CDR.zip[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e6c480a[m
+Binary files /dev/null and b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001414_SUNAT_CDR.zip differ
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001414_XmlFirmado.xml b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001414_XmlFirmado.xml[m
+[1mnew file mode 100644[m
+[1mindex 0000000..5b180d3[m
+[1m--- /dev/null[m
+[1m+++ b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001414_XmlFirmado.xml[m
+[36m@@ -0,0 +1,167 @@[m
+[32m+[m[32m<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:ns6="urn:oasis:names:specification:ubl:schema:xsd:SignatureBasicComponents-2" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2" xmlns:ns9="urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2" xmlns:sac="urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1">[m
+[32m+[m[32m    <ext:UBLExtensions>[m
+[32m+[m[32m        <ext:UBLExtension>[m
+[32m+[m[32m            <ext:ExtensionContent>[m
+[32m+[m[32m                <sac:AdditionalInformation/>[m
+[32m+[m[32m            </ext:ExtensionContent>[m
+[32m+[m[32m        </ext:UBLExtension>[m
+[32m+[m[32m        <ext:UBLExtension>[m
+[32m+[m[32m            <ext:ExtensionContent><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="signer20510910517"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>rXbkMKlzQJkNjki/p4V0gBmacm0=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>fLVpZkMOS9K7UirbsUFV8zINvv79gKVMRDGLBm5Sb581fVlQqFumtKUM6gWtfLMnuHxD3dobScMz&#13;[m
+[32m+[m[32mCv96YG803u3KNTM4z5926dwHQg15b0c65ibT4wyxmhtimrVic7r93Y6weih8C6jILcsxU0u8iP+6&#13;[m
+[32m+[m[32mXiwGoC4HrWlaSx4gUgI=</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIID+TCCAuGgAwIBAgIKYZQ4RwAAAAAA0jANBgkqhkiG9w0BAQUFADAnMRUwEwYKCZImiZPyLGQB&#13;[m
+[32m+[m[32mGRYFU1VOQVQxDjAMBgNVBAMTBVNVTkFUMB4XDTEzMDUxNzE4MTUwM1oXDTE0MDUxNzE4MjUwM1ow&#13;[m
+[32m+[m[32mgaQxCzAJBgNVBAYTAlBFMQ0wCwYDVQQIEwRMSU1BMQ0wCwYDVQQHEwRMSU1BMSUwIwYDVQQKExxB&#13;[m
+[32m+[m[32mTEZBMUxBQiBMQVRJTiBBTUVSSUNBIFMuQS5DMRQwEgYDVQQLEwsyMDUxODQyMDgxMTEXMBUGA1UE&#13;[m
+[32m+[m[32mAxMOSm9yZ2UgUmVhdGVndWkxITAfBgkqhkiG9w0BCQEWEmpvcmdlQGFsZmExbGFiLmNvbTCBnzAN&#13;[m
+[32m+[m[32mBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAtwMhq+qBQF2Cl1T2ojBkWAaCgEomO9Uu3n0NjNdYzL2h&#13;[m
+[32m+[m[32mJr5rXu3GmVtj7GW8yYKmInfj3zg0joqtCqvVMF77ptXXnuP85O7r54OcRxiSybmszphQDc8sLl1H&#13;[m
+[32m+[m[32mDdXLFgRhcIxpvpLAtGGwloeaIMLq4PuaOS30jVEgeTxmATYD1osCAwEAAaOCASswggEnMA4GA1Ud&#13;[m
+[32m+[m[32mDwEB/wQEAwIE8DBEBgkqhkiG9w0BCQ8ENzA1MA4GCCqGSIb3DQMCAgIAgDAOBggqhkiG9w0DBAIC&#13;[m
+[32m+[m[32mAIAwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFJvm9VgC1BIcMMheUtOtipSKTMO8MBMG&#13;[m
+[32m+[m[32mA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFN9kHQDqWONmozw3xdNSIMFW2t+7MDMGA1Ud&#13;[m
+[32m+[m[32mHwQsMCowKKAmoCSGImh0dHA6Ly9wY2IyMjYvQ2VydEVucm9sbC9TVU5BVC5jcmwwRQYIKwYBBQUH&#13;[m
+[32m+[m[32mAQEEOTA3MDUGCCsGAQUFBzAChilodHRwOi8vcGNiMjI2L0NlcnRFbnJvbGwvcGNiMjI2X1NVTkFU&#13;[m
+[32m+[m[32mLmNydDANBgkqhkiG9w0BAQUFAAOCAQEAmr097s/nQw3Ji63oHXsKYA2IunGghE3PuYs/B/qNnauQ&#13;[m
+[32m+[m[32mAh8g1MjROtvZHImMH5FSn6s5MibxjcAMcbsaoZfE4JbSbbb1NhdRLN7Gi40qTXZktQOYY5fwm1dc&#13;[m
+[32m+[m[32m1wJYGjT+0mmXCjzOJC73mJXnCG2xd1v1cFSjkyDpEqxWyYISxM3s11cASJuYEEtgCqnprnLVq5Xt&#13;[m
+[32m+[m[32mPLGeeIBnzjEZsVjkYEiqo4SC0MjxyQlNw9wzhSj61fVbd5bXCWGIATN6RvPVfyb1sfblbv3hIBOI&#13;[m
+[32m+[m[32m4w0decjmWPe43r7G1TbcUaaPkm0PVAv/qIBGu9zUwv6DPNKNPHoJ/elM9MddpRgEj6O35w==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></ext:ExtensionContent>[m
+[32m+[m[32m        </ext:UBLExtension>[m
+[32m+[m[32m    </ext:UBLExtensions>[m
+[32m+[m[32m    <cbc:UBLVersionID>2.1</cbc:UBLVersionID>[m
+[32m+[m[32m    <cbc:CustomizationID>2.0</cbc:CustomizationID>[m
+[32m+[m[32m    <cbc:ProfileID schemeAgencyName="PE:SUNAT" schemeName="Tipo de Operacion" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51">0101</cbc:ProfileID>[m
+[32m+[m[32m    <cbc:ID>FACU-00001414</cbc:ID>[m
+[32m+[m[32m    <cbc:UUID>123123</cbc:UUID>[m
+[32m+[m[32m    <cbc:IssueDate>2023-12-01</cbc:IssueDate>[m
+[32m+[m[32m    <cbc:IssueTime>16:30:01</cbc:IssueTime>[m
+[32m+[m[32m    <cbc:DueDate>2023-12-01</cbc:DueDate>[m
+[32m+[m[32m    <cbc:InvoiceTypeCode listAgencyName="PE:SUNAT" listID="0101" listName="Tipo de Documento" listSchemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo01" name="Tipo de Operacion">01</cbc:InvoiceTypeCode>[m
+[32m+[m[32m    <cbc:Note languageLocaleID="1000">CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES</cbc:Note>[m
+[32m+[m[32m    <cbc:DocumentCurrencyCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 4217 Alpha" listName="Currency">PEN</cbc:DocumentCurrencyCode>[m
+[32m+[m[32m    <cbc:LineCountNumeric>1</cbc:LineCountNumeric>[m
+[32m+[m[32m    <cac:ContractDocumentReference>[m
+[32m+[m[32m        <cbc:ID>577654457</cbc:ID>[m
+[32m+[m[32m        <cbc:DocumentTypeCode>OC</cbc:DocumentTypeCode>[m
+[32m+[m[32m    </cac:ContractDocumentReference>[m
+[32m+[m[32m    <cac:Signature>[m
+[32m+[m[32m        <cbc:ID>signer20510910517</cbc:ID>[m
+[32m+[m[32m        <cac:SignatoryParty>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID>20510910517</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>PRUEBAS CDR OBSERVADOS</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m        </cac:SignatoryParty>[m
+[32m+[m[32m        <cac:DigitalSignatureAttachment>[m
+[32m+[m[32m            <cac:ExternalReference>[m
+[32m+[m[32m                <cbc:URI>#signer20510910517</cbc:URI>[m
+[32m+[m[32m            </cac:ExternalReference>[m
+[32m+[m[32m        </cac:DigitalSignatureAttachment>[m
+[32m+[m[32m    </cac:Signature>[m
+[32m+[m[32m    <cac:AccountingSupplierParty>[m
+[32m+[m[32m        <cac:Party>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20510910517</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>FE PRUEBA</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m            <cac:PartyLegalEntity>[m
+[32m+[m[32m                <cbc:RegistrationName>PRUEBAS CDR OBSERVADOS</cbc:RegistrationName>[m
+[32m+[m[32m                <cac:RegistrationAddress>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">150122</cbc:ID>[m
+[32m+[m[32m                    <cbc:AddressTypeCode listAgencyName="PE:SUNAT" listName="Establecimientos anexos">0000</cbc:AddressTypeCode>[m
+[32m+[m[32m                    <cbc:CityName>LIMA</cbc:CityName>[m
+[32m+[m[32m                    <cbc:CountrySubentity>LIMA</cbc:CountrySubentity>[m
+[32m+[m[32m                    <cbc:District>MIRAFLORES</cbc:District>[m
+[32m+[m[32m                    <cac:AddressLine>[m
+[32m+[m[32m                        <cbc:Line>AVENIDA LA ENCALADA 1420 OFICINA 502 SANTIAGO DE SURCO</cbc:Line>[m
+[32m+[m[32m                    </cac:AddressLine>[m
+[32m+[m[32m                    <cac:Country>[m
+[32m+[m[32m                        <cbc:IdentificationCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 3166-1" listName="Country">PE</cbc:IdentificationCode>[m
+[32m+[m[32m                    </cac:Country>[m
+[32m+[m[32m                </cac:RegistrationAddress>[m
+[32m+[m[32m            </cac:PartyLegalEntity>[m
+[32m+[m[32m        </cac:Party>[m
+[32m+[m[32m    </cac:AccountingSupplierParty>[m
+[32m+[m[32m    <cac:AccountingCustomerParty>[m
+[32m+[m[32m        <cac:Party>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20100313899</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>ZICSA CONTRATISTAS GENERALES S.A.</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m            <cac:PartyLegalEntity>[m
+[32m+[m[32m                <cbc:RegistrationName>ZICSA CONTRATISTAS GENERALES S.A.</cbc:RegistrationName>[m
+[32m+[m[32m            </cac:PartyLegalEntity>[m
+[32m+[m[32m        </cac:Party>[m
+[32m+[m[32m    </cac:AccountingCustomerParty>[m
+[32m+[m[32m    <cac:PaymentTerms>[m
+[32m+[m[32m        <cbc:ID>FormaPago</cbc:ID>[m
+[32m+[m[32m        <cbc:PaymentMeansID>Contado</cbc:PaymentMeansID>[m
+[32m+[m[32m    </cac:PaymentTerms>[m
+[32m+[m[32m    <cac:TaxTotal>[m
+[32m+[m[32m        <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m        <cac:TaxSubtotal>[m
+[32m+[m[32m            <cbc:TaxableAmount currencyID="PEN">100.00</cbc:TaxableAmount>[m
+[32m+[m[32m            <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m            <cac:TaxCategory>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="United Nations Economic Commission for Europe" schemeID="UN/ECE 5305" schemeName="Tax Category Identifier">S</cbc:ID>[m
+[32m+[m[32m                <cac:TaxScheme>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>[m
+[32m+[m[32m                    <cbc:Name>IGV</cbc:Name>[m
+[32m+[m[32m                    <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>[m
+[32m+[m[32m                </cac:TaxScheme>[m
+[32m+[m[32m            </cac:TaxCategory>[m
+[32m+[m[32m        </cac:TaxSubtotal>[m
+[32m+[m[32m    </cac:TaxTotal>[m
+[32m+[m[32m    <cac:LegalMonetaryTotal>[m
+[32m+[m[32m        <cbc:LineExtensionAmount currencyID="PEN">100.00</cbc:LineExtensionAmount>[m
+[32m+[m[32m        <cbc:TaxInclusiveAmount currencyID="PEN">118.00</cbc:TaxInclusiveAmount>[m
+[32m+[m[32m        <cbc:PayableAmount currencyID="PEN">118.00</cbc:PayableAmount>[m
+[32m+[m[32m    </cac:LegalMonetaryTotal>[m
+[32m+[m[32m    <cac:InvoiceLine>[m
+[32m+[m[32m        <cbc:ID>1</cbc:ID>[m
+[32m+[m[32m        <cbc:Note>UND</cbc:Note>[m
+[32m+[m[32m        <cbc:InvoicedQuantity unitCode="NIU" unitCodeListAgencyName="United Nations Economic Commission for Europe" unitCodeListID="UN/ECE rec 20">1.0000000000</cbc:InvoicedQuantity>[m
+[32m+[m[32m        <cbc:LineExtensionAmount currencyID="PEN">100.00</cbc:LineExtensionAmount>[m
+[32m+[m[32m        <cac:PricingReference>[m
+[32m+[m[32m            <cac:AlternativeConditionPrice>[m
+[32m+[m[32m                <cbc:PriceAmount currencyID="PEN">118.000000</cbc:PriceAmount>[m
+[32m+[m[32m                <cbc:PriceTypeCode listAgencyName="PE:SUNAT" listName="Tipo de Precio" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo16">01</cbc:PriceTypeCode>[m
+[32m+[m[32m            </cac:AlternativeConditionPrice>[m
+[32m+[m[32m        </cac:PricingReference>[m
+[32m+[m[32m        <cac:TaxTotal>[m
+[32m+[m[32m            <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m            <cac:TaxSubtotal>[m
+[32m+[m[32m                <cbc:TaxableAmount currencyID="PEN">100.00</cbc:TaxableAmount>[m
+[32m+[m[32m                <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m                <cac:TaxCategory>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="United Nations Economic Commission for Europe" schemeID="UN/ECE 5305" schemeName="Tax Category Identifier">S</cbc:ID>[m
+[32m+[m[32m                    <cbc:Percent>18.00</cbc:Percent>[m
+[32m+[m[32m                    <cbc:TaxExemptionReasonCode listAgencyName="PE:SUNAT" listName="Afectacion del IGV" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo07">10</cbc:TaxExemptionReasonCode>[m
+[32m+[m[32m                    <cac:TaxScheme>[m
+[32m+[m[32m                        <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>[m
+[32m+[m[32m                        <cbc:Name>IGV</cbc:Name>[m
+[32m+[m[32m                        <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>[m
+[32m+[m[32m                    </cac:TaxScheme>[m
+[32m+[m[32m                </cac:TaxCategory>[m
+[32m+[m[32m            </cac:TaxSubtotal>[m
+[32m+[m[32m        </cac:TaxTotal>[m
+[32m+[m[32m        <cac:Item>[m
+[32m+[m[32m            <cbc:Description>TUBO FIERRO NEGRO CUADRADO 2" X 2" X 3MM X 6.0 MT</cbc:Description>[m
+[32m+[m[32m            <cac:SellersItemIdentification>[m
+[32m+[m[32m                <cbc:ID>0030070017</cbc:ID>[m
+[32m+[m[32m            </cac:SellersItemIdentification>[m
+[32m+[m[32m            <cac:CommodityClassification>[m
+[32m+[m[32m                <cbc:ItemClassificationCode listAgencyName="GS1 US" listID="UNSPSC" listName="Item Classification">30181811</cbc:ItemClassificationCode>[m
+[32m+[m[32m            </cac:CommodityClassification>[m
+[32m+[m[32m        </cac:Item>[m
+[32m+[m[32m        <cac:Price>[m
+[32m+[m[32m            <cbc:PriceAmount currencyID="PEN">100.0000000000</cbc:PriceAmount>[m
+[32m+[m[32m        </cac:Price>[m
+[32m+[m[32m    </cac:InvoiceLine>[m
+[32m+[m[32m</Invoice>[m
+\ No newline at end of file[m
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001415_FormatoImpreso.pdf b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001415_FormatoImpreso.pdf[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a89703a[m
+[1m--- /dev/null[m
+[1m+++ b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001415_FormatoImpreso.pdf[m
+[36m@@ -0,0 +1,41 @@[m
+[32m+[m[32m                               AVENIDA LA ENCALADA 1420 OFICINA 502        R.U.C. N° 2051091051[m
+[32m+[m[32m                               SANTIAGO DE SURCO                         FACTURA ELECTRÓNICA[m
+[32m+[m
+[32m+[m[32m                               MIRAFLORES LIMA LIMA                         Nro. FACU-00001415[m
+[32m+[m[32m                               TELÉFON : +51 5194700[m
+[32m+[m[32m                               FAX_TES :[m
+[32m+[m[32m                               PÁGINA WEB : https://www.ssab.com/es-mx[m
+[32m+[m[32m                               CORREO : EJEMPLO@SSAB.COM.PE[m
+[32m+[m
+[32m+[m[32mCLIENTE  : ZICSA CONTRATISTAS GENERALES S.A.                             FECHA DE EMISION                           : 01/12/2023[m
+[32m+[m[32m                                                                         CONDICION DE PAGO                          : CONTADO[m
+[32m+[m[32mDIRECCIÓN : JR. BOLOGNESI NRO. 125 INT. 201 - MIRAFLORES - LIMA - LIMA   ORDEN DE COMPRA                            : 577654457[m
+[32m+[m[32m                                                                         MONEDA                                     : NUEVOS SOLES[m
+[32m+[m[32mR.U.C    : 20100313899[m
+[32m+[m
+[32m+[m[32mG/REMISION : -[m
+[32m+[m
+[32m+[m[32m         1234                  texto_amplio aqui va el[m
+[32m+[m
+[32m+[m[32mITEM     COD         CANTIDAD  DESCRIPCIÓN                               V. UNITARIO SUB-TOTAL                      DESCUENTO  IMPORTE[m
+[32m+[m[32m  1                                                                                                                        0           100.00[m
+[32m+[m[32m         0030070017     1.000  CONTRATACION DEL SERVICIO DE TERAPIA      100.0000[m
+[32m+[m[32m                                     RESPIRATORIA A DOMICILIO PARA[m
+[32m+[m
+[32m+[m[32m                                PACIENTES ADULTOS - HNERM - ESSALUD[m
+[32m+[m[32m                                      PACIENTE : OLIDEN GIL VICTORIA[m
+[32m+[m
+[32m+[m[32mCOMENTARIOS:                                                                                         OP. EXONERADA  USD                0.00[m
+[32m+[m[32m                                                                                                     OP. INAFECTA   USD                0.00[m
+[32m+[m[32m SON: CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES                                                         OP. GRATUITA   USD                0.00[m
+[32m+[m[32m                                                                                                     OP. GRAVADA    USD             100.00[m
+[32m+[m[32m  REPRESENTACIÓN IMPRESA DE LA FACTURA ELECTRÓNICA                                                   ICBPER         USD[m
+[32m+[m[32m  AUTORIZADO MEDIANTE LA RESOLUCIÓN DE INTENDENCIA N° XXXXXXXXXXX/SUNAT                              IGV 18%        USD                    0[m
+[32m+[m[32m  IMPORTE EN LETRAS:                                                                                 IMPORTE TOTAL  USD              18.00[m
+[32m+[m[32m  CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES                                                             ANTICIPO                       118.00[m
+[32m+[m[32m  SI USTED DESEA VER SUS DOCUMENTOS ELECTRÓNICOS EMITIDOS, INGRESAR A:                                              USD[m
+[32m+[m[32m                                                                         "www.ventura.com"                                             0.00[m
+[32m+[m
+[32m+[m[32mOtras Leyendas:[m
+[32m+[m[32m- NINGUNA[m
+[32m+[m[32m[m
+\ No newline at end of file[m
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001415_SUNAT_CDR.zip b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001415_SUNAT_CDR.zip[m
+[1mnew file mode 100644[m
+[1mindex 0000000..40e4af1[m
+Binary files /dev/null and b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001415_SUNAT_CDR.zip differ
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001415_XmlFirmado.xml b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001415_XmlFirmado.xml[m
+[1mnew file mode 100644[m
+[1mindex 0000000..926cafc[m
+[1m--- /dev/null[m
+[1m+++ b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001415_XmlFirmado.xml[m
+[36m@@ -0,0 +1,167 @@[m
+[32m+[m[32m<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:ns6="urn:oasis:names:specification:ubl:schema:xsd:SignatureBasicComponents-2" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2" xmlns:ns9="urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2" xmlns:sac="urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1">[m
+[32m+[m[32m    <ext:UBLExtensions>[m
+[32m+[m[32m        <ext:UBLExtension>[m
+[32m+[m[32m            <ext:ExtensionContent>[m
+[32m+[m[32m                <sac:AdditionalInformation/>[m
+[32m+[m[32m            </ext:ExtensionContent>[m
+[32m+[m[32m        </ext:UBLExtension>[m
+[32m+[m[32m        <ext:UBLExtension>[m
+[32m+[m[32m            <ext:ExtensionContent><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="signer20510910517"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>DXRWf4Ck2Ps3lD5i+mrpDKJYxwI=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>TeaBB09A+FGX9cPda0PtQ5jU0b6C5B+7jZ2k9WBFOaBKKesse3Em5xXhMwIWhwfExtuhgFT+sBXf&#13;[m
+[32m+[m[32mTn2R2jd7Ans+/wkb9XV+ftggOUv6CglvRMHF8yOUJOjxajvLLc1D2r9u8ndbJZ2KBF5h4EKQjvJV&#13;[m
+[32m+[m[32mbwa5DjLRFe0OZMDVI6U=</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIID+TCCAuGgAwIBAgIKYZQ4RwAAAAAA0jANBgkqhkiG9w0BAQUFADAnMRUwEwYKCZImiZPyLGQB&#13;[m
+[32m+[m[32mGRYFU1VOQVQxDjAMBgNVBAMTBVNVTkFUMB4XDTEzMDUxNzE4MTUwM1oXDTE0MDUxNzE4MjUwM1ow&#13;[m
+[32m+[m[32mgaQxCzAJBgNVBAYTAlBFMQ0wCwYDVQQIEwRMSU1BMQ0wCwYDVQQHEwRMSU1BMSUwIwYDVQQKExxB&#13;[m
+[32m+[m[32mTEZBMUxBQiBMQVRJTiBBTUVSSUNBIFMuQS5DMRQwEgYDVQQLEwsyMDUxODQyMDgxMTEXMBUGA1UE&#13;[m
+[32m+[m[32mAxMOSm9yZ2UgUmVhdGVndWkxITAfBgkqhkiG9w0BCQEWEmpvcmdlQGFsZmExbGFiLmNvbTCBnzAN&#13;[m
+[32m+[m[32mBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAtwMhq+qBQF2Cl1T2ojBkWAaCgEomO9Uu3n0NjNdYzL2h&#13;[m
+[32m+[m[32mJr5rXu3GmVtj7GW8yYKmInfj3zg0joqtCqvVMF77ptXXnuP85O7r54OcRxiSybmszphQDc8sLl1H&#13;[m
+[32m+[m[32mDdXLFgRhcIxpvpLAtGGwloeaIMLq4PuaOS30jVEgeTxmATYD1osCAwEAAaOCASswggEnMA4GA1Ud&#13;[m
+[32m+[m[32mDwEB/wQEAwIE8DBEBgkqhkiG9w0BCQ8ENzA1MA4GCCqGSIb3DQMCAgIAgDAOBggqhkiG9w0DBAIC&#13;[m
+[32m+[m[32mAIAwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFJvm9VgC1BIcMMheUtOtipSKTMO8MBMG&#13;[m
+[32m+[m[32mA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFN9kHQDqWONmozw3xdNSIMFW2t+7MDMGA1Ud&#13;[m
+[32m+[m[32mHwQsMCowKKAmoCSGImh0dHA6Ly9wY2IyMjYvQ2VydEVucm9sbC9TVU5BVC5jcmwwRQYIKwYBBQUH&#13;[m
+[32m+[m[32mAQEEOTA3MDUGCCsGAQUFBzAChilodHRwOi8vcGNiMjI2L0NlcnRFbnJvbGwvcGNiMjI2X1NVTkFU&#13;[m
+[32m+[m[32mLmNydDANBgkqhkiG9w0BAQUFAAOCAQEAmr097s/nQw3Ji63oHXsKYA2IunGghE3PuYs/B/qNnauQ&#13;[m
+[32m+[m[32mAh8g1MjROtvZHImMH5FSn6s5MibxjcAMcbsaoZfE4JbSbbb1NhdRLN7Gi40qTXZktQOYY5fwm1dc&#13;[m
+[32m+[m[32m1wJYGjT+0mmXCjzOJC73mJXnCG2xd1v1cFSjkyDpEqxWyYISxM3s11cASJuYEEtgCqnprnLVq5Xt&#13;[m
+[32m+[m[32mPLGeeIBnzjEZsVjkYEiqo4SC0MjxyQlNw9wzhSj61fVbd5bXCWGIATN6RvPVfyb1sfblbv3hIBOI&#13;[m
+[32m+[m[32m4w0decjmWPe43r7G1TbcUaaPkm0PVAv/qIBGu9zUwv6DPNKNPHoJ/elM9MddpRgEj6O35w==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></ext:ExtensionContent>[m
+[32m+[m[32m        </ext:UBLExtension>[m
+[32m+[m[32m    </ext:UBLExtensions>[m
+[32m+[m[32m    <cbc:UBLVersionID>2.1</cbc:UBLVersionID>[m
+[32m+[m[32m    <cbc:CustomizationID>2.0</cbc:CustomizationID>[m
+[32m+[m[32m    <cbc:ProfileID schemeAgencyName="PE:SUNAT" schemeName="Tipo de Operacion" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51">0101</cbc:ProfileID>[m
+[32m+[m[32m    <cbc:ID>FACU-00001415</cbc:ID>[m
+[32m+[m[32m    <cbc:UUID>123123</cbc:UUID>[m
+[32m+[m[32m    <cbc:IssueDate>2023-12-01</cbc:IssueDate>[m
+[32m+[m[32m    <cbc:IssueTime>16:30:04</cbc:IssueTime>[m
+[32m+[m[32m    <cbc:DueDate>2023-12-01</cbc:DueDate>[m
+[32m+[m[32m    <cbc:InvoiceTypeCode listAgencyName="PE:SUNAT" listID="0101" listName="Tipo de Documento" listSchemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo01" name="Tipo de Operacion">01</cbc:InvoiceTypeCode>[m
+[32m+[m[32m    <cbc:Note languageLocaleID="1000">CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES</cbc:Note>[m
+[32m+[m[32m    <cbc:DocumentCurrencyCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 4217 Alpha" listName="Currency">PEN</cbc:DocumentCurrencyCode>[m
+[32m+[m[32m    <cbc:LineCountNumeric>1</cbc:LineCountNumeric>[m
+[32m+[m[32m    <cac:ContractDocumentReference>[m
+[32m+[m[32m        <cbc:ID>577654457</cbc:ID>[m
+[32m+[m[32m        <cbc:DocumentTypeCode>OC</cbc:DocumentTypeCode>[m
+[32m+[m[32m    </cac:ContractDocumentReference>[m
+[32m+[m[32m    <cac:Signature>[m
+[32m+[m[32m        <cbc:ID>signer20510910517</cbc:ID>[m
+[32m+[m[32m        <cac:SignatoryParty>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID>20510910517</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>PRUEBAS CDR OBSERVADOS</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m        </cac:SignatoryParty>[m
+[32m+[m[32m        <cac:DigitalSignatureAttachment>[m
+[32m+[m[32m            <cac:ExternalReference>[m
+[32m+[m[32m                <cbc:URI>#signer20510910517</cbc:URI>[m
+[32m+[m[32m            </cac:ExternalReference>[m
+[32m+[m[32m        </cac:DigitalSignatureAttachment>[m
+[32m+[m[32m    </cac:Signature>[m
+[32m+[m[32m    <cac:AccountingSupplierParty>[m
+[32m+[m[32m        <cac:Party>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20510910517</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>FE PRUEBA</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m            <cac:PartyLegalEntity>[m
+[32m+[m[32m                <cbc:RegistrationName>PRUEBAS CDR OBSERVADOS</cbc:RegistrationName>[m
+[32m+[m[32m                <cac:RegistrationAddress>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">150122</cbc:ID>[m
+[32m+[m[32m                    <cbc:AddressTypeCode listAgencyName="PE:SUNAT" listName="Establecimientos anexos">0000</cbc:AddressTypeCode>[m
+[32m+[m[32m                    <cbc:CityName>LIMA</cbc:CityName>[m
+[32m+[m[32m                    <cbc:CountrySubentity>LIMA</cbc:CountrySubentity>[m
+[32m+[m[32m                    <cbc:District>MIRAFLORES</cbc:District>[m
+[32m+[m[32m                    <cac:AddressLine>[m
+[32m+[m[32m                        <cbc:Line>AVENIDA LA ENCALADA 1420 OFICINA 502 SANTIAGO DE SURCO</cbc:Line>[m
+[32m+[m[32m                    </cac:AddressLine>[m
+[32m+[m[32m                    <cac:Country>[m
+[32m+[m[32m                        <cbc:IdentificationCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 3166-1" listName="Country">PE</cbc:IdentificationCode>[m
+[32m+[m[32m                    </cac:Country>[m
+[32m+[m[32m                </cac:RegistrationAddress>[m
+[32m+[m[32m            </cac:PartyLegalEntity>[m
+[32m+[m[32m        </cac:Party>[m
+[32m+[m[32m    </cac:AccountingSupplierParty>[m
+[32m+[m[32m    <cac:AccountingCustomerParty>[m
+[32m+[m[32m        <cac:Party>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20100313899</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>ZICSA CONTRATISTAS GENERALES S.A.</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m            <cac:PartyLegalEntity>[m
+[32m+[m[32m                <cbc:RegistrationName>ZICSA CONTRATISTAS GENERALES S.A.</cbc:RegistrationName>[m
+[32m+[m[32m            </cac:PartyLegalEntity>[m
+[32m+[m[32m        </cac:Party>[m
+[32m+[m[32m    </cac:AccountingCustomerParty>[m
+[32m+[m[32m    <cac:PaymentTerms>[m
+[32m+[m[32m        <cbc:ID>FormaPago</cbc:ID>[m
+[32m+[m[32m        <cbc:PaymentMeansID>Contado</cbc:PaymentMeansID>[m
+[32m+[m[32m    </cac:PaymentTerms>[m
+[32m+[m[32m    <cac:TaxTotal>[m
+[32m+[m[32m        <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m        <cac:TaxSubtotal>[m
+[32m+[m[32m            <cbc:TaxableAmount currencyID="PEN">100.00</cbc:TaxableAmount>[m
+[32m+[m[32m            <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m            <cac:TaxCategory>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="United Nations Economic Commission for Europe" schemeID="UN/ECE 5305" schemeName="Tax Category Identifier">S</cbc:ID>[m
+[32m+[m[32m                <cac:TaxScheme>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>[m
+[32m+[m[32m                    <cbc:Name>IGV</cbc:Name>[m
+[32m+[m[32m                    <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>[m
+[32m+[m[32m                </cac:TaxScheme>[m
+[32m+[m[32m            </cac:TaxCategory>[m
+[32m+[m[32m        </cac:TaxSubtotal>[m
+[32m+[m[32m    </cac:TaxTotal>[m
+[32m+[m[32m    <cac:LegalMonetaryTotal>[m
+[32m+[m[32m        <cbc:LineExtensionAmount currencyID="PEN">100.00</cbc:LineExtensionAmount>[m
+[32m+[m[32m        <cbc:TaxInclusiveAmount currencyID="PEN">118.00</cbc:TaxInclusiveAmount>[m
+[32m+[m[32m        <cbc:PayableAmount currencyID="PEN">118.00</cbc:PayableAmount>[m
+[32m+[m[32m    </cac:LegalMonetaryTotal>[m
+[32m+[m[32m    <cac:InvoiceLine>[m
+[32m+[m[32m        <cbc:ID>1</cbc:ID>[m
+[32m+[m[32m        <cbc:Note>UND</cbc:Note>[m
+[32m+[m[32m        <cbc:InvoicedQuantity unitCode="NIU" unitCodeListAgencyName="United Nations Economic Commission for Europe" unitCodeListID="UN/ECE rec 20">1.0000000000</cbc:InvoicedQuantity>[m
+[32m+[m[32m        <cbc:LineExtensionAmount currencyID="PEN">100.00</cbc:LineExtensionAmount>[m
+[32m+[m[32m        <cac:PricingReference>[m
+[32m+[m[32m            <cac:AlternativeConditionPrice>[m
+[32m+[m[32m                <cbc:PriceAmount currencyID="PEN">118.000000</cbc:PriceAmount>[m
+[32m+[m[32m                <cbc:PriceTypeCode listAgencyName="PE:SUNAT" listName="Tipo de Precio" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo16">01</cbc:PriceTypeCode>[m
+[32m+[m[32m            </cac:AlternativeConditionPrice>[m
+[32m+[m[32m        </cac:PricingReference>[m
+[32m+[m[32m        <cac:TaxTotal>[m
+[32m+[m[32m            <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m            <cac:TaxSubtotal>[m
+[32m+[m[32m                <cbc:TaxableAmount currencyID="PEN">100.00</cbc:TaxableAmount>[m
+[32m+[m[32m                <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m                <cac:TaxCategory>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="United Nations Economic Commission for Europe" schemeID="UN/ECE 5305" schemeName="Tax Category Identifier">S</cbc:ID>[m
+[32m+[m[32m                    <cbc:Percent>18.00</cbc:Percent>[m
+[32m+[m[32m                    <cbc:TaxExemptionReasonCode listAgencyName="PE:SUNAT" listName="Afectacion del IGV" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo07">10</cbc:TaxExemptionReasonCode>[m
+[32m+[m[32m                    <cac:TaxScheme>[m
+[32m+[m[32m                        <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>[m
+[32m+[m[32m                        <cbc:Name>IGV</cbc:Name>[m
+[32m+[m[32m                        <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>[m
+[32m+[m[32m                    </cac:TaxScheme>[m
+[32m+[m[32m                </cac:TaxCategory>[m
+[32m+[m[32m            </cac:TaxSubtotal>[m
+[32m+[m[32m        </cac:TaxTotal>[m
+[32m+[m[32m        <cac:Item>[m
+[32m+[m[32m            <cbc:Description>TUBO FIERRO NEGRO CUADRADO 2" X 2" X 3MM X 6.0 MT</cbc:Description>[m
+[32m+[m[32m            <cac:SellersItemIdentification>[m
+[32m+[m[32m                <cbc:ID>0030070017</cbc:ID>[m
+[32m+[m[32m            </cac:SellersItemIdentification>[m
+[32m+[m[32m            <cac:CommodityClassification>[m
+[32m+[m[32m                <cbc:ItemClassificationCode listAgencyName="GS1 US" listID="UNSPSC" listName="Item Classification">30181811</cbc:ItemClassificationCode>[m
+[32m+[m[32m            </cac:CommodityClassification>[m
+[32m+[m[32m        </cac:Item>[m
+[32m+[m[32m        <cac:Price>[m
+[32m+[m[32m            <cbc:PriceAmount currencyID="PEN">100.0000000000</cbc:PriceAmount>[m
+[32m+[m[32m        </cac:Price>[m
+[32m+[m[32m    </cac:InvoiceLine>[m
+[32m+[m[32m</Invoice>[m
+\ No newline at end of file[m
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001416_FormatoImpreso.pdf b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001416_FormatoImpreso.pdf[m
+[1mnew file mode 100644[m
+[1mindex 0000000..22c09e9[m
+[1m--- /dev/null[m
+[1m+++ b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001416_FormatoImpreso.pdf[m
+[36m@@ -0,0 +1,41 @@[m
+[32m+[m[32m                               AVENIDA LA ENCALADA 1420 OFICINA 502        R.U.C. N° 2051091051[m
+[32m+[m[32m                               SANTIAGO DE SURCO                         FACTURA ELECTRÓNICA[m
+[32m+[m
+[32m+[m[32m                               MIRAFLORES LIMA LIMA                         Nro. FACU-00001416[m
+[32m+[m[32m                               TELÉFON : +51 5194700[m
+[32m+[m[32m                               FAX_TES :[m
+[32m+[m[32m                               PÁGINA WEB : https://www.ssab.com/es-mx[m
+[32m+[m[32m                               CORREO : EJEMPLO@SSAB.COM.PE[m
+[32m+[m
+[32m+[m[32mCLIENTE  : ZICSA CONTRATISTAS GENERALES S.A.                             FECHA DE EMISION                           : 01/12/2023[m
+[32m+[m[32m                                                                         CONDICION DE PAGO                          : CONTADO[m
+[32m+[m[32mDIRECCIÓN : JR. BOLOGNESI NRO. 125 INT. 201 - MIRAFLORES - LIMA - LIMA   ORDEN DE COMPRA                            : 577654457[m
+[32m+[m[32m                                                                         MONEDA                                     : NUEVOS SOLES[m
+[32m+[m[32mR.U.C    : 20100313899[m
+[32m+[m
+[32m+[m[32mG/REMISION : -[m
+[32m+[m
+[32m+[m[32m         1234                  texto_amplio aqui va el[m
+[32m+[m
+[32m+[m[32mITEM     COD         CANTIDAD  DESCRIPCIÓN                               V. UNITARIO SUB-TOTAL                      DESCUENTO  IMPORTE[m
+[32m+[m[32m  1                                                                                                                        0           100.00[m
+[32m+[m[32m         0030070017     1.000  CONTRATACION DEL SERVICIO DE TERAPIA      100.0000[m
+[32m+[m[32m                                     RESPIRATORIA A DOMICILIO PARA[m
+[32m+[m
+[32m+[m[32m                                PACIENTES ADULTOS - HNERM - ESSALUD[m
+[32m+[m[32m                                      PACIENTE : OLIDEN GIL VICTORIA[m
+[32m+[m
+[32m+[m[32mCOMENTARIOS:                                                                                         OP. EXONERADA  USD                0.00[m
+[32m+[m[32m                                                                                                     OP. INAFECTA   USD                0.00[m
+[32m+[m[32m SON: CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES                                                         OP. GRATUITA   USD                0.00[m
+[32m+[m[32m                                                                                                     OP. GRAVADA    USD             100.00[m
+[32m+[m[32m  REPRESENTACIÓN IMPRESA DE LA FACTURA ELECTRÓNICA                                                   ICBPER         USD[m
+[32m+[m[32m  AUTORIZADO MEDIANTE LA RESOLUCIÓN DE INTENDENCIA N° XXXXXXXXXXX/SUNAT                              IGV 18%        USD                    0[m
+[32m+[m[32m  IMPORTE EN LETRAS:                                                                                 IMPORTE TOTAL  USD              18.00[m
+[32m+[m[32m  CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES                                                             ANTICIPO                       118.00[m
+[32m+[m[32m  SI USTED DESEA VER SUS DOCUMENTOS ELECTRÓNICOS EMITIDOS, INGRESAR A:                                              USD[m
+[32m+[m[32m                                                                         "www.ventura.com"                                             0.00[m
+[32m+[m
+[32m+[m[32mOtras Leyendas:[m
+[32m+[m[32m- NINGUNA[m
+[32m+[m[32m[m
+\ No newline at end of file[m
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001416_SUNAT_CDR.zip b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001416_SUNAT_CDR.zip[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7e04861[m
+Binary files /dev/null and b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001416_SUNAT_CDR.zip differ
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001416_XmlFirmado.xml b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001416_XmlFirmado.xml[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1e125fe[m
+[1m--- /dev/null[m
+[1m+++ b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001416_XmlFirmado.xml[m
+[36m@@ -0,0 +1,167 @@[m
+[32m+[m[32m<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:ns6="urn:oasis:names:specification:ubl:schema:xsd:SignatureBasicComponents-2" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2" xmlns:ns9="urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2" xmlns:sac="urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1">[m
+[32m+[m[32m    <ext:UBLExtensions>[m
+[32m+[m[32m        <ext:UBLExtension>[m
+[32m+[m[32m            <ext:ExtensionContent>[m
+[32m+[m[32m                <sac:AdditionalInformation/>[m
+[32m+[m[32m            </ext:ExtensionContent>[m
+[32m+[m[32m        </ext:UBLExtension>[m
+[32m+[m[32m        <ext:UBLExtension>[m
+[32m+[m[32m            <ext:ExtensionContent><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="signer20510910517"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>J1Dld/dXfoSuETvhfh87uN0cXOE=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>Aqn/aA8jTW+1U2x4QhEj1L/zQo5q8ROmu1xmu1IV0J9PXYOSgdi8VrMPQG5FEyLrwWBvrAtCBuQU&#13;[m
+[32m+[m[32mfkvyq/6CDcOXJPo/V9N5xvhqCChhsMOqVF73Hwgil2vDEQjjxXsP2vSoypX4fzyUJDVbJL10p4fB&#13;[m
+[32m+[m[32m7bgzogN/QNv+JEQK6MY=</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIID+TCCAuGgAwIBAgIKYZQ4RwAAAAAA0jANBgkqhkiG9w0BAQUFADAnMRUwEwYKCZImiZPyLGQB&#13;[m
+[32m+[m[32mGRYFU1VOQVQxDjAMBgNVBAMTBVNVTkFUMB4XDTEzMDUxNzE4MTUwM1oXDTE0MDUxNzE4MjUwM1ow&#13;[m
+[32m+[m[32mgaQxCzAJBgNVBAYTAlBFMQ0wCwYDVQQIEwRMSU1BMQ0wCwYDVQQHEwRMSU1BMSUwIwYDVQQKExxB&#13;[m
+[32m+[m[32mTEZBMUxBQiBMQVRJTiBBTUVSSUNBIFMuQS5DMRQwEgYDVQQLEwsyMDUxODQyMDgxMTEXMBUGA1UE&#13;[m
+[32m+[m[32mAxMOSm9yZ2UgUmVhdGVndWkxITAfBgkqhkiG9w0BCQEWEmpvcmdlQGFsZmExbGFiLmNvbTCBnzAN&#13;[m
+[32m+[m[32mBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAtwMhq+qBQF2Cl1T2ojBkWAaCgEomO9Uu3n0NjNdYzL2h&#13;[m
+[32m+[m[32mJr5rXu3GmVtj7GW8yYKmInfj3zg0joqtCqvVMF77ptXXnuP85O7r54OcRxiSybmszphQDc8sLl1H&#13;[m
+[32m+[m[32mDdXLFgRhcIxpvpLAtGGwloeaIMLq4PuaOS30jVEgeTxmATYD1osCAwEAAaOCASswggEnMA4GA1Ud&#13;[m
+[32m+[m[32mDwEB/wQEAwIE8DBEBgkqhkiG9w0BCQ8ENzA1MA4GCCqGSIb3DQMCAgIAgDAOBggqhkiG9w0DBAIC&#13;[m
+[32m+[m[32mAIAwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFJvm9VgC1BIcMMheUtOtipSKTMO8MBMG&#13;[m
+[32m+[m[32mA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFN9kHQDqWONmozw3xdNSIMFW2t+7MDMGA1Ud&#13;[m
+[32m+[m[32mHwQsMCowKKAmoCSGImh0dHA6Ly9wY2IyMjYvQ2VydEVucm9sbC9TVU5BVC5jcmwwRQYIKwYBBQUH&#13;[m
+[32m+[m[32mAQEEOTA3MDUGCCsGAQUFBzAChilodHRwOi8vcGNiMjI2L0NlcnRFbnJvbGwvcGNiMjI2X1NVTkFU&#13;[m
+[32m+[m[32mLmNydDANBgkqhkiG9w0BAQUFAAOCAQEAmr097s/nQw3Ji63oHXsKYA2IunGghE3PuYs/B/qNnauQ&#13;[m
+[32m+[m[32mAh8g1MjROtvZHImMH5FSn6s5MibxjcAMcbsaoZfE4JbSbbb1NhdRLN7Gi40qTXZktQOYY5fwm1dc&#13;[m
+[32m+[m[32m1wJYGjT+0mmXCjzOJC73mJXnCG2xd1v1cFSjkyDpEqxWyYISxM3s11cASJuYEEtgCqnprnLVq5Xt&#13;[m
+[32m+[m[32mPLGeeIBnzjEZsVjkYEiqo4SC0MjxyQlNw9wzhSj61fVbd5bXCWGIATN6RvPVfyb1sfblbv3hIBOI&#13;[m
+[32m+[m[32m4w0decjmWPe43r7G1TbcUaaPkm0PVAv/qIBGu9zUwv6DPNKNPHoJ/elM9MddpRgEj6O35w==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></ext:ExtensionContent>[m
+[32m+[m[32m        </ext:UBLExtension>[m
+[32m+[m[32m    </ext:UBLExtensions>[m
+[32m+[m[32m    <cbc:UBLVersionID>2.1</cbc:UBLVersionID>[m
+[32m+[m[32m    <cbc:CustomizationID>2.0</cbc:CustomizationID>[m
+[32m+[m[32m    <cbc:ProfileID schemeAgencyName="PE:SUNAT" schemeName="Tipo de Operacion" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51">0101</cbc:ProfileID>[m
+[32m+[m[32m    <cbc:ID>FACU-00001416</cbc:ID>[m
+[32m+[m[32m    <cbc:UUID>123123</cbc:UUID>[m
+[32m+[m[32m    <cbc:IssueDate>2023-12-01</cbc:IssueDate>[m
+[32m+[m[32m    <cbc:IssueTime>16:30:32</cbc:IssueTime>[m
+[32m+[m[32m    <cbc:DueDate>2023-12-01</cbc:DueDate>[m
+[32m+[m[32m    <cbc:InvoiceTypeCode listAgencyName="PE:SUNAT" listID="0101" listName="Tipo de Documento" listSchemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo01" name="Tipo de Operacion">01</cbc:InvoiceTypeCode>[m
+[32m+[m[32m    <cbc:Note languageLocaleID="1000">CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES</cbc:Note>[m
+[32m+[m[32m    <cbc:DocumentCurrencyCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 4217 Alpha" listName="Currency">PEN</cbc:DocumentCurrencyCode>[m
+[32m+[m[32m    <cbc:LineCountNumeric>1</cbc:LineCountNumeric>[m
+[32m+[m[32m    <cac:ContractDocumentReference>[m
+[32m+[m[32m        <cbc:ID>577654457</cbc:ID>[m
+[32m+[m[32m        <cbc:DocumentTypeCode>OC</cbc:DocumentTypeCode>[m
+[32m+[m[32m    </cac:ContractDocumentReference>[m
+[32m+[m[32m    <cac:Signature>[m
+[32m+[m[32m        <cbc:ID>signer20510910517</cbc:ID>[m
+[32m+[m[32m        <cac:SignatoryParty>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID>20510910517</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>PRUEBAS CDR OBSERVADOS</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m        </cac:SignatoryParty>[m
+[32m+[m[32m        <cac:DigitalSignatureAttachment>[m
+[32m+[m[32m            <cac:ExternalReference>[m
+[32m+[m[32m                <cbc:URI>#signer20510910517</cbc:URI>[m
+[32m+[m[32m            </cac:ExternalReference>[m
+[32m+[m[32m        </cac:DigitalSignatureAttachment>[m
+[32m+[m[32m    </cac:Signature>[m
+[32m+[m[32m    <cac:AccountingSupplierParty>[m
+[32m+[m[32m        <cac:Party>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20510910517</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>FE PRUEBA</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m            <cac:PartyLegalEntity>[m
+[32m+[m[32m                <cbc:RegistrationName>PRUEBAS CDR OBSERVADOS</cbc:RegistrationName>[m
+[32m+[m[32m                <cac:RegistrationAddress>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">150122</cbc:ID>[m
+[32m+[m[32m                    <cbc:AddressTypeCode listAgencyName="PE:SUNAT" listName="Establecimientos anexos">0000</cbc:AddressTypeCode>[m
+[32m+[m[32m                    <cbc:CityName>LIMA</cbc:CityName>[m
+[32m+[m[32m                    <cbc:CountrySubentity>LIMA</cbc:CountrySubentity>[m
+[32m+[m[32m                    <cbc:District>MIRAFLORES</cbc:District>[m
+[32m+[m[32m                    <cac:AddressLine>[m
+[32m+[m[32m                        <cbc:Line>AVENIDA LA ENCALADA 1420 OFICINA 502 SANTIAGO DE SURCO</cbc:Line>[m
+[32m+[m[32m                    </cac:AddressLine>[m
+[32m+[m[32m                    <cac:Country>[m
+[32m+[m[32m                        <cbc:IdentificationCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 3166-1" listName="Country">PE</cbc:IdentificationCode>[m
+[32m+[m[32m                    </cac:Country>[m
+[32m+[m[32m                </cac:RegistrationAddress>[m
+[32m+[m[32m            </cac:PartyLegalEntity>[m
+[32m+[m[32m        </cac:Party>[m
+[32m+[m[32m    </cac:AccountingSupplierParty>[m
+[32m+[m[32m    <cac:AccountingCustomerParty>[m
+[32m+[m[32m        <cac:Party>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20100313899</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>ZICSA CONTRATISTAS GENERALES S.A.</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m            <cac:PartyLegalEntity>[m
+[32m+[m[32m                <cbc:RegistrationName>ZICSA CONTRATISTAS GENERALES S.A.</cbc:RegistrationName>[m
+[32m+[m[32m            </cac:PartyLegalEntity>[m
+[32m+[m[32m        </cac:Party>[m
+[32m+[m[32m    </cac:AccountingCustomerParty>[m
+[32m+[m[32m    <cac:PaymentTerms>[m
+[32m+[m[32m        <cbc:ID>FormaPago</cbc:ID>[m
+[32m+[m[32m        <cbc:PaymentMeansID>Contado</cbc:PaymentMeansID>[m
+[32m+[m[32m    </cac:PaymentTerms>[m
+[32m+[m[32m    <cac:TaxTotal>[m
+[32m+[m[32m        <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m        <cac:TaxSubtotal>[m
+[32m+[m[32m            <cbc:TaxableAmount currencyID="PEN">100.00</cbc:TaxableAmount>[m
+[32m+[m[32m            <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m            <cac:TaxCategory>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="United Nations Economic Commission for Europe" schemeID="UN/ECE 5305" schemeName="Tax Category Identifier">S</cbc:ID>[m
+[32m+[m[32m                <cac:TaxScheme>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>[m
+[32m+[m[32m                    <cbc:Name>IGV</cbc:Name>[m
+[32m+[m[32m                    <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>[m
+[32m+[m[32m                </cac:TaxScheme>[m
+[32m+[m[32m            </cac:TaxCategory>[m
+[32m+[m[32m        </cac:TaxSubtotal>[m
+[32m+[m[32m    </cac:TaxTotal>[m
+[32m+[m[32m    <cac:LegalMonetaryTotal>[m
+[32m+[m[32m        <cbc:LineExtensionAmount currencyID="PEN">100.00</cbc:LineExtensionAmount>[m
+[32m+[m[32m        <cbc:TaxInclusiveAmount currencyID="PEN">118.00</cbc:TaxInclusiveAmount>[m
+[32m+[m[32m        <cbc:PayableAmount currencyID="PEN">118.00</cbc:PayableAmount>[m
+[32m+[m[32m    </cac:LegalMonetaryTotal>[m
+[32m+[m[32m    <cac:InvoiceLine>[m
+[32m+[m[32m        <cbc:ID>1</cbc:ID>[m
+[32m+[m[32m        <cbc:Note>UND</cbc:Note>[m
+[32m+[m[32m        <cbc:InvoicedQuantity unitCode="NIU" unitCodeListAgencyName="United Nations Economic Commission for Europe" unitCodeListID="UN/ECE rec 20">1.0000000000</cbc:InvoicedQuantity>[m
+[32m+[m[32m        <cbc:LineExtensionAmount currencyID="PEN">100.00</cbc:LineExtensionAmount>[m
+[32m+[m[32m        <cac:PricingReference>[m
+[32m+[m[32m            <cac:AlternativeConditionPrice>[m
+[32m+[m[32m                <cbc:PriceAmount currencyID="PEN">118.000000</cbc:PriceAmount>[m
+[32m+[m[32m                <cbc:PriceTypeCode listAgencyName="PE:SUNAT" listName="Tipo de Precio" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo16">01</cbc:PriceTypeCode>[m
+[32m+[m[32m            </cac:AlternativeConditionPrice>[m
+[32m+[m[32m        </cac:PricingReference>[m
+[32m+[m[32m        <cac:TaxTotal>[m
+[32m+[m[32m            <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m            <cac:TaxSubtotal>[m
+[32m+[m[32m                <cbc:TaxableAmount currencyID="PEN">100.00</cbc:TaxableAmount>[m
+[32m+[m[32m                <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m                <cac:TaxCategory>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="United Nations Economic Commission for Europe" schemeID="UN/ECE 5305" schemeName="Tax Category Identifier">S</cbc:ID>[m
+[32m+[m[32m                    <cbc:Percent>18.00</cbc:Percent>[m
+[32m+[m[32m                    <cbc:TaxExemptionReasonCode listAgencyName="PE:SUNAT" listName="Afectacion del IGV" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo07">10</cbc:TaxExemptionReasonCode>[m
+[32m+[m[32m                    <cac:TaxScheme>[m
+[32m+[m[32m                        <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>[m
+[32m+[m[32m                        <cbc:Name>IGV</cbc:Name>[m
+[32m+[m[32m                        <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>[m
+[32m+[m[32m                    </cac:TaxScheme>[m
+[32m+[m[32m                </cac:TaxCategory>[m
+[32m+[m[32m            </cac:TaxSubtotal>[m
+[32m+[m[32m        </cac:TaxTotal>[m
+[32m+[m[32m        <cac:Item>[m
+[32m+[m[32m            <cbc:Description>TUBO FIERRO NEGRO CUADRADO 2" X 2" X 3MM X 6.0 MT</cbc:Description>[m
+[32m+[m[32m            <cac:SellersItemIdentification>[m
+[32m+[m[32m                <cbc:ID>0030070017</cbc:ID>[m
+[32m+[m[32m            </cac:SellersItemIdentification>[m
+[32m+[m[32m            <cac:CommodityClassification>[m
+[32m+[m[32m                <cbc:ItemClassificationCode listAgencyName="GS1 US" listID="UNSPSC" listName="Item Classification">30181811</cbc:ItemClassificationCode>[m
+[32m+[m[32m            </cac:CommodityClassification>[m
+[32m+[m[32m        </cac:Item>[m
+[32m+[m[32m        <cac:Price>[m
+[32m+[m[32m            <cbc:PriceAmount currencyID="PEN">100.0000000000</cbc:PriceAmount>[m
+[32m+[m[32m        </cac:Price>[m
+[32m+[m[32m    </cac:InvoiceLine>[m
+[32m+[m[32m</Invoice>[m
+\ No newline at end of file[m
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001417_FormatoImpreso.pdf b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001417_FormatoImpreso.pdf[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e7e0c13[m
+[1m--- /dev/null[m
+[1m+++ b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001417_FormatoImpreso.pdf[m
+[36m@@ -0,0 +1,41 @@[m
+[32m+[m[32m                               AVENIDA LA ENCALADA 1420 OFICINA 502        R.U.C. N° 2051091051[m
+[32m+[m[32m                               SANTIAGO DE SURCO                         FACTURA ELECTRÓNICA[m
+[32m+[m
+[32m+[m[32m                               MIRAFLORES LIMA LIMA                         Nro. FACU-00001417[m
+[32m+[m[32m                               TELÉFON : +51 5194700[m
+[32m+[m[32m                               FAX_TES :[m
+[32m+[m[32m                               PÁGINA WEB : https://www.ssab.com/es-mx[m
+[32m+[m[32m                               CORREO : EJEMPLO@SSAB.COM.PE[m
+[32m+[m
+[32m+[m[32mCLIENTE  : ZICSA CONTRATISTAS GENERALES S.A.                             FECHA DE EMISION                           : 01/12/2023[m
+[32m+[m[32m                                                                         CONDICION DE PAGO                          : CONTADO[m
+[32m+[m[32mDIRECCIÓN : JR. BOLOGNESI NRO. 125 INT. 201 - MIRAFLORES - LIMA - LIMA   ORDEN DE COMPRA                            : 577654457[m
+[32m+[m[32m                                                                         MONEDA                                     : NUEVOS SOLES[m
+[32m+[m[32mR.U.C    : 20100313899[m
+[32m+[m
+[32m+[m[32mG/REMISION : -[m
+[32m+[m
+[32m+[m[32m         1234                  texto_amplio aqui va el[m
+[32m+[m
+[32m+[m[32mITEM     COD         CANTIDAD  DESCRIPCIÓN                               V. UNITARIO SUB-TOTAL                      DESCUENTO  IMPORTE[m
+[32m+[m[32m  1                                                                                                                        0           100.00[m
+[32m+[m[32m         0030070017     1.000  CONTRATACION DEL SERVICIO DE TERAPIA      100.0000[m
+[32m+[m[32m                                     RESPIRATORIA A DOMICILIO PARA[m
+[32m+[m
+[32m+[m[32m                                PACIENTES ADULTOS - HNERM - ESSALUD[m
+[32m+[m[32m                                      PACIENTE : OLIDEN GIL VICTORIA[m
+[32m+[m
+[32m+[m[32mCOMENTARIOS:                                                                                         OP. EXONERADA  USD                0.00[m
+[32m+[m[32m                                                                                                     OP. INAFECTA   USD                0.00[m
+[32m+[m[32m SON: CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES                                                         OP. GRATUITA   USD                0.00[m
+[32m+[m[32m                                                                                                     OP. GRAVADA    USD             100.00[m
+[32m+[m[32m  REPRESENTACIÓN IMPRESA DE LA FACTURA ELECTRÓNICA                                                   ICBPER         USD[m
+[32m+[m[32m  AUTORIZADO MEDIANTE LA RESOLUCIÓN DE INTENDENCIA N° XXXXXXXXXXX/SUNAT                              IGV 18%        USD                    0[m
+[32m+[m[32m  IMPORTE EN LETRAS:                                                                                 IMPORTE TOTAL  USD              18.00[m
+[32m+[m[32m  CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES                                                             ANTICIPO                       118.00[m
+[32m+[m[32m  SI USTED DESEA VER SUS DOCUMENTOS ELECTRÓNICOS EMITIDOS, INGRESAR A:                                              USD[m
+[32m+[m[32m                                                                         "www.ventura.com"                                             0.00[m
+[32m+[m
+[32m+[m[32mOtras Leyendas:[m
+[32m+[m[32m- NINGUNA[m
+[32m+[m[32m[m
+\ No newline at end of file[m
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001417_SUNAT_CDR.zip b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001417_SUNAT_CDR.zip[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c4a0285[m
+Binary files /dev/null and b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001417_SUNAT_CDR.zip differ
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001417_XmlFirmado.xml b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001417_XmlFirmado.xml[m
+[1mnew file mode 100644[m
+[1mindex 0000000..21bfa9f[m
+[1m--- /dev/null[m
+[1m+++ b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001417_XmlFirmado.xml[m
+[36m@@ -0,0 +1,167 @@[m
+[32m+[m[32m<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:ns6="urn:oasis:names:specification:ubl:schema:xsd:SignatureBasicComponents-2" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2" xmlns:ns9="urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2" xmlns:sac="urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1">[m
+[32m+[m[32m    <ext:UBLExtensions>[m
+[32m+[m[32m        <ext:UBLExtension>[m
+[32m+[m[32m            <ext:ExtensionContent>[m
+[32m+[m[32m                <sac:AdditionalInformation/>[m
+[32m+[m[32m            </ext:ExtensionContent>[m
+[32m+[m[32m        </ext:UBLExtension>[m
+[32m+[m[32m        <ext:UBLExtension>[m
+[32m+[m[32m            <ext:ExtensionContent><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="signer20510910517"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>XLwN+oOuC8TopIrvugqDOGMfwI4=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>aNs9nCZ8hou74LkVc0mEZlkM8mi4PfzruLxPPpRquEUn0GdtYPOiVAzeGLIpczD+JPgwTGk54aju&#13;[m
+[32m+[m[32mTakALJmGU4ve9IXtzYu+9AnC6OG/j69qFiAYxNvMkwA8qMclLG42bmt+OzSMKGllTK9wXT34zDyw&#13;[m
+[32m+[m[32mqq6lFRGhswIoXK+8wgU=</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIID+TCCAuGgAwIBAgIKYZQ4RwAAAAAA0jANBgkqhkiG9w0BAQUFADAnMRUwEwYKCZImiZPyLGQB&#13;[m
+[32m+[m[32mGRYFU1VOQVQxDjAMBgNVBAMTBVNVTkFUMB4XDTEzMDUxNzE4MTUwM1oXDTE0MDUxNzE4MjUwM1ow&#13;[m
+[32m+[m[32mgaQxCzAJBgNVBAYTAlBFMQ0wCwYDVQQIEwRMSU1BMQ0wCwYDVQQHEwRMSU1BMSUwIwYDVQQKExxB&#13;[m
+[32m+[m[32mTEZBMUxBQiBMQVRJTiBBTUVSSUNBIFMuQS5DMRQwEgYDVQQLEwsyMDUxODQyMDgxMTEXMBUGA1UE&#13;[m
+[32m+[m[32mAxMOSm9yZ2UgUmVhdGVndWkxITAfBgkqhkiG9w0BCQEWEmpvcmdlQGFsZmExbGFiLmNvbTCBnzAN&#13;[m
+[32m+[m[32mBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAtwMhq+qBQF2Cl1T2ojBkWAaCgEomO9Uu3n0NjNdYzL2h&#13;[m
+[32m+[m[32mJr5rXu3GmVtj7GW8yYKmInfj3zg0joqtCqvVMF77ptXXnuP85O7r54OcRxiSybmszphQDc8sLl1H&#13;[m
+[32m+[m[32mDdXLFgRhcIxpvpLAtGGwloeaIMLq4PuaOS30jVEgeTxmATYD1osCAwEAAaOCASswggEnMA4GA1Ud&#13;[m
+[32m+[m[32mDwEB/wQEAwIE8DBEBgkqhkiG9w0BCQ8ENzA1MA4GCCqGSIb3DQMCAgIAgDAOBggqhkiG9w0DBAIC&#13;[m
+[32m+[m[32mAIAwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFJvm9VgC1BIcMMheUtOtipSKTMO8MBMG&#13;[m
+[32m+[m[32mA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFN9kHQDqWONmozw3xdNSIMFW2t+7MDMGA1Ud&#13;[m
+[32m+[m[32mHwQsMCowKKAmoCSGImh0dHA6Ly9wY2IyMjYvQ2VydEVucm9sbC9TVU5BVC5jcmwwRQYIKwYBBQUH&#13;[m
+[32m+[m[32mAQEEOTA3MDUGCCsGAQUFBzAChilodHRwOi8vcGNiMjI2L0NlcnRFbnJvbGwvcGNiMjI2X1NVTkFU&#13;[m
+[32m+[m[32mLmNydDANBgkqhkiG9w0BAQUFAAOCAQEAmr097s/nQw3Ji63oHXsKYA2IunGghE3PuYs/B/qNnauQ&#13;[m
+[32m+[m[32mAh8g1MjROtvZHImMH5FSn6s5MibxjcAMcbsaoZfE4JbSbbb1NhdRLN7Gi40qTXZktQOYY5fwm1dc&#13;[m
+[32m+[m[32m1wJYGjT+0mmXCjzOJC73mJXnCG2xd1v1cFSjkyDpEqxWyYISxM3s11cASJuYEEtgCqnprnLVq5Xt&#13;[m
+[32m+[m[32mPLGeeIBnzjEZsVjkYEiqo4SC0MjxyQlNw9wzhSj61fVbd5bXCWGIATN6RvPVfyb1sfblbv3hIBOI&#13;[m
+[32m+[m[32m4w0decjmWPe43r7G1TbcUaaPkm0PVAv/qIBGu9zUwv6DPNKNPHoJ/elM9MddpRgEj6O35w==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></ext:ExtensionContent>[m
+[32m+[m[32m        </ext:UBLExtension>[m
+[32m+[m[32m    </ext:UBLExtensions>[m
+[32m+[m[32m    <cbc:UBLVersionID>2.1</cbc:UBLVersionID>[m
+[32m+[m[32m    <cbc:CustomizationID>2.0</cbc:CustomizationID>[m
+[32m+[m[32m    <cbc:ProfileID schemeAgencyName="PE:SUNAT" schemeName="Tipo de Operacion" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51">0101</cbc:ProfileID>[m
+[32m+[m[32m    <cbc:ID>FACU-00001417</cbc:ID>[m
+[32m+[m[32m    <cbc:UUID>123123</cbc:UUID>[m
+[32m+[m[32m    <cbc:IssueDate>2023-12-01</cbc:IssueDate>[m
+[32m+[m[32m    <cbc:IssueTime>16:30:34</cbc:IssueTime>[m
+[32m+[m[32m    <cbc:DueDate>2023-12-01</cbc:DueDate>[m
+[32m+[m[32m    <cbc:InvoiceTypeCode listAgencyName="PE:SUNAT" listID="0101" listName="Tipo de Documento" listSchemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo01" name="Tipo de Operacion">01</cbc:InvoiceTypeCode>[m
+[32m+[m[32m    <cbc:Note languageLocaleID="1000">CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES</cbc:Note>[m
+[32m+[m[32m    <cbc:DocumentCurrencyCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 4217 Alpha" listName="Currency">PEN</cbc:DocumentCurrencyCode>[m
+[32m+[m[32m    <cbc:LineCountNumeric>1</cbc:LineCountNumeric>[m
+[32m+[m[32m    <cac:ContractDocumentReference>[m
+[32m+[m[32m        <cbc:ID>577654457</cbc:ID>[m
+[32m+[m[32m        <cbc:DocumentTypeCode>OC</cbc:DocumentTypeCode>[m
+[32m+[m[32m    </cac:ContractDocumentReference>[m
+[32m+[m[32m    <cac:Signature>[m
+[32m+[m[32m        <cbc:ID>signer20510910517</cbc:ID>[m
+[32m+[m[32m        <cac:SignatoryParty>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID>20510910517</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>PRUEBAS CDR OBSERVADOS</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m        </cac:SignatoryParty>[m
+[32m+[m[32m        <cac:DigitalSignatureAttachment>[m
+[32m+[m[32m            <cac:ExternalReference>[m
+[32m+[m[32m                <cbc:URI>#signer20510910517</cbc:URI>[m
+[32m+[m[32m            </cac:ExternalReference>[m
+[32m+[m[32m        </cac:DigitalSignatureAttachment>[m
+[32m+[m[32m    </cac:Signature>[m
+[32m+[m[32m    <cac:AccountingSupplierParty>[m
+[32m+[m[32m        <cac:Party>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20510910517</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>FE PRUEBA</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m            <cac:PartyLegalEntity>[m
+[32m+[m[32m                <cbc:RegistrationName>PRUEBAS CDR OBSERVADOS</cbc:RegistrationName>[m
+[32m+[m[32m                <cac:RegistrationAddress>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">150122</cbc:ID>[m
+[32m+[m[32m                    <cbc:AddressTypeCode listAgencyName="PE:SUNAT" listName="Establecimientos anexos">0000</cbc:AddressTypeCode>[m
+[32m+[m[32m                    <cbc:CityName>LIMA</cbc:CityName>[m
+[32m+[m[32m                    <cbc:CountrySubentity>LIMA</cbc:CountrySubentity>[m
+[32m+[m[32m                    <cbc:District>MIRAFLORES</cbc:District>[m
+[32m+[m[32m                    <cac:AddressLine>[m
+[32m+[m[32m                        <cbc:Line>AVENIDA LA ENCALADA 1420 OFICINA 502 SANTIAGO DE SURCO</cbc:Line>[m
+[32m+[m[32m                    </cac:AddressLine>[m
+[32m+[m[32m                    <cac:Country>[m
+[32m+[m[32m                        <cbc:IdentificationCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 3166-1" listName="Country">PE</cbc:IdentificationCode>[m
+[32m+[m[32m                    </cac:Country>[m
+[32m+[m[32m                </cac:RegistrationAddress>[m
+[32m+[m[32m            </cac:PartyLegalEntity>[m
+[32m+[m[32m        </cac:Party>[m
+[32m+[m[32m    </cac:AccountingSupplierParty>[m
+[32m+[m[32m    <cac:AccountingCustomerParty>[m
+[32m+[m[32m        <cac:Party>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20100313899</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>ZICSA CONTRATISTAS GENERALES S.A.</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m            <cac:PartyLegalEntity>[m
+[32m+[m[32m                <cbc:RegistrationName>ZICSA CONTRATISTAS GENERALES S.A.</cbc:RegistrationName>[m
+[32m+[m[32m            </cac:PartyLegalEntity>[m
+[32m+[m[32m        </cac:Party>[m
+[32m+[m[32m    </cac:AccountingCustomerParty>[m
+[32m+[m[32m    <cac:PaymentTerms>[m
+[32m+[m[32m        <cbc:ID>FormaPago</cbc:ID>[m
+[32m+[m[32m        <cbc:PaymentMeansID>Contado</cbc:PaymentMeansID>[m
+[32m+[m[32m    </cac:PaymentTerms>[m
+[32m+[m[32m    <cac:TaxTotal>[m
+[32m+[m[32m        <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m        <cac:TaxSubtotal>[m
+[32m+[m[32m            <cbc:TaxableAmount currencyID="PEN">100.00</cbc:TaxableAmount>[m
+[32m+[m[32m            <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m            <cac:TaxCategory>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="United Nations Economic Commission for Europe" schemeID="UN/ECE 5305" schemeName="Tax Category Identifier">S</cbc:ID>[m
+[32m+[m[32m                <cac:TaxScheme>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>[m
+[32m+[m[32m                    <cbc:Name>IGV</cbc:Name>[m
+[32m+[m[32m                    <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>[m
+[32m+[m[32m                </cac:TaxScheme>[m
+[32m+[m[32m            </cac:TaxCategory>[m
+[32m+[m[32m        </cac:TaxSubtotal>[m
+[32m+[m[32m    </cac:TaxTotal>[m
+[32m+[m[32m    <cac:LegalMonetaryTotal>[m
+[32m+[m[32m        <cbc:LineExtensionAmount currencyID="PEN">100.00</cbc:LineExtensionAmount>[m
+[32m+[m[32m        <cbc:TaxInclusiveAmount currencyID="PEN">118.00</cbc:TaxInclusiveAmount>[m
+[32m+[m[32m        <cbc:PayableAmount currencyID="PEN">118.00</cbc:PayableAmount>[m
+[32m+[m[32m    </cac:LegalMonetaryTotal>[m
+[32m+[m[32m    <cac:InvoiceLine>[m
+[32m+[m[32m        <cbc:ID>1</cbc:ID>[m
+[32m+[m[32m        <cbc:Note>UND</cbc:Note>[m
+[32m+[m[32m        <cbc:InvoicedQuantity unitCode="NIU" unitCodeListAgencyName="United Nations Economic Commission for Europe" unitCodeListID="UN/ECE rec 20">1.0000000000</cbc:InvoicedQuantity>[m
+[32m+[m[32m        <cbc:LineExtensionAmount currencyID="PEN">100.00</cbc:LineExtensionAmount>[m
+[32m+[m[32m        <cac:PricingReference>[m
+[32m+[m[32m            <cac:AlternativeConditionPrice>[m
+[32m+[m[32m                <cbc:PriceAmount currencyID="PEN">118.000000</cbc:PriceAmount>[m
+[32m+[m[32m                <cbc:PriceTypeCode listAgencyName="PE:SUNAT" listName="Tipo de Precio" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo16">01</cbc:PriceTypeCode>[m
+[32m+[m[32m            </cac:AlternativeConditionPrice>[m
+[32m+[m[32m        </cac:PricingReference>[m
+[32m+[m[32m        <cac:TaxTotal>[m
+[32m+[m[32m            <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m            <cac:TaxSubtotal>[m
+[32m+[m[32m                <cbc:TaxableAmount currencyID="PEN">100.00</cbc:TaxableAmount>[m
+[32m+[m[32m                <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m                <cac:TaxCategory>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="United Nations Economic Commission for Europe" schemeID="UN/ECE 5305" schemeName="Tax Category Identifier">S</cbc:ID>[m
+[32m+[m[32m                    <cbc:Percent>18.00</cbc:Percent>[m
+[32m+[m[32m                    <cbc:TaxExemptionReasonCode listAgencyName="PE:SUNAT" listName="Afectacion del IGV" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo07">10</cbc:TaxExemptionReasonCode>[m
+[32m+[m[32m                    <cac:TaxScheme>[m
+[32m+[m[32m                        <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>[m
+[32m+[m[32m                        <cbc:Name>IGV</cbc:Name>[m
+[32m+[m[32m                        <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>[m
+[32m+[m[32m                    </cac:TaxScheme>[m
+[32m+[m[32m                </cac:TaxCategory>[m
+[32m+[m[32m            </cac:TaxSubtotal>[m
+[32m+[m[32m        </cac:TaxTotal>[m
+[32m+[m[32m        <cac:Item>[m
+[32m+[m[32m            <cbc:Description>TUBO FIERRO NEGRO CUADRADO 2" X 2" X 3MM X 6.0 MT</cbc:Description>[m
+[32m+[m[32m            <cac:SellersItemIdentification>[m
+[32m+[m[32m                <cbc:ID>0030070017</cbc:ID>[m
+[32m+[m[32m            </cac:SellersItemIdentification>[m
+[32m+[m[32m            <cac:CommodityClassification>[m
+[32m+[m[32m                <cbc:ItemClassificationCode listAgencyName="GS1 US" listID="UNSPSC" listName="Item Classification">30181811</cbc:ItemClassificationCode>[m
+[32m+[m[32m            </cac:CommodityClassification>[m
+[32m+[m[32m        </cac:Item>[m
+[32m+[m[32m        <cac:Price>[m
+[32m+[m[32m            <cbc:PriceAmount currencyID="PEN">100.0000000000</cbc:PriceAmount>[m
+[32m+[m[32m        </cac:Price>[m
+[32m+[m[32m    </cac:InvoiceLine>[m
+[32m+[m[32m</Invoice>[m
+\ No newline at end of file[m
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001418_FormatoImpreso.pdf b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001418_FormatoImpreso.pdf[m
+[1mnew file mode 100644[m
+[1mindex 0000000..58e38c3[m
+[1m--- /dev/null[m
+[1m+++ b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001418_FormatoImpreso.pdf[m
+[36m@@ -0,0 +1,41 @@[m
+[32m+[m[32m                               AVENIDA LA ENCALADA 1420 OFICINA 502        R.U.C. N° 2051091051[m
+[32m+[m[32m                               SANTIAGO DE SURCO                         FACTURA ELECTRÓNICA[m
+[32m+[m
+[32m+[m[32m                               MIRAFLORES LIMA LIMA                         Nro. FACU-00001418[m
+[32m+[m[32m                               TELÉFON : +51 5194700[m
+[32m+[m[32m                               FAX_TES :[m
+[32m+[m[32m                               PÁGINA WEB : https://www.ssab.com/es-mx[m
+[32m+[m[32m                               CORREO : EJEMPLO@SSAB.COM.PE[m
+[32m+[m
+[32m+[m[32mCLIENTE  : ZICSA CONTRATISTAS GENERALES S.A.                             FECHA DE EMISION                           : 01/12/2023[m
+[32m+[m[32m                                                                         CONDICION DE PAGO                          : CONTADO[m
+[32m+[m[32mDIRECCIÓN : JR. BOLOGNESI NRO. 125 INT. 201 - MIRAFLORES - LIMA - LIMA   ORDEN DE COMPRA                            : 577654457[m
+[32m+[m[32m                                                                         MONEDA                                     : NUEVOS SOLES[m
+[32m+[m[32mR.U.C    : 20100313899[m
+[32m+[m
+[32m+[m[32mG/REMISION : -[m
+[32m+[m
+[32m+[m[32m         1234                  texto_amplio aqui va el[m
+[32m+[m
+[32m+[m[32mITEM     COD         CANTIDAD  DESCRIPCIÓN                               V. UNITARIO SUB-TOTAL                      DESCUENTO  IMPORTE[m
+[32m+[m[32m  1                                                                                                                        0           100.00[m
+[32m+[m[32m         0030070017     1.000  CONTRATACION DEL SERVICIO DE TERAPIA      100.0000[m
+[32m+[m[32m                                     RESPIRATORIA A DOMICILIO PARA[m
+[32m+[m
+[32m+[m[32m                                PACIENTES ADULTOS - HNERM - ESSALUD[m
+[32m+[m[32m                                      PACIENTE : OLIDEN GIL VICTORIA[m
+[32m+[m
+[32m+[m[32mCOMENTARIOS:                                                                                         OP. EXONERADA  USD                0.00[m
+[32m+[m[32m                                                                                                     OP. INAFECTA   USD                0.00[m
+[32m+[m[32m SON: CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES                                                         OP. GRATUITA   USD                0.00[m
+[32m+[m[32m                                                                                                     OP. GRAVADA    USD             100.00[m
+[32m+[m[32m  REPRESENTACIÓN IMPRESA DE LA FACTURA ELECTRÓNICA                                                   ICBPER         USD[m
+[32m+[m[32m  AUTORIZADO MEDIANTE LA RESOLUCIÓN DE INTENDENCIA N° XXXXXXXXXXX/SUNAT                              IGV 18%        USD                    0[m
+[32m+[m[32m  IMPORTE EN LETRAS:                                                                                 IMPORTE TOTAL  USD              18.00[m
+[32m+[m[32m  CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES                                                             ANTICIPO                       118.00[m
+[32m+[m[32m  SI USTED DESEA VER SUS DOCUMENTOS ELECTRÓNICOS EMITIDOS, INGRESAR A:                                              USD[m
+[32m+[m[32m                                                                         "www.ventura.com"                                             0.00[m
+[32m+[m
+[32m+[m[32mOtras Leyendas:[m
+[32m+[m[32m- NINGUNA[m
+[32m+[m[32m[m
+\ No newline at end of file[m
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001418_SUNAT_CDR.zip b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001418_SUNAT_CDR.zip[m
+[1mnew file mode 100644[m
+[1mindex 0000000..210545e[m
+Binary files /dev/null and b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001418_SUNAT_CDR.zip differ
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001418_XmlFirmado.xml b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001418_XmlFirmado.xml[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9d84a55[m
+[1m--- /dev/null[m
+[1m+++ b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001418_XmlFirmado.xml[m
+[36m@@ -0,0 +1,167 @@[m
+[32m+[m[32m<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:ns6="urn:oasis:names:specification:ubl:schema:xsd:SignatureBasicComponents-2" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2" xmlns:ns9="urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2" xmlns:sac="urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1">[m
+[32m+[m[32m    <ext:UBLExtensions>[m
+[32m+[m[32m        <ext:UBLExtension>[m
+[32m+[m[32m            <ext:ExtensionContent>[m
+[32m+[m[32m                <sac:AdditionalInformation/>[m
+[32m+[m[32m            </ext:ExtensionContent>[m
+[32m+[m[32m        </ext:UBLExtension>[m
+[32m+[m[32m        <ext:UBLExtension>[m
+[32m+[m[32m            <ext:ExtensionContent><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="signer20510910517"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>Aer3OkRThiJgzLWz6Z3uLKFzkr0=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>pi0GrdqkGmnCWwuteSzk7HXxOd7nqo2EHfOJkeLcELJULDpkFvKMMJl78db6VMTBSA5s5XC9BC5C&#13;[m
+[32m+[m[32mw2D1w+YqzR8xgF2yFVNkGZwIBgiIrNmI/w11IHtp/8GS9qJd3trdJJxF7OEbD+4UB7YC9s1yzQDQ&#13;[m
+[32m+[m[32mtKNabpZxeoUYyTsKGyc=</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIID+TCCAuGgAwIBAgIKYZQ4RwAAAAAA0jANBgkqhkiG9w0BAQUFADAnMRUwEwYKCZImiZPyLGQB&#13;[m
+[32m+[m[32mGRYFU1VOQVQxDjAMBgNVBAMTBVNVTkFUMB4XDTEzMDUxNzE4MTUwM1oXDTE0MDUxNzE4MjUwM1ow&#13;[m
+[32m+[m[32mgaQxCzAJBgNVBAYTAlBFMQ0wCwYDVQQIEwRMSU1BMQ0wCwYDVQQHEwRMSU1BMSUwIwYDVQQKExxB&#13;[m
+[32m+[m[32mTEZBMUxBQiBMQVRJTiBBTUVSSUNBIFMuQS5DMRQwEgYDVQQLEwsyMDUxODQyMDgxMTEXMBUGA1UE&#13;[m
+[32m+[m[32mAxMOSm9yZ2UgUmVhdGVndWkxITAfBgkqhkiG9w0BCQEWEmpvcmdlQGFsZmExbGFiLmNvbTCBnzAN&#13;[m
+[32m+[m[32mBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAtwMhq+qBQF2Cl1T2ojBkWAaCgEomO9Uu3n0NjNdYzL2h&#13;[m
+[32m+[m[32mJr5rXu3GmVtj7GW8yYKmInfj3zg0joqtCqvVMF77ptXXnuP85O7r54OcRxiSybmszphQDc8sLl1H&#13;[m
+[32m+[m[32mDdXLFgRhcIxpvpLAtGGwloeaIMLq4PuaOS30jVEgeTxmATYD1osCAwEAAaOCASswggEnMA4GA1Ud&#13;[m
+[32m+[m[32mDwEB/wQEAwIE8DBEBgkqhkiG9w0BCQ8ENzA1MA4GCCqGSIb3DQMCAgIAgDAOBggqhkiG9w0DBAIC&#13;[m
+[32m+[m[32mAIAwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFJvm9VgC1BIcMMheUtOtipSKTMO8MBMG&#13;[m
+[32m+[m[32mA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFN9kHQDqWONmozw3xdNSIMFW2t+7MDMGA1Ud&#13;[m
+[32m+[m[32mHwQsMCowKKAmoCSGImh0dHA6Ly9wY2IyMjYvQ2VydEVucm9sbC9TVU5BVC5jcmwwRQYIKwYBBQUH&#13;[m
+[32m+[m[32mAQEEOTA3MDUGCCsGAQUFBzAChilodHRwOi8vcGNiMjI2L0NlcnRFbnJvbGwvcGNiMjI2X1NVTkFU&#13;[m
+[32m+[m[32mLmNydDANBgkqhkiG9w0BAQUFAAOCAQEAmr097s/nQw3Ji63oHXsKYA2IunGghE3PuYs/B/qNnauQ&#13;[m
+[32m+[m[32mAh8g1MjROtvZHImMH5FSn6s5MibxjcAMcbsaoZfE4JbSbbb1NhdRLN7Gi40qTXZktQOYY5fwm1dc&#13;[m
+[32m+[m[32m1wJYGjT+0mmXCjzOJC73mJXnCG2xd1v1cFSjkyDpEqxWyYISxM3s11cASJuYEEtgCqnprnLVq5Xt&#13;[m
+[32m+[m[32mPLGeeIBnzjEZsVjkYEiqo4SC0MjxyQlNw9wzhSj61fVbd5bXCWGIATN6RvPVfyb1sfblbv3hIBOI&#13;[m
+[32m+[m[32m4w0decjmWPe43r7G1TbcUaaPkm0PVAv/qIBGu9zUwv6DPNKNPHoJ/elM9MddpRgEj6O35w==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></ext:ExtensionContent>[m
+[32m+[m[32m        </ext:UBLExtension>[m
+[32m+[m[32m    </ext:UBLExtensions>[m
+[32m+[m[32m    <cbc:UBLVersionID>2.1</cbc:UBLVersionID>[m
+[32m+[m[32m    <cbc:CustomizationID>2.0</cbc:CustomizationID>[m
+[32m+[m[32m    <cbc:ProfileID schemeAgencyName="PE:SUNAT" schemeName="Tipo de Operacion" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51">0101</cbc:ProfileID>[m
+[32m+[m[32m    <cbc:ID>FACU-00001418</cbc:ID>[m
+[32m+[m[32m    <cbc:UUID>123123</cbc:UUID>[m
+[32m+[m[32m    <cbc:IssueDate>2023-12-01</cbc:IssueDate>[m
+[32m+[m[32m    <cbc:IssueTime>16:30:35</cbc:IssueTime>[m
+[32m+[m[32m    <cbc:DueDate>2023-12-01</cbc:DueDate>[m
+[32m+[m[32m    <cbc:InvoiceTypeCode listAgencyName="PE:SUNAT" listID="0101" listName="Tipo de Documento" listSchemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo01" name="Tipo de Operacion">01</cbc:InvoiceTypeCode>[m
+[32m+[m[32m    <cbc:Note languageLocaleID="1000">CIENTO DIECIOCHO Y 00/100 NUEVOS SOLES</cbc:Note>[m
+[32m+[m[32m    <cbc:DocumentCurrencyCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 4217 Alpha" listName="Currency">PEN</cbc:DocumentCurrencyCode>[m
+[32m+[m[32m    <cbc:LineCountNumeric>1</cbc:LineCountNumeric>[m
+[32m+[m[32m    <cac:ContractDocumentReference>[m
+[32m+[m[32m        <cbc:ID>577654457</cbc:ID>[m
+[32m+[m[32m        <cbc:DocumentTypeCode>OC</cbc:DocumentTypeCode>[m
+[32m+[m[32m    </cac:ContractDocumentReference>[m
+[32m+[m[32m    <cac:Signature>[m
+[32m+[m[32m        <cbc:ID>signer20510910517</cbc:ID>[m
+[32m+[m[32m        <cac:SignatoryParty>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID>20510910517</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>PRUEBAS CDR OBSERVADOS</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m        </cac:SignatoryParty>[m
+[32m+[m[32m        <cac:DigitalSignatureAttachment>[m
+[32m+[m[32m            <cac:ExternalReference>[m
+[32m+[m[32m                <cbc:URI>#signer20510910517</cbc:URI>[m
+[32m+[m[32m            </cac:ExternalReference>[m
+[32m+[m[32m        </cac:DigitalSignatureAttachment>[m
+[32m+[m[32m    </cac:Signature>[m
+[32m+[m[32m    <cac:AccountingSupplierParty>[m
+[32m+[m[32m        <cac:Party>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20510910517</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>FE PRUEBA</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m            <cac:PartyLegalEntity>[m
+[32m+[m[32m                <cbc:RegistrationName>PRUEBAS CDR OBSERVADOS</cbc:RegistrationName>[m
+[32m+[m[32m                <cac:RegistrationAddress>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">150122</cbc:ID>[m
+[32m+[m[32m                    <cbc:AddressTypeCode listAgencyName="PE:SUNAT" listName="Establecimientos anexos">0000</cbc:AddressTypeCode>[m
+[32m+[m[32m                    <cbc:CityName>LIMA</cbc:CityName>[m
+[32m+[m[32m                    <cbc:CountrySubentity>LIMA</cbc:CountrySubentity>[m
+[32m+[m[32m                    <cbc:District>MIRAFLORES</cbc:District>[m
+[32m+[m[32m                    <cac:AddressLine>[m
+[32m+[m[32m                        <cbc:Line>AVENIDA LA ENCALADA 1420 OFICINA 502 SANTIAGO DE SURCO</cbc:Line>[m
+[32m+[m[32m                    </cac:AddressLine>[m
+[32m+[m[32m                    <cac:Country>[m
+[32m+[m[32m                        <cbc:IdentificationCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 3166-1" listName="Country">PE</cbc:IdentificationCode>[m
+[32m+[m[32m                    </cac:Country>[m
+[32m+[m[32m                </cac:RegistrationAddress>[m
+[32m+[m[32m            </cac:PartyLegalEntity>[m
+[32m+[m[32m        </cac:Party>[m
+[32m+[m[32m    </cac:AccountingSupplierParty>[m
+[32m+[m[32m    <cac:AccountingCustomerParty>[m
+[32m+[m[32m        <cac:Party>[m
+[32m+[m[32m            <cac:PartyIdentification>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20100313899</cbc:ID>[m
+[32m+[m[32m            </cac:PartyIdentification>[m
+[32m+[m[32m            <cac:PartyName>[m
+[32m+[m[32m                <cbc:Name>ZICSA CONTRATISTAS GENERALES S.A.</cbc:Name>[m
+[32m+[m[32m            </cac:PartyName>[m
+[32m+[m[32m            <cac:PartyLegalEntity>[m
+[32m+[m[32m                <cbc:RegistrationName>ZICSA CONTRATISTAS GENERALES S.A.</cbc:RegistrationName>[m
+[32m+[m[32m            </cac:PartyLegalEntity>[m
+[32m+[m[32m        </cac:Party>[m
+[32m+[m[32m    </cac:AccountingCustomerParty>[m
+[32m+[m[32m    <cac:PaymentTerms>[m
+[32m+[m[32m        <cbc:ID>FormaPago</cbc:ID>[m
+[32m+[m[32m        <cbc:PaymentMeansID>Contado</cbc:PaymentMeansID>[m
+[32m+[m[32m    </cac:PaymentTerms>[m
+[32m+[m[32m    <cac:TaxTotal>[m
+[32m+[m[32m        <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m        <cac:TaxSubtotal>[m
+[32m+[m[32m            <cbc:TaxableAmount currencyID="PEN">100.00</cbc:TaxableAmount>[m
+[32m+[m[32m            <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m            <cac:TaxCategory>[m
+[32m+[m[32m                <cbc:ID schemeAgencyName="United Nations Economic Commission for Europe" schemeID="UN/ECE 5305" schemeName="Tax Category Identifier">S</cbc:ID>[m
+[32m+[m[32m                <cac:TaxScheme>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>[m
+[32m+[m[32m                    <cbc:Name>IGV</cbc:Name>[m
+[32m+[m[32m                    <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>[m
+[32m+[m[32m                </cac:TaxScheme>[m
+[32m+[m[32m            </cac:TaxCategory>[m
+[32m+[m[32m        </cac:TaxSubtotal>[m
+[32m+[m[32m    </cac:TaxTotal>[m
+[32m+[m[32m    <cac:LegalMonetaryTotal>[m
+[32m+[m[32m        <cbc:LineExtensionAmount currencyID="PEN">100.00</cbc:LineExtensionAmount>[m
+[32m+[m[32m        <cbc:TaxInclusiveAmount currencyID="PEN">118.00</cbc:TaxInclusiveAmount>[m
+[32m+[m[32m        <cbc:PayableAmount currencyID="PEN">118.00</cbc:PayableAmount>[m
+[32m+[m[32m    </cac:LegalMonetaryTotal>[m
+[32m+[m[32m    <cac:InvoiceLine>[m
+[32m+[m[32m        <cbc:ID>1</cbc:ID>[m
+[32m+[m[32m        <cbc:Note>UND</cbc:Note>[m
+[32m+[m[32m        <cbc:InvoicedQuantity unitCode="NIU" unitCodeListAgencyName="United Nations Economic Commission for Europe" unitCodeListID="UN/ECE rec 20">1.0000000000</cbc:InvoicedQuantity>[m
+[32m+[m[32m        <cbc:LineExtensionAmount currencyID="PEN">100.00</cbc:LineExtensionAmount>[m
+[32m+[m[32m        <cac:PricingReference>[m
+[32m+[m[32m            <cac:AlternativeConditionPrice>[m
+[32m+[m[32m                <cbc:PriceAmount currencyID="PEN">118.000000</cbc:PriceAmount>[m
+[32m+[m[32m                <cbc:PriceTypeCode listAgencyName="PE:SUNAT" listName="Tipo de Precio" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo16">01</cbc:PriceTypeCode>[m
+[32m+[m[32m            </cac:AlternativeConditionPrice>[m
+[32m+[m[32m        </cac:PricingReference>[m
+[32m+[m[32m        <cac:TaxTotal>[m
+[32m+[m[32m            <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m            <cac:TaxSubtotal>[m
+[32m+[m[32m                <cbc:TaxableAmount currencyID="PEN">100.00</cbc:TaxableAmount>[m
+[32m+[m[32m                <cbc:TaxAmount currencyID="PEN">18.00</cbc:TaxAmount>[m
+[32m+[m[32m                <cac:TaxCategory>[m
+[32m+[m[32m                    <cbc:ID schemeAgencyName="United Nations Economic Commission for Europe" schemeID="UN/ECE 5305" schemeName="Tax Category Identifier">S</cbc:ID>[m
+[32m+[m[32m                    <cbc:Percent>18.00</cbc:Percent>[m
+[32m+[m[32m                    <cbc:TaxExemptionReasonCode listAgencyName="PE:SUNAT" listName="Afectacion del IGV" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo07">10</cbc:TaxExemptionReasonCode>[m
+[32m+[m[32m                    <cac:TaxScheme>[m
+[32m+[m[32m                        <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>[m
+[32m+[m[32m                        <cbc:Name>IGV</cbc:Name>[m
+[32m+[m[32m                        <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>[m
+[32m+[m[32m                    </cac:TaxScheme>[m
+[32m+[m[32m                </cac:TaxCategory>[m
+[32m+[m[32m            </cac:TaxSubtotal>[m
+[32m+[m[32m        </cac:TaxTotal>[m
+[32m+[m[32m        <cac:Item>[m
+[32m+[m[32m            <cbc:Description>TUBO FIERRO NEGRO CUADRADO 2" X 2" X 3MM X 6.0 MT</cbc:Description>[m
+[32m+[m[32m            <cac:SellersItemIdentification>[m
+[32m+[m[32m                <cbc:ID>0030070017</cbc:ID>[m
+[32m+[m[32m            </cac:SellersItemIdentification>[m
+[32m+[m[32m            <cac:CommodityClassification>[m
+[32m+[m[32m                <cbc:ItemClassificationCode listAgencyName="GS1 US" listID="UNSPSC" listName="Item Classification">30181811</cbc:ItemClassificationCode>[m
+[32m+[m[32m            </cac:CommodityClassification>[m
+[32m+[m[32m        </cac:Item>[m
+[32m+[m[32m        <cac:Price>[m
+[32m+[m[32m            <cbc:PriceAmount currencyID="PEN">100.0000000000</cbc:PriceAmount>[m
+[32m+[m[32m        </cac:Price>[m
+[32m+[m[32m    </cac:InvoiceLine>[m
+[32m+[m[32m</Invoice>[m
+\ No newline at end of file[m
+[1mdiff --git a/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001419_FormatoImpreso.pdf b/files/20530184596/anexo2023/12/1/01/20510910517/20510910517-01-FACU-00001419_FormatoImpreso.pdf[m
+[1mnew file mode 100644[m
+[1mindex 0000000..28508f0[m

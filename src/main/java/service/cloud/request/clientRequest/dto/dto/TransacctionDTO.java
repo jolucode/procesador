@@ -1,0 +1,138 @@
+package service.cloud.request.clientRequest.dto.dto;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+@Data
+public class TransacctionDTO {
+    private String SN_NombreComercial;
+    private String ANTCIPO_Tipo_Doc_ID;
+    private String SN_DIR_NomCalle;
+    private String SN_DIR_NroCasa;
+    private String DIR_Urbanizacion;
+    private String SN_DocIdentidad_Nro;
+    private String SN_EMail;
+    private String DIR_NomCalle;
+    private String SN_DIR_Distrito;
+    private String DIR_NroCasa;
+    private String NombreComercial;
+    private String DOC_FechaVencimiento;
+    private BigDecimal DOC_ImporteTotal;
+    private String RazonSocial;
+    private String TipoOperacionSunat;
+    private String REFDOC_MotivCode;
+    private String SUNAT_Transact;
+    private String FE_Estado;
+    private BigDecimal DOC_SinPercepcion;
+    private String DocIdentidad_Tipo;
+    private String DIR_Distrito;
+    private String SN_DIR_Direccion;
+    private String SN_DIR_Urbanizacion;
+    private String DocIdentidad_Nro;
+    private Integer FE_Errores;
+    private String FE_FormSAP;
+    private BigDecimal DOC_ImpuestoTotal;
+    private String SN_EMail_Secundario;
+    private String DIR_Direccion;
+    private String SN_RazonSocial;
+    private String DOC_Serie;
+    private String DOC_CondPago;
+    private String DOC_PorcImpuesto;
+    private BigDecimal DOC_PorDescuento;
+    private String DIR_Ubigeo;
+    private String DOC_Id;
+    private String FE_Id;
+    private Integer FE_MaxSalto;
+    private String SN_DIR_Pais;
+    private String REFDOC_MotivDesc;
+    private String PersonContacto;
+    private String FE_ObjectType;
+    private String DIR_Pais;
+    private String DOC_Dscrpcion;
+    private String SN_DocIdentidad_Tipo;
+    private String ANTICIPO_Id;
+    private String MonedaPagado;
+    private String Telefono;
+    private String Telefono_1;
+    private String ANTICIPO_Nro_Doc_ID;
+    private BigDecimal ANTICIPO_Monto;
+    private String REFDOC_Tipo;
+    private String Web;
+    private String SN_DIR_Ubigeo;
+    private Integer FE_Saltos;
+    private String RET_Regimen;
+    private String RET_Tasa;
+    private String Observacione;
+    private String FechaDOCRe;
+    private String FechaVenDOCRef;
+    private String DOC_OtrosCargos;
+    private BigDecimal ImporteDOCRef;
+    private BigDecimal DOC_Descuento;
+    private String DOC_Codigo;
+    private Date DOC_FechaEmision;
+    private String FE_ErrCod;
+    private BigDecimal DOC_DescuentoTotal;
+    private String DOC_MON_Codigo;
+    private Integer FE_DocNum;
+    private String SN_DIR_Departamento;
+    private String REFDOC_Id;
+    private String CuentaDetraccion;
+    private String CodigoDetraccion;
+    private String PorcDetraccion;
+    private String MontoDetraccion;
+    private String CodigoPago;
+    private String Ticket_Baja;
+    private String MontoRetencion;
+    private String SN_DIR_Provincia;
+    private String EMail;
+    private String SN_SegundoNombre;
+    private BigDecimal DOC_MontoTotal;
+    private String FE_ErrMsj;
+    private String ANTICIPO_Tipo;
+    private String DIR_Provincia;
+    private String FE_Comentario;
+    private String DIR_Departamento;
+    private String FE_TipoTrans;
+    private Integer FE_DocEntry;
+    private String DOC_MON_Nombre;
+    private BigDecimal DOC_Importe;
+    private BigDecimal ImportePagado;
+    private BigDecimal DOC_MonPercepcion;
+    private BigDecimal DOC_PorPercepcion;
+    private String DOC_Numero;
+
+    //private List<TransactionContractDocRefDTO> transactionContractDocRefListDTOS;
+    private List<Map<String, String>> transactionContractDocRefListDTOS;
+
+    private List<TransactionPropertiesDTO> transactionPropertiesDTOList;
+
+    private List<TransactionImpuestosDTO> transactionImpuestosDTOList;
+
+    private List<TransactionLineasDTO> transactionLineasDTOList;
+
+    private TransactionGuiasDTO transactionGuias;
+
+    private List<TransactionCuotasDTO> transactionCuotasDTOList;
+
+    private List<TransactionDocReferDTO> transactionDocReferDTOList;
+
+    private List<TransactionTotalesDTO> transactionTotalesDTOList;
+
+    private List<TransactionComprobantesDTO> transactionComprobantesDTOList;
+
+    private List<TransactionActicipoDTO> transactionActicipoDTOList;
+
+
+
+}
+
+
+
+
+
+
+
+
