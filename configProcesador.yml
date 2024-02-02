@@ -5,11 +5,11 @@ spring:
     name: cloud-config
   cloud:
     config:
-      profile: prod
+      profile: dev
       uri: http://localhost:7070
       username: TU_USUARIO_GIT
       password: TU_CONTRASEÑA_GIT
 
 
 server:
-  port: 8083
+  port: 8082
