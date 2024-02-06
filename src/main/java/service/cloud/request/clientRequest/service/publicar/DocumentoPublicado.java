@@ -74,9 +74,16 @@ public class DocumentoPublicado {
         this.correoSecundario = docPublicar.getSNEMailSecundario();
         this.rsRuc = docPublicar.getRSRuc();
         this.rsDescripcion = docPublicar.getRSDescripcion();
-        this.docPdf = encodeFileToBase64Binary(transaccionRespuesta.getPdf()).get();
-        this.docXml = encodeFileToBase64Binary(transaccionRespuesta.getXml()).get();
-        this.docCdr = encodeFileToBase64Binary(transaccionRespuesta.getZip()).get();
+
+        if(this.tipoTransaccion.equals("B")){
+            this.docCdr = encodeFileToBase64Binary(transaccionRespuesta.getZip()).get();
+        }else {
+            this.docPdf = encodeFileToBase64Binary(transaccionRespuesta.getPdf()).get();
+            this.docXml = encodeFileToBase64Binary(transaccionRespuesta.getXml()).get();
+            this.docCdr = encodeFileToBase64Binary(transaccionRespuesta.getZip()).get();
+        }
+
+
     }
 
     private Optional<String> encodeFileToBase64Binary(byte[] byteDocument) {
