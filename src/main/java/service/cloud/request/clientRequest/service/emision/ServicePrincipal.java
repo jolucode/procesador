@@ -1,10 +1,14 @@
 package service.cloud.request.clientRequest.service.emision;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.log4j.PropertyConfigurator;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 import service.cloud.request.clientRequest.config.ProviderProperties;
 import service.cloud.request.clientRequest.dao.TransaccionBajaRepository;
 import service.cloud.request.clientRequest.dao.TransaccionRepository;
@@ -15,6 +19,9 @@ import service.cloud.request.clientRequest.entity.Transaccion;
 import service.cloud.request.clientRequest.entity.TransaccionBaja;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
+import service.cloud.request.clientRequest.mongo.model.Log;
+import service.cloud.request.clientRequest.mongo.model.LogDTO;
+import service.cloud.request.clientRequest.mongo.service.ILogService;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.InterfacePrincipal;
 import service.cloud.request.clientRequest.service.emision.interfac.ServiceInterface;
@@ -37,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 
+@RequiredArgsConstructor
 @Service
 public class ServicePrincipal implements InterfacePrincipal {
 
@@ -56,12 +64,21 @@ public class ServicePrincipal implements InterfacePrincipal {
     @Autowired
     PublicacionManager publicacionManager;
 
+    @Qualifier("defaultMapper")
+    private final ModelMapper mapper;
+
+    @Autowired
+    private ILogService logEntryService;
+
     /**
      * @return la lista de trnsacciones pendientes de envio. Es decir las que
      * tengan el estado [N]uevo,[C]orregido,[E]nviado
      */
-    public RequestPost EnviarTransacciones(Transaccion transaccion) throws Exception {
-        RequestPost request = null;
+
+    public RequestPost EnviarTransacciones(Transaccion transaccion, String stringRequestOnpremise) throws Exception {
+        RequestPost request = new RequestPost();
+
+        //request.getLogMdb().setRequest(new Gson().toJson(transaccion));
         logger.info("Documento extraido de la intermedia es : " + transaccion.getDocIdentidad_Nro() + " - " + transaccion.getDOC_Id());
         try {
 
@@ -76,6 +93,9 @@ public class ServicePrincipal implements InterfacePrincipal {
                 logger.info("Mensaje Documento: " + request.getResponseRequest().getServiceResponse());
             }
 
+            tr.getLogDTO().setRequest(stringRequestOnpremise);
+            logEntryService.saveLogEntryToMongoDB(convertToEntity(tr.getLogDTO())).subscribe();
+
             logger.info("Se realizo de manera exitosa la actualizacion del documento :" + transaccion.getFE_Id());
             logger.info("Se anexo de manera correcta los documentos en SAP");
             logger.info("===============================================================================");
@@ -83,6 +103,10 @@ public class ServicePrincipal implements InterfacePrincipal {
             throw new RuntimeException(e);
         }
         return request;
+    }
+
+    private Log convertToEntity(LogDTO dto) {
+        return mapper.map(dto, Log.class);
     }
 
     public void GenerarIDyFecha(Transaccion tr) {

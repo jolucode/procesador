@@ -7,5 +7,5 @@ import service.cloud.request.clientRequest.entity.Transaccion;
 @Component
 public interface InterfacePrincipal {
 
-    RequestPost EnviarTransacciones(Transaccion transaccion) throws Exception;
+    RequestPost EnviarTransacciones(Transaccion transaccion, String stringRequestOnpremise) throws Exception;
 }

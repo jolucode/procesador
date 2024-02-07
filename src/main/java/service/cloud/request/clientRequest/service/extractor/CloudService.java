@@ -50,14 +50,14 @@ public class CloudService implements CloudInterface {
 
 
     @Override
-    public ResponseEntity<TransacctionDTO[]> proccessDocument(String ejemploString) {
+    public ResponseEntity<TransacctionDTO[]> proccessDocument(String stringRequestOnpremise) {
         TransacctionDTO[] transacctionDTO = null;
         try {
             Gson gson = new Gson();
-            transacctionDTO = gson.fromJson(ejemploString, TransacctionDTO[].class);
+            transacctionDTO = gson.fromJson(stringRequestOnpremise, TransacctionDTO[].class);
             for (int i = 0; i < transacctionDTO.length; i++) {
                 Transaccion transaccion = llenar(transacctionDTO[i]);
-                interfacePrincipal.EnviarTransacciones(transaccion);
+                interfacePrincipal.EnviarTransacciones(transaccion, stringRequestOnpremise);
             }
         } catch (Exception e) {
             logger.info("SE GENERO UN ERROR : " + e.getMessage());

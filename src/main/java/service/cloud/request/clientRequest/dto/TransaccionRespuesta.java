@@ -6,6 +6,7 @@
 package service.cloud.request.clientRequest.dto;
 
 import lombok.Data;
+import service.cloud.request.clientRequest.mongo.model.LogDTO;
 
 import java.util.List;
 
@@ -57,6 +58,8 @@ public class TransaccionRespuesta {
 
 
     private String ticketRest;
+
+    private LogDTO logDTO;
 
 
     public TransaccionRespuesta() {

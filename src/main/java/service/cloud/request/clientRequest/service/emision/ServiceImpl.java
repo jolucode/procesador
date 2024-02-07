@@ -1,5 +1,6 @@
 package service.cloud.request.clientRequest.service.emision;
 
+import com.google.gson.Gson;
 import org.eclipse.persistence.internal.oxm.ByteArrayDataSource;
 import org.eclipse.persistence.internal.oxm.ByteArraySource;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import service.cloud.request.clientRequest.handler.PDFBasicGenerateHandler;
 import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
+import service.cloud.request.clientRequest.mongo.model.LogDTO;
 import service.cloud.request.clientRequest.proxy.object.StatusResponse;
 import service.cloud.request.clientRequest.prueba.Client;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
@@ -33,6 +35,7 @@ import service.cloud.request.clientRequest.utils.CertificateUtils;
 import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.LoggerTrans;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
+import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.ws.WSConsumer;
 import service.cloud.request.clientRequest.ws.WSConsumerConsult;
@@ -65,6 +68,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -330,6 +335,13 @@ public class ServiceImpl implements ServiceInterface {
       throws Exception {
 
     TransaccionRespuesta transactionResponse = null;
+
+    LogDTO log = new LogDTO();
+    log.setRequestDate(DateUtils.formatDateToString(new Date()));
+    log.setRuc(transaction.getDocIdentidad_Nro());
+    log.setBusinessName(transaction.getSN_RazonSocial());
+
+
     String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
 
     boolean isContingencia = false;
@@ -519,6 +531,8 @@ public class ServiceImpl implements ServiceInterface {
           documentWRP.getRetentionType().getUblExtensions());
     }
 
+    log.setThirdPartyRequestXml(new String(signedXmlDocument, StandardCharsets.UTF_8));
+
     ConfigData configuracion = ConfigData
         .builder()
         .usuarioSol(client.getUsuarioSol())
@@ -546,8 +560,10 @@ public class ServiceImpl implements ServiceInterface {
         wsConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion, fileHandler, doctype);
         Thread.sleep(50);
 
+        log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
         Response response = wsConsumer.sendBill(zipDocument, documentName, configuracion);
-
+        log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
+        log.setThirdPartyResponseXml(new String(response.getResponse(), StandardCharsets.UTF_8));
         if (null != response.getResponse()) {
           transactionResponse = processorCoreInterface.processCDRResponseV2(response.getResponse(), signedXmlDocument, documentWRP, transaction, configuracion);
         } else {
@@ -563,7 +579,11 @@ public class ServiceImpl implements ServiceInterface {
           String documentSerie = transaction.getDOC_Serie();
           Integer documentNumber = Integer.valueOf(transaction.getDOC_Numero());
 
+          log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
           StatusResponse statusResponse = wsConsumer.getStatusCDR(documentRuc, documentType, documentSerie, documentNumber, configuracion);
+          log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
+          log.setThirdPartyResponseXml(new String(statusResponse.getContent(), StandardCharsets.UTF_8));
+
           if (statusResponse.getContent() != null) {
             transactionResponse = processorCoreInterface.processCDRResponseV2(statusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion);
           } else {
@@ -573,9 +593,17 @@ public class ServiceImpl implements ServiceInterface {
         }
       }
     }
+    log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
+    log.setSeriesAndCorrelative(documentName);
+    log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
+    log.setResponseDate(DateUtils.formatDateToString(new Date()));
+
+
     transactionResponse.setIdentificador(documentName);
     transactionResponse.setDigestValue(digestValue);
     transactionResponse.setBarcodeValue(barcodeValue);
+
+    transactionResponse.setLogDTO(log);
     return transactionResponse;
   }
 
