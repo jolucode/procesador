@@ -61,7 +61,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
     }
 
     @Override
-    public byte[] createPDFDocument(Object ublDocument, String documentCode, UBLDocumentWRP wrp, Transaccion transaction, ConfigData configuracion) {
+    public byte[] createPDFDocument(UBLDocumentWRP wrp, Transaccion transaction, ConfigData configuracion) {
         if (logger.isDebugEnabled()) {
             logger.debug("+createPDFDocument() [" + this.docUUID + "]");
         }
@@ -80,7 +80,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
             String rutaDOCSelected = "";
             String rutaPaymentSelected = rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "InvoiceDocumentPaymentDetail.jasper");//configuration.getPdf().getPaymentSubReportPath(); // Numa
 
-            if (documentCode.equalsIgnoreCase(IUBLConfig.DOC_INVOICE_CODE)) {
+            if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_INVOICE_CODE)) {
                 rutaDOCSelected = cargarAnalizarReglasFormatoDOC(transaction, IUBLConfig.DOC_INVOICE_CODE);
 
                 if (!rutaDOCSelected.isEmpty()) {
@@ -91,7 +91,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
 
                 pdfBytes = pdfHandler.generateInvoicePDF(wrp, configuracion);
 
-            } else if (documentCode.equalsIgnoreCase(IUBLConfig.DOC_BOLETA_CODE)) {
+            } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_BOLETA_CODE)) {
                 rutaDOCSelected = cargarAnalizarReglasFormatoDOC(transaction, IUBLConfig.DOC_BOLETA_CODE);
                 if (!rutaDOCSelected.equals("")) {
                     pdfHandler.setConfiguration(rutaDOCSelected, rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
@@ -107,7 +107,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
                     logger.info("createPDFDocument() [" + this.docUUID + "] Se genero el PDF de la BOLETA.");
                 }
                 LoggerTrans.getCDThreadLogger().log(Level.INFO, "[{0}] Se genero el PDF de la BOLETA.", this.docUUID);
-            } else if (documentCode.equalsIgnoreCase(IUBLConfig.DOC_CREDIT_NOTE_CODE)) {
+            } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_CREDIT_NOTE_CODE)) {
                 rutaDOCSelected = cargarAnalizarReglasFormatoDOC(transaction, IUBLConfig.DOC_CREDIT_NOTE_CODE);
                 if (!rutaDOCSelected.equals("")) {
                     pdfHandler.setConfiguration(rutaDOCSelected, rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
@@ -124,7 +124,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
                     logger.info("createPDFDocument() [" + this.docUUID + "] Se genero el PDF de la NOTA DE CREDITO.");
                 }
                 LoggerTrans.getCDThreadLogger().log(Level.INFO, "[{0}] Se genero el PDF de la NOTA DE CREDITO.", this.docUUID);
-            } else if (documentCode.equalsIgnoreCase(IUBLConfig.DOC_DEBIT_NOTE_CODE)) {
+            } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_DEBIT_NOTE_CODE)) {
                 rutaDOCSelected = cargarAnalizarReglasFormatoDOC(transaction, IUBLConfig.DOC_DEBIT_NOTE_CODE);
                 if (!rutaDOCSelected.equals("")) {
                     pdfHandler.setConfiguration(rutaDOCSelected, rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
@@ -141,7 +141,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
                     logger.info("createPDFDocument() [" + this.docUUID + "] Se genero el PDF de la NOTA DE DEBITO.");
                 }
                 LoggerTrans.getCDThreadLogger().log(Level.INFO, "[" + this.docUUID + "] Se genero el PDF de la NOTA DE DEBITO.");
-            } else if (documentCode.equalsIgnoreCase(IUBLConfig.DOC_PERCEPTION_CODE)) {
+            } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_PERCEPTION_CODE)) {
                 rutaDOCSelected = cargarAnalizarReglasFormatoDOC(transaction, IUBLConfig.DOC_PERCEPTION_CODE);
                 if (!rutaDOCSelected.equals("")) {
                     pdfHandler.setConfiguration(rutaDOCSelected, rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
@@ -159,7 +159,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
 
                 LoggerTrans.getCDThreadLogger().log(Level.INFO, "[" + this.docUUID + "] Se genero el PDF del COMPROBANTE DE PERCEPCIón.");
 
-            } else if (documentCode.equalsIgnoreCase(IUBLConfig.DOC_RETENTION_CODE)) {
+            } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_RETENTION_CODE)) {
                 rutaDOCSelected = cargarAnalizarReglasFormatoDOC(transaction, IUBLConfig.DOC_RETENTION_CODE);
                 if (!rutaDOCSelected.equals("")) {
                     pdfHandler.setConfiguration(rutaDOCSelected, rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
@@ -175,7 +175,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
                     logger.info("] Se genero el PDF de COMPROBANTE DE RETENCIÓN.");
                 }
                 LoggerTrans.getCDThreadLogger().log(Level.INFO,  " Se genero el PDF de COMPROBANTE DE RETENCIÓN.");
-            } else if (documentCode.equalsIgnoreCase(IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE)) {
+            } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE)) {
                 rutaDOCSelected = cargarAnalizarReglasFormatoDOC(transaction, IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE);
                 if (!rutaDOCSelected.equals("")) {
                     pdfHandler.setConfiguration(rutaDOCSelected, rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected,

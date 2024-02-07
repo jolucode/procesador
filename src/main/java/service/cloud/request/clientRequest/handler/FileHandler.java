@@ -2,6 +2,7 @@ package service.cloud.request.clientRequest.handler;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.persistence.internal.oxm.ByteArrayDataSource;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.utils.exceptions.VenturaExcepcion;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
@@ -177,6 +178,8 @@ public class FileHandler {
         }
         return zipDocument;
     } //compressUBLDocument
+
+     //compressUBLDocument
 
     /**
      * Este metodo guarda la constancia de recepcion de Sunat (CDR) en DISCO.
@@ -376,5 +379,6 @@ public class FileHandler {
         }
         return object;
     } //getSignedDocument
+
 
 } //FileHandler

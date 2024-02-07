@@ -23,8 +23,11 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -218,6 +221,60 @@ public class SignerHandler {
         }
         return outputFile;
     } //signDocument
+
+    public byte[] signDocumentv2(byte[] xmlDocument, String docUUID) throws SignerDocumentException {
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setNamespaceAware(true);
+
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document document = documentBuilder.parse(new ByteArrayInputStream(xmlDocument));
+
+            /* Creates a DOMSignContext object */
+            DOMSignContext signContext = new DOMSignContext(privateKey, getElementPositionToSign(document, docUUID));
+            signContext.putNamespacePrefix(XMLSignature.XMLNS, ISignerConfig.SIGN_CONTEXT_NAMESPACE_PREFIX);
+
+            /* Assembles the XML signature */
+            XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(ISignerConfig.SIGNATURE_FACTORY_MECHANISM);
+
+            Reference reference = signatureFactory.newReference("", signatureFactory.newDigestMethod(javax.xml.crypto.dsig.DigestMethod.SHA1,
+                null), Collections.singletonList(signatureFactory.newTransform(javax.xml.crypto.dsig.Transform.ENVELOPED,
+                (TransformParameterSpec) null)), null, null);
+
+            SignedInfo signedInfo = signatureFactory.newSignedInfo(signatureFactory.newCanonicalizationMethod(javax.xml.crypto.dsig.CanonicalizationMethod.INCLUSIVE,
+                    (C14NMethodParameterSpec) null), signatureFactory.newSignatureMethod(javax.xml.crypto.dsig.SignatureMethod.RSA_SHA1, null),
+                Collections.singletonList(reference));
+
+            KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
+            KeyValue keyValue = keyInfoFactory.newKeyValue(publicKey);
+
+            List<Object> x509DataContent = new java.util.ArrayList<Object>();
+            x509DataContent.add(x509Certificate);
+            X509Data x509Data = keyInfoFactory.newX509Data(x509DataContent);
+
+            KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(x509Data));
+            XMLSignature xmlSignature = signatureFactory.newXMLSignature(signedInfo, keyInfo, null, signerName, null);
+
+            /* Generates the XML signature */
+            xmlSignature.sign(signContext);
+
+            /* Records the XML signature */
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+            /* Creates the TransformerFactory */
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.ENCODING, ISignerConfig.XML_TRANSFORM_KEYS_ENCODING);
+            transformer.setOutputProperty(OutputKeys.METHOD, ISignerConfig.XML_TRANSFORM_KEYS_METHOD);
+            transformer.setOutputProperty(OutputKeys.INDENT, ISignerConfig.XML_TRANSFORM_KEYS_INDENT);
+            transformer.transform(new DOMSource(document), new StreamResult(os));
+
+            return os.toByteArray();
+        } catch (Exception e) {
+            throw new SignerDocumentException(IVenturaError.ERROR_255);
+        }
+    }
 
     /**
      * Este metodo carga el certificado digital, verificando que la contrasenia

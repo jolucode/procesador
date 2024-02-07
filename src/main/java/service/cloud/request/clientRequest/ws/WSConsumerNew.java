@@ -124,7 +124,7 @@ public class WSConsumerNew {
         //this.configuracion = configuracionObj;
 
         /* Agregando el objeto FileHandler */
-        this.fileHandler = fileHandler;
+        //this.fileHandler = fileHandler;
         if (logger.isDebugEnabled()) {
             logger.debug("-setConfiguration() [" + this.docUUID + "]");
         }

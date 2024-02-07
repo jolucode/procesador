@@ -46,33 +46,21 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
     DocumentFormatInterface documentFormatInterface;
 
     @Override
-    public TransaccionRespuesta processCDRResponse(byte[] cdrConstancy, File signedDocument,
-                                                   FileHandler fileHandler, String documentName,
-                                                   String documentCode, UBLDocumentWRP documentWRP,
+    public TransaccionRespuesta processCDRResponseV2(byte[] cdrConstancy, byte[] signedDocument,
+                                                   UBLDocumentWRP documentWRP,
                                                    Transaccion transaction, ConfigData configuracion) throws IOException {
 
         if (logger.isDebugEnabled()) {
             logger.debug("+processCDRResponse() [" + this.docUUID + "]");
         }
         TransaccionRespuesta transactionResponse = null;
-        Object ublDocument = fileHandler.getSignedDocument(signedDocument, documentCode);
 
-        byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
+        byte[] documentBytes = signedDocument;
 
         TransaccionRespuesta.Sunat sunatResponse = proccessResponse(cdrConstancy, transaction, configuracion.getIntegracionWs());
 
         if ((IVenturaError.ERROR_0.getId() == sunatResponse.getCodigo()) || (4000 <= sunatResponse.getCodigo())) {
-            byte[] pdfBytes = documentFormatInterface.createPDFDocument(ublDocument, documentCode, documentWRP, transaction, configuracion);
-
-
-            if (null != cdrConstancy && 0 < cdrConstancy.length) {
-                fileHandler.storePDFDocumentInDisk(cdrConstancy, documentName + "_SUNAT_CDR", ISunatConnectorConfig.EE_ZIP);
-            }
-            if (null != pdfBytes && 0 < pdfBytes.length) {
-                /**guardar pdf en disco */
-                fileHandler.storePDFDocumentInDisk(pdfBytes, documentName + "_FormatoImpreso", ISunatConnectorConfig.EE_PDF);
-            }
-
+            byte[] pdfBytes = documentFormatInterface.createPDFDocument(  documentWRP, transaction, configuracion);
             transactionResponse = new TransaccionRespuesta();
             transactionResponse.setCodigo(TransaccionRespuesta.RQT_EMITDO_ESPERA);
             transactionResponse.setMensaje(sunatResponse.getMensaje());
@@ -123,10 +111,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
         }
 
         try {
-
-            Object ublDocument = fileHandler.getSignedDocument(signedDocument, documentCode);
-
-            pdfBytes = documentFormatInterface.createPDFDocument(ublDocument, documentCode, documentWRP, transaccion, configuracion);
+            pdfBytes = documentFormatInterface.createPDFDocument( documentWRP, transaccion, configuracion);
 
             if (null != pdfBytes && 0 < pdfBytes.length) {
                 if (logger.isDebugEnabled()) {
@@ -210,7 +195,6 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
         }
         return new TransaccionRespuesta.Sunat();
     }
-
     public TransaccionRespuesta processResponseService(Transaccion transaction, Response response) {
 
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
@@ -218,6 +202,5 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
 
         return transactionResponse;
     }
-
 
 }

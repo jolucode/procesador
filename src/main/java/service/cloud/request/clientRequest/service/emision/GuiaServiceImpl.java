@@ -116,10 +116,6 @@ public class GuiaServiceImpl implements GuiaInterface {
                 transaction.getEMail(),
                 isContingencia);
 
-        //UTILIZANDO HASH MAP DE ENTIDADES
-        //String idSociedad = transaction.getKeySociedad();
-        //ListaSociedades sociedad = VariablesGlobales.MapSociedades.get(idSociedad);
-
         Client client = clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
         byte[] certificado = CertificateUtils.getCertificateInBytes(applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator
                 + client.getCertificadoName());
@@ -128,41 +124,15 @@ public class GuiaServiceImpl implements GuiaInterface {
         String ksProvider = client.getCertificadoProveedor();
         String ksType = client.getCertificadoTipoKeystore();
 
-        //GUIAS
-        //String tipoTransaccion = client.getTipoIntegracionGuias();
-        String clientId = client.getClientId();
-        String secretId = client.getClientSecret();
-        String usuarioGuias = client.getPasswordSunatGuias();
-        String passwordGuias = client.getPasswordSunatGuias();
-        String scope = client.getScope();
-
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("transactionRemissionGuideDocument() [" + this.docUUID + "] Certificado en bytes: " + certificado);
-        }
-
-        /*
-         * Validando el Certificado Digital
-         * Se valida:
-         * 	- Certificado nulo o vacio
-         * 	- La contrase�a del certificado pueda abrir el certificado.
-         */
-        ///CertificateUtils.checkDigitalCertificateV2(certificate, certPassword, ksProvider, ksType);
         CertificateUtils.checkDigitalCertificateV2(certificado, certiPassword, ksProvider, ksType);
 
-        /* Generando el objeto DespatchAdviceType para la GUIA DE REMISION */
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
         DespatchAdviceType despatchAdviceType = null;
         despatchAdviceType = ublHandler.generateDespatchAdviceType(transaction, signerName);
 
-        /*
-         * Validar la información necesaria para la RETENCIÓN
-         */
+
         validationHandler.checkRemissionGuideDocument(despatchAdviceType);
 
-        /*
-         * Se genera el nombre del documento de tipo GUIA DE REMISION
-         */
         String documentName = DocumentNameHandler.getInstance().getRemissionGuideName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
         if (logger.isDebugEnabled()) {
             logger.debug("transactionRemissionGuideDocument() [" + this.docUUID + "] El nombre del documento: " + documentName);
@@ -170,9 +140,6 @@ public class GuiaServiceImpl implements GuiaInterface {
 
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
 
-        /*
-         * Setear la ruta del directorio
-         */
         String attachmentPath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() +
                 File.separator + "anexo" + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
         fileHandler.setBaseDirectory(attachmentPath);
@@ -184,9 +151,6 @@ public class GuiaServiceImpl implements GuiaInterface {
             logger.debug("transactionRemissionGuideDocument() [" + this.docUUID + "] Ruta para los archivos adjuntos: " + attachmentPath);
         }
 
-        /*
-         * Guardando el documento UBL en DISCO
-         */
         String documentPath = null;
         documentPath = fileHandler.storeDocumentInDisk(despatchAdviceType, documentName);
 
@@ -334,7 +298,6 @@ public class GuiaServiceImpl implements GuiaInterface {
                         return generateResponseRest(documentWRP, responseDTO);
                     }
 
-                    //sendQR(transaction.getDOCCodigo(), documentWRP);
 
                     //responseDTO.setCodRespuesta("0");
                     if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("0")) {

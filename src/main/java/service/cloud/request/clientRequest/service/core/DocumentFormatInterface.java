@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface DocumentFormatInterface {
 
-    public byte[] createPDFDocument(Object ublDocument, String documentCode, UBLDocumentWRP wrp, Transaccion transaction, ConfigData configuracion);
+    public byte[] createPDFDocument( UBLDocumentWRP wrp, Transaccion transaction, ConfigData configuracion);
 
     public Optional<byte[]> unzipResponse(byte[] cdr) throws IOException;
 

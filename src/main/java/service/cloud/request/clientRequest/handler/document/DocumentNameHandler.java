@@ -17,7 +17,6 @@ public class DocumentNameHandler {
 
     private final String DOCUMENT_PATTERN = "{0}-{1}-{2}";
 
-    private final String CDR_RESPONSE_NAME = "R-{0}";
 
     private final String EE_ZIP = ".zip";
 
@@ -86,17 +85,6 @@ public class DocumentNameHandler {
                 docType, docIdentifier);
     } // getInvoiceName
 
-    /**
-     * Este metodo obtiene el nombre de un documento de tipo BOLETA.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento (Serie y correlativo).
-     * @return Retorna el nombre del documento de tipo BOLETA.
-     */
-    public String getBoletaName(String senderRUC, String docIdentifier) {
-        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
-                IUBLConfig.DOC_BOLETA_CODE, docIdentifier);
-    } // getBoletaName
 
     /**
      * Este metodo obtiene el nombre de un documento de tipo NOTA DE CREDITO.
@@ -134,22 +122,6 @@ public class DocumentNameHandler {
         return senderRUC + "-" + docIdentifier;
     } // getVoidedDocumentName
 
-    public String getVoidedCPEDocumentName(String senderRUC,
-                                           String docIdentifier) {
-        return senderRUC + "-" + docIdentifier;
-    } // getVoidedDocumentName
-
-    /**
-     * Este metodo obtiene el nombre de un documento de tipo RESUMEN DIARIO.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento.
-     * @return Retorna el nombre del documento de tipo RESUMEN DIARIO.
-     */
-    public String getSummaryDocumentName(String senderRUC, String docIdentifier) {
-        return senderRUC + "-" + docIdentifier;
-    } // getSummaryDocumentName
-
     /**
      * Este metodo retorna el nombre del documento concatenando el valor .zip
      *
@@ -160,14 +132,6 @@ public class DocumentNameHandler {
         return documentName + EE_ZIP;
     } // formatZipName
 
-    /**
-     * Este metodo retorna el nombre del documento en formato de respuesta CDR.
-     *
-     * @param documentName El nombre del documento UBL.
-     * @return Retorna el nombre de la constancia CDR de respuesta.
-     */
-    public String getCDRConstancyName(String documentName) {
-        return MessageFormat.format(CDR_RESPONSE_NAME, documentName);
-    } // getCDRConstancyName
+
 
 } // DocumentNameHandler

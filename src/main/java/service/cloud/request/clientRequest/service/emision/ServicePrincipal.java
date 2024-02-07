@@ -155,7 +155,11 @@ public class ServicePrincipal implements InterfacePrincipal {
                         LoggerTrans.getCDThreadLogger().log(Level.INFO, "[{0}] La transaccion es de EMISION de una GUIA DE REMISIÓN.", docUUID);
                         transactionResponse = guiaInterface.transactionRemissionGuideDocumentRest(transaction, IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE);
                     } else {
+                        long startTime = System.nanoTime();
                         transactionResponse = serviceInterface.transactionDocument(transaction, codeTypeDocument);
+                        long endTime = System.nanoTime();
+                        double elapsedTime = (endTime - startTime) / 1_000_000_000.0;
+                        System.out.println("El método EnviarTransaccion tomó " + elapsedTime + " segundos para ejecutarse.");
                     }
                 } else if (transaction.getFE_TipoTrans().equalsIgnoreCase(ISunatConnectorConfig.FE_TIPO_TRANS_BAJA)) {
                     GenerarIDyFecha(transaction);
