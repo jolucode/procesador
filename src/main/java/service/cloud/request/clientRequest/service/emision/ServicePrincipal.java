@@ -11,10 +11,8 @@ import service.cloud.request.clientRequest.dao.TransaccionRepository;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.request.RequestPost;
 import service.cloud.request.clientRequest.dto.response.Data;
-import service.cloud.request.clientRequest.entity.CodErrorSunat;
 import service.cloud.request.clientRequest.entity.Transaccion;
 import service.cloud.request.clientRequest.entity.TransaccionBaja;
-import service.cloud.request.clientRequest.entity.TransaccionResumen;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
@@ -170,35 +168,13 @@ public class ServicePrincipal implements InterfacePrincipal {
         } catch (ConectionSunatException | SoapFaultException | ValidationException e) {
             Optional<String> optional = Optional.ofNullable(e.getLocalizedMessage());
             String mensaje = Optional.ofNullable(optional.orElse(e.getMessage())).orElse("No se pudo obtener la respuesta del servidor.");
-            int rqtValue = transaction.getFE_TipoTrans().equalsIgnoreCase(ISunatConnectorConfig.FE_TIPO_TRANS_EMISION) ? TransaccionRespuesta.RQT_EMITIDO_EXCEPTION : TransaccionRespuesta.RQT_BAJA_EXCEPCION;
-            transactionResponse = exceptionResponse(rqtValue, transaction, IVenturaError.ERROR_2.getId(), mensaje, "Sunat");
+            transactionResponse.setMensaje(mensaje);
         } catch (Exception e) {
             transaccionRepository.delete(transaction);
             transactionResponse.setMensaje(e.getMessage());
         }
         return transactionResponse;
     }
-
-    private TransaccionRespuesta exceptionResponse(int rqtCode, Object transactionObj, int errorCode, String codErrorSunat, String emitioError) {
-        String cod = codErrorSunat.length() == 3 ? "0".concat(codErrorSunat) : codErrorSunat;
-        CodErrorSunat objCodError = null;
-
-        TransaccionRespuesta respuesta = new TransaccionRespuesta();
-        respuesta.setCodigo(rqtCode);
-
-        if (objCodError != null) {
-            respuesta.setMensaje(cod + " - " + objCodError.getCodDescription());
-        } else {
-            respuesta.setMensaje(cod + " - " + "No existe codigo de error en la tabla intermedia");
-        }
-        if (transactionObj instanceof Transaccion) {
-            respuesta.setIdentificador(((Transaccion) transactionObj).getDOC_Id());
-        } else if (transactionObj instanceof TransaccionResumen) {
-            respuesta.setIdentificador(((TransaccionResumen) transactionObj).getIdTransaccion());
-        }
-        return respuesta;
-    }
-
 
     public RequestPost generateDataRequestHana(Transaccion tc, TransaccionRespuesta tr) {
         RequestPost request = new RequestPost();

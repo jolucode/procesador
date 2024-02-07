@@ -28,11 +28,6 @@ public interface IUBLConfig {
     int DOC_RUC_LENGTH = 11;
 
     /**
-     * Codigo de pais
-     */
-    String COUNTRY_CODE = "PE";
-
-    /**
      * Version del estandar UBL utilizado en los documentos
      */
     String UBL_VERSION_ID_2_0 = "2.0";
@@ -43,11 +38,6 @@ public interface IUBLConfig {
      */
     String CUSTOMIZATION_ID_1_0 = "1.0";
     String CUSTOMIZATION_ID_2_0 = "2.0";
-
-//       String UBL_VERSION_ID = "2.0";
-//       String UBL_VERSION_ID_1_0 = "1.0";
-//       String UBL_VERSION_ID_21_0 = "2.1";
-//       String UBL_VERSION_ID_12_0 = "2.1";
 
 
     /**
@@ -64,9 +54,6 @@ public interface IUBLConfig {
     String DOC_FINANCIAL_BANKS_CODE = "13";
     String DOC_BANK_INSURANCE_CODE = "18";
     String DOC_ISSUED_BY_AFP_CODE = "31";
-    String DOC_TRANSPORT_REMISSION_GUIDE_CODE = "56";
-    String DOC_SUMMARY_DOCUMENT_CODE = "RC";
-    String DOC_VOIDED_DOCUMENT_CODE = "RA";
 
     /**
      * Codigo de tipo de Nota de Credito - 01 : Anulacion de la operacion - 02 :
@@ -138,12 +125,6 @@ public interface IUBLConfig {
     String TAX_TOTAL_EXO_CODE = "VAT";
     String TAX_TOTAL_INA_CODE = "FRE";
     String TAX_TOTAL_OTR_CODE = "OTH";
-    /**
-     * Codigo de tipo de Valor Venta
-     */
-    String INSTRUCTION_ID_GRAVADO = "01";
-    String INSTRUCTION_ID_EXONERADO = "02";
-    String INSTRUCTION_ID_INAFECTO = "03";
 
     /**
      * Tag's del AlternativeConditionPrice.
@@ -163,10 +144,8 @@ public interface IUBLConfig {
     int DECIMAL_ALLOWANCECHARGE_AMOUNT = 2;
     int DECIMAL_ALLOWANCECHARGE_BASEAMOUNT = 2;
     int DECIMAL_MONETARYTOTAL_LINEEXTENSIONAMOUNT = 2;
-    int DECIMAL_MONETARYTOTAL_ALLOWANCETOTALAMOUNT = 2;
     int DECIMAL_MONETARYTOTAL_CHARGETOTALAMOUNT = 2;
     int DECIMAL_MONETARYTOTAL_PREPAIDAMOUNT = 2;
-    int DECIMAL_MONETARYTOTAL_TAXINCLUSIVEAMOUNT = 2;
     int DECIMAL_ADDITIONAL_MONETARY_TOTAL_PAYABLE_AMOUNT = 2;
     int DECIMAL_PAYMENTTERMS_PAYMENTPERCENT = 2;
     int DECIMAL_PAYMENTTERMS_AMOUNT = 2;
@@ -183,8 +162,6 @@ public interface IUBLConfig {
 
     String CONTRACT_DOC_REF_PAYMENT_COND_CODE = "pay_cond";
     String CONTRACT_DOC_REF_SELL_ORDER_CODE = "cu01";
-    String CONTRACT_DOC_REF_SELLER_CODE = "cu02";
-    String CONTRACT_DOC_REF_EXTRA_DOC = "cu03";
     String CONTRACT_DOC_REF_SELL_ORDER_INCO = "incoterms";
 
     /**
@@ -202,15 +179,6 @@ public interface IUBLConfig {
 
     String HIDDEN_UVALUE = "hidden_uvalue";
 
-
-    /**
-     * Formato de la fecha para el nombre del cocumento.
-     */
-    String DOCUMENT_DATE_FORMAT = "yyyyMMdd";
-
-    String SERIE_BB11 = "BB11";
-    String SERIE_BB12 = "BB12";
-
     String ADDITIONAL_MONETARY_1001 = "1001";
     String ADDITIONAL_MONETARY_1002 = "1002";
     String ADDITIONAL_MONETARY_1003 = "1003";
@@ -224,38 +192,11 @@ public interface IUBLConfig {
     String ADDITIONAL_MONETARY_3001 = "3001";
 
     String ADDITIONAL_PROPERTY_1000 = "1000";
-    String ADDITIONAL_PROPERTY_1002 = "1002";
-    String ADDITIONAL_PROPERTY_2000 = "2000";
-    String ADDITIONAL_PROPERTY_2001 = "2001";
-    String ADDITIONAL_PROPERTY_2002 = "2002";
+
 
     String UBL_DIGESTVALUE_TAG = "ds:DigestValue";
     String UBL_SIGNATUREVALUE_TAG = "ds:SignatureValue";
     String UBL_SUNAT_TRANSACTION_TAG = "sac:SUNATTransaction";
-
-    /**
-     * Valores para el RESUMEN DIARIO - StartDocumentNumberID -
-     * EndDocumentNumberID
-     */
-    String DOC_NUMBER_BB11_03_START = "BB11_03_START";
-    String DOC_NUMBER_BB11_03_END = "BB11_03_END";
-    String DOC_NUMBER_BB11_07_START = "BB11_07_START";
-    String DOC_NUMBER_BB11_07_END = "BB11_07_END";
-    String DOC_NUMBER_BB11_08_START = "BB11_08_START";
-    String DOC_NUMBER_BB11_08_END = "BB11_08_END";
-    String DOC_NUMBER_BB12_03_START = "BB12_03_START ";
-    String DOC_NUMBER_BB12_03_END = "BB12_03_END";
-    String DOC_NUMBER_BB12_07_START = "BB12_07_START";
-    String DOC_NUMBER_BB12_07_END = "BB12_07_END";
-
-    /**
-     * Valores para la COMUNICACION DE BAJA
-     */
-    String DOC_NUMBER_FF11_01 = "FF11_1";
-    String DOC_NUMBER_FF11_02 = "FF11_2";
-    String DOC_NUMBER_FF11_03 = "FF11_3";
-    String DOC_NUMBER_FF11_04 = "FF11_4";
-    String DOC_NUMBER_FF11_05 = "FF11_5";
 
 
     /**
@@ -309,7 +250,6 @@ public interface IUBLConfig {
     String URI_CATALOG_12 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo12";
     String URI_CATALOG_20 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo20";
     String URI_CATALOG_16 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo16";
-    String URI_CATALOG_17 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo17";
     String URI_CATALOG_18 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo18";
     String URI_CATALOG_51 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51";
     String URI_CATALOG_53 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo53";
@@ -320,9 +260,7 @@ public interface IUBLConfig {
     String URI_CATALOG_61 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo61";
 
 
-    String ISSUETIME_DEFAULT = "00:00:00";
     String ADDRESS_TYPE_CODE_DEFAULT = "0000";
-    String ALLOWANCE_CHARGE_REASON_CODE_DEFAULT = "00";
 
     String TAX_TOTAL_GRT_ID = "9996";
 } //IUBLConfig

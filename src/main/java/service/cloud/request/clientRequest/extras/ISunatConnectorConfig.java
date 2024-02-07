@@ -16,15 +16,7 @@ public interface ISunatConnectorConfig {
      * en base al tipo de documento.
      */
     String INVOICE_PATH = "factura";
-    String PERCEPTION_PATH = "percepcion";
-    String RETENTION_PATH = "retencion";
-    String REMISSION_GUIDE_PATH = "guiaremision";
-    String BOLETA_PATH = "boleta";
-    String CREDIT_NOTE_PATH = "notacredito";
-    String DEBIT_NOTE_PATH = "notadebito";
-    String SUMMARY_DOCUMENT_PATH = "resumen";
-    String VOIDED_DOCUMENT_PATH = "baja";
-    String REVERSION_DOCUMENT_PATH = "reversion";
+
 
 
     /**

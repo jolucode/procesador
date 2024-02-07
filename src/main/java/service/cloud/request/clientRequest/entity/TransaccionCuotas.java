@@ -27,11 +27,6 @@ public class TransaccionCuotas implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-/*
-    @Id
-    @Column(name = "FE_Id")
-    private String fEId;
-*/
 
     @NonNull
     @EmbeddedId

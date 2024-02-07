@@ -10,51 +10,13 @@ public interface IVenturaError {
     ErrorObj ERROR_0 = new ErrorObj(0, "Success");
     ErrorObj ERROR_2 = new ErrorObj(2, "Error");
     /*** Errores Generales* <p>* Disponible: 11 - 100*/
-    ErrorObj ERROR_11 = new ErrorObj(11, "[GENERAL] Ocurrio un error mientras se convertia un FILE a un objeto JAXB.");
-    ErrorObj ERROR_12 = new ErrorObj(12, "[GENERAL] Ocurrio un problema al obtener el numero de errores de inicio de sesion.");
-    ErrorObj ERROR_13 = new ErrorObj(13, "[GENERAL] Ocurrio un error con el archivo de configuracion de la aplicacion. <sunat_config>");
-    ErrorObj ERROR_14 = new ErrorObj(14, "[GENERAL] La ruta especificada no contiene un archivo.");
     ErrorObj ERROR_15 = new ErrorObj(15, "[GENERAL] Hubo un problema al convertir el archivo en bytes.");
     /*** Seccion: Hibernate* <p>* Disponible: 101 - 150*/
-    ErrorObj ERROR_101 = new ErrorObj(101, "[HOMOLOGATION-DB] Hibernate sesion no puede abrirse.");
-    ErrorObj ERROR_102 = new ErrorObj(102, "[HOMOLOGATION-DB] Hibernate sesion is nulo o cerrado.");
-    ErrorObj ERROR_103 = new ErrorObj(103, "[HOMOLOGATION-DB] Hubo un problema al procesar la transaccion. La transaccion no fue registrada.");
     /*** Seccion: Sunat* <p>* Disponible: 151 - 200*/
     ErrorObj ERROR_151 = new ErrorObj(151, "[SUNAT-WS] Hubo un problema al intentar crear un cliente de servicio web de Sunat. El nombre del cliente no existe.");
-    ErrorObj ERROR_152 = new ErrorObj(152, "[SUNAT-WS] Ocurrio un problema al intentar conectarse con SUNAT.");
-    ErrorObj ERROR_153 = new ErrorObj(153, "[SUNAT-WS] Hubo un problema en el proceso de envio al SERVICIO WEB de Sunat.");
     ErrorObj ERROR_154 = new ErrorObj(154, "[SUNAT-WS-CONSULT] Ocurrio un problema al intentar conectarse con SUNAT.");
     ErrorObj ERROR_155 = new ErrorObj(155, "[SUNAT-WS-CONSULT] Hubo un problema en el proceso del SERVICIO WEB de consulta de Sunat.");
-    ErrorObj ERROR_156 = new ErrorObj(156, "[SUNAT-WS] Hubo un problema de conexion. TIMEOUT");
-    ErrorObj ERROR_1033 = new ErrorObj(1033, "[SUNAT-WS] El documento ya se ha declarado anteriormente. Cambie el estado a [Corregido] para si desea consultar el documento");
-    /*** Seccion: Homologation* <p>* Disponible: 201 - 250*/
-    ErrorObj ERROR_201 = new ErrorObj(201, "[HOMOLOGATION] El sistema retorno una lista de departamentos vacia. Verificar en la Base de Datos.");
-    ErrorObj ERROR_202 = new ErrorObj(202, "[HOMOLOGATION] El sistema retorno una lista de casos de prueba vacia. Verificar en la Base de Datos.");
-    ErrorObj ERROR_203 = new ErrorObj(203, "[HOMOLOGATION] Hubo un problema al extraer el PK del JTable, PK es nulo o vacio.");
-    ErrorObj ERROR_204 = new ErrorObj(204, "[HOMOLOGATION] La actualizacion del estado de la ficha de contribuyente no fue exitosa.");
-    ErrorObj ERROR_205 = new ErrorObj(205, "[HOMOLOGATION] Hubo un problema al extraer la lista de fichas de contribuyentes a ser homologadas.");
-    ErrorObj ERROR_206 = new ErrorObj(206, "[HOMOLOGATION] No se puede iniciar el Proceso de Homologacion porque no existen Fichas de contribuyentes para homologar.");
-    ErrorObj ERROR_207 = new ErrorObj(207, "[HOMOLOGATION] No es posible realizar el proceso de TESTEO. No existen Fichas de Contribuyentes.");
-    ErrorObj ERROR_208 = new ErrorObj(208, "[HOMOLOGATION] No es posible iniciar el proceso de HOMOLOGACION en hilos. No existen registros de Homologaciones.");
-    ErrorObj ERROR_209 = new ErrorObj(209, "[HOMOLOGATION] Ocurrio un problema al crear el directorio para los documentos del contribuyente.");
-    ErrorObj ERROR_210 = new ErrorObj(210, "[HOMOLOGATION] No se encontraron casos de prueba para el registro de Homologacion.");
-    ErrorObj ERROR_211 = new ErrorObj(211, "[HOMOLOGATION] No se pudo generar el nombre del documento UBL.");
-    ErrorObj ERROR_212 = new ErrorObj(212, "[HOMOLOGATION] Ocurrio un error al convertir el documento UBL al formato ZIP.");
-    ErrorObj ERROR_213 = new ErrorObj(213, "[HOMOLOGATION] GRAVE Ocurrio un error en el sistema, no se ha retornado una constancia de recepcion (CDR).");
-    ErrorObj ERROR_214 = new ErrorObj(214, "[HOMOLOGATION] Ocurrio un problema al intentar conectarse con SUNAT.");
-    ErrorObj ERROR_215 = new ErrorObj(215, "[HOMOLOGATION] No se puede procesar el caso de prueba ACTUAL porque el caso de prueba relacionado no fue EXITOSO.");
-    ErrorObj ERROR_216 = new ErrorObj(216, "[HOMOLOGATION] Ocurrio un error al extraer los numeros de documentos para el RESUMEN DIARIO.");
-    ErrorObj ERROR_217 = new ErrorObj(217, "[HOMOLOGATION] Ocurrio un error al extraer el ARRAY de error de Sunat (descripcion, tipo).");
-    ErrorObj ERROR_218 = new ErrorObj(218, "[HOMOLOGATION] Hubo un problema en el proceso de envio al SERVICIO WEB de Sunat.");
-    ErrorObj ERROR_219 = new ErrorObj(219, "[HOMOLOGATION] Ocurrio un problema al extraer el TICKET, estaba vacio o nulo.");
-    ErrorObj ERROR_220 = new ErrorObj(220, "[HOMOLOGATION] El caso de prueba fue rechazado por SUNAT.");
-    ErrorObj ERROR_221 = new ErrorObj(221, "[HOMOLOGATION] Proceso de HOMOLOGACION culminado correctamente.");
-    ErrorObj ERROR_222 = new ErrorObj(222, "[HOMOLOGATION] El proceso de HOMOLOGACION no culmino correctamente.");
-    ErrorObj ERROR_223 = new ErrorObj(223, "[HOMOLOGATION] El estado de la HOMOLOGACION ya fue actualizada al estado USER_ERROR.");
-    ErrorObj ERROR_224 = new ErrorObj(224, "[HOMOLOGATION] Hubo un problema al extraer la Ficha de Homologacion de la Base de Datos.");
-    ErrorObj ERROR_225 = new ErrorObj(225, "[HOMOLOGATION] Hubo un problema a nivel de los HILOS en el restablecimiento del proceso de Homologacion.");
-    ErrorObj ERROR_226 = new ErrorObj(226, "[HOMOLOGATION] El objeto ERROR de respuesta del proceso de PRUEBA de Homologacion es nulo.");
-    ErrorObj ERROR_227 = new ErrorObj(227, "[HOMOLOGATION] El documento ZIP a enviar es nulo.");
+
     /*** Seccion: Signer-documents* <p>* Disponible: 251 - 300*/
     ErrorObj ERROR_251 = new ErrorObj(251, "[SIGNER-DOCUMENTS] Ocurrio un problema al convertir el certificado a bytes.");
     ErrorObj ERROR_252 = new ErrorObj(252, "[SIGNER-DOCUMENTS] Ocurrio un error al extraer el ALIAS del certificado.");
@@ -69,14 +31,6 @@ public interface IVenturaError {
     ErrorObj ERROR_301 = new ErrorObj(301, "[UBL-DOCUMENT] Ocurrio un problema al generar el objeto SignatureType.");
     ErrorObj ERROR_302 = new ErrorObj(302, "[UBL-DOCUMENT] Ocurrio un problema al generar el objeto SupplierPartyType.");
     ErrorObj ERROR_303 = new ErrorObj(303, "[UBL-DOCUMENT] Ocurrio un problema al generar el objeto CustomerPartyType.");
-    ErrorObj ERROR_304 = new ErrorObj(304, "[UBL-DOCUMENT] Ocurrio un problema al generar el documento UBL de la ruta del TEMPLATE.");
-    ErrorObj ERROR_305 = new ErrorObj(305, "[UBL-DOCUMENT] El valor del objeto InvoiceTypeCodeType referente al TEMPLATE no es valido.");
-    ErrorObj ERROR_306 = new ErrorObj(306, "[UBL-DOCUMENT] Ocurrio un problema al guardar el documento UBL en DISCO.");
-    ErrorObj ERROR_307 = new ErrorObj(307, "[UBL-DOCUMENT] Ocurrio un problema al colocar la informacion del contribuyente en el TEMPLATE.");
-    ErrorObj ERROR_308 = new ErrorObj(308, "[UBL-DOCUMENT] El valor del objeto DocumentReferenceType referente a una NOTA DE CREDITO o NOTA DE DEBITO del TEMPLATE no es valido.");
-    ErrorObj ERROR_309 = new ErrorObj(309, "[UBL-DOCUMENT] El tipo de documento UBL ingresado no es valido.");
-    ErrorObj ERROR_310 = new ErrorObj(310, "[UBL-DOCUMENT] No es posible generar el RESUMEN DIARIO porque sus casos de pruebas referentes no estan en estado SUCCESS.");
-    ErrorObj ERROR_311 = new ErrorObj(311, "[UBL-DOCUMENT] No es posible generar la COMUNICACION DE BAJA porque sus casos de pruebas referentes no estan en estado SUCCESS.");
     ErrorObj ERROR_312 = new ErrorObj(312, "[UBL-DOCUMENT] La fecha de emision es nula.");
     ErrorObj ERROR_313 = new ErrorObj(313, "[UBL-DOCUMENT] Hubo un problema con la fecha de emision.");
     ErrorObj ERROR_314 = new ErrorObj(314, "[UBL-DOCUMENT] La fecha de vencimiento es nula.");
@@ -104,22 +58,16 @@ public interface IVenturaError {
     ErrorObj ERROR_336 = new ErrorObj(336, "[UBL-DOCUMENT] Ocurrio un problema al extraer la informacion del ANTICIPO.");
     ErrorObj ERROR_337 = new ErrorObj(337, "[UBL-DOCUMENT] Ocurrio un problema al generar el objeto DiscrepancyResponse.");
     ErrorObj ERROR_338 = new ErrorObj(338, "[UBL-DOCUMENT] Ocurrio un problema al generar el objeto BillingReference.");
-    ErrorObj ERROR_339 = new ErrorObj(339, "[UBL-DOCUMENT] No es posible generar el objeto AccountingCustomerParty porque la serie del documento no es valida.");
     ErrorObj ERROR_340 = new ErrorObj(340, "[UBL-DOCUMENT] La fecha de referencia es nula.");
     ErrorObj ERROR_341 = new ErrorObj(341, "[UBL-DOCUMENT] Hubo un problema generico al construir el objeto InvoiceType de la FACTURA.");
     ErrorObj ERROR_342 = new ErrorObj(342, "[UBL-DOCUMENT] Hubo un problema generico al construir el objeto InvoiceType de la BOLETA DE VENTA.");
     ErrorObj ERROR_343 = new ErrorObj(343, "[UBL-DOCUMENT] Hubo un problema generico al construir el objeto CreditNoteType.");
     ErrorObj ERROR_344 = new ErrorObj(344, "[UBL-DOCUMENT] Hubo un problema generico al construir el objeto DebitNoteType.");
     ErrorObj ERROR_345 = new ErrorObj(345, "[UBL-DOCUMENT] Hubo un problema generico al construir el objeto VoidedDocumentsType.");
-    ErrorObj ERROR_346 = new ErrorObj(346, "[UBL-DOCUMENT] Hubo un problema generico al construir el objeto SummaryDocumentsType.");
     ErrorObj ERROR_347 = new ErrorObj(347, "[UBL-DOCUMENT] Hubo un problema con la fecha de referencia.");/* ErrorObj ERROR_348 = new ErrorObj(348,"[UBL-DOCUMENT] No se encontro el valor del SUBTOTAL en la transaccion.");*/
-    ErrorObj ERROR_349 = new ErrorObj(349, "[UBL-DOCUMENT] Hubo un problema al generar el BillingPayment en una de las LINEAS del RESUMEN DIARIO.");
-    ErrorObj ERROR_350 = new ErrorObj(350, "[UBL-DOCUMENT] Hubo un problema al generar el TaxtTotal de Impuestos del RESUMEN DIARIO.");
     ErrorObj ERROR_351 = new ErrorObj(351, "[UBL-DOCUMENT] Hubo un problema generico al construir el objeto PerceptionType.");
     ErrorObj ERROR_352 = new ErrorObj(352, "[UBL-DOCUMENT] Hubo un problema generico al construir el objeto RetentionType.");
     ErrorObj ERROR_353 = new ErrorObj(353, "[UBL-DOCUMENT] Hubo un problema con la hora de emision.");
-    ErrorObj ERROR_354 = new ErrorObj(354, "[UBL-DOCUMENT] La fecha de inicio es nula.");
-    ErrorObj ERROR_355 = new ErrorObj(355, "[UBL-DOCUMENT] Hubo un problema con la fecha de inicio.");
     ErrorObj ERROR_356 = new ErrorObj(356, "[UBL-DOCUMENT] Hubo un problema al generar el TAG Delivery de un item en la transaccion.");
     ErrorObj ERROR_357 = new ErrorObj(357, "[UBL-DOCUMENT] Hubo un problema al generar el TAG Delivery/DeliveryTerms de un item en la transaccion.");
     ErrorObj ERROR_358 = new ErrorObj(358, "[UBL-DOCUMENT] Hubo un problema al generar el TAG <cac:Delivery><cac:Shipment> de un item en la transaccion.");
@@ -147,12 +95,8 @@ public interface IVenturaError {
     ErrorObj ERROR_409 = new ErrorObj(409, "[PDF] El objeto DebitNoteObj es nulo.");
     ErrorObj ERROR_410 = new ErrorObj(410, "[PDF] No se pudo dar formato al departamento, provincia y distrito.");
     ErrorObj ERROR_411 = new ErrorObj(411, "[PDF] No se encontraron items en el objeto InvoiceType de la FACTURA.");
-    ErrorObj ERROR_412 = new ErrorObj(412, "[PDF] No se encontraron items en el objeto InvoiceType de la BOLETA.");
-    ErrorObj ERROR_413 = new ErrorObj(413, "[PDF] No se encontraron items en el objeto CreditNoteType de la NOTA DE CREDITO.");
-    ErrorObj ERROR_414 = new ErrorObj(414, "[PDF] No se encontraron items en el objeto DebitNoteType de la NOTA DE DEBITO.");
     ErrorObj ERROR_415 = new ErrorObj(415, "[PDF] Hubo un problema al extraer la informacion de los items.");
     ErrorObj ERROR_416 = new ErrorObj(416, "[PDF] La lista de AlternativeConditionPrice de un item es nula.");
-    ErrorObj ERROR_417 = new ErrorObj(417, "[PDF] No se pudo encontrar el valor del AlternativeConditionPrice especificado segun el codigo.");
     ErrorObj ERROR_418 = new ErrorObj(418, "[PDF] Ocurrio un problema al generar el CODIGO DE BARRAS.");
     ErrorObj ERROR_419 = new ErrorObj(419, "[PDF] Ocurrio un problema al extraer uno de los valores TOTALES.");
     ErrorObj ERROR_420 = new ErrorObj(420, "[PDF] Ocurrio un problema al extraer uno de los valores de PROPIEDADES.");
@@ -164,7 +108,6 @@ public interface IVenturaError {
     ErrorObj ERROR_426 = new ErrorObj(426, "[PDF] El codigo del tipo de Nota de Credito no es valido.");
     ErrorObj ERROR_427 = new ErrorObj(427, "[PDF] El codigo del tipo de Nota de Credito esta vacio.");
     ErrorObj ERROR_428 = new ErrorObj(428, "[PDF] No existe documento relacionado a la Nota de Credito. BillingReference=null");
-    ErrorObj ERROR_429 = new ErrorObj(429, "[PDF] No existe documento relacionado a la Nota de Debito. BillingReference=null");
     ErrorObj ERROR_430 = new ErrorObj(430, "[PDF] El codigo del tipo de documento relacionado no es valido.");
     ErrorObj ERROR_431 = new ErrorObj(431, "[PDF] No es posible generar los datos del RECEPTOR porque la serie del documento no es valida.");
     ErrorObj ERROR_432 = new ErrorObj(432, "[PDF] El codigo del tipo de Nota de Debito no es valido.");
@@ -174,21 +117,15 @@ public interface IVenturaError {
     ErrorObj ERROR_443 = new ErrorObj(443, "[PDF] Ocurrio un error al crear el PDF de la NOTA DE CREDITO.");
     ErrorObj ERROR_444 = new ErrorObj(444, "[PDF] Ocurrio un error al crear el PDF de la NOTA DE DEBITO.");
     /*** Seccion: SunatConnectorClient* <p>* Disponible: 451 - 500*/
-    ErrorObj ERROR_451 = new ErrorObj(451, "[SUNAT-CONNECTOR] El tipo de transaccion es invalida.");
-    ErrorObj ERROR_452 = new ErrorObj(452, "[SUNAT-CONNECTOR] La transaccion de entrada es nula.");
-    ErrorObj ERROR_453 = new ErrorObj(453, "[SUNAT-CONNECTOR] Hubo un problema al transformar el archivo de configuracion a un objeto JAXB.");
     ErrorObj ERROR_454 = new ErrorObj(454, "[SUNAT-CONNECTOR] Hubo un problema al guardar el documento UBL en DISCO.");
     ErrorObj ERROR_455 = new ErrorObj(455, "[SUNAT-CONNECTOR] Ocurrio un error al convertir el documento UBL al formato ZIP.");
     ErrorObj ERROR_456 = new ErrorObj(456, "[SUNAT-CONNECTOR] No se pudo configurar el WS Consumidor.");
     ErrorObj ERROR_457 = new ErrorObj(457, "[SUNAT-CONNECTOR] Hubo un problema al comprimir el documento.");
     ErrorObj ERROR_458 = new ErrorObj(458, "[SUNAT-CONNECTOR] La constancia CDR retornada por Sunat es nula.");
-    ErrorObj ERROR_459 = new ErrorObj(459, "[SUNAT-CONNECTOR] Ocurrio un problema al convertir el documento UBL en DISCO a bytes.");
     ErrorObj ERROR_460 = new ErrorObj(460, "[SUNAT-CONNECTOR] No es posible generar la representacion impresa porque el tipo de documento no es valido.");
     ErrorObj ERROR_461 = new ErrorObj(461, "[SUNAT-CONNECTOR] No es posible guardar el documento PDF en DISCO porque el PDF en bytes es nulo.");
     ErrorObj ERROR_462 = new ErrorObj(462, "[SUNAT-CONNECTOR] Hubo un problema al extraer un tipo de impuesto.");
-    ErrorObj ERROR_463 = new ErrorObj(463, "[SUNAT-CONNECTOR] El tipo de documento en la transaccion DOC_Codigo no es valido.");
     ErrorObj ERROR_464 = new ErrorObj(464, "[SUNAT-CONNECTOR] No se pudo configurar el WS Consumidor de Consultas.");
-    ErrorObj ERROR_465 = new ErrorObj(465, "[SUNAT-CONNECTOR] El objeto StatusResponse retornado por el WS de Consulta es nulo.");
     /*** Seccion: CHECK* <p>* Disponible: 501 - 550*/
     ErrorObj ERROR_501 = new ErrorObj(501, "[CHECK] Ocurrio un problema al extraer uno de los valores TOTALES.");
     ErrorObj ERROR_502 = new ErrorObj(502, "[CHECK] No se encontro el TAG de totales de la OP.GRAVADA, pero existen items con dicho tipo de operacion.");
@@ -229,9 +166,6 @@ public interface IVenturaError {
     ErrorObj ERROR_534 = new ErrorObj(534, "[CHECK] Se encontro items TAG TotalInvoiceAmount que son menores a CERO.");
     ErrorObj ERROR_535 = new ErrorObj(535, "[CHECK] Se encontro items TAG PerceptionAmount que son menores a CERO.");
     ErrorObj ERROR_536 = new ErrorObj(536, "[CHECK] Se encontro items TAG SunatNetTotalCashed que son menores a CERO.");
-    ErrorObj ERROR_537 = new ErrorObj(537, "[CHECK] El TAG SUNATPerceptionSystemCode debe contener solo DOS caracteres.");
-    ErrorObj ERROR_538 = new ErrorObj(538, "[CHECK] El TAG SunatPerceptionSystemCode debe contener solo UN caracter.");
-    ErrorObj ERROR_539 = new ErrorObj(539, "[CHECK] El formato ID de la referencia no tiene el formato adecuado.");
     ErrorObj ERROR_1000 = new ErrorObj(1000, "[CHECK] El ubigeo del cliente no cumple con el formato establecido .");
     ErrorObj ERROR_1001 = new ErrorObj(1001, "[CHECK] El ubigeo del emisor no cumple con el formato establecido .");
     /***** RETENCION CHECK** ****/
@@ -239,16 +173,11 @@ public interface IVenturaError {
     ErrorObj ERROR_541 = new ErrorObj(541, "[CHECK] El TAG SunatRetentionPercent debe contener solo UN caracter.");
     ErrorObj ERROR_542 = new ErrorObj(542, "[CHECK] El TAG TotalInvoiceAmount debe ser mayor a CERO.");
     ErrorObj ERROR_543 = new ErrorObj(543, "[CHECK] El TAG El TAG TotalPaid debe contener solo UN caracter debe ser mayor a CERO.");
-    ErrorObj ERROR_544 = new ErrorObj(544, "[CHECK] Se encontro items TAG PaidAmount que son menores a CERO.");
-    ErrorObj ERROR_545 = new ErrorObj(545, "[CHECK] Se encontro items TAG TotalInvoiceAmount que son menores a CERO.");
-    ErrorObj ERROR_546 = new ErrorObj(546, "[CHECK] Se encontro items TAG SunatRetentionAmount que son menores a CERO.");
-    ErrorObj ERROR_547 = new ErrorObj(547, "[CHECK] Se encontro items TAG SunatNetTotalCashed que son menores a CERO.");
-    ErrorObj ERROR_548 = new ErrorObj(548, "[CHECK] El formato ID de la referencia no tiene el formato adecuado.");
+
     ErrorObj ERROR_1100 = new ErrorObj(1100, "[CHECK] El ubigeo del cliente no cumple con el formato establecido .");
     ErrorObj ERROR_1101 = new ErrorObj(1101, "[CHECK] El ubigeo del emisor no cumple con el formato establecido .");
     /**
      * ERROR DE CONEXION A INTERNET
      */
     ErrorObj ERROR_5000 = new ErrorObj(5000, "[CONNECTION] No se puede establecer conexion a internet.");
-    ErrorObj ERROR_5001 = new ErrorObj(5001, "[SUNAT] EL CDR devuelto se encuentra vacio.");
 }

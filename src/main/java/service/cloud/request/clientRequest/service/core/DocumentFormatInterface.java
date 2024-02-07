@@ -13,5 +13,4 @@ public interface DocumentFormatInterface {
 
     public Optional<byte[]> unzipResponse(byte[] cdr) throws IOException;
 
-    public String cargarAnalizarReglasFormatoDOC(Transaccion transaction, String documentCode);
 }

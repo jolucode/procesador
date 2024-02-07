@@ -12,15 +12,8 @@ public interface ISunatConfig {
      * Nombre de tipo de clientes WS.
      */
     String TEST_CLIENT = "test";
-    String HOMOLOGATION_CLIENT = "homologation";
     String PRODUCTION_CLIENT = "production";
 
-
-    /**
-     * Prefijos con los que Sunat devuelve el codigo de una excepcion
-     */
-    String SOAP_FAULT_CLIENT_EXP = "soap-env-Client";
-    String SOAP_FAULT_SERVER_EXP = "soap-env-Server";
 
 
     /**
