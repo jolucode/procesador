@@ -563,12 +563,17 @@ public class ServiceImpl implements ServiceInterface {
         log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
         Response response = wsConsumer.sendBill(zipDocument, documentName, configuracion);
         log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
-        log.setThirdPartyResponseXml(new String(response.getResponse(), StandardCharsets.UTF_8));
+
         if (null != response.getResponse()) {
+          log.setThirdPartyResponseXml(new String(response.getResponse(), StandardCharsets.UTF_8));
           transactionResponse = processorCoreInterface.processCDRResponseV2(response.getResponse(), signedXmlDocument, documentWRP, transaction, configuracion);
+          log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
         } else {
+          log.setThirdPartyResponseXml(response.getErrorMessage());
           transactionResponse = processorCoreInterface.processResponseService(transaction, response);
+          logger.error("Error: " + transactionResponse.getMensaje());
         }
+
       } else {
         if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
           WSConsumerConsult wsConsumer = WSConsumerConsult.newInstance(this.docUUID);
@@ -604,6 +609,7 @@ public class ServiceImpl implements ServiceInterface {
     transactionResponse.setBarcodeValue(barcodeValue);
 
     transactionResponse.setLogDTO(log);
+    log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
     return transactionResponse;
   }
 
