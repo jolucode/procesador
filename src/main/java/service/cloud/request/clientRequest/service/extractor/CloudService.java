@@ -67,6 +67,8 @@ public class CloudService implements CloudInterface {
 
     public Transaccion llenar(TransacctionDTO transacctionDTO) throws JsonProcessingException {
 
+
+
         logger.info("Tipo de transaccion: " + Util.getTipoTransac(transacctionDTO.getFE_TipoTrans()));
 
 
@@ -74,6 +76,7 @@ public class CloudService implements CloudInterface {
         optionalTransaccion.ifPresent(transaccionRepository::delete);
 
         Transaccion transaccion = insertarDatosTransaccion(transacctionDTO);
+        transaccion.setDbName(transacctionDTO.getDbName());
         transaccion.setFE_Id(transacctionDTO.getFE_Id());
         transacctionDTO.setFE_Id(transaccion.getFE_Id());
 

@@ -220,6 +220,8 @@ public class ServicePrincipal implements InterfacePrincipal {
       request.setDocumentName(tr.getIdentificador());
       request.setTicketBaja(tr.getTicketRest());
 
+
+      request.setDbName(tc.getDbName());
       request.setUrlOnpremise(providerProperties.getUrlOnpremise(tc.getDocIdentidad_Nro()));
 
       if (tr.getMensaje().contains("ha sido aceptad") || tr.getMensaje().contains("aprobado")) {

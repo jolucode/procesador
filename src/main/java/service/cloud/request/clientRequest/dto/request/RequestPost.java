@@ -21,5 +21,6 @@ public class RequestPost {
     private Data.Error responseError;
     @JsonIgnore
     private String urlOnpremise;
+    private String dbName;
 
 }

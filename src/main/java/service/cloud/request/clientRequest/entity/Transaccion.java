@@ -326,6 +326,9 @@ public class Transaccion implements Serializable {
     private String TicketBaja;
 
 
+    @Transient
+    private String dbName;
+
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "transaccion", fetch = FetchType.EAGER, orphanRemoval = true)
     private List<TransaccionAnticipo> transaccionAnticipoList;

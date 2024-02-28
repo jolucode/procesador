@@ -8,6 +8,8 @@ import java.util.Map;
 
 @Data
 public class TransacctionDTO {
+
+    private String dbName;
     private String SN_NombreComercial;
     private String ANTCIPO_Tipo_Doc_ID;
     private String SN_DIR_NomCalle;
