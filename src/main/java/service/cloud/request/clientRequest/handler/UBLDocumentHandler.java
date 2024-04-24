@@ -153,29 +153,21 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
 
 
-            /* Colocar la informacion en el TAG UBLExtension */
-            ExtensionContentType extensionContent = new ExtensionContentType();
-            //
-
-            boolean texto = false;
             for (int i = 0; i < transaccion.getTransaccionContractdocrefList().size(); i++) {
-                if ("texto_amplio_certimin".equals(transaccion.getTransaccionContractdocrefList().get(i).getUsuariocampos().getNombre())) {
+                if ("texto_amplio".equals(transaccion.getTransaccionContractdocrefList().get(i).getUsuariocampos().getNombre())) {
                     TransaccionContractdocref objecto = transaccion.getTransaccionContractdocrefList().get(i);
                     if (objecto != null && !objecto.getValor().isEmpty()) {
                         NoteType noteType = new NoteType();
                         noteType.setValue(objecto.getValor());
-                        extensionContent.setNote(noteType);
-                        texto = true;
+                        ublExtension.setNote(noteType);
                         break;
                     }
                 }
             }
 
-            if (!texto) {
-                extensionContent.setAny((org.w3c.dom.Element) getExtensionContentNode(additionalInformation));
-            }
-
-
+            /* Colocar la informacion en el TAG UBLExtension */
+            ExtensionContentType extensionContent = new ExtensionContentType();
+            extensionContent.setAny((org.w3c.dom.Element) getExtensionContentNode(additionalInformation));
             ublExtension.setExtensionContent(extensionContent);
         } catch (UBLDocumentException e) {
             logger.error("getUBLExtensionTotalAndProperty() [" + this.identifier + "] UBLDocumentException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
