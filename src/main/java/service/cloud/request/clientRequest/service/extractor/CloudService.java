@@ -364,7 +364,7 @@ public class CloudService implements CloudInterface {
                 transaccionGuiaRemision.setTipoDOCTransportista(transactionGuiasDTO.getTipoDOCTransportista());
                 transaccionGuiaRemision.setTipoDocConductor(transactionGuiasDTO.getTipoDocConductor());
                 transaccionGuiaRemision.setUnidadMedida(transactionGuiasDTO.getUnidadMedida());
-                transaccionGuiaRemision.setDireccionPartida(transactionGuiasDTO.getDireccionLlegada());
+                transaccionGuiaRemision.setDireccionPartida(transactionGuiasDTO.getDireccionPartida());
                 transaccionGuiaRemision.setUbigeoPartida(transactionGuiasDTO.getUbigeoPartida());
 
                 //GUIAS REMISION REST
