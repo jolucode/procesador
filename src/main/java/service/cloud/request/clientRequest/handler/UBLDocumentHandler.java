@@ -21,6 +21,7 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.D
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.invoice_2.InvoiceType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.perception_1.PerceptionType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.retention_1.RetentionType;
+import service.cloud.request.clientRequest.xmlFormatSunat.xsd.summarydocuments_1.SummaryDocumentsType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.sunataggregatecomponents_1.AdditionalInformationType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.sunataggregatecomponents_1.*;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.voideddocuments_1.VoidedDocumentsType;
@@ -2246,4 +2247,541 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         }
         return voidedDocumentType;
     } //generateVoidedDocumentType
-} //UBLDocumentHandler
+
+    public SummaryDocumentsType generateSummaryDocumentsTypeV2(Transaccion transaction, String signerName) throws UBLDocumentException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+generateSummaryDocumentsType() [" + this.identifier + "]");
+        }
+        SummaryDocumentsType summaryDocumentsType = null;
+        String idTransaccion = transaction.getANTICIPO_Id().replace("RA","RC");
+        try {
+            /* Instanciar objeto SummaryDocumentsType para el resumen diario */
+            summaryDocumentsType = new SummaryDocumentsType();
+            /* Agregar <VoidedDocuments><ext:UBLExtensions> */
+            if (logger.isDebugEnabled()) {
+                logger.debug("generateSummaryDocumentsType() [" + this.identifier + "] Agregando TAG para colocar la FIRMA.");
+            }
+            UBLExtensionsType ublExtensions = new UBLExtensionsType();
+
+            ublExtensions.getUBLExtension().add(getUBLExtensionSigner());
+            summaryDocumentsType.setUBLExtensions(ublExtensions);
+
+            /* Agregar <SummaryDocuments><cbc:UBLVersionID> */
+            summaryDocumentsType.setUBLVersionID(getUBLVersionID());
+
+
+            /* Agregar <SummaryDocuments><cbc:CustomizationID> */
+            summaryDocumentsType.setCustomizationID(getCustomizationID11());
+
+            /* Agregar <SummaryDocuments><cbc:ID> */
+            if (logger.isDebugEnabled()) {
+                logger.debug("generateSummaryDocumentsType() [" + this.identifier + "] Agregando IdTransaccion: " + idTransaccion);
+            }
+            IDType idDocIdentifier = new IDType();
+            idDocIdentifier.setValue(idTransaccion);
+            summaryDocumentsType.setID(idDocIdentifier);
+
+            /* Agregar <SummaryDocuments><cbc:ReferenceDate> */
+            System.out.println("*****************************************************************************************************************************");
+            ReferenceDateType referenceDate2 = getReferenceDate(transaction.getDOC_FechaEmision());
+            summaryDocumentsType.setReferenceDate(referenceDate2);
+
+            Date fecha = new Date();
+            summaryDocumentsType.setIssueDate(getIssueDate(fecha));
+            System.out.println("*****************************************************************************************************************************");
+
+            /* Agregar <VoidedDocuments><cac:Signature> */
+            summaryDocumentsType.getSignature().add(getSignature(transaction.getDocIdentidad_Nro(), transaction.getRazonSocial(), signerName));
+
+            /* Agregar <SummaryDocuments><cac:AccountingSupplierParty> */
+            //SupplierPartyType accountingSupplierParty = generateAccountingSupplierParty(transaction.getNumeroRuc(), transaction.getDocIdentidadTipo(), transaction.getRazonSocial(), transaction.getNombreComercial(), transaction.getDIRDireccion(), transaction.getDIRDepartamento(), transaction.getDIRProvincia(), transaction.getDIRDistrito(), transaction.getDIRUbigeo(), transaction.getDIRPais(), transaction.getPersonContacto(), transaction.getEMail());
+            //summaryDocumentsType.setAccountingSupplierParty(accountingSupplierParty);
+            SupplierPartyType accountingSupplierParty = generateAccountingSupplierParty(transaction.getDocIdentidad_Nro(), transaction.getDOC_Codigo(), transaction.getRazonSocial(), transaction.getNombreComercial(), transaction.getDIR_Direccion(), transaction.getDIR_Departamento(), transaction.getDIR_Provincia(), transaction.getDIR_Distrito(), transaction.getDIR_Ubigeo(), transaction.getDIR_Pais(), transaction.getPersonContacto(), transaction.getEMail());
+            summaryDocumentsType.setAccountingSupplierParty(accountingSupplierParty);
+
+            /* Agregar <SummaryDocuments><sac:SummaryDocumentsLine> */
+            summaryDocumentsType.getSummaryDocumentsLine().addAll(getAllSummaryDocumentLinesV2(transaction));
+
+        } catch (UBLDocumentException e) {
+            logger.error("generateSummaryDocumentsType() [" + this.identifier + "] UBLDocumentException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.error("generateSummaryDocumentsType() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
+            throw new UBLDocumentException("Error generación baja de documento");
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("-generateSummaryDocumentsType() [" + this.identifier + "]");
+        }
+        return summaryDocumentsType;
+    } // generateSummaryDocumentsType
+
+    private UBLVersionIDType getUBLVersionID() {
+        UBLVersionIDType ublVersionID = new UBLVersionIDType();
+        ublVersionID.setValue(IUBLConfig.UBL_VERSION_ID_2_0);
+
+        return ublVersionID;
+    } // getUBLVersionID
+
+    private CustomizationIDType getCustomizationID11() {
+        CustomizationIDType customizationID = new CustomizationIDType();
+        customizationID.setValue(IUBLConfig.CUSTOMIZATION_ID1);
+        return customizationID;
+    } // getCustomizationID
+
+    public SupplierPartyType generateAccountingSupplierParty(String identifier,
+                                                             String identifierType, String socialReason, String commercialName,
+                                                             String fiscalAddress, String department, String province,
+                                                             String district, String ubigeo, String countryCode,
+                                                             String contactName, String electronicMail)
+            throws UBLDocumentException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+generateAccountingSupplierParty() ["
+                    + this.identifier + "]");
+        }
+        SupplierPartyType accountingSupplierParty = null;
+
+        try {
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("+CustomerAssignedAccountIDType() ["
+                        + this.identifier + "]");
+            }
+
+            /* <cac:AccountingSupplierParty><cbc:CustomerAssignedAccountID> */
+            CustomerAssignedAccountIDType customerAssignedAccountID = new CustomerAssignedAccountIDType();
+            customerAssignedAccountID.setValue(identifier);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("+AdditionalAccountIDType() ["
+                        + this.identifier + "]");
+            }
+
+            /* <cac:AccountingSupplierParty><cbc:AdditionalAccountID> */
+            AdditionalAccountIDType additionalAccountID = new AdditionalAccountIDType();
+            additionalAccountID.setValue(identifierType);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("+PartyType() ["
+                        + this.identifier + "]");
+            }
+
+            /* <cac:AccountingSupplierParty><cac:Party> */
+            PartyType party = generateParty(socialReason, commercialName,
+                    fiscalAddress, department, province, district, ubigeo,
+                    countryCode, contactName, electronicMail);
+
+            /*
+             * Armar el objeto con sus respectivos TAG's
+             */
+            accountingSupplierParty = new SupplierPartyType();
+            accountingSupplierParty
+                    .setCustomerAssignedAccountID(customerAssignedAccountID);
+            accountingSupplierParty.getAdditionalAccountID().add(
+                    additionalAccountID);
+            accountingSupplierParty.setParty(party);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("-generateAccountingSupplierParty() ["
+                        + this.identifier + "] accountingSupplierParty: "
+                        + e.getMessage());
+            }
+
+            throw new UBLDocumentException(IVenturaError.ERROR_302);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("-generateAccountingSupplierParty() ["
+                    + this.identifier + "] accountingSupplierParty: "
+                    + accountingSupplierParty);
+        }
+        return accountingSupplierParty;
+    } // generateAccountingSupplierParty
+
+    private PartyType generateParty(String socialReasonValue,
+                                    String commercialNameValue, String fiscalAddressValue,
+                                    String departmentValue, String provinceValue, String districtValue,
+                                    String ubigeoValue, String countryCodeValue,
+                                    String contactNameValue, String electronicMailValue)
+            throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+generateParty() [" + this.identifier + "]");
+        }
+        PartyType party = new PartyType();
+
+        /* <cac:Party><cac:PartyName> */
+        if (StringUtils.isNotBlank(commercialNameValue)) {
+            PartyNameType partyName = new PartyNameType();
+            NameType name = new NameType();
+            name.setValue(commercialNameValue);
+            partyName.setName(name);
+
+            party.getPartyName().add(partyName);
+        }
+
+        /* <cac:Party><cac:PostalAddress> */
+        if (StringUtils.isNotBlank(fiscalAddressValue)) {
+            AddressType postalAddress = null;
+
+            /* <cac:Party><cac:PostalAddress><cbc:ID> */
+            IDType id = new IDType();
+            id.setValue(ubigeoValue);
+
+            /* <cac:Party><cac:PostalAddress><cbc:StreetName> */
+            StreetNameType streetName = new StreetNameType();
+            streetName.setValue(fiscalAddressValue);
+
+            /* <cac:Party><cac:PostalAddress><cbc:CityName> */
+            CityNameType cityName = new CityNameType();
+            cityName.setValue(provinceValue);
+
+            /* <cac:Party><cac:PostalAddress><cbc:CountrySubentity> */
+            CountrySubentityType countrySubentity = new CountrySubentityType();
+            countrySubentity.setValue(departmentValue);
+
+            /* <cac:Party><cac:PostalAddress><cbc:District> */
+            DistrictType district = new DistrictType();
+            district.setValue(districtValue);
+
+            /* <cac:Party><cac:PostalAddress><cac:Country> */
+            CountryType country = new CountryType();
+            IdentificationCodeType identificationCode = new IdentificationCodeType();
+            identificationCode.setValue(countryCodeValue);
+            country.setIdentificationCode(identificationCode);
+
+            /*
+             * Armar el objeto con sus respectivos TAG's
+             */
+            postalAddress = new AddressType();
+            postalAddress.setID(id);
+            postalAddress.setStreetName(streetName);
+            postalAddress.setCityName(cityName);
+            postalAddress.setCountrySubentity(countrySubentity);
+            postalAddress.setDistrict(district);
+            postalAddress.setCountry(country);
+
+            party.setPostalAddress(postalAddress);
+        }
+
+        /* <cac:Party><cac:PartyLegalEntity> */
+        PartyLegalEntityType partyLegalEntity = null;
+        {
+            partyLegalEntity = new PartyLegalEntityType();
+
+            RegistrationNameType registrationName = new RegistrationNameType();
+            registrationName.setValue(socialReasonValue);
+            partyLegalEntity.setRegistrationName(registrationName);
+
+            List<PartyLegalEntityType> listaEntityTypes = new ArrayList<>();
+            listaEntityTypes.add(partyLegalEntity);
+
+            party.setPartyLegalEntity(listaEntityTypes);
+        }
+
+        /* <cac:Party><cac:Contact> */
+        if (StringUtils.isNotBlank(electronicMailValue)) {
+            ContactType contact = new ContactType();
+
+            ElectronicMailType electronicMail = new ElectronicMailType();
+            electronicMail.setValue(electronicMailValue);
+            contact.setElectronicMail(electronicMail);
+
+            if (StringUtils.isNotBlank(contactNameValue)) {
+                NameType name = new NameType();
+                name.setValue(contactNameValue);
+                contact.setName(name);
+            }
+
+            party.setContact(contact);
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("-generateParty() [" + this.identifier + "]");
+        }
+        return party;
+    } // generateParty
+
+
+    private List<SummaryDocumentsLineType> getAllSummaryDocumentLinesV2(Transaccion transaccion) throws UBLDocumentException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+getAllSummaryDocumentLines() [" + this.identifier + "] ");
+        }
+        List<SummaryDocumentsLineType> summaryDocumentLineList = null;
+
+        try {
+            summaryDocumentLineList = new ArrayList<>(1);
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Extrayendo informacion del item...");
+            }
+
+            SummaryDocumentsLineType summaryDocumentLine = new SummaryDocumentsLineType();
+
+            /* Agregar <sac:SummaryDocumentsLine><cbc:LineID> */
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando el LINEID.");
+            }
+            LineIDType lineID = new LineIDType();
+            lineID.setValue(String.valueOf(1));
+            summaryDocumentLine.setLineID(lineID);
+
+            /*
+             * Agregar la SERIE a la que hace referencia los documentos
+             * de esta LINEA.
+             * <sac:SummaryDocumentsLine><sac:DocumentSerialID>
+             */
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando la SERIE a la LINEA.");
+            }
+
+            IDType iDType3 = new IDType();
+            iDType3.setValue(transaccion.getDOC_Serie() + "-" + transaccion.getDOC_Numero());
+            summaryDocumentLine.setiD(iDType3);
+
+            /*
+             * Agregar el codigo del tipo de documento de la LINEA
+             * <sac:SummaryDocumentsLine><cbc:DocumentTypeCode>
+             */
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando el CODIGO del tipo de documento.");
+            }
+            DocumentTypeCodeType documentTypeCode = new DocumentTypeCodeType();
+            documentTypeCode.setValue(transaccion.getDOC_Codigo());
+            summaryDocumentLine.setDocumentTypeCode(documentTypeCode);
+
+            CustomerPartyType customerPartyType = new CustomerPartyType();
+            CustomerAssignedAccountIDType customerAssignedAccountIDType = new CustomerAssignedAccountIDType();
+            customerAssignedAccountIDType.setValue(transaccion.getDocIdentidad_Nro());
+            AdditionalAccountIDType additionalAccountIDType = new AdditionalAccountIDType();
+            additionalAccountIDType.setValue(transaccion.getDocIdentidad_Tipo());
+            customerPartyType.setCustomerAssignedAccountID(customerAssignedAccountIDType);
+            customerPartyType.getAdditionalAccountID().add(additionalAccountIDType);
+            summaryDocumentLine.setCustomerParty(customerPartyType);
+
+              /*if (!transLine.getDocIdModificado().isEmpty()) {
+                  BillingReferenceType billingReferenceType = new BillingReferenceType();
+                  DocumentReferenceType documentReferenceType = new DocumentReferenceType();
+                  IDType iDType = new IDType();
+                  iDType.setValue(transLine.getDocIdModificado());
+                  documentReferenceType.setID(iDType);
+                  DocumentTypeCodeType documentTypeCodeType = new DocumentTypeCodeType();
+                  documentTypeCodeType.setValue(transLine.getTipoDocIdentidadModificado());
+                  documentReferenceType.setDocumentTypeCode(documentTypeCodeType);
+                  billingReferenceType.setInvoiceDocumentReference(documentReferenceType);
+                  summaryDocumentLine.setBillingReference(billingReferenceType);
+              }*/
+
+              /*if (transLine.getMontoPercepcion().compareTo(BigDecimal.ZERO) > 0) {
+                  SUNATPerceptionSummaryDocumentReference sUNATPerceptionSummaryDocumentReferenceType = new SUNATPerceptionSummaryDocumentReference();
+                  SUNATPerceptionSystemCodeType sUNATPerceptionSystemCodeType = new SUNATPerceptionSystemCodeType();
+                  sUNATPerceptionSystemCodeType.setValue((transLine.getRegimenPercepcion()));
+                  sUNATPerceptionSummaryDocumentReferenceType.setsUNATPerceptionSystemCode(sUNATPerceptionSystemCodeType);
+
+                  SUNATPerceptionPercentType sUNATPerceptionPercentType = new SUNATPerceptionPercentType();
+                  sUNATPerceptionPercentType.setValue(((transLine.getTasaPercepcion()).setScale(2, BigDecimal.ROUND_HALF_UP)).toString());
+                  sUNATPerceptionSummaryDocumentReferenceType.setsUNATPerceptionPercent(sUNATPerceptionPercentType);
+
+                  TotalInvoiceAmountType totalInvoiceAmountType = new TotalInvoiceAmountType();
+                  totalInvoiceAmountType.setValue((transLine.getMontoPercepcion()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                  totalInvoiceAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transLine.getCodMoneda()));
+                  sUNATPerceptionSummaryDocumentReferenceType.setTotalInvoiceAmount(totalInvoiceAmountType);
+
+                  SUNATTotalCashedType sUNATTotalCashedType = new SUNATTotalCashedType();
+                  sUNATTotalCashedType.setValue((transLine.getMontoTotalCobrar().add(transLine.getMontoPercepcion())).setScale(2, BigDecimal.ROUND_HALF_UP));
+                  sUNATTotalCashedType.setCurrencyID(CurrencyCodeContentType.valueOf(transLine.getCodMoneda()));
+                  sUNATPerceptionSummaryDocumentReferenceType.setsUNATTotalCashed(sUNATTotalCashedType);
+
+                  TaxableAmountType taxableAmountType = new TaxableAmountType();
+                  taxableAmountType.setValue(transLine.getMontoTotalCobrar().setScale(2, BigDecimal.ROUND_HALF_UP));
+                  taxableAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transLine.getCodMoneda()));
+
+                  sUNATPerceptionSummaryDocumentReferenceType.setTaxableAmount(taxableAmountType);
+                  summaryDocumentLine.setSUNATPerceptionSummaryDocumentReference(sUNATPerceptionSummaryDocumentReferenceType);
+
+              }*/
+
+            StatusType statusType = new StatusType();
+            ConditionCodeType conditionCodeType = new ConditionCodeType();
+            conditionCodeType.setValue("3");
+            statusType.setConditionCode(conditionCodeType);
+            summaryDocumentLine.setStatus(statusType);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando el MONTO TOTAL de la LINEA.");
+            }
+
+
+            AmountType totalInvoiceAmountType = new AmountType();
+            totalInvoiceAmountType.setValue(transaccion.getDOC_Importe());
+            totalInvoiceAmountType.setCurrencyID(transaccion.getDOC_MON_Codigo());
+            summaryDocumentLine.setTotalAmount(totalInvoiceAmountType);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAllSummaryDocumentLines() ["
+                        + this.identifier
+                        + "] Agregando MONTOS DE tipos de OPERACIONES.");
+            }
+
+            transaccion.getTransaccionImpuestosList().stream()
+                    .filter(impuesto -> impuesto.getMonto().compareTo(BigDecimal.ZERO) > 0)
+                    .forEach(impuesto -> {
+                        try {
+                            summaryDocumentLine.getBillingPayment().add(getBillingPayment(impuesto.getMonto(), impuesto.getTransaccion().getDOC_MON_Codigo(), impuesto.getNombre()));
+                        } catch (UBLDocumentException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+            /*
+             * Agregar Sumatoria de Otros Cargos
+             * <sac:SummaryDocumentsLine><cac:AllowanceCharge>
+             */
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando sumatoria de OTROS CARGOS.");
+            }
+            if (transaccion.getDOC_OtrosCargos().compareTo(BigDecimal.ZERO) > 0) {
+                summaryDocumentLine.getAllowanceCharge().add(getAllowanceCharge2(transaccion.getDOC_OtrosCargos(), transaccion.getDOC_MON_Codigo(),  true));
+            }
+            /* Agregar MONTOS de IMPUESTOS IGV e ISC */
+            //summaryDocumentLine.getTaxTotal().add(getTaxTotalForSummary(transLine.getTotaIGV(), transLine.getCodMoneda(), IUBLConfig.TAX_TOTAL_IGV_ID, IUBLConfig.TAX_TOTAL_IGV_NAME, IUBLConfig.TAX_TOTAL_IGV_CODE));
+            //summaryDocumentLine.getTaxTotal().add(getTaxTotalForSummary(transLine.getTotalISC(), transLine.getCodMoneda(), IUBLConfig.TAX_TOTAL_ISC_ID, IUBLConfig.TAX_TOTAL_ISC_NAME, IUBLConfig.TAX_TOTAL_ISC_CODE));
+            transaccion.getTransaccionImpuestosList().stream()
+                    .filter(impuesto -> impuesto.getMonto().compareTo(BigDecimal.ZERO) > 0)
+                    .forEach(impuesto -> {
+                        try {
+                            Map<String, String> taxConfig = IUBLConfig.TAX_CONFIG.get(impuesto.getNombre());
+                            if (taxConfig != null) {
+                                summaryDocumentLine.getTaxTotal().add(getTaxTotalForSummary(impuesto.getMonto(), impuesto.getMoneda(), taxConfig.get("ID"), taxConfig.get("NAME"), taxConfig.get("CODE")));
+                            }
+                        } catch (UBLDocumentException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+            summaryDocumentLineList.add(summaryDocumentLine);
+        } catch (UBLDocumentException e) {
+            logger.error("getAllSummaryDocumentLines() [" + this.identifier + "] UBLDocumentException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.error("getAllSummaryDocumentLines() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") - ERROR: " + IVenturaError.ERROR_320.getMessage());
+            logger.error("getAllSummaryDocumentLines() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
+            throw new UBLDocumentException(IVenturaError.ERROR_320);
+        }
+        return summaryDocumentLineList;
+    }
+
+    private TaxTotalType getTaxTotalForSummary(BigDecimal taxAmountValue, String currencyCode, String schemeID, String schemeName, String schemeCode) throws UBLDocumentException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+-getTaxTotalForSummary() [" + this.identifier + "] taxAmountValue: " + taxAmountValue + " schemeID: " + schemeID);
+        }
+        TaxTotalType taxTotal = null;
+        try {
+            taxTotal = new TaxTotalType();
+
+            /* Agregar <cac:TaxTotal><cbc:TaxAmount> */
+            TaxAmountType taxAmount = new TaxAmountType();
+            taxAmount.setValue(taxAmountValue.setScale(2, RoundingMode.HALF_UP));
+            taxAmount.setCurrencyID(currencyCode);
+            TaxSubtotalType taxSubTotal = new TaxSubtotalType();
+            /* Agregar <cac:TaxTotal><cac:TaxSubtotal><cbc:TaxAmount> */
+            taxSubTotal.setTaxAmount(taxAmount);
+            /* Agregar <cac:TaxTotal><cac:TaxSubtotal><cac:TaxCategory> */
+            TaxCategoryType taxCategory = new TaxCategoryType();
+            taxCategory.setTaxScheme(getTaxScheme(schemeID, schemeName, schemeCode));
+            taxSubTotal.setTaxCategory(taxCategory);
+            /*
+             * Agregar los TAG's
+             */
+            taxTotal.setTaxAmount(taxAmount);
+            taxTotal.getTaxSubtotal().add(taxSubTotal);
+        } catch (Exception e) {
+            logger.error("getTaxTotalForSummary() [" + this.identifier + "] ERROR: " + IVenturaError.ERROR_350.getMessage());
+            throw new UBLDocumentException(IVenturaError.ERROR_350);
+        }
+        return taxTotal;
+    } // getTaxTotalForSummary
+
+    private TaxSchemeType getTaxScheme(String taxTotalID, String taxTotalName, String taxTotalCode) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+-getTaxScheme() taxTotalID: " + taxTotalID + " taxTotalName: " + taxTotalName + " taxTotalCode: " + taxTotalCode);
+        }
+        TaxSchemeType taxScheme = new TaxSchemeType();
+        IDType id = new IDType();
+        id.setValue(taxTotalID);
+        NameType name = new NameType();
+        name.setValue(taxTotalName);
+        TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
+        taxTypeCode.setValue(taxTotalCode);
+        /* Agregando los tag's */
+        taxScheme.setID(id);
+        taxScheme.setName(name);
+        taxScheme.setTaxTypeCode(taxTypeCode);
+
+        return taxScheme;
+    } // getTaxScheme
+    private PaymentType getBillingPayment(BigDecimal amount, String currencyCode, String operationType) throws UBLDocumentException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+-getBillingPayment() [" + this.identifier + "] amount: " + amount + " operationType: " + operationType);
+        }
+        PaymentType paymentType = null;
+
+        try {
+            /*
+             * Agregar
+             * <sac:SummaryDocumentsLine><sac:BillingPayment><cbc:PaidAmount>
+             */
+            PaidAmountType paidAmount = new PaidAmountType();
+            paidAmount.setValue(amount.setScale(2, RoundingMode.HALF_UP));
+            paidAmount.setCurrencyID(currencyCode);
+
+            /*
+             * Agregar
+             * <sac:SummaryDocumentsLine><sac:BillingPayment><cbc:InstructionID>
+             */
+            InstructionIDType instructionID = new InstructionIDType();
+            instructionID.setValue(operationType);
+
+            /*
+             * Agregar los TAG's
+             */
+            paymentType = new PaymentType();
+            paymentType.setPaidAmount(paidAmount);
+            paymentType.setInstructionID(instructionID);
+        } catch (Exception e) {
+            throw new UBLDocumentException(IVenturaError.ERROR_349);
+        }
+        return paymentType;
+    } // getBillingPayment
+
+    private AllowanceChargeType getAllowanceCharge2(BigDecimal amountVal, String currencyCode, boolean chargeIndicatorVal) throws UBLDocumentException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+getAllowanceCharge() [" + this.identifier + "]");
+        }
+        AllowanceChargeType allowanceCharge = null;
+        try {
+            allowanceCharge = new AllowanceChargeType();
+            /*
+             * Agregar
+             * <Invoice><cac:InvoiceLine><cac:AllowanceCharge><cbc:ChargeIndicator
+             * >
+             */
+            ChargeIndicatorType chargeIndicator = new ChargeIndicatorType();
+            chargeIndicator.setValue(chargeIndicatorVal);
+            /*
+             * Agregar
+             * <Invoice><cac:InvoiceLine><cac:AllowanceCharge><cbc:Amount>
+             */
+            AmountType amount = new AmountType();
+            amount.setValue(amountVal.setScale(2, RoundingMode.HALF_UP));
+            amount.setCurrencyID(currencyCode);
+            /* Agregar los tag's */
+            allowanceCharge.setChargeIndicator(chargeIndicator);
+            allowanceCharge.setAmount(amount);
+        } catch (Exception e) {
+            logger.error("getAllowanceCharge() [" + this.identifier + "] ERROR: " + IVenturaError.ERROR_327.getMessage());
+            throw new UBLDocumentException(IVenturaError.ERROR_327);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("-getAllowanceCharge() [" + this.identifier + "]");
+        }
+        return allowanceCharge;
+    } // getAllowanceCharge
+
+}

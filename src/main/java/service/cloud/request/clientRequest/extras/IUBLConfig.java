@@ -2,6 +2,8 @@ package service.cloud.request.clientRequest.extras;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Esta interfaz contiene las constantes validas establecidas por Sunat.
@@ -12,7 +14,27 @@ import java.util.ArrayList;
 //
 public interface IUBLConfig {
 
+    //...
+    Map<String, Map<String, String>> TAX_CONFIG = new HashMap<>() {{
+        put("IGV", new HashMap<String, String>() {{
+            put("ID", TAX_TOTAL_IGV_ID);
+            put("NAME", TAX_TOTAL_IGV_NAME);
+            put("CODE", TAX_TOTAL_IGV_CODE);
+        }});
+        put("ISC", new HashMap<String, String>() {{
+            put("ID", TAX_TOTAL_ISC_ID);
+            put("NAME", TAX_TOTAL_ISC_NAME);
+            put("CODE", TAX_TOTAL_ISC_CODE);
+        }});
+    }};
     ArrayList<BigDecimal> lstImporteIGV = new ArrayList<>();
+    public static final String INSTRUCTION_ID_GRAVADO = "01";
+    public static final String INSTRUCTION_ID_EXONERADO = "02";
+    public static final String INSTRUCTION_ID_INAFECTO = "03";
+    public static final String INSTRUCTION_ID_EXPORTACION = "04";
+    public static final String INSTRUCTION_ID_GRATUITAS = "05";
+    public static final String CUSTOMIZATION_ID1 = "1.1";
+
 
     /**
      * Codigo de tipos de documentos

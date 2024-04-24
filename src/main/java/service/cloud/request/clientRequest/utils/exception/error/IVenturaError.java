@@ -6,6 +6,14 @@ import service.cloud.request.clientRequest.extras.IUBLConfig;
 /*** Esta interfaz contiene todos los codigos de errores presentados en el Sistema* de HOMOLOGACION.** @author Jose Manuel Lucas Barrera (josemlucasb@gmail.com)*/
 public interface IVenturaError {
 
+    public ErrorObj ERROR_350 = new ErrorObj(
+            350,
+            "[UBL-DOCUMENT] Hubo un problema al generar el TaxtTotal de Impuestos del RESUMEN DIARIO.");
+    public ErrorObj ERROR_349 = new ErrorObj(
+            349,
+            "[UBL-DOCUMENT] Hubo un problema al generar el BillingPayment en una de las LINEAS del RESUMEN DIARIO.");
+
+
     /*** Stados GENERALES* <p>* Disponible: 0 - 10*/
     ErrorObj ERROR_0 = new ErrorObj(0, "Success");
     ErrorObj ERROR_2 = new ErrorObj(2, "Error");
