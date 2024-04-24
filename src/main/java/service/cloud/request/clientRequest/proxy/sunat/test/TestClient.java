@@ -16,7 +16,7 @@ public class TestClient extends TestWSClient {
 
     private static final Logger logger = Logger.getLogger(TestClient.class);
 
-    @Override
+    //@Override
     public StatusResponse getStatus(String rucComprobante, String tipoComprobante, String serieComprobante, Integer numeroComprobante) throws Exception {
         return null;
     }
@@ -49,7 +49,7 @@ public class TestClient extends TestWSClient {
      * Este metodo envia una 'Comunicacion de Baja' o 'Resumen Diario' al servicio web de la
      * Sunat, retornando un numero de ticket.
      */
-    @Override
+    /*@Override
     public String sendSummary(String fileName, DataHandler contentFile) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+sendSummary() [TEST] fileName: " + fileName + " contentFile: " + contentFile);
@@ -62,13 +62,13 @@ public class TestClient extends TestWSClient {
             logger.debug("-sendSummary() [TEST]");
         }
         return response;
-    } //sendSummary
+    }*/ //sendSummary
 
     /**
      * Este metodo envia un documento al servicio web de la Sunat, retornando un numero de
      * ticket.
      */
-    @Override
+    /*@Override
     public String sendPack(String fileName, DataHandler contentFile) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+sendPack() [TEST] fileName: " + fileName + " contentFile: " + contentFile);
@@ -81,13 +81,13 @@ public class TestClient extends TestWSClient {
             logger.debug("-sendPack() [TEST]");
         }
         return response;
-    } //sendPack
+    }*/ //sendPack
 
     /**
      * Este metodo envia el ticket al servicio web de la Sunat, retornando un objeto que contiene
      * el codigo de respuesta y el CDR de respuesta.
      */
-    @Override
+    //@Override
     public StatusResponse getStatus(String ticket) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+getStatus() [TEST] ticket: " + ticket);

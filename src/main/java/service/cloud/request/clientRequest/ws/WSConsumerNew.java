@@ -163,7 +163,7 @@ public class WSConsumerNew {
     }
 
 
-    public String sendSummary(DataHandler zipDocument, String documentName, ConfigData configuracion) throws Exception {
+    /*public String sendSummary(DataHandler zipDocument, String documentName, ConfigData configuracion) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+sendSummary() [" + this.docUUID + "]");
         }
@@ -182,7 +182,7 @@ public class WSConsumerNew {
             logger.debug("-sendSummary() [" + this.docUUID + "]");
         }
         return ticket;
-    } //sendSummary
+    } *///sendSummary
 
     private void validarConnectionInternet() throws ConectionSunatException {
         try {

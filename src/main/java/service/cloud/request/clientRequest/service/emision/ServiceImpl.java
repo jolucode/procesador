@@ -208,7 +208,7 @@ public class ServiceImpl implements ServiceInterface {
       /**Generacion ticket en caso no este se genera uno nuevo*/
       String ticket = "";
       if (transaction.getTicketBaja() == null || transaction.getTicketBaja().isEmpty()) {
-        ticket = wsConsumer.sendSummary(zipDocument, documentName, configuracion);
+        //ticket = wsConsumer.sendSummary(zipDocument, documentName, configuracion);
         transaction.setTicketBaja(ticket);
         transaccionRepository.save(transaction);
       } else {
