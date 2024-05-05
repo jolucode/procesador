@@ -1,13 +1,16 @@
 package service.cloud.request.clientRequest.ws;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
+import service.cloud.request.clientRequest.exception.ExceptionProxy;
 import service.cloud.request.clientRequest.proxy.consumer.Consumer;
 import service.cloud.request.clientRequest.proxy.ose.IOSEClient;
 import service.cloud.request.clientRequest.proxy.ose.OSEClient;
 import service.cloud.request.clientRequest.proxy.ose.object.StatusResponse;
 import service.cloud.request.clientRequest.proxy.sunat.factory.ISunatClient;
 
+import javax.xml.ws.soap.SOAPFaultException;
 import java.util.logging.FileHandler;
 
 /**
@@ -85,22 +88,17 @@ public class WSConsumer {
         if (logger.isDebugEnabled()) {
             logger.debug("+getStatus() [" + this.docUUID + "]");
         }
-        StatusResponse statusResponse = null;
-        try {
-            if (configuracion.getIntegracionWs().equalsIgnoreCase("SUNAT")) {
-                //pe.gob.sunat.service.StatusResponse statusResponseSUNAT = sunatClient.getStatus(ticket);
-                //statusResponse = getStatusResponse(statusResponseSUNAT);
-            }
-            if (configuracion.getIntegracionWs().equalsIgnoreCase("OSE")) {
-
-                StatusResponse statusResponseCONOSE = oseClient.getStatus(ticket);
-                statusResponse = getStatusResponse(statusResponseCONOSE);
-            }
-
-        } catch (Exception e) {
-            logger.error("getStatus Error: public StatusResponse getStatus(String ticket, ConfigData configuracion) throws Exception {");
-
+        StatusResponse statusResponse = new StatusResponse();
+        if (configuracion.getIntegracionWs().equalsIgnoreCase("SUNAT")) {
+            //pe.gob.sunat.service.StatusResponse statusResponseSUNAT = sunatClient.getStatus(ticket);
+            //statusResponse = getStatusResponse(statusResponseSUNAT);
         }
+        if (configuracion.getIntegracionWs().equalsIgnoreCase("OSE")) {
+
+            StatusResponse statusResponseCONOSE = oseClient.getStatus(ticket);
+            statusResponse = getStatusResponse(statusResponseCONOSE);
+        }
+
         return statusResponse;
     } //getStatus
 

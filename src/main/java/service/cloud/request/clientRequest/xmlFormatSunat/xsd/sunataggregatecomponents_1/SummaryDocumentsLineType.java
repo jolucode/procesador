@@ -58,15 +58,16 @@ import java.util.List;
 @XmlType(name = "SummaryDocumentsLineType", propOrder = {
         "lineID",
         "documentTypeCode",
+        "iD",
         "documentSerialID",
         "customerParty",
         "startDocumentNumberID",
         "endDocumentNumberID",
         "status",
-        "totalAmount",
-        "billingPayment",
+        "totalAmount",//
+        "billingPayment",//
         "allowanceCharge",
-        "taxTotal"
+        "taxTotal"//
 })
 public class SummaryDocumentsLineType implements Serializable {
 

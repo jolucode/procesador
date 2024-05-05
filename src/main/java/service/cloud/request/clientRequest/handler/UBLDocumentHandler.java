@@ -2296,7 +2296,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             /* Agregar <SummaryDocuments><cac:AccountingSupplierParty> */
             //SupplierPartyType accountingSupplierParty = generateAccountingSupplierParty(transaction.getNumeroRuc(), transaction.getDocIdentidadTipo(), transaction.getRazonSocial(), transaction.getNombreComercial(), transaction.getDIRDireccion(), transaction.getDIRDepartamento(), transaction.getDIRProvincia(), transaction.getDIRDistrito(), transaction.getDIRUbigeo(), transaction.getDIRPais(), transaction.getPersonContacto(), transaction.getEMail());
             //summaryDocumentsType.setAccountingSupplierParty(accountingSupplierParty);
-            SupplierPartyType accountingSupplierParty = generateAccountingSupplierParty(transaction.getDocIdentidad_Nro(), transaction.getDOC_Codigo(), transaction.getRazonSocial(), transaction.getNombreComercial(), transaction.getDIR_Direccion(), transaction.getDIR_Departamento(), transaction.getDIR_Provincia(), transaction.getDIR_Distrito(), transaction.getDIR_Ubigeo(), transaction.getDIR_Pais(), transaction.getPersonContacto(), transaction.getEMail());
+            SupplierPartyType accountingSupplierParty = generateAccountingSupplierParty(transaction.getDocIdentidad_Nro(), transaction.getDocIdentidad_Tipo(), transaction.getRazonSocial(), transaction.getNombreComercial(), transaction.getDIR_Direccion(), transaction.getDIR_Departamento(), transaction.getDIR_Provincia(), transaction.getDIR_Distrito(), transaction.getDIR_Ubigeo(), transaction.getDIR_Pais(), transaction.getPersonContacto(), transaction.getEMail());
             summaryDocumentsType.setAccountingSupplierParty(accountingSupplierParty);
 
             /* Agregar <SummaryDocuments><sac:SummaryDocumentsLine> */
@@ -2555,48 +2555,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             customerPartyType.getAdditionalAccountID().add(additionalAccountIDType);
             summaryDocumentLine.setCustomerParty(customerPartyType);
 
-              /*if (!transLine.getDocIdModificado().isEmpty()) {
-                  BillingReferenceType billingReferenceType = new BillingReferenceType();
-                  DocumentReferenceType documentReferenceType = new DocumentReferenceType();
-                  IDType iDType = new IDType();
-                  iDType.setValue(transLine.getDocIdModificado());
-                  documentReferenceType.setID(iDType);
-                  DocumentTypeCodeType documentTypeCodeType = new DocumentTypeCodeType();
-                  documentTypeCodeType.setValue(transLine.getTipoDocIdentidadModificado());
-                  documentReferenceType.setDocumentTypeCode(documentTypeCodeType);
-                  billingReferenceType.setInvoiceDocumentReference(documentReferenceType);
-                  summaryDocumentLine.setBillingReference(billingReferenceType);
-              }*/
-
-              /*if (transLine.getMontoPercepcion().compareTo(BigDecimal.ZERO) > 0) {
-                  SUNATPerceptionSummaryDocumentReference sUNATPerceptionSummaryDocumentReferenceType = new SUNATPerceptionSummaryDocumentReference();
-                  SUNATPerceptionSystemCodeType sUNATPerceptionSystemCodeType = new SUNATPerceptionSystemCodeType();
-                  sUNATPerceptionSystemCodeType.setValue((transLine.getRegimenPercepcion()));
-                  sUNATPerceptionSummaryDocumentReferenceType.setsUNATPerceptionSystemCode(sUNATPerceptionSystemCodeType);
-
-                  SUNATPerceptionPercentType sUNATPerceptionPercentType = new SUNATPerceptionPercentType();
-                  sUNATPerceptionPercentType.setValue(((transLine.getTasaPercepcion()).setScale(2, BigDecimal.ROUND_HALF_UP)).toString());
-                  sUNATPerceptionSummaryDocumentReferenceType.setsUNATPerceptionPercent(sUNATPerceptionPercentType);
-
-                  TotalInvoiceAmountType totalInvoiceAmountType = new TotalInvoiceAmountType();
-                  totalInvoiceAmountType.setValue((transLine.getMontoPercepcion()).setScale(2, BigDecimal.ROUND_HALF_UP));
-                  totalInvoiceAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transLine.getCodMoneda()));
-                  sUNATPerceptionSummaryDocumentReferenceType.setTotalInvoiceAmount(totalInvoiceAmountType);
-
-                  SUNATTotalCashedType sUNATTotalCashedType = new SUNATTotalCashedType();
-                  sUNATTotalCashedType.setValue((transLine.getMontoTotalCobrar().add(transLine.getMontoPercepcion())).setScale(2, BigDecimal.ROUND_HALF_UP));
-                  sUNATTotalCashedType.setCurrencyID(CurrencyCodeContentType.valueOf(transLine.getCodMoneda()));
-                  sUNATPerceptionSummaryDocumentReferenceType.setsUNATTotalCashed(sUNATTotalCashedType);
-
-                  TaxableAmountType taxableAmountType = new TaxableAmountType();
-                  taxableAmountType.setValue(transLine.getMontoTotalCobrar().setScale(2, BigDecimal.ROUND_HALF_UP));
-                  taxableAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transLine.getCodMoneda()));
-
-                  sUNATPerceptionSummaryDocumentReferenceType.setTaxableAmount(taxableAmountType);
-                  summaryDocumentLine.setSUNATPerceptionSummaryDocumentReference(sUNATPerceptionSummaryDocumentReferenceType);
-
-              }*/
-
             StatusType statusType = new StatusType();
             ConditionCodeType conditionCodeType = new ConditionCodeType();
             conditionCodeType.setValue("3");
@@ -2607,54 +2565,21 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando el MONTO TOTAL de la LINEA.");
             }
 
-
             AmountType totalInvoiceAmountType = new AmountType();
-            totalInvoiceAmountType.setValue(transaccion.getDOC_Importe());
+            totalInvoiceAmountType.setValue(transaccion.getDOC_MontoTotal());
             totalInvoiceAmountType.setCurrencyID(transaccion.getDOC_MON_Codigo());
             summaryDocumentLine.setTotalAmount(totalInvoiceAmountType);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("getAllSummaryDocumentLines() ["
-                        + this.identifier
-                        + "] Agregando MONTOS DE tipos de OPERACIONES.");
-            }
+            summaryDocumentLine.getBillingPayment().add(getBillingPayment(transaccion));
 
-            transaccion.getTransaccionImpuestosList().stream()
-                    .filter(impuesto -> impuesto.getMonto().compareTo(BigDecimal.ZERO) > 0)
-                    .forEach(impuesto -> {
-                        try {
-                            summaryDocumentLine.getBillingPayment().add(getBillingPayment(impuesto.getMonto(), impuesto.getTransaccion().getDOC_MON_Codigo(), impuesto.getNombre()));
-                        } catch (UBLDocumentException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-
-            /*
-             * Agregar Sumatoria de Otros Cargos
-             * <sac:SummaryDocumentsLine><cac:AllowanceCharge>
-             */
             if (logger.isDebugEnabled()) {
                 logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando sumatoria de OTROS CARGOS.");
             }
             if (transaccion.getDOC_OtrosCargos().compareTo(BigDecimal.ZERO) > 0) {
                 summaryDocumentLine.getAllowanceCharge().add(getAllowanceCharge2(transaccion.getDOC_OtrosCargos(), transaccion.getDOC_MON_Codigo(),  true));
             }
-            /* Agregar MONTOS de IMPUESTOS IGV e ISC */
-            //summaryDocumentLine.getTaxTotal().add(getTaxTotalForSummary(transLine.getTotaIGV(), transLine.getCodMoneda(), IUBLConfig.TAX_TOTAL_IGV_ID, IUBLConfig.TAX_TOTAL_IGV_NAME, IUBLConfig.TAX_TOTAL_IGV_CODE));
-            //summaryDocumentLine.getTaxTotal().add(getTaxTotalForSummary(transLine.getTotalISC(), transLine.getCodMoneda(), IUBLConfig.TAX_TOTAL_ISC_ID, IUBLConfig.TAX_TOTAL_ISC_NAME, IUBLConfig.TAX_TOTAL_ISC_CODE));
-            transaccion.getTransaccionImpuestosList().stream()
-                    .filter(impuesto -> impuesto.getMonto().compareTo(BigDecimal.ZERO) > 0)
-                    .forEach(impuesto -> {
-                        try {
-                            Map<String, String> taxConfig = IUBLConfig.TAX_CONFIG.get(impuesto.getNombre());
-                            if (taxConfig != null) {
-                                summaryDocumentLine.getTaxTotal().add(getTaxTotalForSummary(impuesto.getMonto(), impuesto.getMoneda(), taxConfig.get("ID"), taxConfig.get("NAME"), taxConfig.get("CODE")));
-                            }
-                        } catch (UBLDocumentException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
 
+            summaryDocumentLine.getTaxTotal().add(getTaxTotalForSummary(transaccion.getDOC_ImpuestoTotal(), transaccion.getDOC_MON_Codigo(), IUBLConfig.TAX_TOTAL_IGV_ID, IUBLConfig.TAX_TOTAL_IGV_NAME, IUBLConfig.TAX_TOTAL_IGV_CODE));
             summaryDocumentLineList.add(summaryDocumentLine);
         } catch (UBLDocumentException e) {
             logger.error("getAllSummaryDocumentLines() [" + this.identifier + "] UBLDocumentException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
@@ -2716,6 +2641,40 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
         return taxScheme;
     } // getTaxScheme
+
+    private PaymentType getBillingPayment(Transaccion transaccion ) throws UBLDocumentException {
+        /*if (logger.isDebugEnabled()) {
+            logger.debug("+-getBillingPayment() [" + this.identifier + "] amount: " + amount + " operationType: " + operationType);
+        }*/
+        PaymentType paymentType = null;
+
+        try {
+            /*
+             * Agregar
+             * <sac:SummaryDocumentsLine><sac:BillingPayment><cbc:PaidAmount>
+             */
+            PaidAmountType paidAmount = new PaidAmountType();
+            paidAmount.setValue(transaccion.getDOC_Importe().setScale(2, RoundingMode.HALF_UP));
+            paidAmount.setCurrencyID(transaccion.getDOC_MON_Codigo());
+
+            /*
+             * Agregar
+             * <sac:SummaryDocumentsLine><sac:BillingPayment><cbc:InstructionID>
+             */
+            InstructionIDType instructionID = new InstructionIDType();
+            instructionID.setValue("01");
+
+            /*
+             * Agregar los TAG's
+             */
+            paymentType = new PaymentType();
+            paymentType.setPaidAmount(paidAmount);
+            paymentType.setInstructionID(instructionID);
+        } catch (Exception e) {
+            throw new UBLDocumentException(IVenturaError.ERROR_349);
+        }
+        return paymentType;
+    } // getBillingPayment
     private PaymentType getBillingPayment(BigDecimal amount, String currencyCode, String operationType) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+-getBillingPayment() [" + this.identifier + "] amount: " + amount + " operationType: " + operationType);

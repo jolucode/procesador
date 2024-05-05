@@ -15,6 +15,7 @@ import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.dto.dto.TransactionGuiasDTO;
 import service.cloud.request.clientRequest.dto.dto.TransactionLineasDTO;
 import service.cloud.request.clientRequest.dto.dto.TransactionLineasImpuestoDTO;
+import service.cloud.request.clientRequest.dto.request.RequestPost;
 import service.cloud.request.clientRequest.entity.*;
 import service.cloud.request.clientRequest.exception.VenturaExcepcion;
 import service.cloud.request.clientRequest.service.emision.interfac.InterfacePrincipal;
@@ -50,19 +51,20 @@ public class CloudService implements CloudInterface {
 
 
     @Override
-    public ResponseEntity<TransacctionDTO[]> proccessDocument(String stringRequestOnpremise) {
+    public ResponseEntity<RequestPost> proccessDocument(String stringRequestOnpremise) {
         TransacctionDTO[] transacctionDTO = null;
+        RequestPost responseProcesor = null;
         try {
             Gson gson = new Gson();
             transacctionDTO = gson.fromJson(stringRequestOnpremise, TransacctionDTO[].class);
             for (int i = 0; i < transacctionDTO.length; i++) {
                 Transaccion transaccion = llenar(transacctionDTO[i]);
-                interfacePrincipal.EnviarTransacciones(transaccion, stringRequestOnpremise);
+                responseProcesor = interfacePrincipal.EnviarTransacciones(transaccion, stringRequestOnpremise);
             }
         } catch (Exception e) {
             logger.info("SE GENERO UN ERROR : " + e.getMessage());
         }
-        return ResponseEntity.ok(transacctionDTO);
+        return ResponseEntity.ok(responseProcesor);
     }
 
     public Transaccion llenar(TransacctionDTO transacctionDTO) throws JsonProcessingException {
