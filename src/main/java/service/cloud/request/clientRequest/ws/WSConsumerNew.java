@@ -201,4 +201,26 @@ public class WSConsumerNew {
     }
 
 
+    public String sendSummary(DataHandler zipDocument, String documentName, ConfigData configuracion) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+sendSummary() [" + this.docUUID + "]");
+        }
+
+        validarConnectionInternet();
+
+        String ticket = null;
+        /*if (configuracion.getIntegracionWs().equalsIgnoreCase("SUNAT")) {
+            ticket = sunatClient.sendSummary(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
+        }*/
+        if (configuracion.getIntegracionWs().equalsIgnoreCase("OSE")) {
+            ticket = oseClient.sendSummary(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("-sendSummary() [" + this.docUUID + "]");
+        }
+        return ticket;
+    }
+
+
 } //WSConsumer

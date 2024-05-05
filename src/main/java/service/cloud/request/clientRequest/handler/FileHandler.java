@@ -80,6 +80,42 @@ public class FileHandler {
         }
     } //setBaseDirectory
 
+    public String storeDocumentInDisk(byte[] fileData, String documentName, String fileExtension) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+storeDocumentInDisk() [" + this.docUUID + "]");
+        }
+        String documentPath = null;
+        try {
+            String separator = File.separator;
+            documentPath = this.baseDirectory + separator + documentName + "." + fileExtension;
+
+            if (logger.isDebugEnabled()) {
+                logger.info("storeDocumentInDisk() [" + this.docUUID + "] Se guardo el documento en: " + documentPath);
+            }
+            File file = new File(this.baseDirectory);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(documentPath)) {
+                fos.write(fileData);
+            }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("storeDocumentInDisk() [" + this.docUUID + "] Se guardo el documento en: " + documentPath);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("storeDocumentInDisk() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_454.getMessage() + e.getMessage());
+            throw new Exception(IVenturaError.ERROR_454.getMessage());
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("-storeDocumentInDisk() [" + this.docUUID + "]");
+        }
+        return documentPath;
+    }
+
     /**
      * Este metodo guarda el documento UBL en DISCO segun la ruta configurada.
      *

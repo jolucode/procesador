@@ -55,6 +55,7 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.D
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.invoice_2.InvoiceType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.perception_1.PerceptionType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.retention_1.RetentionType;
+import service.cloud.request.clientRequest.xmlFormatSunat.xsd.summarydocuments_1.SummaryDocumentsType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.voideddocuments_1.VoidedDocumentsType;
 
 import javax.activation.DataHandler;
@@ -63,10 +64,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -136,7 +134,8 @@ public class ServiceImpl implements ServiceInterface {
 
     /** Generando el objeto VoidedDocumentsType para la COMUNICACION DE BAJA */
     UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
-    VoidedDocumentsType voidedDocumentType = ublHandler.generateVoidedDocumentType(transaction, signerName);
+    //VoidedDocumentsType voidedDocumentType = ublHandler.generateVoidedDocumentType(transaction, signerName);
+    SummaryDocumentsType summaryVoidedDocumentType = ublHandler.generateSummaryDocumentsTypeV2(transaction, signerName);
     LoggerTrans.getCDThreadLogger().log(Level.INFO, "[" + this.docUUID + "] Se genero el objeto VoidedDocumentsType de la COMUNICACION DE BAJA.");
 
     /** Se genera el nombre del documento de tipo COMUNICACION DE BAJA*/
@@ -164,7 +163,7 @@ public class ServiceImpl implements ServiceInterface {
     }
 
     /**Guardando el documento UBL en DISCO*/
-    String documentPath = fileHandler.storeDocumentInDisk(voidedDocumentType, documentName);
+    String documentPath = fileHandler.storeDocumentInDisk(summaryVoidedDocumentType, documentName);
     logger.info("Documento XML guardado en disco : " + documentPath);
 
 
@@ -208,7 +207,7 @@ public class ServiceImpl implements ServiceInterface {
       /**Generacion ticket en caso no este se genera uno nuevo*/
       String ticket = "";
       if (transaction.getTicketBaja() == null || transaction.getTicketBaja().isEmpty()) {
-        //ticket = wsConsumer.sendSummary(zipDocument, documentName, configuracion);
+        ticket = wsConsumer.sendSummary(zipDocument, documentName, configuracion);
         transaction.setTicketBaja(ticket);
         transaccionRepository.save(transaction);
       } else {
@@ -389,7 +388,7 @@ public class ServiceImpl implements ServiceInterface {
     fileHandler.setBaseDirectory(attachmentPath);
     byte[] signedXmlDocument = null;
 
-
+    Object ublDocument = null;
     if (doctype.equals("07")) {
       creditNoteType = ublHandler.generateCreditNoteType(transaction, signerName);
       documentName = DocumentNameHandler.getInstance().getCreditNoteName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
@@ -400,7 +399,7 @@ public class ServiceImpl implements ServiceInterface {
       // Sign the xmlDocument in memory
       signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
       // Convert the signedXmlDocument back to a CreditNoteType object
-      Object ublDocument = getSignedDocumentV2(signedXmlDocument, transaction.getDOC_Codigo());
+      ublDocument = getSignedDocumentV2(signedXmlDocument, transaction.getDOC_Codigo());
       documentWRP.setTransaccion(transaction);
       documentWRP.setCreditNoteType((CreditNoteType) ublDocument);
 
@@ -427,7 +426,7 @@ public class ServiceImpl implements ServiceInterface {
       // Sign the xmlDocument in memory
       signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
       // Convert the signedXmlDocument back to a DebitNoteType object
-      Object ublDocument = getSignedDocumentV2(signedXmlDocument, transaction.getDOC_Codigo());
+      ublDocument = getSignedDocumentV2(signedXmlDocument, transaction.getDOC_Codigo());
       documentWRP.setTransaccion(transaction);
       documentWRP.setDebitNoteType((DebitNoteType) ublDocument);
 
@@ -454,7 +453,7 @@ public class ServiceImpl implements ServiceInterface {
       // Sign the xmlDocument in memory
       signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
       // Convert the signedXmlDocument back to an InvoiceType object
-      Object ublDocument = getSignedDocumentV2(signedXmlDocument, transaction.getDOC_Codigo());
+      ublDocument = getSignedDocumentV2(signedXmlDocument, transaction.getDOC_Codigo());
       //InvoiceType signedInvoiceType = convertBytesToInvoiceType(signedXmlDocument);
       documentWRP.setTransaccion(transaction);
       //documentWRP.setInvoiceType(signedInvoiceType);
@@ -490,7 +489,7 @@ public class ServiceImpl implements ServiceInterface {
       // Sign the xmlDocument in memory
       signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
       // Convert the signedXmlDocument back to a PerceptionType object
-      Object ublDocument = getSignedDocumentV2(signedXmlDocument, transaction.getDOC_Codigo());
+      ublDocument = getSignedDocumentV2(signedXmlDocument, transaction.getDOC_Codigo());
       documentWRP.setTransaccion(transaction);
       documentWRP.setPerceptionType((PerceptionType) ublDocument);
 
@@ -515,7 +514,7 @@ public class ServiceImpl implements ServiceInterface {
       // Sign the xmlDocument in memory
       signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
       // Convert the signedXmlDocument back to a RetentionType object
-      Object ublDocument = getSignedDocumentV2(signedXmlDocument, transaction.getDOC_Codigo());
+      ublDocument = getSignedDocumentV2(signedXmlDocument, transaction.getDOC_Codigo());
       documentWRP.setTransaccion(transaction);
       documentWRP.setRetentionType((RetentionType) ublDocument);
 
@@ -532,6 +531,10 @@ public class ServiceImpl implements ServiceInterface {
     }
 
     log.setThirdPartyRequestXml(new String(signedXmlDocument, StandardCharsets.UTF_8));
+
+    /**Guardando el documento xml UBL en DISCO*/
+    String documentPath = fileHandler.storeDocumentInDisk(ublDocument, documentName);
+    logger.info("Documento XML guardado en disco : " + documentPath);
 
     ConfigData configuracion = ConfigData
         .builder()
@@ -567,6 +570,10 @@ public class ServiceImpl implements ServiceInterface {
         if (null != response.getResponse()) {
           log.setThirdPartyResponseXml(new String(response.getResponse(), StandardCharsets.UTF_8));
           transactionResponse = processorCoreInterface.processCDRResponseV2(response.getResponse(), signedXmlDocument, documentWRP, transaction, configuracion);
+
+          /**Metodo para guardar en disco los documentos*/
+          saveAllFiles(transactionResponse, documentName, attachmentPath);
+
           log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
         } else {
           log.setThirdPartyResponseXml(response.getErrorMessage());
@@ -591,6 +598,7 @@ public class ServiceImpl implements ServiceInterface {
 
           if (statusResponse.getContent() != null) {
             transactionResponse = processorCoreInterface.processCDRResponseV2(statusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion);
+            saveAllFiles(transactionResponse, documentName, attachmentPath);
           } else {
             transactionResponse = processorCoreInterface.processResponseSinCDR(transaction);
           }
@@ -612,6 +620,18 @@ public class ServiceImpl implements ServiceInterface {
     log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
     return transactionResponse;
   }
+
+  public void saveAllFiles(TransaccionRespuesta transactionResponse, String documentName, String attachmentPath) throws Exception {
+
+    FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
+    fileHandler.setBaseDirectory(attachmentPath);
+    fileHandler.storeDocumentInDisk(transactionResponse.getXml(), documentName, "xml");
+    fileHandler.storeDocumentInDisk(transactionResponse.getPdf(), documentName, "pdf");
+    fileHandler.storeDocumentInDisk(transactionResponse.getZip(), documentName, "zip");
+    //fileHandler.storeDocumentInDisk.storeDocumentInDisk(ublDocument, documentName);
+  }
+
+
 
   public byte[] convertDocumentToBytes(InvoiceType invoiceType) {
     return convertToBytes(invoiceType, InvoiceType.class);
