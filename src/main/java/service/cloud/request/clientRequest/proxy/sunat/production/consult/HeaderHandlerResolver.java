@@ -18,4 +18,7 @@ public class HeaderHandlerResolver implements HandlerResolver {
         return handlers;
     }
 
+    public void addHandlers(Handler handler) {
+        this.handlers.add(handler);
+    }
 }

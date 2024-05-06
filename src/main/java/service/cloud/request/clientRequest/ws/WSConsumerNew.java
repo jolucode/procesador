@@ -150,12 +150,20 @@ public class WSConsumerNew {
                 logger.debug("sendBill() [" + this.docUUID + "] Se obtuvo respuesta del WS.");
             }
         } catch (SOAPFaultException e) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            ExceptionProxy exceptionProxy = objectMapper.readValue(e.getFault().getDetail().getTextContent(), ExceptionProxy.class);
-            return Response.builder()
-                    .errorCode(e.getMessage())
-                    .errorMessage(exceptionProxy.getDescripcion())
-                    .build();
+            if (allClass.getIntegracionWs().equalsIgnoreCase("SUNAT")) {
+                return Response.builder()
+                        .errorCode(e.getMessage())
+                        .errorMessage(e.getMessage())
+                        .build();
+            } else if (allClass.getIntegracionWs().equalsIgnoreCase("OSE")) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                ExceptionProxy exceptionProxy = objectMapper.readValue(e.getFault().getDetail().getTextContent(), ExceptionProxy.class);
+                return Response.builder()
+                        .errorCode(e.getMessage())
+                        .errorMessage(exceptionProxy.getDescripcion())
+                        .build();
+            }
+
         }
         return Response.builder()
                 .response(cdrResponse)

@@ -25,7 +25,7 @@ public class OnPremiseImpl implements OnPremiseInterface {
                     .asString();
             logger.info("Se envió de manera correcta al servidor OnPremise los documentos");
         } catch (Exception e) {
-            logger.error("Error capturado es el siguiente: " + e.getMessage());
+            logger.error("Error conexion con servidor destino: " + e.getMessage());
         }
         logger.info("La ruta del servidor donde se esta dejando los documentos es : " + request.getUrlOnpremise());
         return response.getStatus();

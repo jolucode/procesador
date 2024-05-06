@@ -1,6 +1,8 @@
 package service.cloud.request.clientRequest.proxy.sunat.factory;
 
 import org.apache.log4j.Logger;
+import service.cloud.request.clientRequest.proxy.sunat.production.consult.ProductionClient;
+import service.cloud.request.clientRequest.proxy.sunat.production.emision.ProductionCPEClient;
 import service.cloud.request.clientRequest.utils.exception.ConfigurationException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.proxy.sunat.config.ISunatConfig;
@@ -29,7 +31,7 @@ public final class SunatClientFactoryImpl extends SunatClientFactory {
             if (logger.isInfoEnabled()) {
                 logger.info("getSunatClient() Create a PRODUCTION_CLIENT.");
             }
-            //sunatClient = new ProductionClient();
+            sunatClient = new ProductionClient();
         } else if (clientName.equalsIgnoreCase(ISunatConfig.TEST_CLIENT)) {
             if (logger.isInfoEnabled()) {
                 logger.info("getSunatClient() Create a TEST_CLIENT.");
@@ -59,7 +61,7 @@ public final class SunatClientFactoryImpl extends SunatClientFactory {
             }
 
         } else if (clientName.equalsIgnoreCase(ISunatConfig.PRODUCTION_CLIENT)) {
-            //sunatClient = new ProductionCPEClient();
+            sunatClient = new ProductionCPEClient();
             if (logger.isInfoEnabled()) {
                 logger.info("getSunatClient() Create a PRODUCTION_CLIENT para PERCEPCIONES Y RETENCIONES.");
             }
