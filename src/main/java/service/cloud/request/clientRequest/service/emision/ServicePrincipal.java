@@ -253,6 +253,13 @@ public class ServicePrincipal implements InterfacePrincipal {
                 publicacionManager.publicarDocumento(tc.getDocIdentidad_Nro(), tc.getFE_Id(), tr);
 
             } else {
+                Map<String, Data.ResponseDocument> listMapDocuments = new HashMap<>();
+                Data.ResponseDocument document1 = new Data.ResponseDocument("pdf", tr.getPdfBorrador());
+                listMapDocuments.put("pdf_borrador", document1);
+                Data.ResponseRequest responseRequest = new Data.ResponseRequest();
+                responseRequest.setServiceResponse(tr.getMensaje());
+                responseRequest.setListMapDocuments(listMapDocuments);
+
                 Data.Error error = new Data.Error();
                 Data.ErrorRequest errorRequest = new Data.ErrorRequest();
 
@@ -260,6 +267,7 @@ public class ServicePrincipal implements InterfacePrincipal {
                 errorRequest.setDescription(tr.getMensaje());
 
                 error.setErrorRequest(errorRequest);
+                request.setResponseRequest(responseRequest);
                 request.setResponseError(error);
                 request.setStatus(500);
                 transaccionRepository.delete(tc);

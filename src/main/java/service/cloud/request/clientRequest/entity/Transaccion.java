@@ -329,6 +329,9 @@ public class Transaccion implements Serializable {
     @Transient
     private String dbName;
 
+    @Transient
+    private Boolean isPdfBorrador;
+
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "transaccion", fetch = FetchType.EAGER, orphanRemoval = true)
     private List<TransaccionAnticipo> transaccionAnticipoList;

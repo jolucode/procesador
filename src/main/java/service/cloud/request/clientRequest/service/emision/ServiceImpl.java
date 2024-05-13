@@ -67,10 +67,12 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.soap.SOAPFaultException;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -218,7 +220,7 @@ public class ServiceImpl implements ServiceInterface {
             LoggerTrans.getCDThreadLogger().log(Level.INFO, "[" + this.docUUID + "] Enviando WS sendSummary.");
 
 
-            try{
+            try {
                 /**Generacion ticket en caso no este se genera uno nuevo*/
                 String ticket = "";
                 if (transaction.getTicketBaja() == null || transaction.getTicketBaja().isEmpty()) {
@@ -631,6 +633,9 @@ public class ServiceImpl implements ServiceInterface {
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
 
 
+        if (transaction.getIsPdfBorrador())
+            transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
+
         transactionResponse.setIdentificador(documentName);
         transactionResponse.setDigestValue(digestValue);
         transactionResponse.setBarcodeValue(barcodeValue);
@@ -639,6 +644,7 @@ public class ServiceImpl implements ServiceInterface {
         log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
         return transactionResponse;
     }
+
 
     public void saveAllFiles(TransaccionRespuesta transactionResponse, String documentName, String attachmentPath) throws Exception {
 

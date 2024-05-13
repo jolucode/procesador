@@ -46,6 +46,8 @@ public class TransaccionRespuesta {
 
     private byte[] pdf;
 
+    private byte[] pdfBorrador;
+
     private byte[] xml;
 
     private byte[] zip;
@@ -61,6 +63,13 @@ public class TransaccionRespuesta {
 
     private LogDTO logDTO;
 
+    public byte[] getPdfBorrador() {
+        return pdfBorrador;
+    }
+
+    public void setPdfBorrador(byte[] pdfBorrador) {
+        this.pdfBorrador = pdfBorrador;
+    }
 
     public TransaccionRespuesta() {
 
