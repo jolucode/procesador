@@ -567,6 +567,7 @@ public class ServiceImpl implements ServiceInterface {
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
                 .rutaBaseDoc(applicationProperties.getRutaBaseDoc())
+                .pdfIngles(transaction.getTransaccionContractdocrefList().stream().filter(x -> x.getUsuariocampos().getNombre().equals("pdfadicional")).findFirst().get().getValor())
                 .build();
 
         if (configuracion.getIntegracionWs().equals("OSE"))
@@ -633,8 +634,10 @@ public class ServiceImpl implements ServiceInterface {
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
 
 
-        if (transaction.getIsPdfBorrador())
+        if (client.getPdfBorrador().equals("true")){
             transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
+        }
+
 
         transactionResponse.setIdentificador(documentName);
         transactionResponse.setDigestValue(digestValue);

@@ -59,60 +59,64 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
       String rutaPaymentSelected = rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "InvoiceDocumentPaymentDetail.jasper");//configuration.getPdf().getPaymentSubReportPath(); // Numa
 
       if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_INVOICE_CODE)) {
-        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "invoiceDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-
+        String documentName = "invoiceDocument.jrxml";
+        if(configuracion.getPdfIngles().equals("Si")){
+          documentName = "invoiceDocument_Ing.jrxml";
+        }
+        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
         pdfBytes = pdfHandler.generateInvoicePDF(wrp, configuracion);
 
       } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_BOLETA_CODE)) {
 
-        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "boletaDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-
-        if (logger.isInfoEnabled()) {
-          logger.info("createPDFDocument() [" + this.docUUID + "] Generando el PDF de la BOLETA.");
+        String documentName = "boletaDocument.jrxml";
+        if(configuracion.getPdfIngles().equals("Si")){
+          documentName = "boletaDocument_Ing.jrxml";
         }
+        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
         pdfBytes = pdfHandler.generateBoletaPDF(wrp, configuracion);
 
       } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_CREDIT_NOTE_CODE)) {
+
         pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "creditNoteDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-
-        if (logger.isInfoEnabled()) {
-          logger.info("createPDFDocument() [" + this.docUUID + "] Generando el PDF de la NOTA DE CREDITO.");
-        }
-
         pdfBytes = pdfHandler.generateCreditNotePDF(wrp, transaccionTotales, configuracion);
 
       } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_DEBIT_NOTE_CODE)) {
-        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "debitNoteDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
 
-        if (logger.isInfoEnabled()) {
-          logger.info("createPDFDocument() [" + this.docUUID + "] Generando el PDF de la NOTA DE DEBITO.");
+        //pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "debitNoteDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
+        //pdfBytes = pdfHandler.generateDebitNotePDF(wrp, transaccionTotales, configuracion);
+        String documentName = "creditNoteDocument.jrxml";
+        if(configuracion.getPdfIngles().equals("Si")){
+          documentName = "creditNoteDocument_Ing.jrxml";
         }
-
-        pdfBytes = pdfHandler.generateDebitNotePDF(wrp, transaccionTotales, configuracion);
+        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
+        pdfBytes = pdfHandler.generateCreditNotePDF(wrp, transaccionTotales, configuracion);
 
       } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_PERCEPTION_CODE)) {
-        pdfHandler.setConfiguration(providerProperties.getRutaBaseDoc() + File.separator + "perceptionDocument.jrxml", rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
 
-        if (logger.isInfoEnabled()) {
-          logger.info("createPDFDocument() [" + this.docUUID + "] Generando el PDF del COMPROBANTE DE PERCEPCIón.");
-        }
+        pdfHandler.setConfiguration(providerProperties.getRutaBaseDoc() + File.separator + "perceptionDocument.jrxml", rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
         //pdfBytes = pdfHandler.generatePerceptionPDF(wrp);
 
       } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_RETENTION_CODE)) {
-        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "retentionDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
 
-        if (logger.isInfoEnabled()) {
-          logger.info("createPDFDocument() [" + this.docUUID + "] Generando el PDF de la NOTA DE DEBITO.");
+        //pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "retentionDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
+        //pdfBytes = pdfHandler.generateRetentionPDF(wrp, configuracion);
+        String documentName = "retentionDocument.jrxml";
+        if(configuracion.getPdfIngles().equals("Si")){
+          documentName = "retentionDocument_Ing.jrxml";
         }
+        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
         pdfBytes = pdfHandler.generateRetentionPDF(wrp, configuracion);
 
       } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE)) {
-        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "remissionguideDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"),
-            rutaPaymentSelected, logoSociedad, providerProperties.getClientProperties(transaction.getDocIdentidad_Nro()).getEmisorElecRs());
 
-        if (logger.isInfoEnabled()) {
-          logger.info("createPDFDocument() [" + this.docUUID + "] Generando el PDF de la GUIA DE REMISION.");
+        //pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "remissionguideDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"),
+        //    rutaPaymentSelected, logoSociedad, providerProperties.getClientProperties(transaction.getDocIdentidad_Nro()).getEmisorElecRs());
+        //pdfBytes = pdfHandler.generateDespatchAdvicePDF(wrp, configuracion);
+        String documentName = "remissionguideDocument.jrxml";
+        if(configuracion.getPdfIngles().equals("Si")){
+          documentName = "remissionguideDocument_Ing.jrxml";
         }
+        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, providerProperties.getClientProperties(transaction.getDocIdentidad_Nro()).getEmisorElecRs());
         pdfBytes = pdfHandler.generateDespatchAdvicePDF(wrp, configuracion);
 
       } else {

@@ -34,7 +34,7 @@ public class ConfigData {
 
 
     private String urlService;
-
+    private String pdfIngles;
 
 
 }
