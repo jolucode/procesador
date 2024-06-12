@@ -557,6 +557,12 @@ public class ServiceImpl implements ServiceInterface {
         String documentPath = fileHandler.storeDocumentInDisk(ublDocument, documentName);
         logger.info("Documento XML guardado en disco : " + documentPath);
 
+        String valor = transaction.getTransaccionContractdocrefList().stream()
+                .filter(x -> x.getUsuariocampos().getNombre().equals("pdfadicional"))
+                .map(x -> x.getValor())
+                .findFirst()
+                .orElse("No");
+
         ConfigData configuracion = ConfigData
                 .builder()
                 .usuarioSol(client.getUsuarioSol())
@@ -567,7 +573,7 @@ public class ServiceImpl implements ServiceInterface {
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
                 .rutaBaseDoc(applicationProperties.getRutaBaseDoc())
-                .pdfIngles(transaction.getTransaccionContractdocrefList().stream().filter(x -> x.getUsuariocampos().getNombre().equals("pdfadicional")).findFirst().get().getValor())
+                .pdfIngles(valor)
                 .build();
 
         if (configuracion.getIntegracionWs().equals("OSE"))
