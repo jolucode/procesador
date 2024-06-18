@@ -82,6 +82,7 @@ public class CloudService implements CloudInterface {
         transaccion.setFE_Id(transacctionDTO.getFE_Id());
         transacctionDTO.setFE_Id(transaccion.getFE_Id());
         transaccion.setDOC_ImpuestoTotal(transacctionDTO.getDOCImpuestoTotal());
+        transaccion.setDOC_ImpuestoTotal(transacctionDTO.getDOCImpuestoTotal()!=null?transacctionDTO.getDOCImpuestoTotal():transacctionDTO.getDOC_ImpuestoTotal());
 
 
         transaccion.setTransaccionImpuestosList(extraerTransaccionImpuestos(transacctionDTO));

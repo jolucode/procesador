@@ -37,6 +37,7 @@ public class TransacctionDTO {
     private Integer FE_Errores;
     private String FE_FormSAP;
     private BigDecimal DOCImpuestoTotal;
+    private BigDecimal DOC_ImpuestoTotal;
     private String SN_EMail_Secundario;
     private String DIR_Direccion;
     private String SN_RazonSocial;
