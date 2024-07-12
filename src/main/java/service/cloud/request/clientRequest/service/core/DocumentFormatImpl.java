@@ -113,7 +113,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
         //    rutaPaymentSelected, logoSociedad, providerProperties.getClientProperties(transaction.getDocIdentidad_Nro()).getEmisorElecRs());
         //pdfBytes = pdfHandler.generateDespatchAdvicePDF(wrp, configuracion);
         String documentName = "remissionguideDocument.jrxml";
-        if(configuracion.getPdfIngles().equals("Si")){
+        if (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) {
           documentName = "remissionguideDocument_Ing.jrxml";
         }
         pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, providerProperties.getClientProperties(transaction.getDocIdentidad_Nro()).getEmisorElecRs());

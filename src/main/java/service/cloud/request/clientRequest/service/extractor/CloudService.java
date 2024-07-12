@@ -67,41 +67,44 @@ public class CloudService implements CloudInterface {
         return ResponseEntity.ok(responseProcesor);
     }
 
-    public Transaccion llenar(TransacctionDTO transacctionDTO) throws JsonProcessingException {
+    public Transaccion llenar(TransacctionDTO transacctionDTO) throws Exception {
 
 
 
         logger.info("Tipo de transaccion: " + Util.getTipoTransac(transacctionDTO.getFE_TipoTrans()));
 
-
-        Optional<Transaccion> optionalTransaccion = transaccionRepository.findById(transacctionDTO.getFE_Id());
-        optionalTransaccion.ifPresent(transaccionRepository::delete);
-
         Transaccion transaccion = insertarDatosTransaccion(transacctionDTO);
-        transaccion.setDbName(transacctionDTO.getDbName());
-        transaccion.setFE_Id(transacctionDTO.getFE_Id());
-        transacctionDTO.setFE_Id(transaccion.getFE_Id());
-        transaccion.setDOC_ImpuestoTotal(transacctionDTO.getDOCImpuestoTotal());
-        transaccion.setDOC_ImpuestoTotal(transacctionDTO.getDOCImpuestoTotal()!=null?transacctionDTO.getDOCImpuestoTotal():transacctionDTO.getDOC_ImpuestoTotal());
+        try {
+            Optional<Transaccion> optionalTransaccion = transaccionRepository.findById(transacctionDTO.getFE_Id());
+            optionalTransaccion.ifPresent(transaccionRepository::delete);
+
+            transaccion.setDbName(transacctionDTO.getDbName());
+            transaccion.setFE_Id(transacctionDTO.getFE_Id());
+            transacctionDTO.setFE_Id(transaccion.getFE_Id());
+            transaccion.setDOC_ImpuestoTotal(transacctionDTO.getDOCImpuestoTotal());
+            transaccion.setDOC_ImpuestoTotal(transacctionDTO.getDOCImpuestoTotal()!=null?transacctionDTO.getDOCImpuestoTotal():transacctionDTO.getDOC_ImpuestoTotal());
 
 
-        transaccion.setTransaccionImpuestosList(extraerTransaccionImpuestos(transacctionDTO));
-        transaccion.setTransaccionLineasList(extraerTransaccionLineas(transacctionDTO, transaccion));
-        transaccion.setTransaccionCuotas(extraerTranssacionCuotas(transacctionDTO));
-        Set<TransaccionLineas> transaccionLineas = new HashSet<>(transaccion.getTransaccionLineasList());
-        insertarImpuestoBolsa(transaccionLineas, transaccion);
-        List<Usuariocampos> usucamposList = usuariocamposRepository.findAll();
-        List<TransaccionUsucampos> transaccionCamposUsuarios = getTransaccionCamposUsuarios(transaccion.getFE_Id(), transacctionDTO, usucamposList);
-        transaccion.setTransaccionUsucamposList(transaccionCamposUsuarios);
-        transaccion.setTransaccionContractdocrefList(extraerTransaccionContractDocRefs(transacctionDTO));
-        transaccion.setTransaccionTotalesList(extraerTransaccionTotales(transacctionDTO));
-        transaccion.setTransaccionGuiaRemision(extraerTransaccionGuias(transacctionDTO));
-        transaccion.setTransaccionPropiedadesList(extraerTransaccionPropiedades(transacctionDTO));
-        transaccion.setTransaccionDocrefersList(ExtraerTransaccionDocReferes(transacctionDTO));
-        transaccion.setTransaccionComprobantePagoList(ExtraerTransaccionComprobantes(transacctionDTO));
-        transaccion.setTransaccionAnticipoList(extraerTransaccionAnticipos(transacctionDTO));
-        transaccion.setDOC_DescuentoTotal(transaccion.getDOC_Descuento());
-        //transaccion.setKey_sociedad(transaccion.getSN_DocIdentidad_Nro());
+            transaccion.setTransaccionImpuestosList(extraerTransaccionImpuestos(transacctionDTO));
+            transaccion.setTransaccionLineasList(extraerTransaccionLineas(transacctionDTO, transaccion));
+            transaccion.setTransaccionCuotas(extraerTranssacionCuotas(transacctionDTO));
+            Set<TransaccionLineas> transaccionLineas = new HashSet<>(transaccion.getTransaccionLineasList());
+            insertarImpuestoBolsa(transaccionLineas, transaccion);
+            List<Usuariocampos> usucamposList = usuariocamposRepository.findAll();
+            List<TransaccionUsucampos> transaccionCamposUsuarios = getTransaccionCamposUsuarios(transaccion.getFE_Id(), transacctionDTO, usucamposList);
+            transaccion.setTransaccionUsucamposList(transaccionCamposUsuarios);
+            transaccion.setTransaccionContractdocrefList(extraerTransaccionContractDocRefs(transacctionDTO));
+            transaccion.setTransaccionTotalesList(extraerTransaccionTotales(transacctionDTO));
+            transaccion.setTransaccionGuiaRemision(extraerTransaccionGuias(transacctionDTO));
+            transaccion.setTransaccionPropiedadesList(extraerTransaccionPropiedades(transacctionDTO));
+            transaccion.setTransaccionDocrefersList(ExtraerTransaccionDocReferes(transacctionDTO));
+            transaccion.setTransaccionComprobantePagoList(ExtraerTransaccionComprobantes(transacctionDTO));
+            transaccion.setTransaccionAnticipoList(extraerTransaccionAnticipos(transacctionDTO));
+            transaccion.setDOC_DescuentoTotal(transaccion.getDOC_Descuento());
+            //transaccion.setKey_sociedad(transaccion.getSN_DocIdentidad_Nro());
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
 
         return transaccion;
     }
@@ -491,7 +494,8 @@ public class CloudService implements CloudInterface {
     public List<TransaccionLineas> extraerTransaccionLineas(TransacctionDTO transacctionDTO, Transaccion transaccion) {
         Set<TransaccionLineas> transaccionLineas2 = new HashSet<>();
 
-        crearCamposUsuario(transacctionDTO.getTransactionLineasDTOList().get(0).getTransaccionLineasCamposUsuario());
+        if(!transacctionDTO.getTransactionLineasDTOList().isEmpty())
+            crearCamposUsuario(transacctionDTO.getTransactionLineasDTOList().get(0).getTransaccionLineasCamposUsuario());
 
         String feID = transacctionDTO.getFE_Id();
         try {
