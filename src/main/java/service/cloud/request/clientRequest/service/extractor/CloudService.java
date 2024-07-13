@@ -54,12 +54,14 @@ public class CloudService implements CloudInterface {
     public ResponseEntity<RequestPost> proccessDocument(String stringRequestOnpremise) {
         TransacctionDTO[] transacctionDTO = null;
         RequestPost responseProcesor = null;
+        String datePattern = "(\"\\w+\":\\s*\"\\d{4}-\\d{2}-\\d{2}) \\d{2}:\\d{2}:\\d{2}\\.\\d\"";
+        String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
         try {
             Gson gson = new Gson();
-            transacctionDTO = gson.fromJson(stringRequestOnpremise, TransacctionDTO[].class);
+            transacctionDTO = gson.fromJson(updatedJson, TransacctionDTO[].class);
             for (int i = 0; i < transacctionDTO.length; i++) {
                 Transaccion transaccion = llenar(transacctionDTO[i]);
-                responseProcesor = interfacePrincipal.EnviarTransacciones(transaccion, stringRequestOnpremise);
+                responseProcesor = interfacePrincipal.EnviarTransacciones(transaccion, updatedJson);
             }
         } catch (Exception e) {
             logger.info("SE GENERO UN ERROR : " + e.getMessage());
