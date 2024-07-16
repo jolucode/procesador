@@ -1,0 +1,145 @@
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001741.png b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001741.png[m
+[1mindex 2a7168b..526efa4 100644[m
+Binary files a/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001741.png and b/Directorio.ADJUNTOS/CodigoPDF417/01/FACU-00001741.png differ
+[1mdiff --git a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001741.png b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001741.png[m
+[1mindex 2c73360..df615a2 100644[m
+Binary files a/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001741.png and b/Directorio.ADJUNTOS/CodigoQR/01/FACU-00001741.png differ
+[1mdiff --git a/src/main/java/service/cloud/request/clientRequest/dto/dto/TransactionComprobantesDTO.java b/src/main/java/service/cloud/request/clientRequest/dto/dto/TransactionComprobantesDTO.java[m
+[1mindex b89c7c6..2dfd2d2 100644[m
+[1m--- a/src/main/java/service/cloud/request/clientRequest/dto/dto/TransactionComprobantesDTO.java[m
+[1m+++ b/src/main/java/service/cloud/request/clientRequest/dto/dto/TransactionComprobantesDTO.java[m
+[36m@@ -29,4 +29,13 @@[m [mpublic class TransactionComprobantesDTO {[m
+     private String TC_MonedaRef;[m
+     private String TC_Fecha;[m
+ [m
+[32m+[m[32m    /***/[m
+[32m+[m[32m    private String U_PagoNumero;[m
+[32m+[m[32m    private String U_DOC_Tipo;[m
+[32m+[m[32m    private String U_DOC_Numero;[m
+[32m+[m[32m    private String U_DOC_FechaEmision;[m
+[32m+[m[32m    private String U_DOC_Importe;[m
+[32m+[m[32m    private String U_TC_Factor;[m
+[32m+[m[32m    private String U_CP_ImporteTotal;[m
+[32m+[m
+ }[m
+[1mdiff --git a/src/main/java/service/cloud/request/clientRequest/handler/PDFGenerateHandler.java b/src/main/java/service/cloud/request/clientRequest/handler/PDFGenerateHandler.java[m
+[1mindex 13ab3e3..c816495 100644[m
+[1m--- a/src/main/java/service/cloud/request/clientRequest/handler/PDFGenerateHandler.java[m
+[1m+++ b/src/main/java/service/cloud/request/clientRequest/handler/PDFGenerateHandler.java[m
+[36m@@ -290,17 +290,27 @@[m [mpublic class PDFGenerateHandler extends PDFBasicGenerateHandler {[m
+                 WrapperItemObject itemObject = new WrapperItemObject();[m
+                 Map<String, String> itemObjectHash = new HashMap<String, String>();[m
+                 List<String> newlist = new ArrayList<String>();[m
+[31m-                for (int j = 0; j < retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().size(); j++) {[m
+[32m+[m[32m                //for (int j = 0; j < retentionType.getTransaccion().getTransaccionComprobantePagoList().size(); j++) {[m
+                     if (logger.isDebugEnabled()) {[m
+[31m-                        logger.debug("generateRetentionPDF() [" + this.docUUID + "] Extrayendo Campos " + retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre());[m
+[32m+[m[32m                        //logger.debug("generateRetentionPDF() [" + this.docUUID + "] Extrayendo Campos " + retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre());[m
+                     }[m
+[31m-                    itemObjectHash.put(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre(), retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());[m
+[31m-                    newlist.add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());[m
+[32m+[m[32m                    //itemObjectHash.put(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre(), retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());[m
+[32m+[m[32m                TransaccionComprobantePago transaccionComprobantePago = retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i);[m
+[32m+[m[32m                itemObjectHash.put("PagoNumero", transaccionComprobantePago.getPagoNumero());  // Reemplazar Campo1 con el nombre del campo real[m
+[32m+[m[32m                itemObjectHash.put("DOC_Tipo", transaccionComprobantePago.getDOCTipo());[m
+[32m+[m[32m                itemObjectHash.put("DOC_Numero", transaccionComprobantePago.getDOCNumero());[m
+[32m+[m[32m                itemObjectHash.put("TipoMonedaTotal", String.valueOf(transaccionComprobantePago.getCPImporteTotal()));[m
+[32m+[m[32m                itemObjectHash.put("TipoMoneda", String.valueOf(transaccionComprobantePago.getCPImporteTotal()));[m
+[32m+[m[32m                itemObjectHash.put("TipoMonedaTotal", String.valueOf(transaccionComprobantePago.getCPImporteTotal()));[m
+[32m+[m[32m                //itemObjectHash.put("DOC_FechaEmision", transaccionComprobantePago.getDOCFechaEmision());[m
+[32m+[m
+[32m+[m
+[32m+[m[32m                //newlist.add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());[m
+                     if (logger.isDebugEnabled()) {[m
+                         logger.debug("generateRetentionPDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());[m
+                     }[m
+ [m
+[31m-                }[m
+[32m+[m[32m                //}[m
+                 itemObject.setLstItemHashMap(itemObjectHash);[m
+                 itemObject.setLstDinamicaItem(newlist);[m
+                 listaItem.add(itemObject);[m
+[1mdiff --git a/src/main/resources/application.yml b/src/main/resources/application.yml[m
+[1mindex 588b100..f4a96be 100644[m
+[1m--- a/src/main/resources/application.yml[m
+[1m+++ b/src/main/resources/application.yml[m
+[36m@@ -1,76 +1 @@[m
+[31m-spring:[m
+[31m-  data:[m
+[31m-    mongodb:[m
+[31m-      uri: mongodb+srv://lbecerra:Lima40401010@cluster0.g1jnjjj.mongodb.net/ventura2024[m
+[31m-  datasource:[m
+[31m-    url: jdbc:mysql://localhost:3306/xxxxxxx?createDatabaseIfNotExist=true[m
+[31m-    username: root[m
+[31m-    password: B1Admin[m
+[31m-    driver-class-name: com.mysql.cj.jdbc.Driver[m
+[31m-  jpa:[m
+[31m-    hibernate:[m
+[31m-      naming:[m
+[31m-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl[m
+[31m-      ddl-auto: update[m
+[31m-[m
+[31m-[m
+[31m-scheduled:[m
+[31m-  fixedDelay: 10000[m
+[31m-[m
+[31m-[m
+[31m-application:[m
+[31m-  env: dev[m
+[31m-  ambiente: 'test'[m
+[31m-  rutas:[m
+[31m-    rutaBaseDoc: 'C:\clientes\files\'[m
+[31m-  soap-client:[m
+[31m-    sunat:[m
+[31m-      base-url: 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService?wsdl'[m
+[31m-    ose:[m
+[31m-      base-url: 'https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl'[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-ventura:[m
+[31m-  clientes:[m
+[31m-    listaClientes:[m
+[31m-      '20510910517':[m
+[31m-[m
+[31m-        razonSocial: 'Ventura Soluciones1'[m
+[31m-[m
+[31m-        wsUsuario: 'admin'[m
+[31m-        wsClave: 'ventura'[m
+[31m-        wsLocation: 'http://04082022harol.vsperufe.com/'[m
+[31m-[m
+[31m-        emisorElecRs: '205454844881/SUNAT'[m
+[31m-        usuarioSol: '20510910517'[m
+[31m-        claveSol: '20510910517'[m
+[31m-[m
+[31m-        certificadoName: "CERTIFICATE_TEST.pfx"[m
+[31m-        certificadoPassword: '1234'[m
+[31m-        certificadoProveedor: 'SunJSSE'[m
+[31m-        certificadoTipoKeystore: 'Pkcs12'[m
+[31m-[m
+[31m-        integracionWs: OSE[m
+[31m-        mostrarSoap: 'true'[m
+[31m-        pdfBorrador: 'true'[m
+[31m-        impresion: 'Codigo QR'[m
+[31m-[m
+[31m-        urlOnpremise: 'http://localhost:8101/'[m
+[31m-[m
+[31m-        scope: 'https://api-cpe.sunat.gob.pe/'[m
+[31m-        clientId: 'a8a6c50a-d73c-4775-9ddc-6261df69fed8'[m
+[31m-        clientSecret: '5yr+sp24Q1J+LeYhnCooEw=='[m
+[31m-        UserNameSunatGuias: '20510910517JVENTUR1'[m
+[31m-        passwordSunatGuias: 'JVENTUR1'[m
+[31m-errors:[m
+[31m-  backend:[m
+[31m-    gscsErrors:[m
+[31m-      'DOC_DE_IDENTIDAD_REGISTRO_YA_EXISTE':[m
+[31m-        systemCode: 'Y20100'[m
+[31m-        errorCategory: 'CONFLICT'[m
+[31m-        description: 'personId ingresado ya existe'[m
+[31m-        razonSocial: 'Y201001'[m
+[31m-        wsUsuario: 'admin'[m
+[31m-server:[m
+[31m-  port: 8082[m
+\ No newline at end of file[m
+[32m+[m[32mspring.config.location: application.yml[m
+\ No newline at end of file[m

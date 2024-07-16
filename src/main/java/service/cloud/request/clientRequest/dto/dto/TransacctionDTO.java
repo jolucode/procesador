@@ -106,6 +106,7 @@ public class TransacctionDTO {
     private BigDecimal DOC_MonPercepcion;
     private BigDecimal DOC_PorPercepcion;
     private String DOC_Numero;
+    private String TipoMoneda;
 
     //private List<TransactionContractDocRefDTO> transactionContractDocRefListDTOS;
     private List<Map<String, String>> transactionContractDocRefListDTOS;

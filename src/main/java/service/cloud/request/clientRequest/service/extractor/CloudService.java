@@ -237,9 +237,9 @@ public class CloudService implements CloudInterface {
                     comprobantePago.setCPFecha(new Date());
                 }
                 try {
-                    comprobantePago.setDOCFechaEmision(Util.returnDate(transactionComprobantesDTO.getDOC_FechaEmision()));
+                    comprobantePago.setDOC_FechaEmision(Util.returnDate(transactionComprobantesDTO.getDOC_FechaEmision()));
                 } catch (Exception e) {
-                    comprobantePago.setDOCFechaEmision(new Date());
+                    comprobantePago.setDOC_FechaEmision(new Date());
                 }
                 try {
                     comprobantePago.setPagoFecha(Util.returnDate(transactionComprobantesDTO.getPagoFecha()));
@@ -251,20 +251,21 @@ public class CloudService implements CloudInterface {
                 } catch (Exception e) {
                     comprobantePago.setTCFecha(new Date());
                 }
-                comprobantePago.setCPImporte(transactionComprobantesDTO.getCP_Importe());
-                comprobantePago.setCPImporteTotal(transactionComprobantesDTO.getCP_ImporteTotal());
+                comprobantePago.setCP_Importe(transactionComprobantesDTO.getCP_Importe());
+                comprobantePago.setCP_ImporteTotal(transactionComprobantesDTO.getCP_ImporteTotal());
                 comprobantePago.setCPMoneda(transactionComprobantesDTO.getCP_Moneda());
                 comprobantePago.setCPMonedaMontoNeto(transactionComprobantesDTO.getCP_MonedaMontoNeto());
-
-                comprobantePago.setDOCImporte(transactionComprobantesDTO.getDOC_Importe());
+                comprobantePago.setTipoMoneda(transactionComprobantesDTO.getU_TipoMoneda());
+                comprobantePago.setTipoMonedaTotal(transactionComprobantesDTO.getU_TipoMonedaTotal());
+                comprobantePago.setDOC_Importe(transactionComprobantesDTO.getDOC_Importe());
                 comprobantePago.setDOCMoneda(transactionComprobantesDTO.getDOC_Moneda());
-                comprobantePago.setDOCNumero(transactionComprobantesDTO.getDOC_Numero());
-                comprobantePago.setDOCTipo(transactionComprobantesDTO.getDOC_Tipo());
+                comprobantePago.setDOC_Numero(transactionComprobantesDTO.getDOC_Numero());
+                comprobantePago.setDOC_Tipo(transactionComprobantesDTO.getDOC_Tipo());
 
-                comprobantePago.setPagoImporteSR(transactionComprobantesDTO.getPagoImporteSR());
+                comprobantePago.setImporte_Pago_Soles(transactionComprobantesDTO.getPagoImporteSR());
                 comprobantePago.setPagoMoneda(transactionComprobantesDTO.getPagoMoneda());
                 comprobantePago.setPagoNumero(transactionComprobantesDTO.getPagoNumero());
-                comprobantePago.setTCFactor(transactionComprobantesDTO.getTC_Factor());
+                comprobantePago.setTC_Factor(transactionComprobantesDTO.getTC_Factor());
 
                 comprobantePago.setTCMonedaObj(transactionComprobantesDTO.getTC_MonedaObj());
                 comprobantePago.setTCMonedaRef(transactionComprobantesDTO.getTC_MonedaRef());

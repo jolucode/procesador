@@ -35,10 +35,12 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccompone
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.NameType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.TaxableAmountType;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -258,9 +260,9 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             BigDecimal importeTotalDOC = new BigDecimal("0.00");
             BigDecimal importeDocumento = new BigDecimal("0.00");
             for (int i = 0; i < retentionType.getTransaccion().getTransaccionComprobantePagoList().size(); i++) {
-                montoSoles = montoSoles.add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getCPImporte().add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getCPImporteTotal()));
+                montoSoles = montoSoles.add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getCP_Importe().add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getCP_ImporteTotal()));
                 importeTotalDOC = importeTotalDOC.add(retentionType.getRetentionType().getSunatRetentionDocumentReference().get(i).getPayment().getPaidAmount().getValue());
-                importeDocumento = importeDocumento.add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getCPImporteTotal());
+                importeDocumento = importeDocumento.add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getCP_ImporteTotal());
             }
 
             if (Boolean.parseBoolean(configData.getPdfBorrador())) {
@@ -283,24 +285,31 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
 
-            for (int i = 0; i < retentionType.getTransaccion().getTransaccionComprobantePagoList().size(); i++) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateRetentionPDF() [" + this.docUUID + "] Agregando datos al HashMap" + retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().size());
-                }
+            for (TransaccionComprobantePago transaccion : retentionType.getTransaccion().getTransaccionComprobantePagoList()) {
+
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<String, String>();
                 List<String> newlist = new ArrayList<String>();
-                for (int j = 0; j < retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().size(); j++) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateRetentionPDF() [" + this.docUUID + "] Extrayendo Campos " + retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre());
-                    }
-                    itemObjectHash.put(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre(), retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());
-                    newlist.add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateRetentionPDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
-                    }
 
+                /***/
+                // Utilizar reflección para obtener los campos y valores del objeto
+                for (Field field : transaccion.getClass().getDeclaredFields()) {
+                    field.setAccessible(true); // Permitir acceso a campos privados
+                    try {
+                        Object value = field.get(transaccion);
+                        if (value != null) {
+                            itemObjectHash.put(field.getName(), value.toString());
+                            newlist.add(value.toString());
+                        }
+                        if(field.getName().equals("DOC_FechaEmision"))
+                        {
+                            itemObjectHash.put("DOC_FechaEmision", formatIssueDate((XMLGregorianCalendar) value));
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
                 }
+
                 itemObject.setLstItemHashMap(itemObjectHash);
                 itemObject.setLstDinamicaItem(newlist);
                 listaItem.add(itemObject);

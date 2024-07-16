@@ -254,14 +254,14 @@ public class UBLDocumentHandler20 {
              * ****************** <cbc:ID schemeID=></cbc:ID>
              * ****************************
              */
-            objIdType.setSchemeID(transaccionComprobantePago.getDOCTipo());
-            objIdType.setValue(transaccionComprobantePago.getDOCNumero());
+            objIdType.setSchemeID(transaccionComprobantePago.getDOC_Tipo());
+            objIdType.setValue(transaccionComprobantePago.getDOC_Numero());
             documentReferenceType.setId(objIdType);
             /**
              * ********************** <cbc:IssueDate></cbc:IssueDate>
              * ***************************************************
              */
-            documentReferenceType.setIssueDate(getIssueDate(transaccionComprobantePago.getDOCFechaEmision()));
+            documentReferenceType.setIssueDate(getIssueDate(transaccionComprobantePago.getDOC_FechaEmision()));
 
             /**
              * ****
@@ -269,7 +269,7 @@ public class UBLDocumentHandler20 {
              */
             TotalInvoiceAmountType totalInvoiceAmountType = new TotalInvoiceAmountType();
             totalInvoiceAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getDOCMoneda()).value());
-            totalInvoiceAmountType.setValue(transaccionComprobantePago.getDOCImporte().setScale(2, RoundingMode.HALF_UP));
+            totalInvoiceAmountType.setValue(transaccionComprobantePago.getDOC_Importe().setScale(2, RoundingMode.HALF_UP));
 
             documentReferenceType.setTotalInvoiceAmount(totalInvoiceAmountType);
 
@@ -281,17 +281,17 @@ public class UBLDocumentHandler20 {
             paymentType.setID(numero);
             PaidAmountType objPaidAmountType = new PaidAmountType();
             objPaidAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getPagoMoneda()).value());
-            objPaidAmountType.setValue(transaccionComprobantePago.getPagoImporteSR().setScale(2, RoundingMode.HALF_UP));
+            objPaidAmountType.setValue(transaccionComprobantePago.getImporte_Pago_Soles().setScale(2, RoundingMode.HALF_UP));
             paymentType.setPaidAmount(objPaidAmountType);
             documentReferenceType.setPayment(paymentType);
             SUNATRetentionAmountType objPerceptionAmountType = new SUNATRetentionAmountType();
             objPerceptionAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getCPMoneda()).value());
-            objPerceptionAmountType.setValue(transaccionComprobantePago.getCPImporte().setScale(2, RoundingMode.HALF_UP));
+            objPerceptionAmountType.setValue(transaccionComprobantePago.getCP_Importe().setScale(2, RoundingMode.HALF_UP));
 
             sunatRetentionInformationType.setSunatRetentionAmount(objPerceptionAmountType);
             SUNATNetTotalPaidType objCashedType = new SUNATNetTotalPaidType();
             objCashedType.setCurrencyID(CurrencyCodeContentType.valueOf(tscp.get(0).getCPMonedaMontoNeto()).value());
-            objCashedType.setValue(transaccionComprobantePago.getCPImporteTotal().setScale(2, RoundingMode.HALF_UP));
+            objCashedType.setValue(transaccionComprobantePago.getCP_ImporteTotal().setScale(2, RoundingMode.HALF_UP));
 
             sunatRetentionInformationType.setSunatNetTotalPaid(objCashedType);
             sunatRetentionInformationType.setSunatRetentionDate(getIssueDate5(transaccionComprobantePago.getCPFecha()));
@@ -304,7 +304,7 @@ public class UBLDocumentHandler20 {
             targetCurrencyCodeType.setValue(transaccionComprobantePago.getTCMonedaObj());
             exchangeRateType.setTargetCurrencyCode(targetCurrencyCodeType);
             CalculationRateType calculationRateType = new CalculationRateType();
-            calculationRateType.setValue(transaccionComprobantePago.getTCFactor().setScale(3));
+            calculationRateType.setValue(transaccionComprobantePago.getTC_Factor().setScale(3));
 
             exchangeRateType.setCalculationRate(calculationRateType);
             exchangeRateType.setDate(getIssueDate4(transaccionComprobantePago.getTCFecha()));
@@ -322,14 +322,14 @@ public class UBLDocumentHandler20 {
         for (TransaccionComprobantePago transaccionComprobantePago : tscp) {
             IDType objIdType = new IDType();
             if (logger.isInfoEnabled()) {
-                logger.info("SUNATPerceptionDocumentReference() ID - " + transaccionComprobantePago.getDOCTipo() + " - " + transaccionComprobantePago.getDOCNumero());
+                logger.info("SUNATPerceptionDocumentReference() ID - " + transaccionComprobantePago.getDOC_Tipo() + " - " + transaccionComprobantePago.getDOC_Numero());
             }
             /**
              * ****************** <cbc:ID schemeID=></cbc:ID>
              * ****************************
              */
-            objIdType.setSchemeID(transaccionComprobantePago.getDOCTipo());
-            objIdType.setValue(transaccionComprobantePago.getDOCNumero());
+            objIdType.setSchemeID(transaccionComprobantePago.getDOC_Tipo());
+            objIdType.setValue(transaccionComprobantePago.getDOC_Numero());
 
             documentReferenceType.setId(objIdType);
 
@@ -338,19 +338,19 @@ public class UBLDocumentHandler20 {
              * ***************************************************
              */
             if (logger.isInfoEnabled()) {
-                logger.info("SUNATPerceptionDocumentReference()  - ISSUEDATE " + transaccionComprobantePago.getDOCFechaEmision());
+                logger.info("SUNATPerceptionDocumentReference()  - ISSUEDATE " + transaccionComprobantePago.getDOC_FechaEmision());
             }
-            documentReferenceType.setIssueDate(getIssueDate(transaccionComprobantePago.getDOCFechaEmision()));
+            documentReferenceType.setIssueDate(getIssueDate(transaccionComprobantePago.getDOC_FechaEmision()));
             /**
              * ****
              * <cbc:TotalInvoiceAmount currencyID></cbc:TotalInvoiceAmount> *
              */
             if (logger.isInfoEnabled()) {
-                logger.info("SUNATPerceptionDocumentReference()  - TOTALAMOUNT " + transaccionComprobantePago.getDOCImporte());
+                logger.info("SUNATPerceptionDocumentReference()  - TOTALAMOUNT " + transaccionComprobantePago.getDOC_Importe());
             }
             TotalInvoiceAmountType totalInvoiceAmountType = new TotalInvoiceAmountType();
             totalInvoiceAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getDOCMoneda()).value());
-            totalInvoiceAmountType.setValue(transaccionComprobantePago.getDOCImporte().setScale(2));
+            totalInvoiceAmountType.setValue(transaccionComprobantePago.getDOC_Importe().setScale(2));
 
             documentReferenceType.setTotalInvoiceAmount(totalInvoiceAmountType);
             /**
@@ -375,7 +375,7 @@ public class UBLDocumentHandler20 {
             }
             PaidAmountType objPaidAmountType = new PaidAmountType();
             objPaidAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getPagoMoneda()).value());
-            objPaidAmountType.setValue(transaccionComprobantePago.getPagoImporteSR().setScale(2));
+            objPaidAmountType.setValue(transaccionComprobantePago.getImporte_Pago_Soles().setScale(2));
             paymentType.setPaidAmount(objPaidAmountType);
 
             documentReferenceType.setPayment(paymentType);
@@ -383,11 +383,11 @@ public class UBLDocumentHandler20 {
             SUNATPerceptionInformationType objPerceptionInformationType = new SUNATPerceptionInformationType();
 
             if (logger.isInfoEnabled()) {
-                logger.info("sac:SUNATPerceptionInformation() - SUNATPerceptionAmount " + tscp.get(0).getCPImporte());
+                logger.info("sac:SUNATPerceptionInformation() - SUNATPerceptionAmount " + tscp.get(0).getCP_Importe());
             }
             SUNATPerceptionAmountType objPerceptionAmountType = new SUNATPerceptionAmountType();
             objPerceptionAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(tscp.get(0).getCPMoneda()).value());
-            objPerceptionAmountType.setValue(tscp.get(0).getCPImporte().setScale(2));
+            objPerceptionAmountType.setValue(tscp.get(0).getCP_Importe().setScale(2));
 
             objPerceptionInformationType.setPerceptionAmount(objPerceptionAmountType);
 
@@ -401,7 +401,7 @@ public class UBLDocumentHandler20 {
             }
             SUNATNetTotalCashedType objCashedType = new SUNATNetTotalCashedType();
             objCashedType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getCPMonedaMontoNeto()).value());
-            objCashedType.setValue(transaccionComprobantePago.getCPImporteTotal().setScale(2));
+            objCashedType.setValue(transaccionComprobantePago.getCP_ImporteTotal().setScale(2));
 
             objPerceptionInformationType.setSunatNetTotalCashed(objCashedType);
 
@@ -436,11 +436,11 @@ public class UBLDocumentHandler20 {
             targetCurrencyCodeType.setValue(transaccionComprobantePago.getTCMonedaObj());
 
             if (logger.isInfoEnabled()) {
-                logger.info("sac:SUNATPerceptionInformation()  - CalculationRate " + transaccionComprobantePago.getTCFactor());
+                logger.info("sac:SUNATPerceptionInformation()  - CalculationRate " + transaccionComprobantePago.getTC_Factor());
             }
 
             CalculationRateType calculationRateType = new CalculationRateType();
-            calculationRateType.setValue(transaccionComprobantePago.getTCFactor());
+            calculationRateType.setValue(transaccionComprobantePago.getTC_Factor());
 
             exchangeRateType.setSourceCurrencyCode(currencyCodeType);
             exchangeRateType.setTargetCurrencyCode(targetCurrencyCodeType);

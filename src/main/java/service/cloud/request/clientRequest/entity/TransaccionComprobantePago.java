@@ -33,18 +33,18 @@ public class TransaccionComprobantePago implements Serializable {
     protected TransaccionComprobantePagoPK transaccionComprobantePagoPK;
 
     @Column(name = "DOC_Tipo")
-    private String dOCTipo;
+    private String DOC_Tipo;
 
     @Column(name = "DOC_Numero")
-    private String dOCNumero;
+    private String DOC_Numero;
 
     @Column(name = "DOC_FechaEmision")
     @Temporal(TemporalType.DATE)
-    private Date dOCFechaEmision;
+    private Date DOC_FechaEmision;
 
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "DOC_Importe")
-    private BigDecimal dOCImporte;
+    private BigDecimal DOC_Importe;
 
     @Column(name = "DOC_Moneda")
     private String dOCMoneda;
@@ -54,26 +54,32 @@ public class TransaccionComprobantePago implements Serializable {
     private Date pagoFecha;
 
     @Column(name = "PagoNumero")
-    private String pagoNumero;
+    private String PagoNumero;
 
     @Column(name = "PagoImporteSR")
-    private BigDecimal pagoImporteSR;
+    private BigDecimal Importe_Pago_Soles;
 
     @Column(name = "PagoMoneda")
     private String pagoMoneda;
 
     @Column(name = "CP_Importe")
-    private BigDecimal cPImporte;
+    private BigDecimal CP_Importe;
 
     @Column(name = "CP_Moneda")
     private String cPMoneda;
+
+    @Transient
+    private String TipoMoneda;
+
+    @Transient
+    private String TipoMonedaTotal;
 
     @Column(name = "CP_Fecha")
     @Temporal(TemporalType.DATE)
     private Date cPFecha;
 
     @Column(name = "CP_ImporteTotal")
-    private BigDecimal cPImporteTotal;
+    private BigDecimal CP_ImporteTotal;
 
     @Column(name = "CP_MonedaMontoNeto")
     private String cPMonedaMontoNeto;
@@ -85,7 +91,7 @@ public class TransaccionComprobantePago implements Serializable {
     private String tCMonedaObj;
 
     @Column(name = "TC_Factor")
-    private BigDecimal tCFactor;
+    private BigDecimal TC_Factor;
 
     @Column(name = "TC_Fecha")
     @Temporal(TemporalType.DATE)
