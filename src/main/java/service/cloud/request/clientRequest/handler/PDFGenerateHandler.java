@@ -23,6 +23,7 @@ import service.cloud.request.clientRequest.handler.creator.PDFRetentionCreator;
 import service.cloud.request.clientRequest.handler.object.*;
 import service.cloud.request.clientRequest.handler.object.legend.BoletaObject;
 import service.cloud.request.clientRequest.handler.object.legend.LegendObject;
+import service.cloud.request.clientRequest.utils.DateConverter;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.UBLDocumentException;
 import service.cloud.request.clientRequest.utils.exception.error.ErrorObj;
@@ -303,7 +304,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                         }
                         if(field.getName().equals("DOC_FechaEmision"))
                         {
-                            itemObjectHash.put("DOC_FechaEmision", formatIssueDate((XMLGregorianCalendar) value));
+                            itemObjectHash.put("DOC_FechaEmision", DateConverter.convertToDate(value));
                         }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
@@ -1215,10 +1216,6 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             debitNoteObj.setPaymentCondition(debitNoteType.getTransaccion().getDOC_CondPago());
 
             debitNoteObj.setSellOrder(getContractDocumentReference(debitNoteType.getDebitNoteType().getContractDocumentReference(), IUBLConfig.CONTRACT_DOC_REF_SELL_ORDER_CODE));
-//            debitNoteObj.setSellerName(getContractDocumentReference(
-//                    debitNoteType.getDebitNoteType()
-//                    .getContractDocumentReference(),
-//                    IUBLConfig.CONTRACT_DOC_REF_SELLER_CODE));
             if (logger.isInfoEnabled()) {
                 logger.info("generateDebitNotePDF() [" + this.docUUID + "] Condicion_pago: " + debitNoteObj.getPaymentCondition());
                 logger.info("generateDebitNotePDF() [" + this.docUUID + "] Orden de venta: " + debitNoteObj.getSellOrder());
@@ -1346,12 +1343,6 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             BigDecimal iscValue = getTaxTotalValue(debitNoteType.getDebitNoteType().getTaxTotal(), IUBLConfig.TAX_TOTAL_ISC_ID);
             debitNoteObj.setIscValue(getCurrency(iscValue, currencyCode));
-//
-//            BigDecimal lineExtensionAmount = debitNoteType.getDebitNoteType()
-//                    .getRequestedMonetaryTotal().getLineExtensionAmount()
-//                    .getValue();
-//            debitNoteObj.setAmountValue(getCurrency(lineExtensionAmount,
-//                    currencyCode));
 
             if (logger.isDebugEnabled()) {
                 logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion de la percepción.");
@@ -1428,21 +1419,9 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             String barcodeValue = generateBarCodeInfoString(debitNoteType.getTransaccion().getDocIdentidad_Nro(), debitNoteType.getTransaccion().getDOC_Codigo(), debitNoteType.getTransaccion().getDOC_Serie(), debitNoteType.getTransaccion().getDOC_Numero(), debitNoteType.getDebitNoteType().getTaxTotal(), debitNoteObj.getIssueDate(), debitNoteType.getTransaccion().getDOC_MontoTotal().toString(), debitNoteType.getTransaccion().getSN_DocIdentidad_Tipo(), debitNoteType.getTransaccion().getSN_DocIdentidad_Nro(), debitNoteType.getDebitNoteType().getUBLExtensions());
 
-//            String barcodeValue = generateBarcodeInfo(debitNoteType
-//                    .getDebitNoteType().getID().getValue(),
-//                    IUBLConfig.DOC_DEBIT_NOTE_CODE,
-//                    debitNoteObj.getIssueDate(), debitNoteType
-//                    .getDebitNoteType().getRequestedMonetaryTotal()
-//                    .getPayableAmount().getValue(), debitNoteType
-//                    .getDebitNoteType().getTaxTotal(), debitNoteType
-//                    .getDebitNoteType().getAccountingSupplierParty(),
-//                    debitNoteType.getDebitNoteType()
-//                    .getAccountingCustomerParty(), debitNoteType
-//                    .getDebitNoteType().getUBLExtensions());
             if (logger.isInfoEnabled()) {
                 logger.debug("generateDebitNotePDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
             }
-            //debitNoteObj.setBarcodeValue(barcodeValue);
 
             InputStream inputStream;
             InputStream inputStreamPDF;
@@ -1486,18 +1465,9 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             if (logger.isDebugEnabled()) {
                 logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
             }
-            /*
-            Map<String, LegendObject> legendsMap = getaddLeyends(debitNoteType.getDebitNoteType().getNote());
-             */
 
             Map<String, LegendObject> legendsMap = null;
-
-
-            //if (TipoVersionUBL.notadebito.equals("21")) {
             legendsMap = getaddLeyends(debitNoteType.getDebitNoteType().getNote());
-            /*} else if (TipoVersionUBL.notadebito.equals("20")) {
-                legendsMap = getAdditionalProperties(debitNoteType.getDebitNoteType().getUBLExtensions().getUBLExtension());
-            }*/
             if (logger.isDebugEnabled()) {
                 logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
             }
@@ -1512,10 +1482,6 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             debitNoteObj.setResolutionCodeValue(this.resolutionCode);
 
-            /*
-             * Generando el PDF de la NOTA DE CREDITO con la informacion
-             * recopilada.
-             */
             debitNoteInBytes = PDFDebitNoteCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createDebitNotePDF(debitNoteObj, docUUID, configData);
         } catch (PDFReportException e) {
             logger.error("generateDebitNotePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());

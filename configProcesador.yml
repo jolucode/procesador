@@ -262,6 +262,35 @@ ventura:
         clientSecret: '5yr+sp24Q1J+LeYhnCooEw=='
         UserNameSunatGuias: '20510910517JVENTUR1'
         passwordSunatGuias: 'JVENTUR1'
+      '20538492028':
+
+        razonSocial: 'INDUSTRIAS BASA S.A.C.'
+
+        wsUsuario: 'admin'
+        wsClave: 'ventura'
+        wsLocation: 'http://facturacion.vsperufe.com/'
+
+        emisorElecRs: '205454844881/SUNAT'
+        usuarioSol: '20538492028MODDATOS'
+        claveSol: 'moddatos'
+
+        certificadoName: "CERTIFICATE_TEST.pfx"
+        certificadoPassword: '1234'
+        certificadoProveedor: 'SunJSSE'
+        certificadoTipoKeystore: 'Pkcs12'
+
+        integracionWs: SUNAT
+        mostrarSoap: 'true'
+        pdfBorrador: 'true'
+        impresion: 'Codigo QR'
+
+        urlOnpremise: 'http://101.44.10.195:60083/'
+
+        scope: 'https://api-cpe.sunat.gob.pe/'
+        clientId: '96f17bc0-8dec-438b-864d-a6982b512cf9'
+        clientSecret: '9n8JTJY0AAvXY/wzZGQPUA=='
+        UserNameSunatGuias: '20538492028VENTUSAP'
+        passwordSunatGuias: 'Ventu2023'
 errors:
   backend:
     gscsErrors:
