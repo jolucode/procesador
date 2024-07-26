@@ -52,76 +52,58 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
     byte[] pdfBytes = null;
     List<TransaccionTotales> transaccionTotales = new ArrayList<>(transaction.getTransaccionTotalesList());
     try {
+      // Crear una nueva instancia de PDFGenerateHandler para cada llamada
       PDFGenerateHandler pdfHandler = PDFGenerateHandler.newInstance(this.docUUID);
 
       String logoSociedad = providerProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + "COMPANY_LOGO.jpg";
+      String rutaPaymentSelected = rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "InvoiceDocumentPaymentDetail.jasper");
 
-      String rutaPaymentSelected = rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "InvoiceDocumentPaymentDetail.jasper");//configuration.getPdf().getPaymentSubReportPath(); // Numa
+      String documentName;
+      switch (transaction.getDOC_Codigo()) {
+        case IUBLConfig.DOC_INVOICE_CODE:
+          documentName = configuracion.getPdfIngles().equals("Si") ? "invoiceDocument_Ing.jrxml" : "invoiceDocument.jrxml";
+          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
+          pdfBytes = pdfHandler.generateInvoicePDF(wrp, configuracion);
+          break;
 
-      if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_INVOICE_CODE)) {
-        String documentName = "invoiceDocument.jrxml";
-        if(configuracion.getPdfIngles().equals("Si")){
-          documentName = "invoiceDocument_Ing.jrxml";
-        }
-        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-        pdfBytes = pdfHandler.generateInvoicePDF(wrp, configuracion);
+        case IUBLConfig.DOC_BOLETA_CODE:
+          documentName = configuracion.getPdfIngles().equals("Si") ? "boletaDocument_Ing.jrxml" : "boletaDocument.jrxml";
+          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
+          pdfBytes = pdfHandler.generateBoletaPDF(wrp, configuracion);
+          break;
 
-      } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_BOLETA_CODE)) {
+        case IUBLConfig.DOC_CREDIT_NOTE_CODE:
+          documentName = configuracion.getPdfIngles().equals("Si") ? "creditNoteDocument_Ing.jrxml" : "creditNoteDocument.jrxml";
+          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
+          pdfBytes = pdfHandler.generateCreditNotePDF(wrp, transaccionTotales, configuracion);
+          break;
 
-        String documentName = "boletaDocument.jrxml";
-        if(configuracion.getPdfIngles().equals("Si")){
-          documentName = "boletaDocument_Ing.jrxml";
-        }
-        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-        pdfBytes = pdfHandler.generateBoletaPDF(wrp, configuracion);
+        case IUBLConfig.DOC_DEBIT_NOTE_CODE:
+          documentName = configuracion.getPdfIngles().equals("Si") ? "debitNoteDocument_Ing.jrxml" : "debitNoteDocument.jrxml";
+          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
+          pdfBytes = pdfHandler.generateDebitNotePDF(wrp, transaccionTotales, configuracion);
+          break;
 
-      } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_CREDIT_NOTE_CODE)) {
+        case IUBLConfig.DOC_PERCEPTION_CODE:
+          pdfHandler.setConfiguration(providerProperties.getRutaBaseDoc() + File.separator + "perceptionDocument.jrxml", rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
+          // pdfBytes = pdfHandler.generatePerceptionPDF(wrp); // Comentado porque no estaba implementado
+          break;
 
-        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "creditNoteDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-        pdfBytes = pdfHandler.generateCreditNotePDF(wrp, transaccionTotales, configuracion);
+        case IUBLConfig.DOC_RETENTION_CODE:
+          documentName = configuracion.getPdfIngles().equals("Si") ? "retentionDocument_Ing.jrxml" : "retentionDocument.jrxml";
+          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
+          pdfBytes = pdfHandler.generateRetentionPDF(wrp, configuracion);
+          break;
 
-      } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_DEBIT_NOTE_CODE)) {
+        case IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE:
+          documentName = configuracion.getPdfIngles().equals("Si") ? "remissionguideDocument_Ing.jrxml" : "remissionguideDocument.jrxml";
+          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, providerProperties.getClientProperties(transaction.getDocIdentidad_Nro()).getEmisorElecRs());
+          pdfBytes = pdfHandler.generateDespatchAdvicePDF(wrp, configuracion);
+          break;
 
-        //pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "debitNoteDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-        //pdfBytes = pdfHandler.generateDebitNotePDF(wrp, transaccionTotales, configuracion);
-        String documentName = "creditNoteDocument.jrxml";
-        if(configuracion.getPdfIngles().equals("Si")){
-          documentName = "creditNoteDocument_Ing.jrxml";
-        }
-        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-        pdfBytes = pdfHandler.generateCreditNotePDF(wrp, transaccionTotales, configuracion);
-
-      } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_PERCEPTION_CODE)) {
-
-        pdfHandler.setConfiguration(providerProperties.getRutaBaseDoc() + File.separator + "perceptionDocument.jrxml", rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-        //pdfBytes = pdfHandler.generatePerceptionPDF(wrp);
-
-      } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_RETENTION_CODE)) {
-
-        //pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "retentionDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-        //pdfBytes = pdfHandler.generateRetentionPDF(wrp, configuracion);
-        String documentName = "retentionDocument.jrxml";
-        if(configuracion.getPdfIngles().equals("Si")){
-          documentName = "retentionDocument_Ing.jrxml";
-        }
-        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-        pdfBytes = pdfHandler.generateRetentionPDF(wrp, configuracion);
-
-      } else if (transaction.getDOC_Codigo().equalsIgnoreCase(IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE)) {
-
-        //pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "remissionguideDocument.jrxml"), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"),
-        //    rutaPaymentSelected, logoSociedad, providerProperties.getClientProperties(transaction.getDocIdentidad_Nro()).getEmisorElecRs());
-        //pdfBytes = pdfHandler.generateDespatchAdvicePDF(wrp, configuracion);
-        String documentName = "remissionguideDocument.jrxml";
-        if (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) {
-          documentName = "remissionguideDocument_Ing.jrxml";
-        }
-        pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, providerProperties.getClientProperties(transaction.getDocIdentidad_Nro()).getEmisorElecRs());
-        pdfBytes = pdfHandler.generateDespatchAdvicePDF(wrp, configuracion);
-
-      } else {
-        logger.error("createPDFDocument() [" + this.docUUID + "] " + IVenturaError.ERROR_460.getMessage());
-        throw new ConfigurationException(IVenturaError.ERROR_460.getMessage());
+        default:
+          logger.error("createPDFDocument() [" + this.docUUID + "] " + IVenturaError.ERROR_460.getMessage());
+          throw new ConfigurationException(IVenturaError.ERROR_460.getMessage());
       }
     } catch (PDFReportException e) {
       logger.error("createPDFDocument() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
@@ -137,7 +119,8 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
       logger.debug("-createPDFDocument() [" + this.docUUID + "]");
     }
     return pdfBytes;
-  } //createPDFDocument}
+  }
+  //createPDFDocument}
 
   @Override
   public Optional<byte[]> unzipResponse(byte[] cdr) throws IOException {
