@@ -61,25 +61,25 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
       String documentName;
       switch (transaction.getDOC_Codigo()) {
         case IUBLConfig.DOC_INVOICE_CODE:
-          documentName = configuracion.getPdfIngles().equals("Si") ? "invoiceDocument_Ing.jrxml" : "invoiceDocument.jrxml";
+          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "invoiceDocument_Ing.jrxml" : "invoiceDocument.jrxml";
           pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
           pdfBytes = pdfHandler.generateInvoicePDF(wrp, configuracion);
           break;
 
         case IUBLConfig.DOC_BOLETA_CODE:
-          documentName = configuracion.getPdfIngles().equals("Si") ? "boletaDocument_Ing.jrxml" : "boletaDocument.jrxml";
+          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "boletaDocument_Ing.jrxml" : "boletaDocument.jrxml";
           pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
           pdfBytes = pdfHandler.generateBoletaPDF(wrp, configuracion);
           break;
 
         case IUBLConfig.DOC_CREDIT_NOTE_CODE:
-          documentName = configuracion.getPdfIngles().equals("Si") ? "creditNoteDocument_Ing.jrxml" : "creditNoteDocument.jrxml";
+          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "creditNoteDocument_Ing.jrxml" : "creditNoteDocument.jrxml";
           pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
           pdfBytes = pdfHandler.generateCreditNotePDF(wrp, transaccionTotales, configuracion);
           break;
 
         case IUBLConfig.DOC_DEBIT_NOTE_CODE:
-          documentName = configuracion.getPdfIngles().equals("Si") ? "debitNoteDocument_Ing.jrxml" : "debitNoteDocument.jrxml";
+          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "debitNoteDocument_Ing.jrxml" : "debitNoteDocument.jrxml";
           pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
           pdfBytes = pdfHandler.generateDebitNotePDF(wrp, transaccionTotales, configuracion);
           break;
@@ -90,13 +90,13 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
           break;
 
         case IUBLConfig.DOC_RETENTION_CODE:
-          documentName = configuracion.getPdfIngles().equals("Si") ? "retentionDocument_Ing.jrxml" : "retentionDocument.jrxml";
+          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "retentionDocument_Ing.jrxml" : "retentionDocument.jrxml";
           pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
           pdfBytes = pdfHandler.generateRetentionPDF(wrp, configuracion);
           break;
 
         case IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE:
-          documentName = configuracion.getPdfIngles().equals("Si") ? "remissionguideDocument_Ing.jrxml" : "remissionguideDocument.jrxml";
+          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "remissionguideDocument_Ing.jrxml" : "remissionguideDocument.jrxml";
           pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, providerProperties.getClientProperties(transaction.getDocIdentidad_Nro()).getEmisorElecRs());
           pdfBytes = pdfHandler.generateDespatchAdvicePDF(wrp, configuracion);
           break;
@@ -120,6 +120,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
     }
     return pdfBytes;
   }
+
   //createPDFDocument}
 
   @Override
