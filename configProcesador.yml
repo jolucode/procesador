@@ -3,7 +3,7 @@ spring:
     mongodb:
       uri: mongodb+srv://lbecerra:Lima40401010@cluster0.g1jnjjj.mongodb.net/ventura2024
   datasource:
-    url: jdbc:mysql://localhost:3306/xxxxxxx?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/xxxxxxx?createDatabaseIfNotExist=true&sessionVariables=sql_mode='NO_ENGINE_SUBSTITUTION'&jdbcCompliantTruncation=false
     username: root
     password: B1Admin
     driver-class-name: com.mysql.cj.jdbc.Driver
