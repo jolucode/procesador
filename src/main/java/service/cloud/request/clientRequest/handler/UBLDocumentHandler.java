@@ -572,7 +572,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 logger.info("Entro a esta parte de la validacion");
                 lineExtensionAmount = transaction.getDOC_MontoTotal();
                 taxInclusiveAmount = lineExtensionAmount;
-                payableAmount = taxInclusiveAmount.add(otrosCargosValue);
+                if(Objects.nonNull(otrosCargosValue)) payableAmount = taxInclusiveAmount.add(otrosCargosValue);
             }
             BigDecimal docDescuentoTotal = transaction.getDOC_DescuentoTotal();
             System.out.println("*******************************************************************************************************************************************************************************");
@@ -602,7 +602,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             throw e;
         } catch (Exception e) {
             logger.error("generateInvoiceType() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
-            throw new UBLDocumentException(IVenturaError.ERROR_341, e);
+            throw new IllegalArgumentException(e.getMessage());
         }
         if (logger.isDebugEnabled()) {
             logger.debug("-generateInvoiceType() [" + this.identifier + "]");
