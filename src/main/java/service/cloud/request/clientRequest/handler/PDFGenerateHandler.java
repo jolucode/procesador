@@ -16,11 +16,9 @@ import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
 import service.cloud.request.clientRequest.entity.*;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.extras.pdf.PDFInvoiceCreator;
-import service.cloud.request.clientRequest.handler.creator.PDFBoletaCreator;
-import service.cloud.request.clientRequest.handler.creator.PDFCreditNoteCreator;
-import service.cloud.request.clientRequest.handler.creator.PDFDebitNoteCreator;
-import service.cloud.request.clientRequest.handler.creator.PDFRetentionCreator;
+import service.cloud.request.clientRequest.handler.creator.*;
 import service.cloud.request.clientRequest.handler.object.*;
+import service.cloud.request.clientRequest.handler.object.item.PerceptionItemObject;
 import service.cloud.request.clientRequest.handler.object.legend.BoletaObject;
 import service.cloud.request.clientRequest.handler.object.legend.LegendObject;
 import service.cloud.request.clientRequest.utils.DateConverter;
@@ -35,6 +33,7 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecom
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.LineExtensionAmountType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.NameType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.TaxableAmountType;
+import service.cloud.request.clientRequest.xmlFormatSunat.xsd.sunataggregatecomponents_1.SUNATPerceptionDocumentReferenceType;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.File;
@@ -2089,6 +2088,194 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             this.logger.error("getSubtotalValueFromTransaction() [" + identifier + "] ERROR: " + IVenturaError.ERROR_330.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_330);
         }
+    }
+
+
+    public byte[] generatePerceptionPDF(UBLDocumentWRP perceptionType, ConfigData configData) throws PDFReportException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+generateInvoicePDF() [" + this.docUUID + "]");
+        }
+        byte[] perceptionBytes = null;
+
+        try {
+            PerceptionObject perceptionObj = new PerceptionObject();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
+            }
+            perceptionObj.setDocumentIdentifier(perceptionType.getPerceptionType().getId().getValue());
+            if (logger.isDebugEnabled()) {
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de la fecha." + perceptionType.getPerceptionType().getIssueDate().getValue());
+            }
+            perceptionObj.setIssueDate(formatIssueDate(perceptionType.getPerceptionType().getIssueDate().getValue()));
+            if (logger.isDebugEnabled()) {
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
+            }
+            perceptionObj.setSenderSocialReason(perceptionType.getPerceptionType().getAgentParty().getPartyLegalEntity().get(0).getRegistrationName().getValue().toUpperCase());
+            perceptionObj.setSenderRuc(perceptionType.getPerceptionType().getAgentParty().getPartyIdentification().get(0).getID().getValue());
+            perceptionObj.setSenderFiscalAddress(perceptionType.getPerceptionType().getAgentParty().getPostalAddress().getStreetName().getValue());
+            perceptionObj.setSenderDepProvDist(formatDepProvDist(perceptionType.getPerceptionType().getAgentParty().getPostalAddress()));
+            perceptionObj.setSenderLogo(this.senderLogo);
+            perceptionObj.setTelValue(perceptionType.getTransaccion().getTelefono());
+            //perceptionObj.setTel2Value(perceptionType.getTransaccion().getTelefono1());
+            perceptionObj.setWebValue(perceptionType.getTransaccion().getWeb());
+            perceptionObj.setSenderMail(perceptionType.getTransaccion().getEMail());
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
+            }
+            perceptionObj.setReceiverSocialReason(perceptionType.getPerceptionType().getReceiverParty().getPartyLegalEntity().get(0).getRegistrationName().getValue().toUpperCase());
+            perceptionObj.setReceiverRuc(perceptionType.getPerceptionType().getReceiverParty().getPartyIdentification().get(0).getID().getValue());
+            if (logger.isDebugEnabled()) {
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
+            }
+            perceptionObj.setPerceptionItems(getPerceptionItems(perceptionType.getPerceptionType().getSunatPerceptionDocumentReference(), new BigDecimal(perceptionType.getPerceptionType().getSunatPerceptionPercent().getValue())));
+            List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
+            for (int i = 0; i < perceptionType.getTransaccion().getTransaccionComprobantePagoList().size(); i++) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Agregando datos al HashMap" + perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().size());
+                }
+                WrapperItemObject itemObject = new WrapperItemObject();
+                Map<String, String> itemObjectHash = new HashMap<String, String>();
+                List<String> newlist = new ArrayList<String>();
+                for (int j = 0; j < perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().size(); j++) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Extrayendo Campos " + perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre());
+                    }
+                    itemObjectHash.put(perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre(), perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());
+                    newlist.add(perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
+                    }
+                }
+                itemObject.setLstItemHashMap(itemObjectHash);
+                itemObject.setLstDinamicaItem(newlist);
+                listaItem.add(itemObject);
+            }
+
+            perceptionObj.setItemListDynamic(listaItem);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
+            }
+            // Map<String, LegendObject> legendsMap = new HashMap<String,
+            // LegendObject>();
+
+            perceptionObj.setTotalAmountValue(perceptionType.getPerceptionType().getTotalInvoiceAmount().getValue().toString());
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
+            }
+            perceptionType.getTransaccion();
+            for (int i = 0; i < perceptionType.getTransaccion().getTransaccionPropiedadesList().size(); i++) {
+                if (perceptionType.getTransaccion().getTransaccionPropiedadesList().get(i).getTransaccionPropiedadesPK().getId().equalsIgnoreCase("1000")) {
+                    perceptionObj.setLetterAmountValue(perceptionType.getTransaccion().getTransaccionPropiedadesList().get(i).getValor());
+                }
+
+            }
+            if (Boolean.parseBoolean(configData.getPdfBorrador())) {
+                perceptionObj.setValidezPDF("Este documento no tiene validez fiscal.");
+            } else {
+                perceptionObj.setValidezPDF("");
+            }
+
+            // LegendObject legendLetters =
+            // legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
+            // perceptionObj.setLetterAmountValue(legendLetters.getLegendValue());
+            // legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
+            if (logger.isDebugEnabled()) {
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
+            }
+            // String barcodeValue =
+            // generateBarcodeInfoV2(perceptionType.getPerceptionType().getId().getValue(),
+            // "40",
+            // perceptionType.getPerceptionType().getIssueDate().toString(),
+            // perceptionType.getPerceptionType().getTotalInvoiceAmount().getValue(),
+            // perceptionType.getPerceptionType().getAgentParty(),
+            // perceptionType.getPerceptionType().getReceiverParty(),
+            // perceptionType.getPerceptionType().getUblExtensions());
+            // if (logger.isInfoEnabled()) {logger.info("generateInvoicePDF() ["
+            // + this.docUUID + "] BARCODE: \n" + barcodeValue);}
+            // perceptionObj.setBarcodeValue(barcodeValue);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
+            }
+            // perceptionObj.setLegends(getLegendList(legendsMap));
+
+            perceptionObj.setResolutionCodeValue(this.resolutionCode);
+            perceptionObj.setImporteTexto(perceptionType.getTransaccion().getTransaccionPropiedadesList().get(0).getValor());
+
+            /*
+             * Generando el PDF de la FACTURA con la informacion recopilada.
+             */
+            perceptionBytes = PDFPerceptionCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createPerceptionPDF(perceptionObj, docUUID);
+        } catch (PDFReportException e) {
+            logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
+            ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
+            throw new PDFReportException(error);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("-generateInvoicePDF() [" + this.docUUID + "]");
+        }
+        return perceptionBytes;
+    } // generateInvoicePDF
+
+
+    protected List<PerceptionItemObject> getPerceptionItems(List<SUNATPerceptionDocumentReferenceType> perceptionLines, BigDecimal porcentaje) throws PDFReportException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+getInvoiceItems() [" + this.docUUID + "] invoiceLines: " + perceptionLines);
+        }
+        List<PerceptionItemObject> itemList = null;
+
+        if (null != perceptionLines && 0 < perceptionLines.size()) {
+            /* Instanciando la lista de objetos */
+            itemList = new ArrayList<PerceptionItemObject>(
+                    perceptionLines.size());
+
+            try {
+                for (SUNATPerceptionDocumentReferenceType iLine : perceptionLines) {
+                    PerceptionItemObject invoiceItemObj = new PerceptionItemObject();
+
+                    invoiceItemObj.setFechaEmision(formatIssueDate(iLine
+                            .getIssueDate().getValue()));
+                    invoiceItemObj
+                            .setTipoDocumento(iLine.getId().getSchemeID());
+                    invoiceItemObj.setNumSerieDoc(iLine.getId().getValue());
+                    invoiceItemObj.setMonedaMontoTotal(iLine.getTotalInvoiceAmount().getCurrencyID() + " ");
+                    invoiceItemObj.setPrecioVenta(iLine.getTotalInvoiceAmount()
+                            .getValue());
+                    invoiceItemObj.setMonedaPercepcion("PEN ");
+                    invoiceItemObj.setImportePercepcion(iLine
+                            .getSunatPerceptionInformation()
+                            .getPerceptionAmount().getValue());
+                    invoiceItemObj.setMontoTotalCobrado(iLine
+                            .getSunatPerceptionInformation()
+                            .getSunatNetTotalCashed().getValue());
+                    invoiceItemObj.setPorcentajePercepcion(porcentaje);
+                    itemList.add(invoiceItemObj);
+                }
+            } catch (PDFReportException e) {
+                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+                        + e.getMessage());
+                throw e;
+            } catch (Exception e) {
+                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+                        + IVenturaError.ERROR_415.getMessage());
+                throw new PDFReportException(IVenturaError.ERROR_415);
+            }
+        } else {
+            logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+                    + IVenturaError.ERROR_411.getMessage());
+            throw new PDFReportException(IVenturaError.ERROR_411);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("-getInvoiceItems()");
+        }
+        return itemList;
     }
 
 

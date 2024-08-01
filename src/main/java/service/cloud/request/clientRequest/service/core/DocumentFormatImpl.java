@@ -86,7 +86,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
 
         case IUBLConfig.DOC_PERCEPTION_CODE:
           pdfHandler.setConfiguration(providerProperties.getRutaBaseDoc() + File.separator + "perceptionDocument.jrxml", rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-          // pdfBytes = pdfHandler.generatePerceptionPDF(wrp); // Comentado porque no estaba implementado
+          pdfBytes = pdfHandler.generatePerceptionPDF(wrp, configuracion); // Comentado porque no estaba implementado
           break;
 
         case IUBLConfig.DOC_RETENTION_CODE:

@@ -2408,16 +2408,24 @@ public abstract class UBLBasicHandler {
             prepaidAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
             monetaryTotal.setPrepaidAmount(prepaidAmount);
         }
-        if (transaccion.getTransaccionPropiedadesList().size() == 2 && (transaccion.getTransaccionPropiedadesList().get(0).getDescription().contains("GRATUITA") ||
-                transaccion.getTransaccionPropiedadesList().get(1).getDescription().contains("GRATUITA"))) {
-            final LineExtensionAmountType lineExtensionAmount = new LineExtensionAmountType();
-            lineExtensionAmount.setValue(lineExtensionAmountValue.setScale(2, RoundingMode.HALF_UP));
-            lineExtensionAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
-            monetaryTotal.setLineExtensionAmount(lineExtensionAmount);
-            final TaxInclusiveAmountType taxInclusiveAmount = new TaxInclusiveAmountType();
-            taxInclusiveAmount.setValue(lineExtensionAmountValue.setScale(2, RoundingMode.HALF_UP));
-            taxInclusiveAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
-            monetaryTotal.setTaxInclusiveAmount(taxInclusiveAmount);
+        if (transaccion.getTransaccionPropiedadesList().size() == 2) {
+            TransaccionPropiedades propiedad1 = transaccion.getTransaccionPropiedadesList().get(0);
+            TransaccionPropiedades propiedad2 = transaccion.getTransaccionPropiedadesList().get(1);
+
+            boolean descripcion1ContieneGratuita = propiedad1 != null && propiedad1.getDescription() != null && propiedad1.getDescription().contains("GRATUITA");
+            boolean descripcion2ContieneGratuita = propiedad2 != null && propiedad2.getDescription() != null && propiedad2.getDescription().contains("GRATUITA");
+
+            if (descripcion1ContieneGratuita || descripcion2ContieneGratuita) {
+                final LineExtensionAmountType lineExtensionAmount = new LineExtensionAmountType();
+                lineExtensionAmount.setValue(lineExtensionAmountValue.setScale(2, RoundingMode.HALF_UP));
+                lineExtensionAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
+                monetaryTotal.setLineExtensionAmount(lineExtensionAmount);
+                final TaxInclusiveAmountType taxInclusiveAmount = new TaxInclusiveAmountType();
+                taxInclusiveAmount.setValue(lineExtensionAmountValue.setScale(2, RoundingMode.HALF_UP));
+                taxInclusiveAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
+                monetaryTotal.setTaxInclusiveAmount(taxInclusiveAmount);
+            }
+
         }
         final PayableAmountType payableAmount = new PayableAmountType();
         payableAmount.setValue(payableAmountValue.setScale(2, RoundingMode.HALF_UP));
