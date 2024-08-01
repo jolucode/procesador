@@ -1289,7 +1289,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             despatchAdviceType.setDespatchSupplierParty(getDespatchSupplierParty(transaction.getDocIdentidad_Nro(), transaction.getDocIdentidad_Tipo(), transaction.getRazonSocial()));
 
             /* Agregar <DespatchAdvice><cac:DeliveryCustomerParty> */
-            if (transaction.getTransaccionGuiaRemision().getCodigoMotivo().equals("02")) {/*Motivo de Venta: Compra - 02*/
+            if (transaction.getTransaccionGuiaRemision().getCodigoMotivo() != null && "02".equals(transaction.getTransaccionGuiaRemision().getCodigoMotivo())) {/*Motivo de Venta: Compra - 02*/
                 despatchAdviceType.setDeliveryCustomerParty(getDeliveryCustomerParty(transaction.getDocIdentidad_Nro(), transaction.getDocIdentidad_Tipo(), transaction.getRazonSocial()));
             } else {
                 despatchAdviceType.setDeliveryCustomerParty(getDeliveryCustomerParty(transaction.getSN_DocIdentidad_Nro(), transaction.getSN_DocIdentidad_Tipo(), transaction.getSN_RazonSocial()));
@@ -1301,13 +1301,13 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             }
 
             /* Agregar <DespatchAdvice><cac:SellerSupplierParty> */
-            if (transaction.getTransaccionGuiaRemision().getCodigoMotivo().equals("02") || transaction.getTransaccionGuiaRemision().getCodigoMotivo().equals("07") ||
-                    transaction.getTransaccionGuiaRemision().getCodigoMotivo().equals("13")) {
+            if (transaction.getTransaccionGuiaRemision().getCodigoMotivo() != null && (transaction.getTransaccionGuiaRemision().getCodigoMotivo().equals("02") || transaction.getTransaccionGuiaRemision().getCodigoMotivo().equals("07") ||
+                    transaction.getTransaccionGuiaRemision().getCodigoMotivo().equals("13"))) {
                 despatchAdviceType.setSellerSupplierParty(getSellerSupplierParty(transaction.getSN_DocIdentidad_Nro(), transaction.getSN_DocIdentidad_Tipo(), transaction.getSN_RazonSocial()));
             }
 
             /* Agregar <DespatchAdvice><cac:BuyerCustomerParty> */
-            if (transaction.getTransaccionGuiaRemision().getCodigoMotivo().equals("03") || transaction.getTransaccionGuiaRemision().getCodigoMotivo().equals("13"))
+            if (transaction.getTransaccionGuiaRemision().getCodigoMotivo() != null && (transaction.getTransaccionGuiaRemision().getCodigoMotivo().equals("03") || transaction.getTransaccionGuiaRemision().getCodigoMotivo().equals("13")))
                 despatchAdviceType.setBuyerCustomerParty(getBuyerCustomerParty(transaction.getSN_DocIdentidad_Nro(), transaction.getSN_DocIdentidad_Tipo(), transaction.getSN_RazonSocial()));
             /***/
 

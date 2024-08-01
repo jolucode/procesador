@@ -1736,12 +1736,14 @@ public abstract class UBLBasicHandler {
 
             /* <cac:Shipment><cbc:GrossWeightMeasure> */
             GrossWeightMeasureType grossWeightMeasure = new GrossWeightMeasureType();
-            grossWeightMeasure.setValue(new BigDecimal(transaccionGuiaRemision.getPeso().setScale(3, RoundingMode.HALF_UP).toString()));
+            if (transaccionGuiaRemision.getPeso() != null) {
+                grossWeightMeasure.setValue(new BigDecimal(transaccionGuiaRemision.getPeso().setScale(3, RoundingMode.HALF_UP).toString()));
+            }
             grossWeightMeasure.setUnitCode(transaccionGuiaRemision.getUnidadMedida());
             shipment.setGrossWeightMeasure(grossWeightMeasure);
 
 
-            if (transaccionGuiaRemision.getCodigoMotivo().equals("08") || transaccionGuiaRemision.getCodigoMotivo().equals("09")) {
+            if (transaccionGuiaRemision.getCodigoMotivo() != null && ( transaccionGuiaRemision.getCodigoMotivo().equals("08") || transaccionGuiaRemision.getCodigoMotivo().equals("09"))) {
                 if (transaccionGuiaRemision.getNumeroBultos() != null && transaccionGuiaRemision.getNumeroBultos().compareTo(BigDecimal.ZERO) > 0) {
                     /* <cac:Shipment><cbc:TotalTransportHandlingUnitQuantity> */
                     TotalTransportHandlingUnitQuantityType totalTransportHandlingUnitQuantity = new TotalTransportHandlingUnitQuantityType();
@@ -1751,36 +1753,42 @@ public abstract class UBLBasicHandler {
             }
 
 
-            if (transaccionGuiaRemision.getIndicadorTransbordo().equals("Y")) {
+            if (transaccionGuiaRemision.getIndicadorTransbordo() != null && transaccionGuiaRemision.getIndicadorTransbordo().equals("Y")) {
                 SpecialInstructionsType specialInstructions = new SpecialInstructionsType();
                 specialInstructions.setValue("SUNAT_Envio_IndicadorTransbordoProgramado");
                 shipment.getSpecialInstructions().add(specialInstructions);
             }
-            if (transaccionGuiaRemision.getIndicadorTraslado().equals("Y")) {
+
+            if (transaccionGuiaRemision.getIndicadorTraslado() != null && transaccionGuiaRemision.getIndicadorTraslado().equals("Y")) {
                 SpecialInstructionsType specialInstructions = new SpecialInstructionsType();
                 specialInstructions.setValue("SUNAT_Envio_IndicadorTrasladoVehiculoM1L");
                 shipment.getSpecialInstructions().add(specialInstructions);
             }
-            if (transaccionGuiaRemision.getIndicadorRetorno().equals("Y")) {
+
+            if (transaccionGuiaRemision.getIndicadorRetorno() != null && transaccionGuiaRemision.getIndicadorRetorno().equals("Y")) {
                 SpecialInstructionsType specialInstructions = new SpecialInstructionsType();
                 specialInstructions.setValue("SUNAT_Envio_IndicadorRetornoVehiculoEnvaseVacio");
                 shipment.getSpecialInstructions().add(specialInstructions);
             }
-            if (transaccionGuiaRemision.getIndicadorRetornoVehiculo().equals("Y")) {
+
+            if (transaccionGuiaRemision.getIndicadorRetornoVehiculo() != null && transaccionGuiaRemision.getIndicadorRetornoVehiculo().equals("Y")) {
                 SpecialInstructionsType specialInstructions = new SpecialInstructionsType();
                 specialInstructions.setValue("SUNAT_Envio_IndicadorRetornoVehiculoVacio");
                 shipment.getSpecialInstructions().add(specialInstructions);
             }
-            if (transaccionGuiaRemision.getIndicadorTrasladoTotal().equals("Y")) {
+
+            if (transaccionGuiaRemision.getIndicadorTrasladoTotal() != null && transaccionGuiaRemision.getIndicadorTrasladoTotal().equals("Y")) {
                 SpecialInstructionsType specialInstructions = new SpecialInstructionsType();
                 specialInstructions.setValue("SUNAT_Envio_IndicadorTrasladoTotalDAMoDS");
                 shipment.getSpecialInstructions().add(specialInstructions);
             }
-            if (transaccionGuiaRemision.getIndicadorRegistro().equals("Y")) {
+
+            if (transaccionGuiaRemision.getIndicadorRegistro() != null && transaccionGuiaRemision.getIndicadorRegistro().equals("Y")) {
                 SpecialInstructionsType specialInstructions = new SpecialInstructionsType();
                 specialInstructions.setValue("SUNAT_Envio_IndicadorVehiculoConductoresTransp");
                 shipment.getSpecialInstructions().add(specialInstructions);
             }
+
 
 
             ShipmentStageType shipmentStage = new ShipmentStageType();
@@ -1794,11 +1802,15 @@ public abstract class UBLBasicHandler {
                 shipmentStage.setTransportModeCode(transportModeCode);
 
                 /* <cac:Shipment><cac:ShipmentStage><cac:TransitPeriod> */
-                PeriodType transitPeriod = new PeriodType();
-                transitPeriod.setStartDate(getStartDate(transaccionGuiaRemision.getFechaInicioTraslado()));
-                shipmentStage.setTransitPeriod(transitPeriod);
+                /* <cac:Shipment><cac:ShipmentStage><cac:TransitPeriod> */
+                if (transaccionGuiaRemision.getFechaInicioTraslado() != null) {
+                    PeriodType transitPeriod = new PeriodType();
+                    transitPeriod.setStartDate(getStartDate(transaccionGuiaRemision.getFechaInicioTraslado()));
+                    shipmentStage.setTransitPeriod(transitPeriod);
+                }
 
-                if (transaccionGuiaRemision.getModalidadTraslado().equalsIgnoreCase("01")) {
+
+                if (transaccionGuiaRemision.getModalidadTraslado() != null && transaccionGuiaRemision.getModalidadTraslado().equalsIgnoreCase("01")) {
 
                     /* <cac:Shipment><cac:ShipmentStage><cac:CarrierParty> */
                     PartyType carrierParty = new PartyType();
@@ -1875,7 +1887,7 @@ public abstract class UBLBasicHandler {
             AddressType deliveryAddress = new AddressType();
 
 
-            if (transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("02") || transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("08")) {
+            if (transaccion.getTransaccionGuiaRemision().getCodigoMotivo() != null && (transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("02") || transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("08"))) {
 
                 /* <cac:Shipment><cac:Delivery><cac:DeliveryAddress><cbc:ID> */
                 IDType idDelivery = new IDType();
@@ -1938,7 +1950,7 @@ public abstract class UBLBasicHandler {
             /* <cac:Shipment><cac:Delivery><cac:Despatch><cac:DespatchAddress>*/
             AddressType despatchAddress = new AddressType();
 
-            if (transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("02") || transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("08")) {
+            if (transaccion.getTransaccionGuiaRemision().getCodigoMotivo() !=null && (transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("02") || transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("08"))) {
                 /* <cac:Shipment><cac:Delivery><cac:Despatch><cac:DespatchAddress><cbc:ID>*/
                 IDType idDespatch = new IDType();
                 idDespatch.setSchemeName("Ubigeos");
@@ -2019,7 +2031,7 @@ public abstract class UBLBasicHandler {
             }
 
 
-            if (transaccionGuiaRemision.getCodigoMotivo().equals("08") || (transaccionGuiaRemision.getCodigoMotivo().equals("09"))) {
+            if (transaccionGuiaRemision.getCodigoMotivo() != null && ( transaccionGuiaRemision.getCodigoMotivo().equals("08") || (transaccionGuiaRemision.getCodigoMotivo().equals("09")))) {
                 if (transaccionGuiaRemision.getNumeroContenedor() != null && !transaccionGuiaRemision.getNumeroContenedor().isEmpty()) {
                     transportHandlingUnit.getPackage().add(getPackage(transaccionGuiaRemision.getNumeroContenedor(), transaccionGuiaRemision.getNumeroPrecinto()));
                 }
@@ -2032,7 +2044,7 @@ public abstract class UBLBasicHandler {
 
             //</cac:Shipment><cac:FirstArrivalPortLocation>
 
-            if (transaccionGuiaRemision.getCodigoMotivo().equals("08") || (transaccionGuiaRemision.getCodigoMotivo().equals("09"))) {
+            if (transaccionGuiaRemision.getCodigoMotivo() != null && ( transaccionGuiaRemision.getCodigoMotivo().equals("08") || (transaccionGuiaRemision.getCodigoMotivo().equals("09")))) {
                 if (transaccionGuiaRemision.getCodigoPuerto() != null && !transaccionGuiaRemision.getCodigoPuerto().isEmpty()) {
                     shipment.setFirstArrivalPortLocation(getFirstArrivalPortLocation("Puertos", transaccionGuiaRemision.getCodigoPuerto(), "1", transaccionGuiaRemision.getDescripcionPuerto()));
                 }
