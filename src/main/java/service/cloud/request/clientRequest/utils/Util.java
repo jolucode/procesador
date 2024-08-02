@@ -67,6 +67,7 @@ public class Util {
     public static Date returnDate(String dateString) {
         SimpleDateFormat originalDateFormatFull = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
         SimpleDateFormat originalDateFormatShort = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat alternativeDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat desiredDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         Date date;
@@ -77,8 +78,13 @@ public class Util {
             try {
                 date = originalDateFormatShort.parse(dateString);
             } catch (ParseException ex) {
-                ex.printStackTrace();
-                return null;
+                // Try the alternative date format if the short format fails
+                try {
+                    date = alternativeDateFormat.parse(dateString);
+                } catch (ParseException exc) {
+                    exc.printStackTrace();
+                    return null;
+                }
             }
         }
 
