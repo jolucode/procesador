@@ -1867,7 +1867,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 SUNATPerceptionDocumentReferenceType sunatPerceptionDocReference = new SUNATPerceptionDocumentReferenceType();
 
                 /* Agregar <sac:SUNATPerceptionDocumentReference><cbc:ID> */
-                sunatPerceptionDocReference.setId(getID(transaccionComprobantePago.getDOC_Numero(), transaccionComprobantePago.getTipoComprobante()));
+                sunatPerceptionDocReference.setId(getID(transaccionComprobantePago.getDOC_Numero(), transaccionComprobantePago.getDOC_Tipo()));
 
                 /* Agregar <sac:SUNATPerceptionDocumentReference><cbc:IssueDate> */
                 sunatPerceptionDocReference.setIssueDate(getIssueDate(transaccionComprobantePago.getDOC_FechaEmision()));
@@ -1976,7 +1976,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 SUNATRetentionDocumentReferenceType sunatRetentionDocReference = new SUNATRetentionDocumentReferenceType();
 
                 /* Agregar <sac:SUNATRetentionDocumentReference><cbc:ID> */
-                sunatRetentionDocReference.setId(getID(transaccionComprobantePago.getDOC_Numero(), transaccionComprobantePago.getTipoComprobante()));
+                sunatRetentionDocReference.setId(getID(transaccionComprobantePago.getDOC_Numero(), transaccionComprobantePago.getDOC_Tipo()));
 
                 /* Agregar <sac:SUNATRetentionDocumentReference><cbc:IssueDate> */
                 sunatRetentionDocReference.setIssueDate(getIssueDate(transaccionComprobantePago.getDOC_FechaEmision()));

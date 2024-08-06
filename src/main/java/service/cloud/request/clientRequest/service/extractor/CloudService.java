@@ -258,9 +258,10 @@ public class CloudService implements CloudInterface {
                 comprobantePago.setTipoMoneda(transactionComprobantesDTO.getU_TipoMoneda());
                 comprobantePago.setTipoMonedaTotal(transactionComprobantesDTO.getU_TipoMonedaTotal());
                 comprobantePago.setDOC_Importe(transactionComprobantesDTO.getDOC_Importe());
+                comprobantePago.setTipoComprobante(transactionComprobantesDTO.getU_TipoComprobante());
                 comprobantePago.setDOC_Moneda(transactionComprobantesDTO.getU_DOC_Moneda());
                 comprobantePago.setDOC_Numero(transactionComprobantesDTO.getDOC_Numero());
-                comprobantePago.setTipoComprobante(transactionComprobantesDTO.getU_DOC_Tipo());
+                comprobantePago.setDOC_Tipo(transactionComprobantesDTO.getU_DOC_Tipo());
                 comprobantePago.setImporte_Pago_Soles(transactionComprobantesDTO.getU_Importe_Pago_Soles());
                 comprobantePago.setPagoImporteSR(transactionComprobantesDTO.getU_PagoImporteSR());
                 comprobantePago.setPagoMoneda(transactionComprobantesDTO.getPagoMoneda());

@@ -28,5 +28,6 @@ public class TransactionComprobantesDTO {
     private String U_CP_Fecha;
     private String TC_MonedaRef;
     private String TC_Fecha;
+    private String U_TipoComprobante;
 
 }

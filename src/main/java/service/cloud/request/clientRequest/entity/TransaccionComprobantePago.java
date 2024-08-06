@@ -33,6 +33,9 @@ public class TransaccionComprobantePago implements Serializable {
     protected TransaccionComprobantePagoPK transaccionComprobantePagoPK;
 
     @Column(name = "DOC_Tipo")
+    private String DOC_Tipo;
+
+    @Column(name = "TipoComprobante")
     private String TipoComprobante;
 
     @Column(name = "DOC_Numero")

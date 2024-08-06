@@ -254,7 +254,7 @@ public class UBLDocumentHandler20 {
              * ****************** <cbc:ID schemeID=></cbc:ID>
              * ****************************
              */
-            objIdType.setSchemeID(transaccionComprobantePago.getTipoComprobante());
+            objIdType.setSchemeID(transaccionComprobantePago.getDOC_Tipo());
             objIdType.setValue(transaccionComprobantePago.getDOC_Numero());
             documentReferenceType.setId(objIdType);
             /**
@@ -322,13 +322,13 @@ public class UBLDocumentHandler20 {
         for (TransaccionComprobantePago transaccionComprobantePago : tscp) {
             IDType objIdType = new IDType();
             if (logger.isInfoEnabled()) {
-                logger.info("SUNATPerceptionDocumentReference() ID - " + transaccionComprobantePago.getTipoComprobante() + " - " + transaccionComprobantePago.getDOC_Numero());
+                logger.info("SUNATPerceptionDocumentReference() ID - " + transaccionComprobantePago.getDOC_Tipo() + " - " + transaccionComprobantePago.getDOC_Numero());
             }
             /**
              * ****************** <cbc:ID schemeID=></cbc:ID>
              * ****************************
              */
-            objIdType.setSchemeID(transaccionComprobantePago.getTipoComprobante());
+            objIdType.setSchemeID(transaccionComprobantePago.getDOC_Tipo());
             objIdType.setValue(transaccionComprobantePago.getDOC_Numero());
 
             documentReferenceType.setId(objIdType);
