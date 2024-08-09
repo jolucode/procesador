@@ -321,7 +321,7 @@ public class CloudService implements CloudInterface {
         try {
             transacctionDTO.getTransactionDocReferDTOList().stream().map(transactionDocReferDTO -> {
                 TransaccionDocrefers docrefers = new TransaccionDocrefers(new TransaccionDocrefersPK(feID, transactionDocReferDTO.getLineId()));
-                docrefers.setId(transactionDocReferDTO.getId().toString());
+                docrefers.setId(transactionDocReferDTO.getId());
                 docrefers.setTipo(transactionDocReferDTO.getTipo());
                 transaccionDocrefers.add(docrefers);
                 return docrefers;
