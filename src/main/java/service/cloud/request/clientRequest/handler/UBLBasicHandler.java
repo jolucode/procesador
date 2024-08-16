@@ -3,8 +3,9 @@ package service.cloud.request.clientRequest.handler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-import service.cloud.request.clientRequest.entity.*;
+import service.cloud.request.clientRequest.dto.dto.*;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
+import service.cloud.request.clientRequest.utils.DateUtil;
 import service.cloud.request.clientRequest.utils.Utils;
 import service.cloud.request.clientRequest.utils.exception.UBLDocumentException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
@@ -411,36 +412,36 @@ public abstract class UBLBasicHandler {
         return despatchAdviceTypeCode;
     } //getDespatchAdviceTypeCode
 
-    protected List<NoteType> getNotes(List<TransaccionPropiedades> transaccionPropiedades) {
+    protected List<NoteType> getNotes(List<TransactionPropertiesDTO> transaccionPropiedades) {
         List<NoteType> noteList = new ArrayList<>();
-        List<TransaccionPropiedades> propiedades = new ArrayList<>();
-        for (TransaccionPropiedades tp : transaccionPropiedades) {
+        List<TransactionPropertiesDTO> propiedades = new ArrayList<>();
+        for (TransactionPropertiesDTO tp : transaccionPropiedades) {
             //System.out.println(tp.getTransaccionPropiedadesPK().getId());
-            if ("1000".equalsIgnoreCase(tp.getTransaccionPropiedadesPK().getId()) || "2006".equalsIgnoreCase(tp.getTransaccionPropiedadesPK().getId()))
+            if ("1000".equalsIgnoreCase(tp.getId()) || "2006".equalsIgnoreCase(tp.getId()))
                 propiedades.add(tp);
         }
-        for (TransaccionPropiedades transaccionPropiedad : propiedades) {
+        for (TransactionPropertiesDTO transaccionPropiedad : propiedades) {
             if (logger.isDebugEnabled()) {
-                logger.debug("getNotes() [" + this.identifier + "] xxxxxxxxxxxxxxx Agregando PROPIEDAD(" + transaccionPropiedad.getTransaccionPropiedadesPK().getId() + ", " + transaccionPropiedad.getValor() + ")");
+                logger.debug("getNotes() [" + this.identifier + "] xxxxxxxxxxxxxxx Agregando PROPIEDAD(" + transaccionPropiedad.getId() + ", " + transaccionPropiedad.getValor() + ")");
             }
             NoteType note = new NoteType();
-            note.setLanguageLocaleID(transaccionPropiedad.getTransaccionPropiedadesPK().getId());
+            note.setLanguageLocaleID(transaccionPropiedad.getId());
             note.setValue(transaccionPropiedad.getValor());
             noteList.add(note);
         }
         return noteList;
     } //getNotes
 
-    protected List<NoteType> getNotesWithIfSentence(List<TransaccionPropiedades> transaccionPropiedadesList) {
+    protected List<NoteType> getNotesWithIfSentence(List<TransactionPropertiesDTO> transaccionPropiedadesList) {
         List<NoteType> noteList = new ArrayList<NoteType>();
-        for (TransaccionPropiedades transaccionPropiedad : transaccionPropiedadesList) {
-            if (transaccionPropiedad.getTransaccionPropiedadesPK().getId().startsWith("10") ||
-                    transaccionPropiedad.getTransaccionPropiedadesPK().getId().startsWith("20")) {
+        for (TransactionPropertiesDTO transaccionPropiedad : transaccionPropiedadesList) {
+            if (transaccionPropiedad.getId().startsWith("10") ||
+                    transaccionPropiedad.getId().startsWith("20")) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("getNotes() [" + this.identifier + "] xxxxxxxxxxxxxxx Agregando PROPIEDAD(" + transaccionPropiedad.getTransaccionPropiedadesPK().getId() + ", " + transaccionPropiedad.getValor() + ")");
+                    logger.debug("getNotes() [" + this.identifier + "] xxxxxxxxxxxxxxx Agregando PROPIEDAD(" + transaccionPropiedad.getId() + ", " + transaccionPropiedad.getValor() + ")");
                 }
                 NoteType note = new NoteType();
-                note.setLanguageLocaleID(transaccionPropiedad.getTransaccionPropiedadesPK().getId());
+                note.setLanguageLocaleID(transaccionPropiedad.getId());
                 note.setValue(transaccionPropiedad.getValor());
                 noteList.add(note);
             }
@@ -524,12 +525,12 @@ public abstract class UBLBasicHandler {
         return billingReference;
     } //getBillingReference
 
-    protected List<DocumentReferenceType> getDespatchDocumentReferences(List<TransaccionDocrefers> transaccionDocrefersList) throws UBLDocumentException {
+    protected List<DocumentReferenceType> getDespatchDocumentReferences(List<TransactionDocReferDTO> transaccionDocrefersList) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getDespatchDocumentReferences() [" + this.identifier + "]");
         }
         List<DocumentReferenceType> despatchDocumentReferenceList = new ArrayList<>(transaccionDocrefersList.size());
-        for (TransaccionDocrefers transaccionDocrefer : transaccionDocrefersList) {
+        for (TransactionDocReferDTO transaccionDocrefer : transaccionDocrefersList) {
             if (StringUtils.isNotBlank(transaccionDocrefer.getId())) {
                 String[] remissionGuides = transaccionDocrefer.getId().trim().split(",");
                 for (String rGuide : remissionGuides) {
@@ -562,7 +563,7 @@ public abstract class UBLBasicHandler {
         return despatchDocumentReferenceList;
     } //getDespatchDocumentReferences
 
-    protected List<DocumentReferenceType> getAdditionalDocumentReferences(List<TransaccionAnticipo> transaccionAnticipoList, String identifier, String identifierType) throws UBLDocumentException {
+    protected List<DocumentReferenceType> getAdditionalDocumentReferences(List<TransactionActicipoDTO> transaccionAnticipoList, String identifier, String identifierType) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getAdditionalDocumentReferences() [" + this.identifier + "]");
         }
@@ -570,21 +571,21 @@ public abstract class UBLBasicHandler {
         if (logger.isDebugEnabled()) {
             logger.debug("getAdditionalDocumentReferences() [" + this.identifier + "] size: " + transaccionAnticipoList.size());
         }
-        for (TransaccionAnticipo transaccionAnticipo : transaccionAnticipoList) {
+        for (TransactionActicipoDTO transaccionAnticipo : transaccionAnticipoList) {
             try {
                 DocumentReferenceType additionalDocumentReference = new DocumentReferenceType();
                 /* <cac:AdditionalDocumentReference><cbc:ID> */
                 IDType id = new IDType();
-                id.setValue(transaccionAnticipo.getAntiDOCSerieCorrelativo());
+                id.setValue(transaccionAnticipo.getAntiDOC_Serie_Correlativo());
                 additionalDocumentReference.setID(id);
                 /* <cac:AdditionalDocumentReference><cbc:DocumentTypeCode> */
                 DocumentTypeCodeType documentTypeCode = new DocumentTypeCodeType();
-                documentTypeCode.setValue(transaccionAnticipo.getAntiDOCTipo());
+                documentTypeCode.setValue(transaccionAnticipo.getAntiDOC_Tipo());
                 documentTypeCode.setListAgencyName(IUBLConfig.LIST_AGENCY_NAME_PE_SUNAT);
                 documentTypeCode.setListName("Documento Relacionado");
                 documentTypeCode.setListURI(IUBLConfig.URI_CATALOG_12);
                 additionalDocumentReference.setDocumentTypeCode(documentTypeCode);
-                String nroAnticipo = String.format("%02d", transaccionAnticipo.getTransaccionAnticipoPK().getNroAnticipo());
+                String nroAnticipo = String.format("%02d", transaccionAnticipo.getNroAnticipo());
                 /* <cac:AdditionalDocumentReference><cbc:DocumentStatusCode> */
                 DocumentStatusCodeType documentStatusCode = new DocumentStatusCodeType();
                 documentStatusCode.setValue(nroAnticipo);
@@ -894,7 +895,7 @@ public abstract class UBLBasicHandler {
     } //getDespatchSupplierParty
 
 
-    protected List<PaymentTermsType> getPaymentTermsInvoice(boolean contado, Transaccion transaccion) {
+    protected List<PaymentTermsType> getPaymentTermsInvoice(boolean contado, TransacctionDTO transaccion) {
 
 
         List<PaymentTermsType> paymentTermsTypes = new ArrayList<>();
@@ -904,7 +905,7 @@ public abstract class UBLBasicHandler {
             PaymentTermsType paymentTermsType2 = null;
             if (contado) {
 
-                for (TransaccionCuotas lineaCuota : transaccion.getTransaccionCuotas()) {
+                for (TransactionCuotasDTO lineaCuota : transaccion.getTransactionCuotasDTOList()) {
                     List<PaymentMeansIDType> paymentMeansIDList = new ArrayList<>();
                     paymentTermsType = new PaymentTermsType();
                     IDType idType = new IDType();
@@ -939,7 +940,7 @@ public abstract class UBLBasicHandler {
 
                 /**MONTO PAGO*/
                 BigDecimal sumaTotalCuotas = BigDecimal.ZERO;
-                for (TransaccionCuotas lineaCuota : transaccion.getTransaccionCuotas()) {
+                for (TransactionCuotasDTO lineaCuota : transaccion.getTransactionCuotasDTOList()) {
                     BigDecimal pagoCuota = Optional.ofNullable(lineaCuota.getMontoCuota().setScale(2, RoundingMode.HALF_UP)).orElse(BigDecimal.ZERO);
                     sumaTotalCuotas = sumaTotalCuotas.add(pagoCuota);
                 }
@@ -953,7 +954,7 @@ public abstract class UBLBasicHandler {
 
                 paymentTermsTypes.add(paymentTermsType1);
 
-                for (TransaccionCuotas lineaCuota : transaccion.getTransaccionCuotas()) {
+                for (TransactionCuotasDTO lineaCuota : transaccion.getTransactionCuotasDTOList()) {
                     List<PaymentMeansIDType> paymentMeansIDList2 = new ArrayList<>();
                     paymentTermsType2 = new PaymentTermsType();
 
@@ -975,7 +976,7 @@ public abstract class UBLBasicHandler {
 
                     /**FECHA**/
                     PaymentDueDateType paymentDueDateType = new PaymentDueDateType();
-                    paymentDueDateType.setValue(Utils.stringDateToDateGregory(lineaCuota.getFechaCuota()));
+                    paymentDueDateType.setValue(Utils.stringDateToDateGregory(DateUtil.parseDate(lineaCuota.getFechaCuota())));
 
                     paymentTermsType2.setID(idType);
                     paymentTermsType2.setPaymentMeansID(paymentMeansIDList2);
@@ -991,7 +992,7 @@ public abstract class UBLBasicHandler {
     }
 
 
-    protected List<PaymentTermsType> getPaymentTermsNoteCredit(Transaccion transaccion) {
+    protected List<PaymentTermsType> getPaymentTermsNoteCredit(TransacctionDTO transaccion) {
         List<PaymentTermsType> paymentTermsTypes = new ArrayList<>();
         try {
             PaymentTermsType paymentTermsType1 = null;
@@ -1026,7 +1027,7 @@ public abstract class UBLBasicHandler {
 
             paymentTermsTypes.add(paymentTermsType1);
 
-            for (TransaccionCuotas lineaCuota : transaccion.getTransaccionCuotas()) {
+            for (TransactionCuotasDTO lineaCuota : transaccion.getTransactionCuotasDTOList()) {
 
                 /** Se suma todos los montos para la cabecera de la cuota*/
                 sumTotalCuotas = sumTotalCuotas.add(lineaCuota.getMontoCuota());
@@ -1053,7 +1054,7 @@ public abstract class UBLBasicHandler {
 
                 /**FECHA**/
                 PaymentDueDateType paymentDueDateType = new PaymentDueDateType();
-                paymentDueDateType.setValue(Utils.stringDateToDateGregory(lineaCuota.getFechaCuota()));
+                paymentDueDateType.setValue(Utils.stringDateToDateGregory(DateUtil.parseDate(lineaCuota.getFechaCuota())));
 
                 paymentTermsType2.setID(idType);
                 paymentTermsType2.setPaymentMeansID(paymentMeansIDList2);
@@ -1069,7 +1070,7 @@ public abstract class UBLBasicHandler {
     }
 
 
-    protected List<PaymentTermsType> getPaymentTermsNoteCreditLast(boolean contado, Transaccion transaccion) {
+    protected List<PaymentTermsType> getPaymentTermsNoteCreditLast(boolean contado, TransacctionDTO transaccion) {
         List<PaymentTermsType> paymentTermsTypes = new ArrayList<>();
         try {
             PaymentTermsType paymentTermsType = null;
@@ -1653,7 +1654,7 @@ public abstract class UBLBasicHandler {
         return totalInvoiceAmount;
     } //getTotalInvoiceAmount
 
-    protected List<PaymentType> getPrepaidPaymentV21(List<TransaccionAnticipo> lstAnticipo) throws UBLDocumentException {
+    protected List<PaymentType> getPrepaidPaymentV21(List<TransactionActicipoDTO> lstAnticipo) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getPrepaidPaymentV21() [" + this.identifier + "]");
         }
@@ -1666,32 +1667,32 @@ public abstract class UBLBasicHandler {
             try {
                 PaymentType prepaidPayment = new PaymentType();
 
-                String nroAnticipo = String.format("%02d", lstAnticipo.get(i).getTransaccionAnticipoPK().getNroAnticipo());
+                String nroAnticipo = String.format("%02d", lstAnticipo.get(i).getNroAnticipo());
 
                 /* <cac:PrepaidPayment><cbc:ID> */
                 IDType id = new IDType();
                 id.setValue(nroAnticipo);
-                id.setSchemeID(lstAnticipo.get(i).getAntiDOCTipo());
+                id.setSchemeID(lstAnticipo.get(i).getAntiDOC_Tipo());
                 id.setSchemeAgencyName(IUBLConfig.SCHEME_AGENCY_NAME_PE_SUNAT);
                 id.setSchemeName("Anticipo");
                 prepaidPayment.setID(id);
 
                 /* <cac:PrepaidPayment><cbc:PaidAmount> */
                 if (logger.isDebugEnabled()) {
-                    logger.debug("+getPrepaidPaymentV21() [" + this.identifier + "] AnticipoMonto: " + lstAnticipo.get(i).getAnticipoMonto() + " DOCMoneda: " + lstAnticipo.get(i).getDOCMoneda());
+                    logger.debug("+getPrepaidPaymentV21() [" + this.identifier + "] AnticipoMonto: " + lstAnticipo.get(i).getAnticipo_Monto() + " DOCMoneda: " + lstAnticipo.get(i).getDOC_Moneda());
                 }
                 PaidAmountType paidAmount = new PaidAmountType();
-                paidAmount.setValue(lstAnticipo.get(i).getAnticipoMonto().setScale(IUBLConfig.DECIMAL_PREPAIDPAYMENT_PAIDAMOUNT, RoundingMode.HALF_UP));
-                paidAmount.setCurrencyID(CurrencyCodeContentType.valueOf(lstAnticipo.get(i).getDOCMoneda()).value());
+                paidAmount.setValue(lstAnticipo.get(i).getAnticipo_Monto().setScale(IUBLConfig.DECIMAL_PREPAIDPAYMENT_PAIDAMOUNT, RoundingMode.HALF_UP));
+                paidAmount.setCurrencyID(CurrencyCodeContentType.valueOf(lstAnticipo.get(i).getDOC_Moneda()).value());
                 prepaidPayment.setPaidAmount(paidAmount);
 
                 /* <cac:PrepaidPayment><cbc:InstructionID> */
                 if (logger.isDebugEnabled()) {
-                    logger.debug("+getPrepaidPaymentV21() [" + this.identifier + "] DOCNumero: " + lstAnticipo.get(i).getDOCNumero() + " DOCTipo: " + lstAnticipo.get(i).getDOCTipo() + "]");
+                    logger.debug("+getPrepaidPaymentV21() [" + this.identifier + "] DOCNumero: " + lstAnticipo.get(i).getDOC_Numero() + " DOCTipo: " + lstAnticipo.get(i).getDOC_Tipo() + "]");
                 }
                 InstructionIDType instructionID = new InstructionIDType();
-                instructionID.setValue(lstAnticipo.get(i).getDOCNumero());
-                instructionID.setSchemeID(lstAnticipo.get(i).getDOCTipo());
+                instructionID.setValue(lstAnticipo.get(i).getDOC_Numero());
+                instructionID.setSchemeID(lstAnticipo.get(i).getDOC_Tipo());
                 prepaidPayment.setInstructionID(instructionID);
 
                 prepaidPaymentList.add(prepaidPayment);
@@ -1711,7 +1712,7 @@ public abstract class UBLBasicHandler {
         return prepaidPaymentList;
     } //getPrepaidPaymentV21
 
-    protected ShipmentType getShipment(TransaccionGuiaRemision transaccionGuiaRemision, Transaccion transaccion) throws UBLDocumentException {
+    protected ShipmentType getShipment(TransactionGuiasDTO transaccionGuiaRemision, TransacctionDTO transaccion) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getShipment() [" + this.identifier + "]");
         }
@@ -1871,7 +1872,7 @@ public abstract class UBLBasicHandler {
                     /* <cac:Shipment><cac:ShipmentStage><cac:DriverPerson><cac:IdentityDocumentReference><cbc:ID> */
                     IdentityDocumentReferenceType identityDocumentReference = new IdentityDocumentReferenceType();
                     IDType idd = new IDType();
-                    idd.setValue(transaccionGuiaRemision.getLicenciaConducir());
+                    idd.setValue(transaccionGuiaRemision.getLicenciaConductor());
                     identityDocumentReference.setID(idd);
                     driverPerson.setIdentityDocumentReference(identityDocumentReference);
 
@@ -1887,7 +1888,7 @@ public abstract class UBLBasicHandler {
             AddressType deliveryAddress = new AddressType();
 
 
-            if (transaccion.getTransaccionGuiaRemision().getCodigoMotivo() != null && (transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("02") || transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("08"))) {
+            if (transaccion.getTransactionGuias().getCodigoMotivo() != null && (transaccion.getTransactionGuias().getCodigoMotivo().equals("02") || transaccion.getTransactionGuias().getCodigoMotivo().equals("08"))) {
 
                 /* <cac:Shipment><cac:Delivery><cac:DeliveryAddress><cbc:ID> */
                 IDType idDelivery = new IDType();
@@ -1950,7 +1951,7 @@ public abstract class UBLBasicHandler {
             /* <cac:Shipment><cac:Delivery><cac:Despatch><cac:DespatchAddress>*/
             AddressType despatchAddress = new AddressType();
 
-            if (transaccion.getTransaccionGuiaRemision().getCodigoMotivo() !=null && (transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("02") || transaccion.getTransaccionGuiaRemision().getCodigoMotivo().equals("08"))) {
+            if (transaccion.getTransactionGuias().getCodigoMotivo() !=null && (transaccion.getTransactionGuias().getCodigoMotivo().equals("02") || transaccion.getTransactionGuias().getCodigoMotivo().equals("08"))) {
                 /* <cac:Shipment><cac:Delivery><cac:Despatch><cac:DespatchAddress><cbc:ID>*/
                 IDType idDespatch = new IDType();
                 idDespatch.setSchemeName("Ubigeos");
@@ -2222,7 +2223,7 @@ public abstract class UBLBasicHandler {
         return allowanceCharge;
     } //getAllowanceCharge
 
-    protected TaxTotalType getTaxTotalV21(Transaccion transaccion, List<TransaccionImpuestos> transaccionImpuestos, BigDecimal impuestoTotal, String currencyCode) throws UBLDocumentException {
+    protected TaxTotalType getTaxTotalV21(TransacctionDTO transaccion, List<TransactionImpuestosDTO> transaccionImpuestos, BigDecimal impuestoTotal, String currencyCode) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getTaxTotalV21() [" + this.identifier + "]");
         }
@@ -2236,10 +2237,10 @@ public abstract class UBLBasicHandler {
         boolean contieneGratificacion;
         BigDecimal totalTaxAmount = BigDecimal.ZERO;
         BigDecimal totalTaxableAmount = BigDecimal.ZERO;
-        List<TransaccionLineas> transaccionLineas = transaccion.getTransaccionLineasList();
-        for (TransaccionLineas transaccionLinea : transaccionLineas) {
-            List<TransaccionLineaImpuestos> transaccionLineaImpuestos = transaccionLinea.getTransaccionLineaImpuestosList();
-            for (TransaccionLineaImpuestos lineaImpuesto : transaccionLineaImpuestos) {
+        List<TransactionLineasDTO> transaccionLineas = transaccion.getTransactionLineasDTOList();
+        for (TransactionLineasDTO transaccionLinea : transaccionLineas) {
+            List<TransactionLineasImpuestoDTO> transaccionLineaImpuestos = transaccionLinea.getTransactionLineasImpuestoListDTO();
+            for (TransactionLineasImpuestoDTO lineaImpuesto : transaccionLineaImpuestos) {
                 if (IUBLConfig.TAX_TOTAL_GRA_NAME.equalsIgnoreCase(lineaImpuesto.getNombre())) {
                     totalTaxAmount = totalTaxAmount.add(lineaImpuesto.getMonto());
                     totalTaxableAmount = totalTaxableAmount.add(lineaImpuesto.getValorVenta());
@@ -2252,11 +2253,11 @@ public abstract class UBLBasicHandler {
             if (logger.isDebugEnabled()) {
                 logger.debug("getTaxTotalV21() [" + this.identifier + "] Agregando IMPUESTO_TOTAL(" + impuestoTotal + ") - TAG TaxAmount.");
             }
-            for (TransaccionImpuestos transaccionImpuesto : transaccionImpuestos) {
+            for (TransactionImpuestosDTO transaccionImpuesto : transaccionImpuestos) {
                 // System.out.println(transaccionImpuesto.getNombre());
             }
-            ArrayList<TransaccionImpuestos> impuestos = new ArrayList<>(transaccionImpuestos);
-            Optional<TransaccionImpuestos> impuestosOptional = impuestos.stream().filter(impuesto -> impuesto.getNombre().equalsIgnoreCase("ICBPER")).findAny();
+            ArrayList<TransactionImpuestosDTO> impuestos = new ArrayList<>(transaccionImpuestos);
+            Optional<TransactionImpuestosDTO> impuestosOptional = impuestos.stream().filter(impuesto -> impuesto.getNombre().equalsIgnoreCase("ICBPER")).findAny();
             TaxAmountType taxAmountTotal = new TaxAmountType();
             taxAmountTotal.setValue(Utils.round(impuestoTotal, 2));
             taxAmountTotal.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
@@ -2266,7 +2267,7 @@ public abstract class UBLBasicHandler {
                 taxTotal.setTaxAmount(taxAmountTotal);
             });*/
 
-            for (TransaccionImpuestos transaccionImpuesto : transaccionImpuestos) {
+            for (TransactionImpuestosDTO transaccionImpuesto : transaccionImpuestos) {
                 TaxSubtotalType taxSubtotal = new TaxSubtotalType();
                 contieneGratificacion = IUBLConfig.TAX_TOTAL_GRA_NAME.equalsIgnoreCase(transaccionImpuesto.getNombre());
                 boolean isImpuestoBolsa = IUBLConfig.TAX_TOTAL_BPT_NAME.equalsIgnoreCase(transaccionImpuesto.getNombre());
@@ -2352,7 +2353,7 @@ public abstract class UBLBasicHandler {
         return taxTotal;
     } //getTaxTotalV21
 
-    protected MonetaryTotalType getMonetaryTotal(final Transaccion transaccion, final BigDecimal lineExtensionAmountValue, final BigDecimal taxInclusiveAmountValue, final boolean noContainsFreeItem, final BigDecimal chargeTotalAmountValue, final BigDecimal prepaidAmountValue, final BigDecimal payableAmountValue, final BigDecimal descuento, final String currencyCode, final boolean isInvoiceOrBoleta) throws UBLDocumentException {
+    protected MonetaryTotalType getMonetaryTotal(final TransacctionDTO transaccion, final BigDecimal lineExtensionAmountValue, final BigDecimal taxInclusiveAmountValue, final boolean noContainsFreeItem, final BigDecimal chargeTotalAmountValue, final BigDecimal prepaidAmountValue, final BigDecimal payableAmountValue, final BigDecimal descuento, final String currencyCode, final boolean isInvoiceOrBoleta) throws UBLDocumentException {
         final boolean bandera = false;
         if (this.logger.isDebugEnabled()) {
             this.logger.debug("+getMonetaryTotal() [" + this.identifier + "]");
@@ -2377,12 +2378,12 @@ public abstract class UBLBasicHandler {
             if (transaccion.getANTICIPO_Monto().intValue() > 0) {
                 taxInclusiveAmount.setValue(lineExtensionAmountValue.multiply(b2).setScale(2, RoundingMode.HALF_UP));
                 taxInclusiveAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
-            } else if (transaccion.getTransaccionImpuestosList() != null) {
+            } else if (transaccion.getTransactionImpuestosDTOList() != null) {
                 boolean existIGV = false;
-                for (int i = 0; i < transaccion.getTransaccionImpuestosList().size(); ++i) {
-                    if (transaccion.getTransaccionImpuestosList().get(i).getNombre().equals("IGV")) {
+                for (int i = 0; i < transaccion.getTransactionImpuestosDTOList().size(); ++i) {
+                    if (transaccion.getTransactionImpuestosDTOList().get(i).getNombre().equals("IGV")) {
                         existIGV = true;
-                        taxInclusiveAmount.setValue(lineExtensionAmountValue.add(transaccion.getTransaccionImpuestosList().get(i).getMonto()).setScale(2, RoundingMode.HALF_UP));
+                        taxInclusiveAmount.setValue(lineExtensionAmountValue.add(transaccion.getTransactionImpuestosDTOList().get(i).getMonto()).setScale(2, RoundingMode.HALF_UP));
                         taxInclusiveAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
                     }
                 }
@@ -2391,10 +2392,10 @@ public abstract class UBLBasicHandler {
                     taxInclusiveAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
                 }
             }
-            if (transaccion.getTransaccionImpuestosList() != null) {
-                for (int j = 0; j < transaccion.getTransaccionImpuestosList().size(); ++j) {
-                    if (transaccion.getTransaccionImpuestosList().get(j).getNombre().equals("ISC")) {
-                        taxInclusiveAmount.setValue(lineExtensionAmountValue.add(transaccion.getTransaccionImpuestosList().get(j).getMonto()).multiply(b2).setScale(2, RoundingMode.HALF_UP));
+            if (transaccion.getTransactionImpuestosDTOList() != null) {
+                for (int j = 0; j < transaccion.getTransactionImpuestosDTOList().size(); ++j) {
+                    if (transaccion.getTransactionImpuestosDTOList().get(j).getNombre().equals("ISC")) {
+                        taxInclusiveAmount.setValue(lineExtensionAmountValue.add(transaccion.getTransactionImpuestosDTOList().get(j).getMonto()).multiply(b2).setScale(2, RoundingMode.HALF_UP));
                         taxInclusiveAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
                     }
                 }
@@ -2420,9 +2421,9 @@ public abstract class UBLBasicHandler {
             prepaidAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
             monetaryTotal.setPrepaidAmount(prepaidAmount);
         }
-        if (transaccion.getTransaccionPropiedadesList().size() == 2) {
-            TransaccionPropiedades propiedad1 = transaccion.getTransaccionPropiedadesList().get(0);
-            TransaccionPropiedades propiedad2 = transaccion.getTransaccionPropiedadesList().get(1);
+        if (transaccion.getTransactionPropertiesDTOList().size() == 2) {
+            TransactionPropertiesDTO propiedad1 = transaccion.getTransactionPropertiesDTOList().get(0);
+            TransactionPropertiesDTO propiedad2 = transaccion.getTransactionPropertiesDTOList().get(1);
 
             boolean descripcion1ContieneGratuita = propiedad1 != null && propiedad1.getDescription() != null && propiedad1.getDescription().contains("GRATUITA");
             boolean descripcion2ContieneGratuita = propiedad2 != null && propiedad2.getDescription() != null && propiedad2.getDescription().contains("GRATUITA");
@@ -2497,15 +2498,15 @@ public abstract class UBLBasicHandler {
         return lineExtensionAmount;
     } //getLineExtensionAmount
 
-    protected PricingReferenceType getPricingReference(String priceTypeCodeValue, BigDecimal priceAmountValue, String currencyCode, TransaccionLineas linea) {
+    protected PricingReferenceType getPricingReference(String priceTypeCodeValue, BigDecimal priceAmountValue, String currencyCode, TransactionLineasDTO linea) {
         PricingReferenceType pricingReference = new PricingReferenceType();
 
         PriceType alternativeConditionPrice = new PriceType();
         BigDecimal cantidad = linea.getCantidad();
         BigDecimal totalTaxAmount = BigDecimal.ZERO;
-        List<TransaccionLineaImpuestos> lineaImpuestos = linea.getTransaccionLineaImpuestosList();
+        List<TransactionLineasImpuestoDTO> lineaImpuestos = linea.getTransactionLineasImpuestoListDTO();
         boolean contieneGratificacion = false;
-        for (TransaccionLineaImpuestos lineaImpuesto : lineaImpuestos) {
+        for (TransactionLineasImpuestoDTO lineaImpuesto : lineaImpuestos) {
             if (IUBLConfig.TAX_TOTAL_GRA_NAME.equalsIgnoreCase(lineaImpuesto.getNombre())) {
                 totalTaxAmount = totalTaxAmount.add(lineaImpuesto.getValorVenta());
                 contieneGratificacion = true;
@@ -2626,7 +2627,7 @@ public abstract class UBLBasicHandler {
         return delivery;
     } //getDeliveryForLine
 
-    protected TaxTotalType getTaxTotalLineV21(List<TransaccionLineaImpuestos> transaccionLineaImpuestos, BigDecimal impuestoTotalLinea, String currencyCode) throws UBLDocumentException {
+    protected TaxTotalType getTaxTotalLineV21(List<TransactionLineasImpuestoDTO> transaccionLineaImpuestos, BigDecimal impuestoTotalLinea, String currencyCode) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getTaxTotalLineV21() [" + this.identifier + "]");
         }
@@ -2641,7 +2642,7 @@ public abstract class UBLBasicHandler {
                 logger.debug("getTaxTotalLineV21() [" + this.identifier + "] Agregando IMPUESTO_TOTAL_LINEA(" + impuestoTotalLinea + ") - TAG TaxAmount.");
             }
             BigDecimal taxAmountValue = BigDecimal.ZERO;
-            boolean contieneGratificacion = transaccionLineaImpuestos.stream().map(TransaccionLineaImpuestos::getNombre).anyMatch(IUBLConfig.TAX_TOTAL_GRT_NAME::equalsIgnoreCase);
+            boolean contieneGratificacion = transaccionLineaImpuestos.stream().map(TransactionLineasImpuestoDTO::getNombre).anyMatch(IUBLConfig.TAX_TOTAL_GRT_NAME::equalsIgnoreCase);
 //            for (TransaccionLineaImpuestoDTO lineaImpuesto : transaccionLineaImpuestos) {
 //                if (IUBLConfig.TAX_TOTAL_GRA_NAME.equalsIgnoreCase(lineaImpuesto.getNombre())) {
 //                    contieneGratificacion = true;
@@ -2658,7 +2659,7 @@ public abstract class UBLBasicHandler {
             taxTotal.setTaxAmount(taxAmountTotal);
 
             List<BigDecimal> valoresImpuesto = new ArrayList<>();
-            for (TransaccionLineaImpuestos lineaImpuesto : transaccionLineaImpuestos) {
+            for (TransactionLineasImpuestoDTO lineaImpuesto : transaccionLineaImpuestos) {
                 String tributo = lineaImpuesto.getTipoTributo();
                 if (tributo.equalsIgnoreCase(IUBLConfig.TAX_TOTAL_IGV_ID) || tributo.equalsIgnoreCase(IUBLConfig.TAX_TOTAL_ISC_ID) || tributo.equalsIgnoreCase(IUBLConfig.TAX_TOTAL_EXP_ID) || tributo.equalsIgnoreCase(IUBLConfig.TAX_TOTAL_GRT_ID)
                         || tributo.equalsIgnoreCase(IUBLConfig.TAX_TOTAL_EXO_ID) || tributo.equalsIgnoreCase(IUBLConfig.TAX_TOTAL_INA_ID) || tributo.equalsIgnoreCase(IUBLConfig.TAX_TOTAL_OTR_ID)) {
@@ -2760,7 +2761,8 @@ public abstract class UBLBasicHandler {
                     /* Agregar TAG TaxSubtotalType */
                     taxTotal.getTaxSubtotal().add(taxSubtotal);
                 } else if (tributo.equalsIgnoreCase(IUBLConfig.TAX_TOTAL_BPT_ID)) {
-                    BigDecimal cantidad = lineaImpuesto.getTransaccionLineas().getCantidad();
+                    /**revisar*/
+                    BigDecimal cantidad = null;// lineaImpuesto.getTransaccionLineas().getCantidad();
 
                     TaxSubtotalType taxSubtotal = new TaxSubtotalType();
                     TaxAmountType bolsaTaxAmount = new TaxAmountType();
@@ -2770,7 +2772,7 @@ public abstract class UBLBasicHandler {
                     taxSubtotal.setTaxAmount(bolsaTaxAmount);
 
                     BaseUnitMeasureType baseUnitMeasure = new BaseUnitMeasureType();
-                    baseUnitMeasure.setUnitCode(lineaImpuesto.getTransaccionLineas().getUnidadSunat());
+                    baseUnitMeasure.setUnitCode(null/*lineaImpuesto.getTransaccionLineas().getUnidadSunat()*/); /**revisar*/
                     baseUnitMeasure.setValue(cantidad.setScale(0, RoundingMode.HALF_UP));
 
                     taxSubtotal.setBaseUnitMeasure(baseUnitMeasure);
@@ -2816,8 +2818,8 @@ public abstract class UBLBasicHandler {
         return taxTotal;
     }
 
-    protected ItemType getItemForLine(Transaccion transaccion, TransaccionLineas linea, String descriptionValue, String sellersItemIdentificationIDValue, String commodityClassificationCodeValue, String standardItemIdentificationIDValue,
-                                      List<TransaccionPropiedades> transaccionPropiedadesList) throws UBLDocumentException {
+    protected ItemType getItemForLine(TransacctionDTO transaccion, TransactionLineasDTO linea, String descriptionValue, String sellersItemIdentificationIDValue, String commodityClassificationCodeValue, String standardItemIdentificationIDValue,
+                                      List<TransactionPropertiesDTO> transaccionPropiedadesList) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getItemForLine() [" + this.identifier + "]");
         }
@@ -2896,7 +2898,7 @@ public abstract class UBLBasicHandler {
         return item;
     } //getItemForLine
 
-    protected ItemType getItemForLineRest(TransaccionLineas transaccionLineas) {//String descriptionValue, String sellersItemIdentificationIDValue) {
+    protected ItemType getItemForLineRest(TransactionLineasDTO transaccionLineas) {//String descriptionValue, String sellersItemIdentificationIDValue) {
         ItemType item = new ItemType();
         /* <cac:Item><cbc:Name> */
         DescriptionType description = new DescriptionType();
@@ -2974,7 +2976,7 @@ public abstract class UBLBasicHandler {
         return additionalItemProperty;
     }
 
-    protected PriceType getPriceForLine(List<TransaccionLineasBillref> transaccionLineasBillrefList, String currencyCode) throws UBLDocumentException {
+    protected PriceType getPriceForLine(List<TransactionLineasBillRefDTO> transaccionLineasBillrefList, String currencyCode) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getPriceForLine() [" + this.identifier + "]");
         }
@@ -2985,12 +2987,12 @@ public abstract class UBLBasicHandler {
         PriceType price = null;
         try {
             String hidden_unitValue = null;
-            for (TransaccionLineasBillref billReference : transaccionLineasBillrefList) {
-                if (billReference.getAdtDocRefSchemaId().equalsIgnoreCase(IUBLConfig.HIDDEN_UVALUE)) {
+            for (TransactionLineasBillRefDTO billReference : transaccionLineasBillrefList) {
+                if (billReference.getAdtDocRef_SchemaId().equalsIgnoreCase(IUBLConfig.HIDDEN_UVALUE)) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getPriceForLine() [" + this.identifier + "] Se encontro el " + IUBLConfig.HIDDEN_UVALUE);
                     }
-                    hidden_unitValue = billReference.getAdtDocRefId();
+                    hidden_unitValue = billReference.getAdtDocRef_Id();
                     break;
                 }
             }
@@ -3047,7 +3049,7 @@ public abstract class UBLBasicHandler {
         return orderLineReference;
     } //getOrderLineReference
 
-    private ItemPropertyType getAdditionalItemProperty(TransaccionLineas lineas, String codi, String valuer) throws UBLDocumentException {
+    private ItemPropertyType getAdditionalItemProperty(TransactionLineasDTO lineas, String codi, String valuer) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getAdditionalItemProperty() [" + this.identifier + "]");
         }
@@ -3082,7 +3084,7 @@ public abstract class UBLBasicHandler {
                 additionalItemProperty.getValue().add(value);
             } else if (codi.equals("3003")) {
                 ValueType value = new ValueType();
-                value.setValue(lineas.getTipoEspeciaVendida());
+                value.setValue(lineas.getTipoEspecieVendida());
                 additionalItemProperty.getValue().add(value);
             } else if (codi.equals("3004")) {
                 ValueType value = new ValueType();
@@ -3377,13 +3379,13 @@ public abstract class UBLBasicHandler {
     } //getMeasurementDimension
 
     protected BigDecimal getSubtotalValueFromTransaction(
-            List<TransaccionTotales> transactionTotalList)
+            List<TransactionTotalesDTO> transactionTotalList)
             throws UBLDocumentException {
         BigDecimal subtotal = null;
 
         if (null != transactionTotalList && 0 < transactionTotalList.size()) {
             for (int i = 0; i < transactionTotalList.size(); i++) {
-                if (transactionTotalList.get(i).getTransaccionTotalesPK()
+                if (transactionTotalList.get(i)
                         .getId()
                         .equalsIgnoreCase(IUBLConfig.ADDITIONAL_MONETARY_1005)) {
                     subtotal = transactionTotalList.get(i).getMonto();

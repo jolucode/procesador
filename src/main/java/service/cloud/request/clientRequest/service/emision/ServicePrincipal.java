@@ -9,13 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import service.cloud.request.clientRequest.config.ProviderProperties;
-import service.cloud.request.clientRequest.dao.TransaccionBajaRepository;
-import service.cloud.request.clientRequest.dao.TransaccionRepository;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
+import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.dto.request.RequestPost;
 import service.cloud.request.clientRequest.dto.response.Data;
-import service.cloud.request.clientRequest.entity.Transaccion;
-import service.cloud.request.clientRequest.entity.TransaccionBaja;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.mongo.model.Log;
@@ -24,7 +21,6 @@ import service.cloud.request.clientRequest.mongo.service.ILogService;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.InterfacePrincipal;
 import service.cloud.request.clientRequest.service.emision.interfac.ServiceInterface;
-import service.cloud.request.clientRequest.service.publicar.DocumentService;
 import service.cloud.request.clientRequest.service.publicar.PublicacionManager;
 import service.cloud.request.clientRequest.utils.LoggerTrans;
 import service.cloud.request.clientRequest.utils.exception.ConectionSunatException;
@@ -33,10 +29,6 @@ import service.cloud.request.clientRequest.utils.exception.ValidationException;
 import service.cloud.request.clientRequest.utils.exceptions.VenturaExcepcion;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -50,15 +42,10 @@ public class ServicePrincipal implements InterfacePrincipal {
     @Autowired
     ServiceInterface serviceInterface;
     @Autowired
-    TransaccionRepository transaccionRepository;
-    @Autowired
-    TransaccionBajaRepository transaccionBajaRepository;
-    @Autowired
     ProviderProperties providerProperties;
     @Autowired
     GuiaInterface guiaInterface;
-    @Autowired
-    DocumentService documentService;
+
     @Autowired
     PublicacionManager publicacionManager;
 
@@ -73,7 +60,7 @@ public class ServicePrincipal implements InterfacePrincipal {
      * tengan el estado [N]uevo,[C]orregido,[E]nviado
      */
 
-    public RequestPost EnviarTransacciones(Transaccion transaccion, String stringRequestOnpremise) throws Exception {
+    public RequestPost EnviarTransacciones(TransacctionDTO transaccion, String stringRequestOnpremise) throws Exception {
         RequestPost request = new RequestPost();
 
         //request.getLogMdb().setRequest(new Gson().toJson(transaccion));
@@ -83,7 +70,7 @@ public class ServicePrincipal implements InterfacePrincipal {
             TransaccionRespuesta tr = EnviarTransaccion(transaccion);
             OnPremiseImpl clientHanaService = new OnPremiseImpl();
             request = generateDataRequestHana(transaccion, tr);
-            clientHanaService.anexarDocumentos(request);
+            //clientHanaService.anexarDocumentos(request);
             logger.info("Ruc: " + request.getRuc() + " DocObject: " + request.getDocObject() + " DocEntry: " + request.getDocEntry());
             logger.info("Nombre Documento: " + request.getDocumentName());
 
@@ -106,13 +93,13 @@ public class ServicePrincipal implements InterfacePrincipal {
         return mapper.map(dto, Log.class);
     }
 
-    public String GenerarIDyFecha(Transaccion tr) {
+    public String GenerarIDyFecha(TransacctionDTO tr) {
         String serie = "";
         try {
             if (tr.getFE_TipoTrans().compareTo("E") == 0) {
                 return "";
             }
-            TransaccionBaja trb = transaccionBajaRepository.getLastRow();
+            /*TransaccionBaja trb = transaccionBajaRepository.getLastRow();
             LocalDateTime date = LocalDateTime.now();
             Date fecha = Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -122,7 +109,6 @@ public class ServicePrincipal implements InterfacePrincipal {
                 int indexOf = trb.getSerie().lastIndexOf("-");
                 String fin = trb.getSerie().substring(indexOf + 1);
                 if (simpleDateFormat.format(fecha).equals(trb.getFecha().toString())) {
-                    /**actualizar ultimo registro*/
                     int numero = Integer.parseInt(fin);
                     numero++;
                     String nuevoId = String.format("%05d", numero);
@@ -132,7 +118,7 @@ public class ServicePrincipal implements InterfacePrincipal {
                     trb.setFecha(Long.valueOf(simpleDateFormat.format(fecha)));
                     trb.setId(numero);
                     trb.setSerie(serie);
-                    transaccionBajaRepository.saveAndFlush(trb);
+                    //transaccionBajaRepository.saveAndFlush(trb);
                 } else {
                     String nuevoId = String.format("%05d", 1);
                     serie = "RA-" + simpleDateFormat.format(fecha) + "-" + nuevoId;
@@ -142,10 +128,9 @@ public class ServicePrincipal implements InterfacePrincipal {
                     nuevaBaja2.setId(1);
                     nuevaBaja2.setSerie(serie);
 
-                    transaccionBajaRepository.saveAndFlush(nuevaBaja2);
+                    //transaccionBajaRepository.saveAndFlush(nuevaBaja2);
                 }
             } else {
-                /**crear nuevo registro*/
                 int numero = 0;
                 numero++;
                 String nuevoId = String.format("%05d", numero);
@@ -155,10 +140,9 @@ public class ServicePrincipal implements InterfacePrincipal {
                 nuevaBaja.setSerie(serie);
                 nuevaBaja.setFecha(Long.valueOf(simpleDateFormat.format(fecha)));
                 nuevaBaja.setId(numero);
-                transaccionBajaRepository.saveAndFlush(nuevaBaja);
             }
-            tr.setANTICIPO_Id(serie);
-            transaccionRepository.save(tr);
+            tr.setANTICIPO_Id(serie);*/
+            //transaccionRepository.save(tr);
 
         } catch (Exception ex) {
             LoggerTrans.getCDThreadLogger().log(Level.SEVERE, ex.getMessage());
@@ -166,7 +150,7 @@ public class ServicePrincipal implements InterfacePrincipal {
         return serie;
     }
 
-    public TransaccionRespuesta EnviarTransaccion(Transaccion transaction) throws VenturaExcepcion {
+    public TransaccionRespuesta EnviarTransaccion(TransacctionDTO transaction) throws VenturaExcepcion {
 
         String largePath = System.getProperty("user.dir") + File.separator + "log4j.properties";
         File f = new File(largePath);
@@ -202,13 +186,13 @@ public class ServicePrincipal implements InterfacePrincipal {
             String mensaje = Optional.ofNullable(optional.orElse(e.getMessage())).orElse("No se pudo obtener la respuesta del servidor.");
             transactionResponse.setMensaje(mensaje);
         } catch (Exception e) {
-            transaccionRepository.delete(transaction);
+            //transaccionRepository.delete(transaction);
             transactionResponse.setMensaje(e.getMessage());
         }
         return transactionResponse;
     }
 
-    public RequestPost generateDataRequestHana(Transaccion tc, TransaccionRespuesta tr) {
+    public RequestPost generateDataRequestHana(TransacctionDTO tc, TransaccionRespuesta tr) {
         RequestPost request = new RequestPost();
         try {
 
@@ -252,9 +236,9 @@ public class ServicePrincipal implements InterfacePrincipal {
                 request.setResponseRequest(responseRequest);
                 request.setStatus(200);
 
-                transaccionRepository.delete(tc);
-                documentService.crearObjectPublicardocWs(tc, null, true);
-                publicacionManager.publicarDocumento(tc.getDocIdentidad_Nro(), tc.getFE_Id(), tr);
+                //transaccionRepository.delete(tc);
+                //PublicardocWs transPubli = documentService.crearObjectPublicardocWs(tc, null, true);
+                publicacionManager.publicarDocumento(tc, tc.getFE_Id(), tr);
 
             } else {
                 if (tr.getPdfBorrador() != null) {
@@ -274,7 +258,7 @@ public class ServicePrincipal implements InterfacePrincipal {
                 error.setErrorRequest(errorRequest);
                 request.setResponseError(error);
                 request.setStatus(500);
-                transaccionRepository.delete(tc);
+                //transaccionRepository.delete(tc);
             }
         } catch (Exception e) {
             logger.error("Error : " + e.getMessage());

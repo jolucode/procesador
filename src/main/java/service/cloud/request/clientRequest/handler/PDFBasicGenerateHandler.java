@@ -3,8 +3,8 @@ package service.cloud.request.clientRequest.handler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.NodeList;
-import service.cloud.request.clientRequest.entity.TransaccionImpuestos;
-import service.cloud.request.clientRequest.entity.TransaccionTotales;
+import service.cloud.request.clientRequest.dto.dto.TransactionImpuestosDTO;
+import service.cloud.request.clientRequest.dto.dto.TransactionTotalesDTO;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
 import service.cloud.request.clientRequest.handler.object.item.InvoiceItemObject;
@@ -523,12 +523,12 @@ public class PDFBasicGenerateHandler {
         return value;
     } // getDiscountItem
 
-    protected BigDecimal getTransaccionTotales(List<TransaccionTotales> lstTotales, String addiMonetaryValue) {
+    protected BigDecimal getTransaccionTotales(List<TransactionTotalesDTO> lstTotales, String addiMonetaryValue) {
 
         if (lstTotales != null) {
             if (lstTotales.size() > 0) {
                 for (int i = 0; i < lstTotales.size(); i++) {
-                    if (lstTotales.get(i).getTransaccionTotalesPK().getId().equalsIgnoreCase(addiMonetaryValue)) {
+                    if (lstTotales.get(i).getId().equalsIgnoreCase(addiMonetaryValue)) {
                         return lstTotales.get(i).getMonto();
                     }
                 }
@@ -601,7 +601,7 @@ public class PDFBasicGenerateHandler {
         return responseValue;
     } // getAdditionalMonetaryTotal
 
-    protected BigDecimal getTaxTotalValue2(List<TransaccionImpuestos> taxTotalList,
+    protected BigDecimal getTaxTotalValue2(List<TransactionImpuestosDTO> taxTotalList,
                                            String taxTotalCode) throws PDFReportException {
         if (logger.isDebugEnabled()) {
             logger.debug("+-getTaxTotalValue() [" + this.docUUID

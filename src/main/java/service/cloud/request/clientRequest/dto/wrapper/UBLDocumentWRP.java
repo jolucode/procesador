@@ -1,6 +1,6 @@
 package service.cloud.request.clientRequest.dto.wrapper;
 
-import service.cloud.request.clientRequest.entity.Transaccion;
+import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.creditnote_2.CreditNoteType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.debitnote_2.DebitNoteType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
@@ -30,7 +30,7 @@ public class UBLDocumentWRP {
         return instance;
     }
 
-    private Transaccion transaccion;
+    private TransacctionDTO transaccion;
 
     private InvoiceType invoiceType;
 
@@ -55,11 +55,11 @@ public class UBLDocumentWRP {
         this.adviceType = adviceType;
     }
 
-    public Transaccion getTransaccion() {
+    public TransacctionDTO getTransaccion() {
         return transaccion;
     }
 
-    public void setTransaccion(Transaccion transaccion) {
+    public void setTransaccion(TransacctionDTO transaccion) {
         this.transaccion = transaccion;
     }
 

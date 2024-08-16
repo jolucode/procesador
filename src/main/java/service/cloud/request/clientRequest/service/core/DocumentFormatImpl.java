@@ -6,10 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import service.cloud.request.clientRequest.config.ProviderProperties;
+import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
+import service.cloud.request.clientRequest.dto.dto.TransactionTotalesDTO;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
-import service.cloud.request.clientRequest.entity.Transaccion;
-import service.cloud.request.clientRequest.entity.TransaccionTotales;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.handler.PDFGenerateHandler;
 import service.cloud.request.clientRequest.utils.Constants;
@@ -45,12 +45,12 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
   }
 
   @Override
-  public byte[] createPDFDocument(UBLDocumentWRP wrp, Transaccion transaction, ConfigData configuracion) {
+  public byte[] createPDFDocument(UBLDocumentWRP wrp, TransacctionDTO transaction, ConfigData configuracion) {
     if (logger.isDebugEnabled()) {
       logger.debug("+createPDFDocument() [" + this.docUUID + "]");
     }
     byte[] pdfBytes = null;
-    List<TransaccionTotales> transaccionTotales = new ArrayList<>(transaction.getTransaccionTotalesList());
+    List<TransactionTotalesDTO> transaccionTotales = new ArrayList<>(transaction.getTransactionTotalesDTOList());
     try {
       // Crear una nueva instancia de PDFGenerateHandler para cada llamada
       PDFGenerateHandler pdfHandler = PDFGenerateHandler.newInstance(this.docUUID);

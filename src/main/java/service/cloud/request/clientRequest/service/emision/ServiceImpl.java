@@ -10,13 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import service.cloud.request.clientRequest.config.ApplicationProperties;
 import service.cloud.request.clientRequest.config.ClientProperties;
-import service.cloud.request.clientRequest.dao.TransaccionRepository;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
+import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.finalClass.Response;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
-import service.cloud.request.clientRequest.entity.Transaccion;
-import service.cloud.request.clientRequest.entity.TransaccionContractdocref;
 import service.cloud.request.clientRequest.exception.ExceptionProxy;
 import service.cloud.request.clientRequest.extras.ISignerConfig;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
@@ -96,14 +94,11 @@ public class ServiceImpl implements ServiceInterface {
     ClientProperties clientProperties;
 
     @Autowired
-    TransaccionRepository transaccionRepository;
-
-    @Autowired
     DocumentFormatInterface documentFormatInterface;
 
 
     @Override
-    public TransaccionRespuesta transactionVoidedDocument(Transaccion transaction, String doctype) throws Exception {
+    public TransaccionRespuesta transactionVoidedDocument(TransacctionDTO transaction, String doctype) throws Exception {
 
         if (transaction.getFE_Comentario().isEmpty()) {
             TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
@@ -223,12 +218,12 @@ public class ServiceImpl implements ServiceInterface {
             try {
                 /**Generacion ticket en caso no este se genera uno nuevo*/
                 String ticket = "";
-                if (transaction.getTicketBaja() == null || transaction.getTicketBaja().isEmpty()) {
+                if (transaction.getTicket_Baja() == null || transaction.getTicket_Baja().isEmpty()) {
                     ticket = wsConsumer.sendSummary(zipDocument, documentName, configuracion);
-                    transaction.setTicketBaja(ticket);
-                    transaccionRepository.save(transaction);
+                    //transaction.getTicket_Baja(ticket);
+                    //transaccionRepository.save(transaction);
                 } else {
-                    ticket = transaction.getTicketBaja();
+                    ticket = transaction.getTicket_Baja();
                 }
 
                 /**Enviamos ticket a Sunat*/
@@ -270,7 +265,7 @@ public class ServiceImpl implements ServiceInterface {
         return issueDate;
     }
 
-    private TransaccionRespuesta processOseResponseBAJA(byte[] statusResponse, Transaccion transaction, FileHandler fileHandler, String documentName, ConfigData configuracion) {
+    private TransaccionRespuesta processOseResponseBAJA(byte[] statusResponse, TransacctionDTO transaction, FileHandler fileHandler, String documentName, ConfigData configuracion) {
         TransaccionRespuesta.Sunat sunatResponse = proccessResponse(statusResponse, transaction, configuracion.getIntegracionWs());
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
         if ((IVenturaError.ERROR_0.getId() == sunatResponse.getCodigo()) || (4000 <= sunatResponse.getCodigo())) {
@@ -293,7 +288,7 @@ public class ServiceImpl implements ServiceInterface {
         return transactionResponse;
     }
 
-    public TransaccionRespuesta.Sunat proccessResponse(byte[] cdrConstancy, Transaccion transaction, String
+    public TransaccionRespuesta.Sunat proccessResponse(byte[] cdrConstancy, TransacctionDTO transaction, String
             sunatType) {
         try {
             String descripcionRespuesta = "";
@@ -351,7 +346,7 @@ public class ServiceImpl implements ServiceInterface {
     }
 
     @Override
-    public TransaccionRespuesta transactionDocument(Transaccion transaction, String doctype)
+    public TransaccionRespuesta transactionDocument(TransacctionDTO transaction, String doctype)
             throws Exception {
 
         TransaccionRespuesta transactionResponse = null;
@@ -365,13 +360,15 @@ public class ServiceImpl implements ServiceInterface {
         String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
 
         boolean isContingencia = false;
-        List<TransaccionContractdocref> contractdocrefs = transaction.getTransaccionContractdocrefList();
-        for (TransaccionContractdocref contractdocref : contractdocrefs) {
+        List<Map<String, String>> contractdocrefs = transaction.getTransactionContractDocRefListDTOS();
+        /**revisar*/
+        /*for (Map<String, String> contractdocref : contractdocrefs) {
             if ("cu31".equalsIgnoreCase(contractdocref.getUsuariocampos().getNombre())) {
                 isContingencia = "Si".equalsIgnoreCase(contractdocref.getValor());
                 break;
             }
-        }
+        }¨*/
+
 
         ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
         validationHandler.checkBasicInformation(transaction.getDOC_Id(), transaction.getDocIdentidad_Nro(), transaction.getDOC_FechaEmision(), transaction.getSN_EMail(), transaction.getEMail(), isContingencia);
@@ -557,11 +554,11 @@ public class ServiceImpl implements ServiceInterface {
         String documentPath = fileHandler.storeDocumentInDisk(ublDocument, documentName);
         logger.info("Documento XML guardado en disco : " + documentPath);
 
-        String valor = transaction.getTransaccionContractdocrefList().stream()
+        /*String valor = transaction.getTransaccionContractdocrefList().stream()
                 .filter(x -> x.getUsuariocampos().getNombre().equals("pdfadicional"))
                 .map(x -> x.getValor())
                 .findFirst()
-                .orElse("No");
+                .orElse("No");*/
 
         ConfigData configuracion = ConfigData
                 .builder()
@@ -573,7 +570,7 @@ public class ServiceImpl implements ServiceInterface {
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
                 .rutaBaseDoc(applicationProperties.getRutaBaseDoc())
-                .pdfIngles(valor)
+                //.pdfIngles(valor)
                 .build();
 
         if (configuracion.getIntegracionWs().equals("OSE"))

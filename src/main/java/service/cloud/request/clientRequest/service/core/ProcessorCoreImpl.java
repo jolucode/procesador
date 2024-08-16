@@ -6,11 +6,10 @@ import org.eclipse.persistence.internal.oxm.ByteArraySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
+import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.finalClass.Response;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
-import service.cloud.request.clientRequest.entity.Transaccion;
-import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
@@ -48,7 +47,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
     @Override
     public TransaccionRespuesta processCDRResponseV2(byte[] cdrConstancy, byte[] signedDocument,
                                                    UBLDocumentWRP documentWRP,
-                                                   Transaccion transaction, ConfigData configuracion) throws IOException {
+                                                     TransacctionDTO transaction, ConfigData configuracion) throws IOException {
 
         if (logger.isDebugEnabled()) {
             logger.debug("+processCDRResponse() [" + this.docUUID + "]");
@@ -85,7 +84,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
 
     @Override
     //interface nueva:
-    public TransaccionRespuesta processResponseSinCDR(Transaccion transaction) {
+    public TransaccionRespuesta processResponseSinCDR(TransacctionDTO transaction) {
         if (logger.isDebugEnabled()) {
             logger.debug("+processResponseSinResponse() [" + this.docUUID + "]");
         }
@@ -102,7 +101,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
 
     @Override
     public byte[] processCDRResponseContigencia(byte[] cdrConstancy, File signedDocument, FileHandler fileHandler,
-                                                String documentName, String documentCode, UBLDocumentWRP documentWRP, Transaccion
+                                                String documentName, String documentCode, UBLDocumentWRP documentWRP, TransacctionDTO
                                                         transaccion, ConfigData configuracion) {
         byte[] pdfBytes = null;
 
@@ -139,7 +138,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
     }
 
     @Override
-    public TransaccionRespuesta.Sunat proccessResponse(byte[] cdrConstancy, Transaccion transaction, String
+    public TransaccionRespuesta.Sunat proccessResponse(byte[] cdrConstancy, TransacctionDTO transaction, String
             sunatType) {
         try {
             String descripcionRespuesta = "";
@@ -195,7 +194,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
         }
         return new TransaccionRespuesta.Sunat();
     }
-    public TransaccionRespuesta processResponseService(Transaccion transaction, Response response) {
+    public TransaccionRespuesta processResponseService(TransacctionDTO transaction, Response response) {
 
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
         transactionResponse.setMensaje(response.getErrorMessage());

@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import service.cloud.request.clientRequest.config.ApplicationProperties;
 import service.cloud.request.clientRequest.config.ClientProperties;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
+import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
-import service.cloud.request.clientRequest.entity.Transaccion;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
@@ -58,7 +58,7 @@ public class ProcessorBajaImpl implements ProcessorBajaInterface {
     DocumentFormatInterface documentFormatInterface;
 
     @Override
-    public TransaccionRespuesta consultVoidedDocument(Transaccion transaction, String doctype) throws Exception {
+    public TransaccionRespuesta consultVoidedDocument(TransacctionDTO transaction, String doctype) throws Exception {
 
         TransaccionRespuesta transactionResponse = null;
 
@@ -105,7 +105,7 @@ public class ProcessorBajaImpl implements ProcessorBajaInterface {
         wsConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion);
 
         /**obtener ticket de base datos, para consultar cdr documento baja*/
-        String ticket = transaction.getTicketBaja();
+        String ticket = transaction.getTicket_Baja();
         LoggerTrans.getCDThreadLogger().log(Level.INFO, "[{0}] El numero de ticket es: {1}", new Object[]{this.docUUID, ticket});
 
         /*if (configuracion.getAmbiente().equals("SUNAT")) {
@@ -135,7 +135,7 @@ public class ProcessorBajaImpl implements ProcessorBajaInterface {
     }
 
 
-    private TransaccionRespuesta processOseResponseBAJA(byte[]  statusResponse, Transaccion transaction, String documentName, ConfigData configuracion) {
+    private TransaccionRespuesta processOseResponseBAJA(byte[]  statusResponse, TransacctionDTO transaction, String documentName, ConfigData configuracion) {
         TransaccionRespuesta.Sunat sunatResponse = proccessResponse(statusResponse, transaction, configuracion.getIntegracionWs());
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
         if ((IVenturaError.ERROR_0.getId() == sunatResponse.getCodigo()) || (4000 <= sunatResponse.getCodigo())) {
@@ -151,7 +151,7 @@ public class ProcessorBajaImpl implements ProcessorBajaInterface {
     }
 
 
-    public TransaccionRespuesta.Sunat proccessResponse(byte[] cdrConstancy, Transaccion transaction, String
+    public TransaccionRespuesta.Sunat proccessResponse(byte[] cdrConstancy, TransacctionDTO transaction, String
             sunatType) {
         try {
             String descripcionRespuesta = "";

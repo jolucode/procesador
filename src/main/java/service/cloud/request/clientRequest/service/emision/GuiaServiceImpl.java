@@ -21,10 +21,9 @@ import org.w3c.dom.NodeList;
 import service.cloud.request.clientRequest.config.ApplicationProperties;
 import service.cloud.request.clientRequest.config.ClientProperties;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
+import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
-import service.cloud.request.clientRequest.entity.Transaccion;
-import service.cloud.request.clientRequest.entity.TransaccionContractdocref;
 import service.cloud.request.clientRequest.extras.ISignerConfig;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
@@ -74,7 +73,7 @@ public class GuiaServiceImpl implements GuiaInterface {
     ProcessorCoreInterface processorCoreInterface;
 
     @Override
-    public TransaccionRespuesta transactionRemissionGuideDocumentRest(Transaccion transaction, String doctype) throws Exception {
+    public TransaccionRespuesta transactionRemissionGuideDocumentRest(TransacctionDTO transaction, String doctype) throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug("+transactionRemissionGuideDocument() ["
@@ -97,10 +96,17 @@ public class GuiaServiceImpl implements GuiaInterface {
          * - Fecha de emision
          */
         boolean isContingencia = false;
-        List<TransaccionContractdocref> contractdocrefs = transaction.getTransaccionContractdocrefList();
+        /*List<TransaccionContractdocref> contractdocrefs = transaction.getTransaccionContractdocrefList();
         for (TransaccionContractdocref contractdocref : contractdocrefs) {
             if ("cu31".equalsIgnoreCase(contractdocref.getUsuariocampos().getNombre())) {
                 isContingencia = "Si".equalsIgnoreCase(contractdocref.getValor());
+                break;
+            }
+        }*/
+        List<Map<String, String>> contractdocrefs = transaction.getTransactionContractDocRefListDTOS();
+        for (Map<String, String> contractdocref : contractdocrefs) {
+            if ("cu31".equalsIgnoreCase(contractdocref.get("nombre"))) {
+                isContingencia = "Si".equalsIgnoreCase(contractdocref.get("valor"));
                 break;
             }
         }
@@ -182,9 +188,13 @@ public class GuiaServiceImpl implements GuiaInterface {
         PDFBasicGenerateHandler db = new PDFBasicGenerateHandler(docUUID);
 
         /* Agregar código de Barra */
-        Date docFechaVencimiento = transaction.getDOC_FechaVencimiento();
+        //Date docFechaVencimiento = transaction.getDOC_FechaVencimiento();
+        /*Date docFechaVencimiento = transaction.getDOC_FechaVencimiento();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String fecha = simpleDateFormat.format(docFechaVencimiento);
+        DespatchAdviceType guia = documentWRP.getAdviceType();*/
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String fecha = simpleDateFormat.format(transaction.getDOC_FechaVencimiento());
         DespatchAdviceType guia = documentWRP.getAdviceType();
 
         DataHandler zipDocument = fileHandler.compressUBLDocument(signedDocument, documentName, transaction.getSN_DocIdentidad_Nro(), transaction.getDocIdentidad_Nro());
@@ -286,12 +296,12 @@ public class GuiaServiceImpl implements GuiaInterface {
 
             } else if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
 
-                if (transaction.getTransaccionGuiaRemision().getTicketRest() != null && !transaction.getTransaccionGuiaRemision().getTicketRest().isEmpty()) {
+                if (transaction.getTransactionGuias().getTicketRest() != null && !transaction.getTransactionGuias().getTicketRest().isEmpty()) {
 
                     //CONSULT
                     ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
 
-                    ResponseDTO responseDTO = consult(transaction.getTransaccionGuiaRemision().getTicketRest(), responseDTOJWT.getAccess_token());
+                    ResponseDTO responseDTO = consult(transaction.getTransactionGuias().getTicketRest(), responseDTOJWT.getAccess_token());
                     if (responseDTO.getStatusCode() == 401) {
                         responseDTOJWT = getJwtSunat(configuracion);
                         responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());

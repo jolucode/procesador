@@ -10,9 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
+import service.cloud.request.clientRequest.dto.dto.*;
+import service.cloud.request.clientRequest.utils.DateUtil;
 import service.cloud.request.clientRequest.utils.exception.UBLDocumentException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
-import service.cloud.request.clientRequest.entity.*;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.codelist.specification._54217._2001.CurrencyCodeContentType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.LocationType;
@@ -245,69 +246,69 @@ public class UBLDocumentHandler20 {
         return accountingSupplierParty;
     } // generateAccountingSupplierParty
 
-    public List<SUNATRetentionDocumentReferenceType> generateDocumentReferenceV2(List<TransaccionComprobantePago> tscp) throws UBLDocumentException {
+    public List<SUNATRetentionDocumentReferenceType> generateDocumentReferenceV2(List<TransactionComprobantesDTO> tscp) throws UBLDocumentException {
         List<SUNATRetentionDocumentReferenceType> lst = new ArrayList<SUNATRetentionDocumentReferenceType>();
-        for (TransaccionComprobantePago transaccionComprobantePago : tscp) {
+        for (TransactionComprobantesDTO transaccionComprobantePago : tscp) {
             SUNATRetentionDocumentReferenceType documentReferenceType = new SUNATRetentionDocumentReferenceType();
             IDType objIdType = new IDType();
             /**
              * ****************** <cbc:ID schemeID=></cbc:ID>
              * ****************************
              */
-            objIdType.setSchemeID(transaccionComprobantePago.getDOC_Tipo());
+            objIdType.setSchemeID(transaccionComprobantePago.getU_DOC_Tipo());
             objIdType.setValue(transaccionComprobantePago.getDOC_Numero());
             documentReferenceType.setId(objIdType);
             /**
              * ********************** <cbc:IssueDate></cbc:IssueDate>
              * ***************************************************
              */
-            documentReferenceType.setIssueDate(getIssueDate(transaccionComprobantePago.getDOC_FechaEmision()));
+            documentReferenceType.setIssueDate(getIssueDate(DateUtil.parseDate(transaccionComprobantePago.getDOC_FechaEmision())));
 
             /**
              * ****
              * <cbc:TotalInvoiceAmount currencyID></cbc:TotalInvoiceAmount> *
              */
             TotalInvoiceAmountType totalInvoiceAmountType = new TotalInvoiceAmountType();
-            totalInvoiceAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getDOC_Moneda()).value());
+            totalInvoiceAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getU_DOC_Moneda()).value());
             totalInvoiceAmountType.setValue(transaccionComprobantePago.getDOC_Importe().setScale(2, RoundingMode.HALF_UP));
 
             documentReferenceType.setTotalInvoiceAmount(totalInvoiceAmountType);
 
             SUNATRetentionInformationType sunatRetentionInformationType = new SUNATRetentionInformationType();
             PaymentType paymentType = new PaymentType();
-            paymentType.setPaidDate(getIssueDate2(transaccionComprobantePago.getPagoFecha()));
+            paymentType.setPaidDate(getIssueDate2(DateUtil.parseDate(transaccionComprobantePago.getPagoFecha())));
             IDType numero = new IDType();
             numero.setValue(String.valueOf(transaccionComprobantePago.getPagoNumero()));
             paymentType.setID(numero);
             PaidAmountType objPaidAmountType = new PaidAmountType();
             objPaidAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getPagoMoneda()).value());
-            objPaidAmountType.setValue(transaccionComprobantePago.getPagoImporteSR().setScale(2, RoundingMode.HALF_UP));
+            objPaidAmountType.setValue(transaccionComprobantePago.getU_PagoImporteSR().setScale(2, RoundingMode.HALF_UP));
             paymentType.setPaidAmount(objPaidAmountType);
             documentReferenceType.setPayment(paymentType);
             SUNATRetentionAmountType objPerceptionAmountType = new SUNATRetentionAmountType();
-            objPerceptionAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getCPMoneda()).value());
+            objPerceptionAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getCP_Moneda()).value());
             objPerceptionAmountType.setValue(transaccionComprobantePago.getCP_Importe().setScale(2, RoundingMode.HALF_UP));
 
             sunatRetentionInformationType.setSunatRetentionAmount(objPerceptionAmountType);
             SUNATNetTotalPaidType objCashedType = new SUNATNetTotalPaidType();
-            objCashedType.setCurrencyID(CurrencyCodeContentType.valueOf(tscp.get(0).getCPMonedaMontoNeto()).value());
+            objCashedType.setCurrencyID(CurrencyCodeContentType.valueOf(tscp.get(0).getCP_MonedaMontoNeto()).value());
             objCashedType.setValue(transaccionComprobantePago.getCP_ImporteTotal().setScale(2, RoundingMode.HALF_UP));
 
             sunatRetentionInformationType.setSunatNetTotalPaid(objCashedType);
-            sunatRetentionInformationType.setSunatRetentionDate(getIssueDate5(transaccionComprobantePago.getCP_Fecha()));
+            sunatRetentionInformationType.setSunatRetentionDate(getIssueDate5(DateUtil.parseDate(transaccionComprobantePago.getU_CP_Fecha())));
 
             ExchangeRateType exchangeRateType = new ExchangeRateType();
             SourceCurrencyCodeType currencyCodeType = new SourceCurrencyCodeType();
-            currencyCodeType.setValue(transaccionComprobantePago.getTCMonedaRef());
+            currencyCodeType.setValue(transaccionComprobantePago.getTC_MonedaRef());
             exchangeRateType.setSourceCurrencyCode(currencyCodeType);
             TargetCurrencyCodeType targetCurrencyCodeType = new TargetCurrencyCodeType();
-            targetCurrencyCodeType.setValue(transaccionComprobantePago.getTCMonedaObj());
+            targetCurrencyCodeType.setValue(transaccionComprobantePago.getTC_MonedaObj());
             exchangeRateType.setTargetCurrencyCode(targetCurrencyCodeType);
             CalculationRateType calculationRateType = new CalculationRateType();
-            calculationRateType.setValue(transaccionComprobantePago.getTC_Factor().setScale(3));
+            calculationRateType.setValue(transaccionComprobantePago.getU_TC_Factor().setScale(3));
 
             exchangeRateType.setCalculationRate(calculationRateType);
-            exchangeRateType.setDate(getIssueDate4(transaccionComprobantePago.getTCFecha()));
+            exchangeRateType.setDate(getIssueDate4(DateUtil.parseDate(transaccionComprobantePago.getTC_Fecha())));
             sunatRetentionInformationType.setExchangeRate(exchangeRateType);
             documentReferenceType.setSunatRetentionInformation(sunatRetentionInformationType);
             lst.add(documentReferenceType);
@@ -315,20 +316,20 @@ public class UBLDocumentHandler20 {
         return lst;
     }
 
-    public List<SUNATPerceptionDocumentReferenceType> generateDocumentReference(List<TransaccionComprobantePago> tscp) throws UBLDocumentException {
+    public List<SUNATPerceptionDocumentReferenceType> generateDocumentReference(List<TransactionComprobantesDTO> tscp) throws UBLDocumentException {
         List<SUNATPerceptionDocumentReferenceType> sunatPerceptionDocumentReferenceTypes = new ArrayList<SUNATPerceptionDocumentReferenceType>();
         SUNATPerceptionDocumentReferenceType documentReferenceType = new SUNATPerceptionDocumentReferenceType();
 
-        for (TransaccionComprobantePago transaccionComprobantePago : tscp) {
+        for (TransactionComprobantesDTO transaccionComprobantePago : tscp) {
             IDType objIdType = new IDType();
             if (logger.isInfoEnabled()) {
-                logger.info("SUNATPerceptionDocumentReference() ID - " + transaccionComprobantePago.getDOC_Tipo() + " - " + transaccionComprobantePago.getDOC_Numero());
+                logger.info("SUNATPerceptionDocumentReference() ID - " + transaccionComprobantePago.getU_DOC_Tipo() + " - " + transaccionComprobantePago.getDOC_Numero());
             }
             /**
              * ****************** <cbc:ID schemeID=></cbc:ID>
              * ****************************
              */
-            objIdType.setSchemeID(transaccionComprobantePago.getDOC_Tipo());
+            objIdType.setSchemeID(transaccionComprobantePago.getU_DOC_Tipo());
             objIdType.setValue(transaccionComprobantePago.getDOC_Numero());
 
             documentReferenceType.setId(objIdType);
@@ -340,7 +341,7 @@ public class UBLDocumentHandler20 {
             if (logger.isInfoEnabled()) {
                 logger.info("SUNATPerceptionDocumentReference()  - ISSUEDATE " + transaccionComprobantePago.getDOC_FechaEmision());
             }
-            documentReferenceType.setIssueDate(getIssueDate(transaccionComprobantePago.getDOC_FechaEmision()));
+            documentReferenceType.setIssueDate(getIssueDate(DateUtil.parseDate(transaccionComprobantePago.getDOC_FechaEmision())));
             /**
              * ****
              * <cbc:TotalInvoiceAmount currencyID></cbc:TotalInvoiceAmount> *
@@ -349,7 +350,7 @@ public class UBLDocumentHandler20 {
                 logger.info("SUNATPerceptionDocumentReference()  - TOTALAMOUNT " + transaccionComprobantePago.getDOC_Importe());
             }
             TotalInvoiceAmountType totalInvoiceAmountType = new TotalInvoiceAmountType();
-            totalInvoiceAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getDOC_Moneda()).value());
+            totalInvoiceAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getU_DOC_Moneda()).value());
             totalInvoiceAmountType.setValue(transaccionComprobantePago.getDOC_Importe().setScale(2));
 
             documentReferenceType.setTotalInvoiceAmount(totalInvoiceAmountType);
@@ -361,7 +362,7 @@ public class UBLDocumentHandler20 {
                 logger.info("Payment()  - PaidDate " + transaccionComprobantePago.getPagoFecha());
             }
             PaymentType paymentType = new PaymentType();
-            paymentType.setPaidDate(getIssueDate2(transaccionComprobantePago.getPagoFecha()));
+            paymentType.setPaidDate(getIssueDate2(DateUtil.parseDate(transaccionComprobantePago.getPagoFecha())));
 
             if (logger.isInfoEnabled()) {
                 logger.info("Payment()  - ID " + transaccionComprobantePago.getPagoNumero());
@@ -375,7 +376,7 @@ public class UBLDocumentHandler20 {
             }
             PaidAmountType objPaidAmountType = new PaidAmountType();
             objPaidAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getPagoMoneda()).value());
-            objPaidAmountType.setValue(transaccionComprobantePago.getPagoImporteSR().setScale(2));
+            objPaidAmountType.setValue(transaccionComprobantePago.getU_PagoImporteSR().setScale(2));
             paymentType.setPaidAmount(objPaidAmountType);
 
             documentReferenceType.setPayment(paymentType);
@@ -386,7 +387,7 @@ public class UBLDocumentHandler20 {
                 logger.info("sac:SUNATPerceptionInformation() - SUNATPerceptionAmount " + tscp.get(0).getCP_Importe());
             }
             SUNATPerceptionAmountType objPerceptionAmountType = new SUNATPerceptionAmountType();
-            objPerceptionAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(tscp.get(0).getCPMoneda()).value());
+            objPerceptionAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(tscp.get(0).getCP_Moneda()).value());
             objPerceptionAmountType.setValue(tscp.get(0).getCP_Importe().setScale(2));
 
             objPerceptionInformationType.setPerceptionAmount(objPerceptionAmountType);
@@ -397,10 +398,10 @@ public class UBLDocumentHandler20 {
              * ***************************************************************
              */
             if (logger.isInfoEnabled()) {
-                logger.info("sac:SUNATPerceptionInformation()  - SUNATNetTotalCashed " + transaccionComprobantePago.getCPMonedaMontoNeto());
+                logger.info("sac:SUNATPerceptionInformation()  - SUNATNetTotalCashed " + transaccionComprobantePago.getCP_MonedaMontoNeto());
             }
             SUNATNetTotalCashedType objCashedType = new SUNATNetTotalCashedType();
-            objCashedType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getCPMonedaMontoNeto()).value());
+            objCashedType.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getCP_MonedaMontoNeto()).value());
             objCashedType.setValue(transaccionComprobantePago.getCP_ImporteTotal().setScale(2));
 
             objPerceptionInformationType.setSunatNetTotalCashed(objCashedType);
@@ -411,9 +412,9 @@ public class UBLDocumentHandler20 {
              * ***************************************************************
              */
             if (logger.isInfoEnabled()) {
-                logger.info("sac:SUNATPerceptionInformation()  - SUNATNetTotalCashed " + transaccionComprobantePago.getCP_Fecha());
+                logger.info("sac:SUNATPerceptionInformation()  - SUNATNetTotalCashed " + transaccionComprobantePago.getU_CP_Fecha());
             }
-            objPerceptionInformationType.setPerceptionDate(getIssueDate3(transaccionComprobantePago.getCP_Fecha()));
+            objPerceptionInformationType.setPerceptionDate(getIssueDate3(DateUtil.parseDate(transaccionComprobantePago.getU_CP_Fecha())));
 
             /**
              * ************************************
@@ -423,35 +424,35 @@ public class UBLDocumentHandler20 {
             ExchangeRateType exchangeRateType = new ExchangeRateType();
 
             if (logger.isInfoEnabled()) {
-                logger.info("sac:SUNATPerceptionInformation()  - SourceCurrencyCode " + transaccionComprobantePago.getTCMonedaRef());
+                logger.info("sac:SUNATPerceptionInformation()  - SourceCurrencyCode " + transaccionComprobantePago.getTC_MonedaRef());
             }
 
             SourceCurrencyCodeType currencyCodeType = new SourceCurrencyCodeType();
-            currencyCodeType.setValue(transaccionComprobantePago.getTCMonedaRef());
+            currencyCodeType.setValue(transaccionComprobantePago.getTC_MonedaRef());
             if (logger.isInfoEnabled()) {
-                logger.info("sac:SUNATPerceptionInformation()  - targetCurrencyCode " + transaccionComprobantePago.getTCMonedaObj());
+                logger.info("sac:SUNATPerceptionInformation()  - targetCurrencyCode " + transaccionComprobantePago.getTC_MonedaObj());
             }
 
             TargetCurrencyCodeType targetCurrencyCodeType = new TargetCurrencyCodeType();
-            targetCurrencyCodeType.setValue(transaccionComprobantePago.getTCMonedaObj());
+            targetCurrencyCodeType.setValue(transaccionComprobantePago.getTC_MonedaObj());
 
             if (logger.isInfoEnabled()) {
-                logger.info("sac:SUNATPerceptionInformation()  - CalculationRate " + transaccionComprobantePago.getTC_Factor());
+                logger.info("sac:SUNATPerceptionInformation()  - CalculationRate " + transaccionComprobantePago.getU_TC_Factor());
             }
 
             CalculationRateType calculationRateType = new CalculationRateType();
-            calculationRateType.setValue(transaccionComprobantePago.getTC_Factor());
+            calculationRateType.setValue(transaccionComprobantePago.getU_TC_Factor());
 
             exchangeRateType.setSourceCurrencyCode(currencyCodeType);
             exchangeRateType.setTargetCurrencyCode(targetCurrencyCodeType);
             exchangeRateType.setCalculationRate(calculationRateType);
             if (logger.isInfoEnabled()) {
-                logger.info("sac:SUNATPerceptionInformation()  - CPFecha" + transaccionComprobantePago.getTCFecha());
+                logger.info("sac:SUNATPerceptionInformation()  - CPFecha" + transaccionComprobantePago.getTC_Fecha());
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-            String date = sdf.format(transaccionComprobantePago.getTCFecha());
+            String date = sdf.format(transaccionComprobantePago.getTC_Fecha());
             XMLGregorianCalendar xmlCal = null;
             try {
                 xmlCal = DatatypeFactory.newInstance().newXMLGregorianCalendar(date);
@@ -885,7 +886,7 @@ public class UBLDocumentHandler20 {
     }
 
 
-    public InvoiceType generateInvoiceType(Transaccion transaction, String signerName) throws UBLDocumentException {
+    public InvoiceType generateInvoiceType(TransacctionDTO transaction, String signerName) throws UBLDocumentException {
 
         if (logger.isDebugEnabled()) {
             logger.debug("+generateInvoiceType() [" + this.identifier + "]");
@@ -908,7 +909,7 @@ public class UBLDocumentHandler20 {
                  * ><ext:UBLExtension><ext:ExtensionContent
                  * ><sac:AdditionalInformation>
                  */
-                ublExtensions.getUBLExtension().add(getUBLExtensionTotalAndProperty(transaction, transaction.getTransaccionTotalesList(), transaction.getTransaccionPropiedadesList(), transaction.getSUNAT_Transact()));
+                ublExtensions.getUBLExtension().add(getUBLExtensionTotalAndProperty(transaction, transaction.getTransactionTotalesDTOList(), transaction.getTransactionPropertiesDTOList(), transaction.getSUNAT_Transact()));
 
                 /*
                  * Agregar TAG para colocar la FIRMA
@@ -953,7 +954,7 @@ public class UBLDocumentHandler20 {
                  * Agregar una nota para colocar la fecha de vencimiento.
                  */
                 NoteType dueDateNote = new NoteType();
-                dueDateNote.setValue(getDueDateValue(transaction.getDOC_FechaVencimiento()));
+                dueDateNote.setValue(getDueDateValue(DateUtil.parseDate(transaction.getDOC_FechaVencimiento())));
                 invoiceType.getNote().add(dueDateNote);
             }
 
@@ -965,12 +966,12 @@ public class UBLDocumentHandler20 {
              *
              * <Invoice><cac:DespatchDocumentReference>
              */
-            if (null != transaction.getTransaccionDocrefersList() && 0 < transaction.getTransaccionDocrefersList().size()) {
+            if (null != transaction.getTransactionDocReferDTOList() && 0 < transaction.getTransactionDocReferDTOList().size()) {
                 if (logger.isInfoEnabled()) {
                     logger.info("generateInvoiceType() [" + this.identifier + "] Verificar si existen GUIAS DE REMISION en la FACTURA.");
                 }
 
-                invoiceType.getDespatchDocumentReference().addAll(getDespatchDocumentReferences(transaction.getTransaccionDocrefersList()));
+                invoiceType.getDespatchDocumentReference().addAll(getDespatchDocumentReferences(transaction.getTransactionDocReferDTOList()));
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("generateInvoiceType() [" + this.identifier + "] Se agregaron [" + invoiceType.getDespatchDocumentReference().size() + "] guias de remision.");
@@ -993,12 +994,20 @@ public class UBLDocumentHandler20 {
             if (logger.isDebugEnabled()) {
                 logger.debug("generateInvoiceType() [" + this.identifier + "] CAMPOS PERSONALIZADOS ");
             }
-            List<TransaccionContractdocref> transaccionContractdocrefList = transaction.getTransaccionContractdocrefList();
-            Optional<TransaccionContractdocref> optional = transaccionContractdocrefList.parallelStream().filter(docRefer -> IUBLConfig.CONTRACT_DOC_REF_SELL_ORDER_CODE.equalsIgnoreCase(docRefer.getUsuariocampos().getNombre())).findAny();
-            if (optional.isPresent()) {
-                TransaccionContractdocref docRefer = optional.get();
-                invoiceType.getContractDocumentReference().add(getContractDocumentReference(docRefer.getValor(), "OC"));
+            List<Map<String, String>> transaccionContractdocrefList = transaction.getTransactionContractDocRefListDTOS();
+            Optional<Map<String, String>> optionalMap = transaccionContractdocrefList.parallelStream()
+                    .filter(map -> IUBLConfig.CONTRACT_DOC_REF_SELL_ORDER_CODE.equalsIgnoreCase(map.get("cu01"))) // Ajustar clave según sea necesario
+                    .findAny();
+
+            if (optionalMap.isPresent()) {
+                Map<String, String> docReferMap = optionalMap.get();
+                String valor = docReferMap.get("cu01"); // Ajustar clave según sea necesario
+                if (valor != null) {
+                    invoiceType.getContractDocumentReference().add(getContractDocumentReference(valor, "OC"));
+                }
             }
+
+
 
             if (logger.isDebugEnabled()) {
                 logger.debug("generateInvoiceType() [" + this.identifier + "] SignatureType");
@@ -1136,12 +1145,12 @@ public class UBLDocumentHandler20 {
                 if (logger.isInfoEnabled()) {
                     logger.info("generateInvoiceType() [" + this.identifier + "] La transaccion contiene informacion de ANTICIPO.");
                 }
-                List<PaymentType> prepaidPayment = generatePrepaidPaymentV2(transaction.getTransaccionAnticipoList());
+                List<PaymentType> prepaidPayment = generatePrepaidPaymentV2(transaction.getTransactionActicipoDTOList());
                 invoiceType.getPrepaidPayment().addAll(prepaidPayment);
             }
 
             /* Agregar impuestos <Invoice><cac:TaxTotal> */
-            invoiceType.getTaxTotal().addAll(getAllTaxTotal(transaction.getTransaccionImpuestosList()));
+            invoiceType.getTaxTotal().addAll(getAllTaxTotal(transaction.getTransactionImpuestosDTOList()));
 
             /*
              * Agregar - Importe (Total de Op.Gravada, Op.Inafecta,
@@ -1149,10 +1158,10 @@ public class UBLDocumentHandler20 {
              * la Factura - Monto total de anticipos
              */
             //SETEAR OTROS CARGOS
-            invoiceType.setLegalMonetaryTotal(getMonetaryTotal(transaction.getDOC_Importe(), transaction.getDOC_MontoTotal(), transaction.getDOC_OtrosCargos(), transaction.getANTICIPO_Monto(), transaction.getDOC_MON_Codigo()));
+            invoiceType.setLegalMonetaryTotal(getMonetaryTotal(transaction.getDOC_Importe(), transaction.getDOC_MontoTotal(), new BigDecimal(transaction.getDOC_OtrosCargos()), transaction.getANTICIPO_Monto(), transaction.getDOC_MON_Codigo()));
 
             /* Agregar items <Invoice><cac:InvoiceLine> */
-            invoiceType.getInvoiceLine().addAll(getAllInvoiceLines(transaction.getTransaccionLineasList(), transaction.getDOC_MON_Codigo()));
+            invoiceType.getInvoiceLine().addAll(getAllInvoiceLines(transaction.getTransactionLineasDTOList(), transaction.getDOC_MON_Codigo()));
 
         } catch (UBLDocumentException e) {
             logger.error("generateInvoiceType() [" + this.identifier + "] UBLDocumentException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
@@ -1204,7 +1213,7 @@ public class UBLDocumentHandler20 {
         return customizationID;
     } // getCustomizationID
 
-    private UBLExtensionType getUBLExtensionTotalAndProperty(Transaccion transaccion, List<TransaccionTotales> transactionTotalList, List<TransaccionPropiedades> transactionPropertyList, String sunatTransactionID) throws UBLDocumentException {
+    private UBLExtensionType getUBLExtensionTotalAndProperty(TransacctionDTO transaccion, List<TransactionTotalesDTO> transactionTotalList, List<TransactionPropertiesDTO> transactionPropertyList, String sunatTransactionID) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getUBLExtensionTotalAndProperty() [" + this.identifier + "] transactionTotalList: " + transactionTotalList + " transactionPropertyList: " + transactionPropertyList + " sunatTransactionID: " + sunatTransactionID);
         }
@@ -1237,11 +1246,11 @@ public class UBLDocumentHandler20 {
                     logger.debug("getUBLExtensionTotalAndProperty() Se encontró un total de  [" + transactionTotalList.size() + "] Agregando informacion de TOTALES.");
                 }
 
-                for (TransaccionTotales transactionTotal : transactionTotalList) {
+                for (TransactionTotalesDTO transactionTotal : transactionTotalList) {
                     AdditionalMonetaryTotalType additionalMonetaryTotal = new AdditionalMonetaryTotalType();
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("getUBLExtensionTotalAndProperty() [" + transactionTotal.getMonto() + "-" + transactionTotal.getTransaccionTotalesPK().getId() + "] Agregando informacion de TOTALES.");
+                        logger.debug("getUBLExtensionTotalAndProperty() [" + transactionTotal.getMonto() + "-" + transactionTotal.getId() + "] Agregando informacion de TOTALES.");
                     }
 
                     /*
@@ -1250,7 +1259,7 @@ public class UBLDocumentHandler20 {
                      * ><sac:AdditionalMonetaryTotal><cbc:ID>
                      */
                     IDType id = new IDType();
-                    id.setValue(transactionTotal.getTransaccionTotalesPK().getId());
+                    id.setValue(transactionTotal.getId());
 
                     /*
                      * Agregar <ext:UBLExtension><ext:ExtensionContent><sac:
@@ -1259,7 +1268,7 @@ public class UBLDocumentHandler20 {
                      */
                     PayableAmountType payableAmount = new PayableAmountType();
                     payableAmount.setValue(transactionTotal.getMonto().setScale(IUBLConfig.DECIMAL_ADDITIONAL_MONETARY_TOTAL_PAYABLE_AMOUNT, RoundingMode.HALF_UP));
-                    payableAmount.setCurrencyID(CurrencyCodeContentType.valueOf(transactionTotal.getTransaccion().getDOC_MON_Codigo()).value());
+                    payableAmount.setCurrencyID(CurrencyCodeContentType.valueOf(transaccion.getDOC_MON_Codigo()).value());
 
                     /* Agregar ID y PayableAmount al objeto */
                     additionalMonetaryTotal.setID(id);
@@ -1278,7 +1287,7 @@ public class UBLDocumentHandler20 {
                 if (logger.isDebugEnabled()) {
                     logger.debug("getUBLExtensionTotalAndProperty() [" + this.identifier + "] Agregando informacion de PROPIEDADES.");
                 }
-                for (TransaccionPropiedades transactionProperty : transactionPropertyList) {
+                for (TransactionPropertiesDTO transactionProperty : transactionPropertyList) {
                     AdditionalPropertyType additionalProperty = new AdditionalPropertyType();
 
                     int cadena1en = transactionProperty.getValor().length();
@@ -1290,7 +1299,7 @@ public class UBLDocumentHandler20 {
                      * AdditionalInformation><sac:AdditionalProperty><cbc:ID>
                      */
                     IDType id = new IDType();
-                    id.setValue(transactionProperty.getTransaccionPropiedadesPK().getId());
+                    id.setValue(transactionProperty.getId());
 
                     /*
                      * Agregar <ext:UBLExtension><ext:ExtensionContent><sac:
@@ -1308,34 +1317,30 @@ public class UBLDocumentHandler20 {
                 }
             }
 
-            if (transaccion.getTransaccionContractdocrefList() != null && !transaccion.getTransaccionContractdocrefList().isEmpty()) {
-                Optional<TransaccionContractdocref> optional = transaccion.getTransaccionContractdocrefList()
-                        .parallelStream().filter(docRefer -> IUBLConfig.CONTRACT_DOC_REF_SELL_ORDER_INCO.equalsIgnoreCase(docRefer.getUsuariocampos().getNombre())).findAny();
-                if (optional.isPresent()) {
+            if (transaccion.getTransactionContractDocRefListDTOS() != null && !transaccion.getTransactionContractDocRefListDTOS().isEmpty()) {
+                Optional<Map<String, String>> optionalMap = transaccion.getTransactionContractDocRefListDTOS()
+                        .parallelStream()
+                        .filter(map -> IUBLConfig.CONTRACT_DOC_REF_SELL_ORDER_INCO.equalsIgnoreCase(map.get("incoterms"))) // Ajustar clave según sea necesario
+                        .findAny();
+
+                if (optionalMap.isPresent()) {
                     AdditionalPropertyType additionalProperty = new AdditionalPropertyType();
-                    TransaccionContractdocref docRefer = optional.get();
-                    /***/
-                    /*
-                     * Agregar <ext:UBLExtension><ext:ExtensionContent><sac:
-                     * AdditionalInformation><sac:AdditionalProperty><cbc:ID>
-                     */
+                    Map<String, String> docReferMap = optionalMap.get();
+
+                    // Crear IDType y ValueType
                     IDType id = new IDType();
                     id.setValue("7003");
 
-                    /*
-                     * Agregar <ext:UBLExtension><ext:ExtensionContent><sac:
-                     * AdditionalInformation><sac:AdditionalProperty><cbc:Value>
-                     */
                     ValueType value = new ValueType();
-                    value.setValue(docRefer.getValor());
+                    value.setValue(docReferMap.get("incoterms")); // Ajustar clave según sea necesario
 
-                    /* Agregar ID y Value al objeto */
+                    // Configurar AdditionalPropertyType
                     additionalProperty.setID(id);
                     additionalProperty.setValue(value);
 
-                    /* Agregar el objeto AdditionalPropertyType a la lista */
+                    // Agregar AdditionalPropertyType a la lista
                     additionalInformation.getAdditionalProperty().add(additionalProperty);
-                    //invoiceType.getContractDocumentReference().add(getContractDocumentReference(docRefer.getValor(), "OC"));
+                    //invoiceType.getContractDocumentReference().add(getContractDocumentReference(docReferMap.get("valor"), "OC"));
                 }
             }
 
@@ -1350,15 +1355,33 @@ public class UBLDocumentHandler20 {
 //extensionContent.setAny((org.w3c.dom.Element) getExtensionContentNode(additionalInformation));
 
             boolean texto = false;
-            for (int i = 0; i < transaccion.getTransaccionContractdocrefList().size(); i++) {
-                if ("texto_amplio_certimin".equals(transaccion.getTransaccionContractdocrefList().get(i).getUsuariocampos().getNombre())) {
-                    TransaccionContractdocref objecto = transaccion.getTransaccionContractdocrefList().get(i);
-                    if (objecto != null && !objecto.getValor().isEmpty()) {
-                        NoteType noteType = new NoteType();
-                        noteType.setValue(objecto.getValor());
-                        extensionContent.setNote(noteType);
-                        texto = true;
-                        break;
+            List<Map<String, String>> transaccionContractdocrefList = transaccion.getTransactionContractDocRefListDTOS();
+
+            if (transaccionContractdocrefList != null) {
+                for (Map<String, String> contractDocRefsMap : transaccionContractdocrefList) {
+                    // Verificar que el mapa no sea nulo
+                    if (contractDocRefsMap != null) {
+                        // Recorrer cada entrada en el mapa
+                        for (Map.Entry<String, String> entry : contractDocRefsMap.entrySet()) {
+                            String clave = entry.getKey();
+                            String valor = entry.getValue();
+
+                            // Comparar la clave con "texto_amplio_certimin"
+                            if ("texto_amplio_certimin".equals(clave)) {
+                                // Verificar si el valor no es nulo ni vacío
+                                if (valor != null && !valor.isEmpty()) {
+                                    // Crear y configurar el NoteType
+                                    NoteType noteType = new NoteType();
+                                    noteType.setValue(valor);
+                                    extensionContent.setNote(noteType);
+                                    texto = true;
+                                    break; // Salir del bucle de entradas
+                                }
+                            }
+                        }
+                        if (texto) {
+                            break; // Salir del bucle de mapas si ya se encontró un valor válido
+                        }
                     }
                 }
             }
@@ -1380,7 +1403,7 @@ public class UBLDocumentHandler20 {
         return ublExtension;
     } // getUBLExtensionTotalAndProperty
 
-    private UBLExtensionType getUBLExtensionTotalAndPropertyForNCND(List<TransaccionTotales> transactionTotalList, List<TransaccionPropiedades> transactionPropertyList, Transaccion transaccion) throws UBLDocumentException {
+    private UBLExtensionType getUBLExtensionTotalAndPropertyForNCND(List<TransactionTotalesDTO> transactionTotalList, List<TransactionPropertiesDTO> transactionPropertyList, TransacctionDTO transaccion) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getUBLExtensionTotalAndProperty() [" + this.identifier + "] transactionTotalList: " + transactionTotalList + " transactionPropertyList: " + transactionPropertyList + " sunatTransactionID: " + transaccion.getSUNAT_Transact());
         }
@@ -1406,16 +1429,16 @@ public class UBLDocumentHandler20 {
                     logger.debug("getUBLExtensionTotalAndProperty() [" + this.identifier + "] Agregando informacion de TOTALES.");
                 }
 
-                for (TransaccionTotales transactionTotal : transactionTotalList) {
+                for (TransactionTotalesDTO transactionTotal : transactionTotalList) {
                     AdditionalMonetaryTotalType additionalMonetaryTotal = new AdditionalMonetaryTotalType();
                     /*
                      * Agregar <ext:UBLExtension><ext:ExtensionContent><sac:
                      * AdditionalInformation
                      * ><sac:AdditionalMonetaryTotal><cbc:ID>
                      */
-                    if (!transactionTotal.getTransaccionTotalesPK().getId().equalsIgnoreCase(IUBLConfig.ADDITIONAL_MONETARY_1005)) {
+                    if (!transactionTotal.getId().equalsIgnoreCase(IUBLConfig.ADDITIONAL_MONETARY_1005)) {
                         IDType id = new IDType();
-                        id.setValue(transactionTotal.getTransaccionTotalesPK().getId());
+                        id.setValue(transactionTotal.getId());
                         /*
                          * Agregar <ext:UBLExtension><ext:ExtensionContent><sac:
                          * AdditionalInformation
@@ -1423,7 +1446,7 @@ public class UBLDocumentHandler20 {
                          */
                         PayableAmountType payableAmount = new PayableAmountType();
                         payableAmount.setValue(transactionTotal.getMonto().setScale(IUBLConfig.DECIMAL_ADDITIONAL_MONETARY_TOTAL_PAYABLE_AMOUNT, RoundingMode.HALF_UP));
-                        payableAmount.setCurrencyID(CurrencyCodeContentType.valueOf(transactionTotal.getTransaccion().getDOC_MON_Codigo()).value());
+                        payableAmount.setCurrencyID(CurrencyCodeContentType.valueOf(transaccion.getDOC_MON_Codigo()).value());
                         /* Agregar ID y PayableAmount al objeto */
                         additionalMonetaryTotal.setID(id);
                         additionalMonetaryTotal.setPayableAmount(payableAmount);
@@ -1438,14 +1461,14 @@ public class UBLDocumentHandler20 {
                 if (logger.isDebugEnabled()) {
                     logger.debug("getUBLExtensionTotalAndProperty() [" + this.identifier + "] Agregando informacion de PROPIEDADES.");
                 }
-                for (TransaccionPropiedades transactionProperty : transactionPropertyList) {
+                for (TransactionPropertiesDTO transactionProperty : transactionPropertyList) {
                     AdditionalPropertyType additionalProperty = new AdditionalPropertyType();
                     /*
                      * Agregar <ext:UBLExtension><ext:ExtensionContent><sac:
                      * AdditionalInformation><sac:AdditionalProperty><cbc:ID>
                      */
                     IDType id = new IDType();
-                    id.setValue(transactionProperty.getTransaccionPropiedadesPK().getId());
+                    id.setValue(transactionProperty.getId());
                     /*
                      * Agregar <ext:UBLExtension><ext:ExtensionContent><sac:
                      * AdditionalInformation><sac:AdditionalProperty><cbc:Value>
@@ -1467,18 +1490,35 @@ public class UBLDocumentHandler20 {
 
             /* Colocar la informacion en el TAG UBLExtension */
             ExtensionContentType extensionContent = new ExtensionContentType();
-//extensionContent.setAny((org.w3c.dom.Element) getExtensionContentNode(additionalInformation));
-
+            //extensionContent.setAny((org.w3c.dom.Element) getExtensionContentNode(additionalInformation));
             boolean texto = false;
-            for (int i = 0; i < transaccion.getTransaccionContractdocrefList().size(); i++) {
-                if ("texto_amplio_certimin".equals(transaccion.getTransaccionContractdocrefList().get(i).getUsuariocampos().getNombre())) {
-                    TransaccionContractdocref objecto = transaccion.getTransaccionContractdocrefList().get(i);
-                    if (objecto != null && !objecto.getValor().isEmpty()) {
-                        NoteType noteType = new NoteType();
-                        noteType.setValue(objecto.getValor());
-                        extensionContent.setNote(noteType);
-                        texto = true;
-                        break;
+            List<Map<String, String>> transaccionContractdocrefList = transaccion.getTransactionContractDocRefListDTOS();
+
+            if (transaccionContractdocrefList != null) {
+                for (Map<String, String> contractDocRefsMap : transaccionContractdocrefList) {
+                    // Verificar que el mapa no sea nulo
+                    if (contractDocRefsMap != null) {
+                        // Recorrer cada entrada en el mapa
+                        for (Map.Entry<String, String> entry : contractDocRefsMap.entrySet()) {
+                            String clave = entry.getKey();
+                            String valor = entry.getValue();
+
+                            // Comparar la clave con "texto_amplio_certimin"
+                            if ("texto_amplio_certimin".equals(clave)) {
+                                // Verificar si el valor no es nulo ni vacío
+                                if (valor != null && !valor.isEmpty()) {
+                                    // Crear y configurar el NoteType
+                                    NoteType noteType = new NoteType();
+                                    noteType.setValue(valor);
+                                    extensionContent.setNote(noteType);
+                                    texto = true;
+                                    break; // Salir del bucle de entradas
+                                }
+                            }
+                        }
+                        if (texto) {
+                            break; // Salir del bucle de mapas si ya se encontró un valor válido
+                        }
                     }
                 }
             }
@@ -1926,7 +1966,7 @@ public class UBLDocumentHandler20 {
         return dueDate;
     } // getDueDateValue
 
-    private List<PaymentType> generatePrepaidPaymentV2(List<TransaccionAnticipo> lstAnticipo) throws UBLDocumentException {
+    private List<PaymentType> generatePrepaidPaymentV2(List<TransactionActicipoDTO> lstAnticipo) throws UBLDocumentException {
         List<PaymentType> prepaidPayment_2 = new ArrayList<PaymentType>();
         if (lstAnticipo != null) {
             if (logger.isDebugEnabled()) {
@@ -1940,11 +1980,11 @@ public class UBLDocumentHandler20 {
                 try {
                     /* Agregar <Invoice><cac:PrepaidPayment><cbc:PaidAmount> */
                     PaidAmountType paidAmount = new PaidAmountType();
-                    paidAmount.setValue(lstAnticipo.get(i).getAnticipoMonto().setScale(IUBLConfig.DECIMAL_PREPAIDPAYMENT_PAIDAMOUNT, RoundingMode.HALF_UP));
-                    paidAmount.setCurrencyID(CurrencyCodeContentType.valueOf(lstAnticipo.get(i).getDOCMoneda()).value());
+                    paidAmount.setValue(lstAnticipo.get(i).getAnticipo_Monto().setScale(IUBLConfig.DECIMAL_PREPAIDPAYMENT_PAIDAMOUNT, RoundingMode.HALF_UP));
+                    paidAmount.setCurrencyID(CurrencyCodeContentType.valueOf(lstAnticipo.get(i).getDOC_Moneda()).value());
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("+generatePrepaidPayment() [" + lstAnticipo.get(i).getAnticipoMonto() + lstAnticipo.get(i).getDOCMoneda() + "]");
+                        logger.debug("+generatePrepaidPayment() [" + lstAnticipo.get(i).getAnticipo_Monto() + lstAnticipo.get(i).getDOC_Moneda() + "]");
                     }
                     if (logger.isDebugEnabled()) {
                         logger.debug("+cac:PrepaidPayment() [" + this.identifier + "]");
@@ -1952,20 +1992,20 @@ public class UBLDocumentHandler20 {
 
                     /* Agregar <Invoice><cac:PrepaidPayment><cbc:ID> */
                     IDType id = new IDType();
-                    id.setValue(lstAnticipo.get(i).getAntiDOCSerieCorrelativo());
-                    id.setSchemeID(lstAnticipo.get(i).getAntiDOCTipo());
+                    id.setValue(lstAnticipo.get(i).getAntiDOC_Serie_Correlativo());
+                    id.setSchemeID(lstAnticipo.get(i).getAntiDOC_Tipo());
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("+generatePrepaidPayment() [" + lstAnticipo.get(i).getAntiDOCSerieCorrelativo() + lstAnticipo.get(i).getAntiDOCTipo() + "]");
+                        logger.debug("+generatePrepaidPayment() [" + lstAnticipo.get(i).getAntiDOC_Serie_Correlativo() + lstAnticipo.get(i).getAntiDOC_Tipo() + "]");
                     }
 
                     /* Agregar <Invoice><cac:PrepaidPayment><cbc:InstructionID> */
                     InstructionIDType instructionID = new InstructionIDType();
-                    instructionID.setValue(lstAnticipo.get(i).getDOCNumero());
-                    instructionID.setSchemeID(lstAnticipo.get(i).getDOCTipo());
+                    instructionID.setValue(lstAnticipo.get(i).getDOC_Numero());
+                    instructionID.setSchemeID(lstAnticipo.get(i).getDOC_Tipo());
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("+generatePrepaidPayment() [" + lstAnticipo.get(i).getDOCNumero() + lstAnticipo.get(i).getDOCTipo() + "]");
+                        logger.debug("+generatePrepaidPayment() [" + lstAnticipo.get(i).getDOC_Numero() + lstAnticipo.get(i).getDOC_Tipo() + "]");
                     }
                     /*
                      * Agregar los tag's
@@ -1990,16 +2030,16 @@ public class UBLDocumentHandler20 {
         return prepaidPayment_2;
     } // generatePrepaidPayment
 
-    private List<TaxTotalType> getAllTaxTotal(List<TransaccionImpuestos> taxTotalTransactions) throws UBLDocumentException {
+    private List<TaxTotalType> getAllTaxTotal(List<TransactionImpuestosDTO> taxTotalTransactions) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getAllTaxTotal() [" + this.identifier + "] taxTotalTransactions: " + taxTotalTransactions);
         }
         List<TaxTotalType> taxTotalList = new ArrayList<>();
         if (null != taxTotalTransactions && !taxTotalTransactions.isEmpty()) {
             try {
-                for (TransaccionImpuestos taxTotalTrans : taxTotalTransactions) {
+                for (TransactionImpuestosDTO taxTotalTrans : taxTotalTransactions) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("getAllTaxTotal() [" + this.identifier + "] " + "\nTipoTributo: " + taxTotalTrans.getTipoTributo() + "\tMonto: " + taxTotalTrans.getMonto() + "\tPorcentaje: " + taxTotalTrans.getPorcentaje() + "\nMoneda: " + taxTotalTrans.getMoneda() + "\nTierRange: " + taxTotalTrans.getTierRange() + "\tTransaccion: " + taxTotalTrans.getTransaccion());
+                        logger.debug("getAllTaxTotal() [" + this.identifier + "] " + "\nTipoTributo: " + taxTotalTrans.getTipoTributo() + "\tMonto: " + taxTotalTrans.getMonto() + "\tPorcentaje: " + taxTotalTrans.getPorcentaje() + "\nMoneda: " + taxTotalTrans.getMoneda() + "\nTierRange: " + taxTotalTrans.getTierRange());
                     }
                     TaxTotalType taxTotalType = new TaxTotalType();
                     /*
@@ -2183,16 +2223,16 @@ public class UBLDocumentHandler20 {
         return taxTotalList;
     } // getAllTaxTotal
 
-    private List<TaxTotalType> getAllTaxTotalLines(List<TransaccionLineaImpuestos> taxTotalTransactionLines) throws UBLDocumentException {
+    private List<TaxTotalType> getAllTaxTotalLines(List<TransactionLineasImpuestoDTO> taxTotalTransactionLines) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getAllTaxTotalLines() [" + this.identifier + "]");
         }
         List<TaxTotalType> taxTotalLineList = new ArrayList<>();
         if (null != taxTotalTransactionLines && !taxTotalTransactionLines.isEmpty()) {
             try {
-                for (TransaccionLineaImpuestos taxTotalTransLine : taxTotalTransactionLines) {
+                for (TransactionLineasImpuestoDTO taxTotalTransLine : taxTotalTransactionLines) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("getAllTaxTotalLines() [" + this.identifier + "] LineId: " + taxTotalTransLine.getTransaccionLineaImpuestosPK().getLineId() + " NroOrden: " + taxTotalTransLine.getTransaccionLineaImpuestosPK().getNroOrden() + "\nTipoTributo: " + taxTotalTransLine.getTipoTributo() + "\tMonto: " + taxTotalTransLine.getMonto() + "\tPorcentaje: " + taxTotalTransLine.getPorcentaje() + "\nMoneda: " + taxTotalTransLine.getMoneda() + "\nTierRange: " + taxTotalTransLine.getTierRange() + "\tTransaccionLineas: " + taxTotalTransLine.getTransaccionLineas());
+                        logger.debug("getAllTaxTotalLines() [" + this.identifier + "] LineId: " + taxTotalTransLine.getLineId() + " NroOrden: " + taxTotalTransLine.getNroOrden() + "\nTipoTributo: " + taxTotalTransLine.getTipoTributo() + "\tMonto: " + taxTotalTransLine.getMonto() + "\tPorcentaje: " + taxTotalTransLine.getPorcentaje() + "\nMoneda: " + taxTotalTransLine.getMoneda() + "\nTierRange: " + taxTotalTransLine.getTierRange());
                     }
 
                     TaxTotalType taxTotalType = new TaxTotalType();
@@ -2389,7 +2429,7 @@ public class UBLDocumentHandler20 {
         return legalMonetaryTotal;
     } // getLegalMonetaryTotal
 
-    private List<InvoiceLineType> getAllInvoiceLines(List<TransaccionLineas> transactionLines, String currencyCode) throws UBLDocumentException {
+    private List<InvoiceLineType> getAllInvoiceLines(List<TransactionLineasDTO> transactionLines, String currencyCode) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getAllInvoiceLines() [" + this.identifier + "] transactionLines: " + transactionLines + " currencyCode: " + currencyCode);
         }
@@ -2398,12 +2438,12 @@ public class UBLDocumentHandler20 {
             try {
                 invoiceLineList = new ArrayList<>(transactionLines.size());
 
-                for (TransaccionLineas transLine : transactionLines) {
+                for (TransactionLineasDTO transLine : transactionLines) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllInvoiceLines() [" + this.identifier + "] Extrayendo informacion del item...");
                     }
                     if (logger.isDebugEnabled()) {
-                        logger.debug("getAllInvoiceLines() [" + this.identifier + "] NroOrden: " + transLine.getTransaccionLineasPK().getNroOrden() + "\nCantidad: " + transLine.getCantidad() + "\tUnidad: " + transLine.getUnidad() + "\tUnidadSunat: " + transLine.getUnidadSunat() + "\tTotalLineaSinIGV: " + transLine.getTotalLineaSinIGV() + "\nPrecioRefCodigo: " + transLine.getPrecioRefCodigo() + "\tPrecioIGV: " + transLine.getPrecioIGV() + "\tPrecioRefMonto: " + transLine.getPrecioRefMonto() + "\nDCTOMonto: " + transLine.getDSCTOMonto() + "\tDescripcion: " + transLine.getDescripcion() + "\tCodArticulo: " + transLine.getCodArticulo());
+                        logger.debug("getAllInvoiceLines() [" + this.identifier + "] NroOrden: " + transLine.getNroOrden() + "\nCantidad: " + transLine.getCantidad() + "\tUnidad: " + transLine.getUnidad() + "\tUnidadSunat: " + transLine.getUnidadSunat() + "\tTotalLineaSinIGV: " + transLine.getTotalLineaSinIGV() + "\nPrecioRefCodigo: " + transLine.getPrecioRef_Codigo() + "\tPrecioIGV: " + transLine.getPrecioIGV() + "\tPrecioRefMonto: " + transLine.getPrecioRef_Monto() + "\nDCTOMonto: " + transLine.getDSCTO_Monto() + "\tDescripcion: " + transLine.getDescripcion() + "\tCodArticulo: " + transLine.getCodArticulo());
                     }
                     InvoiceLineType invoiceLine = new InvoiceLineType();
                     /* Agregar <Invoice><cac:InvoiceLine><cbc:ID> */
@@ -2411,7 +2451,7 @@ public class UBLDocumentHandler20 {
                         logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando el ID.");
                     }
                     IDType idNumber = new IDType();
-                    idNumber.setValue(String.valueOf(transLine.getTransaccionLineasPK().getNroOrden()));
+                    idNumber.setValue(String.valueOf(transLine.getNroOrden()));
                     invoiceLine.setID(idNumber);
                     /*
                      * Agregar UNIDAD DE MEDIDA segun SUNAT
@@ -2455,14 +2495,14 @@ public class UBLDocumentHandler20 {
                      *
                      * <Invoice><cac:InvoiceLine><cac:PricingReference>
                      */
-                    if (transLine.getPrecioRefCodigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
+                    if (transLine.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("getAllInvoiceLines() [" + this.identifier + "] PricingReference: PRECIO_UNITARIO");
                         }
                         PricingReferenceType pricingReference = new PricingReferenceType();
-                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRefCodigo()));
+                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRef_Codigo()));
                         invoiceLine.setPricingReference(pricingReference);
-                    } else if (transLine.getPrecioRefCodigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
+                    } else if (transLine.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("getAllInvoiceLines() [" + this.identifier + "] PricingReference: VALOR_REFERENCIAL");
                         }
@@ -2473,14 +2513,14 @@ public class UBLDocumentHandler20 {
                          * 0.00
                          */
                         pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(2, RoundingMode.HALF_UP), currencyCode, IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE));
-                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioRefMonto().setScale(IUBLConfig.DECIMAL_LINE_REFERENCE_VALUE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRefCodigo()));
+                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioRef_Monto().setScale(IUBLConfig.DECIMAL_LINE_REFERENCE_VALUE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRef_Codigo()));
                         invoiceLine.setPricingReference(pricingReference);
                     }
                     /*
                      * Agregar impuestos de linea
                      * <Invoice><cac:InvoiceLine><cac:AllowanceCharge>
                      */
-                    if (null != transLine.getDSCTOMonto() && transLine.getDSCTOMonto().compareTo(BigDecimal.ZERO) > 0) {
+                    if (null != transLine.getDSCTO_Monto() && transLine.getDSCTO_Monto().compareTo(BigDecimal.ZERO) > 0) {
                         /*
                          * ChargeIndicatorType
                          *
@@ -2490,7 +2530,7 @@ public class UBLDocumentHandler20 {
                         if (logger.isDebugEnabled()) {
                             logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando DESCUENTO_LINEA.");
                         }
-                        invoiceLine.getAllowanceCharge().add(getAllowanceCharge(transLine.getDSCTOMonto(), currencyCode, false));
+                        invoiceLine.getAllowanceCharge().add(getAllowanceCharge(transLine.getDSCTO_Monto(), currencyCode, false));
                     }
                     /*
                      * Agregar impuestos de linea
@@ -2499,7 +2539,7 @@ public class UBLDocumentHandler20 {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando IMPUESTO DE LINEA.");
                     }
-                    invoiceLine.getTaxTotal().addAll(getAllTaxTotalLines(transLine.getTransaccionLineaImpuestosList()));
+                    invoiceLine.getTaxTotal().addAll(getAllTaxTotalLines(transLine.getTransactionLineasImpuestoListDTO()));
 
                     /*
                      * Agregar DESCRIPCION y CODIGO DEL ITEM
@@ -2516,7 +2556,7 @@ public class UBLDocumentHandler20 {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando VALOR UNITARIO.");
                     }
-                    invoiceLine.setPrice(getPriceForLine(transLine.getTransaccionLineasBillrefList(), currencyCode));
+                    invoiceLine.setPrice(getPriceForLine(transLine.getTransaccionLineasBillrefListDTO(), currencyCode));
                     invoiceLineList.add(invoiceLine);
                 }
                 for (int i = 0; i < IUBLConfig.lstImporteIGV.size(); i++) {
@@ -2542,7 +2582,7 @@ public class UBLDocumentHandler20 {
         return invoiceLineList;
     } // getAllInvoiceLines
 
-    private List<InvoiceLineType> getAllBoletaLines(List<TransaccionLineas> transactionLines, String currencyCode) throws UBLDocumentException {
+    private List<InvoiceLineType> getAllBoletaLines(List<TransactionLineasDTO> transactionLines, String currencyCode) throws UBLDocumentException {
 
         if (logger.isDebugEnabled()) {
             logger.debug("+getAllBoletaLines() [" + this.identifier + "] transactionLines: " + transactionLines + " currencyCode: " + currencyCode);
@@ -2559,12 +2599,12 @@ public class UBLDocumentHandler20 {
                     }
                 }
                 // IUBLConfig.lstImporteIGV = new ArrayList<BigDecimal>();
-                for (TransaccionLineas transLine : transactionLines) {
+                for (TransactionLineasDTO transLine : transactionLines) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllBoletaLines() [" + this.identifier + "] Extrayendo informacion del item...");
                     }
                     if (logger.isDebugEnabled()) {
-                        logger.debug("getAllBoletaLines() [" + this.identifier + "] NroOrden: " + transLine.getTransaccionLineasPK().getNroOrden() + "\nCantidad: " + transLine.getCantidad() + "\tUnidad: " + transLine.getUnidad() + "\tUnidadSunat: " + transLine.getUnidadSunat() + "\tTotalLineaSinIGV: " + transLine.getTotalLineaSinIGV() + "\tTotalLineaConIGV: " + transLine.getTotalLineaConIGV() + "\nPrecioRefCodigo: " + transLine.getPrecioRefCodigo() + "\tPrecioIGV: " + transLine.getPrecioIGV() + "\tPrecioRefMonto: " + transLine.getPrecioRefMonto() + "\nDCTOMonto: " + transLine.getDSCTOMonto() + "\tDescripcion: " + transLine.getDescripcion() + "\tCodArticulo: " + transLine.getCodArticulo());
+                        logger.debug("getAllBoletaLines() [" + this.identifier + "] NroOrden: " + transLine.getNroOrden() + "\nCantidad: " + transLine.getCantidad() + "\tUnidad: " + transLine.getUnidad() + "\tUnidadSunat: " + transLine.getUnidadSunat() + "\tTotalLineaSinIGV: " + transLine.getTotalLineaSinIGV() + "\tTotalLineaConIGV: " + transLine.getTotalLineaConIGV() + "\nPrecioRefCodigo: " + transLine.getPrecioRef_Codigo() + "\tPrecioIGV: " + transLine.getPrecioIGV() + "\tPrecioRefMonto: " + transLine.getPrecioRef_Monto() + "\nDCTOMonto: " + transLine.getDSCTO_Monto() + "\tDescripcion: " + transLine.getDescripcion() + "\tCodArticulo: " + transLine.getCodArticulo());
 
                     }
 
@@ -2575,7 +2615,7 @@ public class UBLDocumentHandler20 {
                         logger.debug("getAllBoletaLines() [" + this.identifier + "] Agregando el ID.");
                     }
                     IDType idNumber = new IDType();
-                    idNumber.setValue(String.valueOf(transLine.getTransaccionLineasPK().getNroOrden()));
+                    idNumber.setValue(String.valueOf(transLine.getNroOrden()));
                     boletaLine.setID(idNumber);
 
                     /*
@@ -2620,15 +2660,15 @@ public class UBLDocumentHandler20 {
                      *
                      * <Invoice><cac:InvoiceLine><cac:PricingReference>
                      */
-                    if (transLine.getPrecioRefCodigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
+                    if (transLine.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("getAllBoletaLines() [" + this.identifier + "] PricingReference: PRECIO_UNITARIO");
                         }
                         PricingReferenceType pricingReference = new PricingReferenceType();
-                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRefCodigo()));
+                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRef_Codigo()));
 
                         boletaLine.setPricingReference(pricingReference);
-                    } else if (transLine.getPrecioRefCodigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
+                    } else if (transLine.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("getAllBoletaLines() [" + this.identifier + "] PricingReference: VALOR_REFERENCIAL");
                         }
@@ -2640,7 +2680,7 @@ public class UBLDocumentHandler20 {
                          * 0.00
                          */
                         pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(2, RoundingMode.HALF_UP), currencyCode, IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE));
-                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioRefMonto().setScale(IUBLConfig.DECIMAL_LINE_REFERENCE_VALUE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRefCodigo()));
+                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioRef_Monto().setScale(IUBLConfig.DECIMAL_LINE_REFERENCE_VALUE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRef_Codigo()));
 
                         boletaLine.setPricingReference(pricingReference);
                     }
@@ -2649,7 +2689,7 @@ public class UBLDocumentHandler20 {
                      * Agregar impuestos de linea
                      * <Invoice><cac:InvoiceLine><cac:AllowanceCharge>
                      */
-                    if (null != transLine.getDSCTOMonto() && transLine.getDSCTOMonto().compareTo(BigDecimal.ZERO) == 1) {
+                    if (null != transLine.getDSCTO_Monto() && transLine.getDSCTO_Monto().compareTo(BigDecimal.ZERO) == 1) {
                         /*
                          * ChargeIndicatorType
                          *
@@ -2659,7 +2699,7 @@ public class UBLDocumentHandler20 {
                         if (logger.isDebugEnabled()) {
                             logger.debug("getAllBoletaLines() [" + this.identifier + "] Agregando DESCUENTO_LINEA.");
                         }
-                        boletaLine.getAllowanceCharge().add(getAllowanceCharge(transLine.getDSCTOMonto(), currencyCode, false));
+                        boletaLine.getAllowanceCharge().add(getAllowanceCharge(transLine.getDSCTO_Monto(), currencyCode, false));
                     }
 
                     /*
@@ -2669,7 +2709,7 @@ public class UBLDocumentHandler20 {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllBoletaLines() [" + this.identifier + "] Agregando IMPUESTO DE LINEA.");
                     }
-                    boletaLine.getTaxTotal().addAll(getAllTaxTotalLines(transLine.getTransaccionLineaImpuestosList()));
+                    boletaLine.getTaxTotal().addAll(getAllTaxTotalLines(transLine.getTransactionLineasImpuestoListDTO()));
                     /*
                      * Agregar DESCRIPCION y CODIGO DEL ITEM
                      * <Invoice><cac:InvoiceLine><cac:Item>
@@ -2685,7 +2725,7 @@ public class UBLDocumentHandler20 {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllBoletaLines() [" + this.identifier + "] Agregando VALOR UNITARIO.");
                     }
-                    boletaLine.setPrice(getPriceForLine(transLine.getTransaccionLineasBillrefList(), currencyCode));
+                    boletaLine.setPrice(getPriceForLine(transLine.getTransaccionLineasBillrefListDTO(), currencyCode));
                     boletaLineList.add(boletaLine);
                 }
                 for (int i = 0; i < IUBLConfig.lstImporteIGV.size(); i++) {
@@ -2712,7 +2752,7 @@ public class UBLDocumentHandler20 {
         return boletaLineList;
     } // getAllBoletaLines
 
-    private List<CreditNoteLineType> getAllCreditNoteLines(List<TransaccionLineas> transactionLines, String currencyCode) throws UBLDocumentException {
+    private List<CreditNoteLineType> getAllCreditNoteLines(List<TransactionLineasDTO> transactionLines, String currencyCode) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getAllCreditNoteLines() [" + this.identifier + "] transactionLines: " + transactionLines + " currencyCode: " + currencyCode);
         }
@@ -2720,12 +2760,12 @@ public class UBLDocumentHandler20 {
         if (null != transactionLines && !transactionLines.isEmpty()) {
             try {
                 creditNoteLineList = new ArrayList<>(transactionLines.size());
-                for (TransaccionLineas transLine : transactionLines) {
+                for (TransactionLineasDTO transLine : transactionLines) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllCreditNoteLines() [" + this.identifier + "] Extrayendo informacion del item...");
                     }
                     if (logger.isDebugEnabled()) {
-                        logger.debug("getAllCreditNoteLines() [" + this.identifier + "] NroOrden: " + transLine.getTransaccionLineasPK().getNroOrden() + "\nCantidad: " + transLine.getCantidad() + "\tUnidad: " + transLine.getUnidad() + "\tUnidadSunat: " + transLine.getUnidadSunat() + "\tTotalLineaSinIGV: " + transLine.getTotalLineaSinIGV() + "\nPrecioRefCodigo: " + transLine.getPrecioRefCodigo() + "\tPrecioIGV: " + transLine.getPrecioIGV() + "\tPrecioRefMonto: " + transLine.getPrecioRefMonto() + "\nDCTOMonto: " + transLine.getDSCTOMonto() + "\tDescripcion: " + transLine.getDescripcion() + "\tCodArticulo: " + transLine.getCodArticulo());
+                        logger.debug("getAllCreditNoteLines() [" + this.identifier + "] NroOrden: " + transLine.getNroOrden() + "\nCantidad: " + transLine.getCantidad() + "\tUnidad: " + transLine.getUnidad() + "\tUnidadSunat: " + transLine.getUnidadSunat() + "\tTotalLineaSinIGV: " + transLine.getTotalLineaSinIGV() + "\nPrecioRefCodigo: " + transLine.getPrecioRef_Codigo() + "\tPrecioIGV: " + transLine.getPrecioIGV() + "\tPrecioRefMonto: " + transLine.getPrecioRef_Monto() + "\nDCTOMonto: " + transLine.getDSCTO_Monto() + "\tDescripcion: " + transLine.getDescripcion() + "\tCodArticulo: " + transLine.getCodArticulo());
                     }
                     CreditNoteLineType creditNoteLine = new CreditNoteLineType();
 
@@ -2734,7 +2774,7 @@ public class UBLDocumentHandler20 {
                         logger.debug("getAllCreditNoteLines() [" + this.identifier + "] Agregando el ID.");
                     }
                     IDType idNumber = new IDType();
-                    idNumber.setValue(String.valueOf(transLine.getTransaccionLineasPK().getNroOrden()));
+                    idNumber.setValue(String.valueOf(transLine.getNroOrden()));
                     creditNoteLine.setID(idNumber);
 
                     /*
@@ -2780,14 +2820,14 @@ public class UBLDocumentHandler20 {
                      *
                      * <CreditNote><cac:CreditNoteLine><cac:PricingReference>
                      */
-                    if (transLine.getPrecioRefCodigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
+                    if (transLine.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("getAllCreditNoteLines() [" + this.identifier + "] PricingReference: PRECIO_UNITARIO");
                         }
                         PricingReferenceType pricingReference = new PricingReferenceType();
-                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRefCodigo()));
+                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRef_Codigo()));
                         creditNoteLine.setPricingReference(pricingReference);
-                    } else if (transLine.getPrecioRefCodigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
+                    } else if (transLine.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("getAllCreditNoteLines() [" + this.identifier + "] PricingReference: VALOR_REFERENCIAL");
                         }
@@ -2798,13 +2838,13 @@ public class UBLDocumentHandler20 {
                          * 0.00
                          */
                         pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(2, RoundingMode.HALF_UP), currencyCode, IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE));
-                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioRefMonto().setScale(IUBLConfig.DECIMAL_LINE_REFERENCE_VALUE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRefCodigo()));
+                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioRef_Monto().setScale(IUBLConfig.DECIMAL_LINE_REFERENCE_VALUE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRef_Codigo()));
                         creditNoteLine.setPricingReference(pricingReference);
                     }                    /*                     * Agregar impuestos de linea                     * <CreditNote><cac:CreditNoteLine><cac:TaxTotal>                     */
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllCreditNoteLines() [" + this.identifier + "] Agregando IMPUESTO DE LINEA.");
                     }
-                    creditNoteLine.getTaxTotal().addAll(getAllTaxTotalLines(transLine.getTransaccionLineaImpuestosList()));
+                    creditNoteLine.getTaxTotal().addAll(getAllTaxTotalLines(transLine.getTransactionLineasImpuestoListDTO()));
 
                     /*
                      * Agregar DESCRIPCION y CODIGO DEL ITEM
@@ -2822,7 +2862,7 @@ public class UBLDocumentHandler20 {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllCreditNoteLines() [" + this.identifier + "] Agregando VALOR UNITARIO.");
                     }
-                    creditNoteLine.setPrice(getPriceForLine(transLine.getTransaccionLineasBillrefList(), currencyCode));
+                    creditNoteLine.setPrice(getPriceForLine(transLine.getTransaccionLineasBillrefListDTO(), currencyCode));
                     creditNoteLineList.add(creditNoteLine);
                 }
             } catch (UBLDocumentException e) {
@@ -2843,19 +2883,19 @@ public class UBLDocumentHandler20 {
         return creditNoteLineList;
     } // getAllCreditNoteLines
 
-    private List<DebitNoteLineType> getAllDebitNoteLines(List<TransaccionLineas> transactionLines, String currencyCode) throws UBLDocumentException {
+    private List<DebitNoteLineType> getAllDebitNoteLines(List<TransactionLineasDTO> transactionLines, String currencyCode) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getAllDebitNoteLines() [" + this.identifier + "] transactionLines: " + transactionLines + " currencyCode: " + currencyCode);
         }
         List<DebitNoteLineType> debitNoteLineList = new ArrayList<>(transactionLines.size());
         if (null != transactionLines && !transactionLines.isEmpty()) {
             try {
-                for (TransaccionLineas transLine : transactionLines) {
+                for (TransactionLineasDTO transLine : transactionLines) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllDebitNoteLines() [" + this.identifier + "] Extrayendo informacion del item...");
                     }
                     if (logger.isDebugEnabled()) {
-                        logger.debug("getAllDebitNoteLines() [" + this.identifier + "] NroOrden: " + transLine.getTransaccionLineasPK().getNroOrden() + "\nCantidad: " + transLine.getCantidad() + "\tUnidad: " + transLine.getUnidad() + "\tUnidadSunat: " + transLine.getUnidadSunat() + "\tTotalLineaSinIGV: " + transLine.getTotalLineaSinIGV() + "\nPrecioRefCodigo: " + transLine.getPrecioRefCodigo() + "\tPrecioIGV: " + transLine.getPrecioIGV() + "\tPrecioRefMonto: " + transLine.getPrecioRefMonto() + "\nDCTOMonto: " + transLine.getDSCTOMonto() + "\tDescripcion: " + transLine.getDescripcion() + "\tCodArticulo: " + transLine.getCodArticulo());
+                        logger.debug("getAllDebitNoteLines() [" + this.identifier + "] NroOrden: " + transLine.getNroOrden() + "\nCantidad: " + transLine.getCantidad() + "\tUnidad: " + transLine.getUnidad() + "\tUnidadSunat: " + transLine.getUnidadSunat() + "\tTotalLineaSinIGV: " + transLine.getTotalLineaSinIGV() + "\nPrecioRefCodigo: " + transLine.getPrecioRef_Codigo() + "\tPrecioIGV: " + transLine.getPrecioIGV() + "\tPrecioRefMonto: " + transLine.getPrecioRef_Monto() + "\nDCTOMonto: " + transLine.getDSCTO_Monto() + "\tDescripcion: " + transLine.getDescripcion() + "\tCodArticulo: " + transLine.getCodArticulo());
                     }
 
                     DebitNoteLineType debitNoteLine = new DebitNoteLineType();
@@ -2865,7 +2905,7 @@ public class UBLDocumentHandler20 {
                         logger.debug("getAllDebitNoteLines() [" + this.identifier + "] Agregando el ID.");
                     }
                     IDType idNumber = new IDType();
-                    idNumber.setValue(String.valueOf(transLine.getTransaccionLineasPK().getNroOrden()));
+                    idNumber.setValue(String.valueOf(transLine.getNroOrden()));
                     debitNoteLine.setID(idNumber);
 
                     /*
@@ -2911,15 +2951,15 @@ public class UBLDocumentHandler20 {
                      *
                      * <DebitNote><cac:DebitNoteLine><cac:PricingReference>
                      */
-                    if (transLine.getPrecioRefCodigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
+                    if (transLine.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("getAllDebitNoteLines() [" + this.identifier + "] PricingReference: PRECIO_UNITARIO");
                         }
                         PricingReferenceType pricingReference = new PricingReferenceType();
-                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRefCodigo()));
+                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRef_Codigo()));
 
                         debitNoteLine.setPricingReference(pricingReference);
-                    } else if (transLine.getPrecioRefCodigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
+                    } else if (transLine.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("getAllDebitNoteLines() [" + this.identifier + "] PricingReference: VALOR_REFERENCIAL");
                         }
@@ -2931,7 +2971,7 @@ public class UBLDocumentHandler20 {
                          * 0.00
                          */
                         pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioIGV().setScale(2, RoundingMode.HALF_UP), currencyCode, IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE));
-                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioRefMonto().setScale(IUBLConfig.DECIMAL_LINE_REFERENCE_VALUE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRefCodigo()));
+                        pricingReference.getAlternativeConditionPrice().add(getAlternativeConditionPrice(transLine.getPrecioRef_Monto().setScale(IUBLConfig.DECIMAL_LINE_REFERENCE_VALUE, RoundingMode.HALF_UP), currencyCode, transLine.getPrecioRef_Codigo()));
 
                         debitNoteLine.setPricingReference(pricingReference);
                     }
@@ -2943,7 +2983,7 @@ public class UBLDocumentHandler20 {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllDebitNoteLines() [" + this.identifier + "] Agregando IMPUESTO DE LINEA.");
                     }
-                    debitNoteLine.getTaxTotal().addAll(getAllTaxTotalLines(transLine.getTransaccionLineaImpuestosList()));
+                    debitNoteLine.getTaxTotal().addAll(getAllTaxTotalLines(transLine.getTransactionLineasImpuestoListDTO()));
 
                     /*
                      * Agregar DESCRIPCION y CODIGO DEL ITEM
@@ -2961,7 +3001,7 @@ public class UBLDocumentHandler20 {
                     if (logger.isDebugEnabled()) {
                         logger.debug("getAllDebitNoteLines() [" + this.identifier + "] Agregando VALOR UNITARIO.");
                     }
-                    debitNoteLine.setPrice(getPriceForLine(transLine.getTransaccionLineasBillrefList(), currencyCode));
+                    debitNoteLine.setPrice(getPriceForLine(transLine.getTransaccionLineasBillrefListDTO(), currencyCode));
                     debitNoteLineList.add(debitNoteLine);
                 }
             } catch (UBLDocumentException e) {
@@ -3070,7 +3110,7 @@ public class UBLDocumentHandler20 {
         return item;
     } // getItemForLine
 
-    private PriceType getPriceForLine(List<TransaccionLineasBillref> transBillReferenceList, String currencyCode) throws UBLDocumentException {
+    private PriceType getPriceForLine(List<TransactionLineasBillRefDTO> transBillReferenceList, String currencyCode) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getPriceForLine() [" + this.identifier + "]");
         }
@@ -3080,12 +3120,12 @@ public class UBLDocumentHandler20 {
             String unitValue = null;
 
             if (null != transBillReferenceList && 0 < transBillReferenceList.size()) {
-                for (TransaccionLineasBillref billReference : transBillReferenceList) {
-                    if (billReference.getAdtDocRefSchemaId().equalsIgnoreCase(IUBLConfig.HIDDEN_UVALUE)) {
+                for (TransactionLineasBillRefDTO billReference : transBillReferenceList) {
+                    if (billReference.getAdtDocRef_SchemaId().equalsIgnoreCase(IUBLConfig.HIDDEN_UVALUE)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("getPriceForLine() [" + this.identifier + "] Se encontro el " + IUBLConfig.HIDDEN_UVALUE);
                         }
-                        unitValue = billReference.getAdtDocRefId();
+                        unitValue = billReference.getAdtDocRef_Id();
                         break;
                     }
                 }
@@ -3220,11 +3260,11 @@ public class UBLDocumentHandler20 {
         return billingReference;
     } // getBillingReference
 
-    private BigDecimal getSubtotalValueFromTransaction(List<TransaccionTotales> transactionTotalList) throws UBLDocumentException {
+    private BigDecimal getSubtotalValueFromTransaction(List<TransactionTotalesDTO> transactionTotalList) throws UBLDocumentException {
         BigDecimal subtotal = null;
         if (null != transactionTotalList && !transactionTotalList.isEmpty()) {
             for (int i = 0; i < transactionTotalList.size(); i++) {
-                if (transactionTotalList.get(i).getTransaccionTotalesPK().getId().equalsIgnoreCase(IUBLConfig.ADDITIONAL_MONETARY_1005)) {
+                if (transactionTotalList.get(i).getId().equalsIgnoreCase(IUBLConfig.ADDITIONAL_MONETARY_1005)) {
                     subtotal = transactionTotalList.get(i).getMonto();
                     transactionTotalList.remove(i);
                     break;
@@ -3247,13 +3287,13 @@ public class UBLDocumentHandler20 {
         return subtotal;
     }
 
-    private List<DocumentReferenceType> getDespatchDocumentReferences(List<TransaccionDocrefers> transaccionDocrefersList) throws UBLDocumentException {
+    private List<DocumentReferenceType> getDespatchDocumentReferences(List<TransactionDocReferDTO> transaccionDocrefersList) throws UBLDocumentException {
         if (logger.isInfoEnabled()) {
             logger.info("+getDespatchDocumentReferences() [" + this.identifier + "]");
         }
         List<DocumentReferenceType> despatchDocRefList = new ArrayList<>();
         if (null != transaccionDocrefersList && 0 < transaccionDocrefersList.size()) {
-            for (TransaccionDocrefers transDocrefer : transaccionDocrefersList) {
+            for (TransactionDocReferDTO transDocrefer : transaccionDocrefersList) {
                 DocumentReferenceType despatchDocumentReference = new DocumentReferenceType();
                 /* <cac:DespatchDocumentReference><cbc:ID> */
                 IDType id = new IDType();
@@ -3321,50 +3361,50 @@ public class UBLDocumentHandler20 {
         return cpt;
     }
 
-    private ShipmentType getShipment(Transaccion tr) {
+    private ShipmentType getShipment(TransacctionDTO tr) {
         ShipmentType st = new ShipmentType();
         HandlingCodeType handlingCodeType = new HandlingCodeType();
-        handlingCodeType.setValue(tr.getTransaccionGuiaRemision().getCodigoMotivo());
+        handlingCodeType.setValue(tr.getTransactionGuias().getCodigoMotivo());
 
         InformationType informationType = new InformationType();
-        informationType.setValue(tr.getTransaccionGuiaRemision().getDescripcionMotivo());
+        informationType.setValue(tr.getTransactionGuias().getDescripcionMotivo());
 
         SplitConsignmentIndicatorType splitConsignmentIndicatorType = new SplitConsignmentIndicatorType();
-        if (tr.getTransaccionGuiaRemision().getIndicadorTransbordoProgramado().equalsIgnoreCase("0")) {
+        if (tr.getTransactionGuias().getIndicadorTransbordoProgramado().equalsIgnoreCase("0")) {
             splitConsignmentIndicatorType.setValue(Boolean.FALSE);
         } else {
             splitConsignmentIndicatorType.setValue(Boolean.TRUE);
         }
 
         GrossWeightMeasureType grossWeightMeasureType = new GrossWeightMeasureType();
-        grossWeightMeasureType.setValue(tr.getTransaccionGuiaRemision().getPeso());
-        grossWeightMeasureType.setUnitCode(tr.getTransaccionGuiaRemision().getUnidadMedida());
+        grossWeightMeasureType.setValue(tr.getTransactionGuias().getPeso());
+        grossWeightMeasureType.setUnitCode(tr.getTransactionGuias().getUnidadMedida());
         TotalTransportHandlingUnitQuantityType totalTransportHandlingUnitQuantityType = new TotalTransportHandlingUnitQuantityType();
-        if (tr.getTransaccionGuiaRemision().getNumeroBultos().intValue() > 0) {
-            totalTransportHandlingUnitQuantityType.setValue(tr.getTransaccionGuiaRemision().getNumeroBultos());
+        if (tr.getTransactionGuias().getNumeroBultos().intValue() > 0) {
+            totalTransportHandlingUnitQuantityType.setValue(tr.getTransactionGuias().getNumeroBultos());
         }
 
         ShipmentStageType shipmentStageType = new ShipmentStageType();
         TransportModeCodeType transportModeCodeType = new TransportModeCodeType();
-        transportModeCodeType.setValue(tr.getTransaccionGuiaRemision().getModalidadTraslado());
+        transportModeCodeType.setValue(tr.getTransactionGuias().getModalidadTraslado());
         shipmentStageType.setTransportModeCode(transportModeCodeType);
 
         PeriodType periodType = new PeriodType();
         StartDateType startDateType = new StartDateType();
-        startDateType.setValue(returnXMLGregorianCalendar(tr.getTransaccionGuiaRemision().getFechaInicioTraslado()));
+        startDateType.setValue(returnXMLGregorianCalendar(DateUtil.parseDate(tr.getTransactionGuias().getFechaInicioTraslado())));
         periodType.setStartDate(startDateType);
         shipmentStageType.setTransitPeriod(periodType);
 
-        if (tr.getTransaccionGuiaRemision().getModalidadTraslado().equalsIgnoreCase("01")) {
+        if (tr.getTransactionGuias().getModalidadTraslado().equalsIgnoreCase("01")) {
             PartyType partyType = new PartyType();
             PartyIdentificationType partyIdentificationType = new PartyIdentificationType();
             IDType iDType = new IDType();
-            iDType.setValue(tr.getTransaccionGuiaRemision().getRUCTransporista());
-            iDType.setSchemeID(tr.getTransaccionGuiaRemision().getTipoDOCTransportista());
+            iDType.setValue(tr.getTransactionGuias().getRUCTransporista());
+            iDType.setSchemeID(tr.getTransactionGuias().getTipoDOCTransportista());
             partyIdentificationType.setID(iDType);
 
             RegistrationNameType registrationNameType = new RegistrationNameType();
-            registrationNameType.setValue(tr.getTransaccionGuiaRemision().getNombreRazonTransportista());
+            registrationNameType.setValue(tr.getTransactionGuias().getNombreRazonTransportista());
             PartyLegalEntityType entityType = new PartyLegalEntityType();
             entityType.setRegistrationName(registrationNameType);
 
@@ -3375,15 +3415,15 @@ public class UBLDocumentHandler20 {
             TransportMeansType transportMeansType = new TransportMeansType();
             RoadTransportType roadTransportType = new RoadTransportType();
             LicensePlateIDType licensePlateIDType = new LicensePlateIDType();
-            licensePlateIDType.setValue(tr.getTransaccionGuiaRemision().getPlacaVehiculo());
+            licensePlateIDType.setValue(tr.getTransactionGuias().getPlacaVehiculo());
             roadTransportType.setLicensePlateID(licensePlateIDType);
             transportMeansType.setRoadTransport(roadTransportType);
 
             shipmentStageType.setTransportMeans(transportMeansType);
             PersonType personType = new PersonType();
             IDType dType = new IDType();
-            dType.setSchemeID(tr.getTransaccionGuiaRemision().getTipoDocConductor());
-            dType.setValue(tr.getTransaccionGuiaRemision().getDocumentoConductor());
+            dType.setSchemeID(tr.getTransactionGuias().getTipoDocConductor());
+            dType.setValue(tr.getTransactionGuias().getDocumentoConductor());
             personType.setID(dType);
             shipmentStageType.getDriverPerson().add(personType);
         }
@@ -3399,11 +3439,11 @@ public class UBLDocumentHandler20 {
 
         dirSN.setDeliveryAddress(addressSN);
 
-        if (tr.getTransaccionGuiaRemision().getCodigoMotivo().equalsIgnoreCase("08")) {
+        if (tr.getTransactionGuias().getCodigoMotivo().equalsIgnoreCase("08")) {
             TransportHandlingUnitType transportHandlingUnitType = new TransportHandlingUnitType();
             TransportEquipmentType transportEquipmentType = new TransportEquipmentType();
             IDType iDType1 = new IDType();
-            iDType1.setValue(tr.getTransaccionGuiaRemision().getNumeroContenedor());
+            iDType1.setValue(tr.getTransactionGuias().getNumeroContenedor());
             transportEquipmentType.setID(iDType1);
             transportHandlingUnitType.getTransportEquipment().add(transportEquipmentType);
             st.getTransportHandlingUnit().add(transportHandlingUnitType);
@@ -3411,15 +3451,15 @@ public class UBLDocumentHandler20 {
 
         AddressType AddressEM = new AddressType();
         IDType iDTypeEM = new IDType();
-        iDTypeEM.setValue(tr.getTransaccionGuiaRemision().getUbigeoPartida());
+        iDTypeEM.setValue(tr.getTransactionGuias().getUbigeoPartida());
         AddressEM.setID(iDTypeEM);
         StreetNameType streetNameTypeEM = new StreetNameType();
-        streetNameTypeEM.setValue(tr.getTransaccionGuiaRemision().getDireccionPartida());
+        streetNameTypeEM.setValue(tr.getTransactionGuias().getDireccionPartida());
         AddressEM.setStreetName(streetNameTypeEM);
 
         LocationType locationType = new LocationType();
         IDType iDType1 = new IDType();
-        iDType1.setValue(tr.getTransaccionGuiaRemision().getCodigoPuerto());
+        iDType1.setValue(tr.getTransactionGuias().getCodigoPuerto());
         locationType.setID(iDType1);
 
         IDType idt = new IDType();
@@ -3430,7 +3470,7 @@ public class UBLDocumentHandler20 {
         st.setInformation(informationType);
         st.setSplitConsignmentIndicator(splitConsignmentIndicatorType);
         st.setGrossWeightMeasure(grossWeightMeasureType);
-        if (tr.getTransaccionGuiaRemision().getNumeroBultos().intValue() > 0) {
+        if (tr.getTransactionGuias().getNumeroBultos().intValue() > 0) {
             st.setTotalTransportHandlingUnitQuantity(totalTransportHandlingUnitQuantityType);
         }
 

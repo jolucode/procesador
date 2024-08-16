@@ -11,9 +11,9 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import service.cloud.request.clientRequest.dto.dto.*;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
-import service.cloud.request.clientRequest.entity.*;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.extras.pdf.PDFInvoiceCreator;
 import service.cloud.request.clientRequest.handler.creator.*;
@@ -22,6 +22,7 @@ import service.cloud.request.clientRequest.handler.object.item.PerceptionItemObj
 import service.cloud.request.clientRequest.handler.object.legend.BoletaObject;
 import service.cloud.request.clientRequest.handler.object.legend.LegendObject;
 import service.cloud.request.clientRequest.utils.DateConverter;
+import service.cloud.request.clientRequest.utils.DateUtil;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.UBLDocumentException;
 import service.cloud.request.clientRequest.utils.exception.error.ErrorObj;
@@ -259,10 +260,10 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             BigDecimal importeTotal = null;
             BigDecimal importeTotalDOC = new BigDecimal("0.00");
             BigDecimal importeDocumento = new BigDecimal("0.00");
-            for (int i = 0; i < retentionType.getTransaccion().getTransaccionComprobantePagoList().size(); i++) {
-                montoSoles = montoSoles.add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getCP_Importe().add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getCP_ImporteTotal()));
+            for (int i = 0; i < retentionType.getTransaccion().getTransactionComprobantesDTOList().size(); i++) {
+                montoSoles = montoSoles.add(retentionType.getTransaccion().getTransactionComprobantesDTOList().get(i).getCP_Importe().add(retentionType.getTransaccion().getTransactionComprobantesDTOList().get(i).getCP_ImporteTotal()));
                 importeTotalDOC = importeTotalDOC.add(retentionType.getRetentionType().getSunatRetentionDocumentReference().get(i).getPayment().getPaidAmount().getValue());
-                importeDocumento = importeDocumento.add(retentionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getCP_ImporteTotal());
+                importeDocumento = importeDocumento.add(retentionType.getTransaccion().getTransactionComprobantesDTOList().get(i).getCP_ImporteTotal());
             }
 
             if (Boolean.parseBoolean(configData.getPdfBorrador())) {
@@ -277,15 +278,15 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             if (logger.isDebugEnabled()) {
                 logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
             }
-            for (int i = 0; i < retentionType.getTransaccion().getTransaccionPropiedadesList().size(); i++) {
-                if (retentionType.getTransaccion().getTransaccionPropiedadesList().get(i).getTransaccionPropiedadesPK().getId().equalsIgnoreCase("1000")) {
-                    retentionObject.setLetterAmountValue(retentionType.getTransaccion().getTransaccionPropiedadesList().get(i).getValor());
+            for (int i = 0; i < retentionType.getTransaccion().getTransactionPropertiesDTOList().size(); i++) {
+                if (retentionType.getTransaccion().getTransactionPropertiesDTOList().get(i).getId().equalsIgnoreCase("1000")) {
+                    retentionObject.setLetterAmountValue(retentionType.getTransaccion().getTransactionPropertiesDTOList().get(i).getValor());
                 }
             }
 
             List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
 
-            for (TransaccionComprobantePago transaccion : retentionType.getTransaccion().getTransaccionComprobantePagoList()) {
+            for (TransactionComprobantesDTO transaccion : retentionType.getTransaccion().getTransactionComprobantesDTOList()) {
 
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<String, String>();
@@ -414,9 +415,9 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (null != boletaType.getInvoiceType().getNote() && 0 < boletaType.getInvoiceType().getNote().size()) {
-                boletaObj.setDueDate(formatDueDate(boletaType.getTransaccion().getDOC_FechaVencimiento()));
+                boletaObj.setDueDate(boletaType.getTransaccion().getDOC_FechaVencimiento());
             } else {
-                boletaObj.setDueDate(formatDueDate(boletaType.getTransaccion().getDOC_FechaVencimiento()));
+                boletaObj.setDueDate(boletaType.getTransaccion().getDOC_FechaVencimiento());
                 //boletaObj.setDueDate(IPDFCreatorConfig.EMPTY_VALUE);
             }
             List<TaxTotalType> taxTotal = boletaType.getInvoiceType().getTaxTotal();
@@ -460,38 +461,55 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 logger.info("generateBoletaPDF() [" + this.docUUID + "] Condicion_pago: " + boletaObj.getPaymentCondition());
             }
 
-            if (null != boletaType.getTransaccion().getTransaccionContractdocrefList() && 0 < boletaType.getTransaccion().getTransaccionContractdocrefList().size()) {
-                Map<String, String> hashedMap = new HashMap<String, String>();
-                for (int i = 0; i < boletaType.getTransaccion().getTransaccionContractdocrefList().size(); i++) {
-                    hashedMap.put(boletaType.getTransaccion().getTransaccionContractdocrefList().get(i).getUsuariocampos().getNombre(), boletaType.getTransaccion().getTransaccionContractdocrefList().get(i).getValor());
+            if (null != boletaType.getTransaccion().getTransactionContractDocRefListDTOS()
+                    && !boletaType.getTransaccion().getTransactionContractDocRefListDTOS().isEmpty()) {
+
+                Map<String, String> hashedMap = new HashMap<>();
+
+                for (Map<String, String> map : boletaType.getTransaccion().getTransactionContractDocRefListDTOS()) {
+                    // Suponiendo que cada mapa tiene solo un par clave-valor
+                    for (Map.Entry<String, String> entry : map.entrySet()) {
+                        hashedMap.put(entry.getKey(), entry.getValue());
+                    }
                 }
+
                 boletaObj.setInvoicePersonalizacion(hashedMap);
             }
 
             List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
 
-            for (int i = 0; i < boletaType.getTransaccion().getTransaccionLineasList().size(); i++) {
+            for (int i = 0; i < boletaType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateBoletaPDF() [" + this.docUUID + "] Agregando datos al HashMap" + boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
+                    logger.debug("generateBoletaPDF() [" + this.docUUID + "] Agregando datos al HashMap");
                 }
+
                 WrapperItemObject itemObject = new WrapperItemObject();
-                Map<String, String> itemObjectHash = new HashMap<String, String>();
-                List<String> newlist = new ArrayList<String>();
-                for (int j = 0; j < boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size(); j++) {
+                Map<String, String> itemObjectHash = new HashMap<>();
+                List<String> newlist = new ArrayList<>();
+
+                // Obtener el mapa de transaccionLineasCamposUsuario
+                Map<String, String> camposUsuarioMap = boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransaccionLineasCamposUsuario();
+
+                // Iterar sobre las entradas del mapa
+                for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
+                    String nombreCampo = entry.getKey();
+                    String valorCampo = entry.getValue();
+
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
+                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
                     }
-                    itemObjectHash.put(boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre(), boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
-                    newlist.add(boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
+
+                    itemObjectHash.put(nombreCampo, valorCampo);
+                    newlist.add(valorCampo);
+
                     if (logger.isDebugEnabled()) {
                         logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
                     }
-
                 }
+
                 itemObject.setLstItemHashMap(itemObjectHash);
                 itemObject.setLstDinamicaItem(newlist);
                 listaItem.add(itemObject);
-
             }
 
             boletaObj.setItemsDynamic(listaItem);
@@ -520,12 +538,12 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             BigDecimal percepctionAmount = null;
             BigDecimal perceptionPercentage = null;
-            for (int i = 0; i < boletaType.getTransaccion().getTransaccionTotalesList().size(); i++) {
-                if (boletaType.getTransaccion().getTransaccionTotalesList().get(i).getTransaccionTotalesPK().getId().equalsIgnoreCase("2001")) {
-                    percepctionAmount = boletaType.getTransaccion().getTransaccionTotalesList().get(i).getMonto();
-                    perceptionPercentage = boletaType.getTransaccion().getTransaccionTotalesList().get(i).getPrcnt();
-                    boletaObj.setPerceptionAmount(currencyCode + " " + boletaType.getTransaccion().getTransaccionTotalesList().get(i).getMonto().toString());
-                    boletaObj.setPerceptionPercentage(boletaType.getTransaccion().getTransaccionTotalesList().get(i).getPrcnt().toString() + "%");
+            for (int i = 0; i < boletaType.getTransaccion().getTransactionTotalesDTOList().size(); i++) {
+                if (boletaType.getTransaccion().getTransactionTotalesDTOList().get(i).getId().equalsIgnoreCase("2001")) {
+                    percepctionAmount = boletaType.getTransaccion().getTransactionTotalesDTOList().get(i).getMonto();
+                    perceptionPercentage = boletaType.getTransaccion().getTransactionTotalesDTOList().get(i).getPrcnt();
+                    boletaObj.setPerceptionAmount(currencyCode + " " + boletaType.getTransaccion().getTransactionTotalesDTOList().get(i).getMonto().toString());
+                    boletaObj.setPerceptionPercentage(boletaType.getTransaccion().getTransactionTotalesDTOList().get(i).getPrcnt().toString() + "%");
                 }
             }
 
@@ -534,11 +552,11 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             BigDecimal retentionpercentage = null;
 
-            for (int i = 0; i < boletaType.getTransaccion().getTransaccionLineasList().size(); i++) {
-                for (int j = 0; j < boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().size(); j++) {
-                    if (boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
-                        boletaObj.setPorcentajeISC(boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getPorcentaje().setScale(1, BigDecimal.ROUND_HALF_UP).toString());
-                        retentionpercentage = boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getPorcentaje();
+            for (int i = 0; i < boletaType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
+                for (int j = 0; j < boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().size(); j++) {
+                    if (boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
+                        boletaObj.setPorcentajeISC(boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje().setScale(1, BigDecimal.ROUND_HALF_UP).toString());
+                        retentionpercentage = boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje();
                         break;
                     }
                 }
@@ -598,8 +616,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             } else {
                 boletaObj.setValidezPDF("");
             }
-            List<TransaccionAnticipo> anticipoList = boletaType.getTransaccion().getTransaccionAnticipoList();
-            String anticipos = anticipoList.parallelStream().map(TransaccionAnticipo::getAntiDOCSerieCorrelativo).collect(Collectors.joining(" "));
+            List<TransactionActicipoDTO> anticipoList = boletaType.getTransaccion().getTransactionActicipoDTOList();
+            String anticipos = anticipoList.parallelStream().map(TransactionActicipoDTO::getAntiDOC_Serie_Correlativo).collect(Collectors.joining(" "));
 //            String Anticipos = "";
 //            for (int i = 0; i < boletaType.getTransaccion().getTransaccionAnticipoList().size(); i++) {
 //                Anticipos.concat(boletaType.getTransaccion().getTransaccionAnticipoList().get(i).getAntiDOCSerieCorrelativo() + " ");
@@ -618,7 +636,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             // boletaObj.setBoletaItems(getBoletaItems(boletaType.getBoletaType().getInvoiceLine()));
 
-            BigDecimal subtotalValue = getTransaccionTotales(boletaType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1005);
+            BigDecimal subtotalValue = getTransaccionTotales(boletaType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1005);
             if (null != boletaType.getInvoiceType().getPrepaidPayment() && !boletaType.getInvoiceType().getPrepaidPayment().isEmpty() && null != boletaType.getInvoiceType().getPrepaidPayment().get(0).getPaidAmount()) {
                 boletaObj.setSubtotalValue(getCurrency(subtotalValue.add(prepaidAmount.multiply(BigDecimal.ONE.negate())), currencyCode));
             } else {
@@ -626,10 +644,10 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + boletaType.getTransaccion().getTransaccionContractdocrefList().size());
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + boletaType.getTransaccion().getTransactionContractDocRefListDTOS().size());
             }
 
-            BigDecimal igvValue = getTaxTotalValue2(boletaType.getTransaccion().getTransaccionImpuestosList(), IUBLConfig.TAX_TOTAL_IGV_ID);
+            BigDecimal igvValue = getTaxTotalValue2(boletaType.getTransaccion().getTransactionImpuestosDTOList(), IUBLConfig.TAX_TOTAL_IGV_ID);
             boletaObj.setIgvValue(getCurrency(igvValue, currencyCode));
 
             BigDecimal iscValue = getTaxTotalValue(boletaType.getInvoiceType().getTaxTotal(), IUBLConfig.TAX_TOTAL_ISC_ID);
@@ -645,16 +663,16 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             BigDecimal payableAmount = boletaType.getInvoiceType().getLegalMonetaryTotal().getPayableAmount().getValue();
             boletaObj.setTotalAmountValue(getCurrency(payableAmount, currencyCode));
 
-            BigDecimal gravadaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1001);
+            BigDecimal gravadaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1001);
             boletaObj.setGravadaAmountValue(getCurrency(gravadaAmount, currencyCode));
 
-            BigDecimal inafectaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1002);
+            BigDecimal inafectaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1002);
             boletaObj.setInafectaAmountValue(getCurrency(inafectaAmount, currencyCode));
 
-            BigDecimal exoneradaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1003);
+            BigDecimal exoneradaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1003);
             boletaObj.setExoneradaAmountValue(getCurrency(exoneradaAmount, currencyCode));
 
-            BigDecimal gratuitaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
+            BigDecimal gratuitaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
             if (!gratuitaAmount.equals(BigDecimal.ZERO)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("generateBoletaPDF() [" + this.docUUID + "] Existe Op. Gratuitas.");
@@ -783,15 +801,15 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 invoiceObj.setCurrencyValue(invoiceType.getTransaccion().getDOC_MON_Nombre().toUpperCase());
             }
             if (null != invoiceType.getInvoiceType().getNote() && 0 < invoiceType.getInvoiceType().getNote().size()) {
-                invoiceObj.setDueDate(formatDueDate(invoiceType.getTransaccion().getDOC_FechaVencimiento()));
+                invoiceObj.setDueDate(invoiceType.getTransaccion().getDOC_FechaVencimiento());
                 //invoiceObj.setDueDate(formatDueDate(invoiceType.getInvoiceType().getNote().get(0).getValue()));
             } else {
-                invoiceObj.setDueDate(formatDueDate(invoiceType.getTransaccion().getDOC_FechaVencimiento()));
+                invoiceObj.setDueDate(invoiceType.getTransaccion().getDOC_FechaVencimiento());
             }
 
             String Anticipos = "";
-            for (int i = 0; i < invoiceType.getTransaccion().getTransaccionAnticipoList().size(); i++) {
-                Anticipos.concat(invoiceType.getTransaccion().getTransaccionAnticipoList().get(i).getAntiDOCSerieCorrelativo() + " ");
+            for (int i = 0; i < invoiceType.getTransaccion().getTransactionActicipoDTOList().size(); i++) {
+                Anticipos.concat(invoiceType.getTransaccion().getTransactionActicipoDTOList().get(i).getAntiDOC_Serie_Correlativo() + " ");
             }
             invoiceObj.setAnticipos(Anticipos);
             if (logger.isDebugEnabled()) {
@@ -845,12 +863,12 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             BigDecimal percepctionAmount = null;
             BigDecimal perceptionPercentage = null;
-            for (int i = 0; i < invoiceType.getTransaccion().getTransaccionTotalesList().size(); i++) {
-                if (invoiceType.getTransaccion().getTransaccionTotalesList().get(i).getTransaccionTotalesPK().getId().equalsIgnoreCase("2001")) {
-                    percepctionAmount = invoiceType.getTransaccion().getTransaccionTotalesList().get(i).getMonto();
-                    perceptionPercentage = invoiceType.getTransaccion().getTransaccionTotalesList().get(i).getPrcnt();
-                    invoiceObj.setPerceptionAmount(currencyCode + " " + invoiceType.getTransaccion().getTransaccionTotalesList().get(i).getMonto().toString());
-                    invoiceObj.setPerceptionPercentage(invoiceType.getTransaccion().getTransaccionTotalesList().get(i).getPrcnt().toString() + "%");
+            for (int i = 0; i < invoiceType.getTransaccion().getTransactionTotalesDTOList().size(); i++) {
+                if (invoiceType.getTransaccion().getTransactionTotalesDTOList().get(i).getId().equalsIgnoreCase("2001")) {
+                    percepctionAmount = invoiceType.getTransaccion().getTransactionTotalesDTOList().get(i).getMonto();
+                    perceptionPercentage = invoiceType.getTransaccion().getTransactionTotalesDTOList().get(i).getPrcnt();
+                    invoiceObj.setPerceptionAmount(currencyCode + " " + invoiceType.getTransaccion().getTransactionTotalesDTOList().get(i).getMonto().toString());
+                    invoiceObj.setPerceptionPercentage(invoiceType.getTransaccion().getTransactionTotalesDTOList().get(i).getPrcnt().toString() + "%");
                 }
             }
 
@@ -859,11 +877,11 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             BigDecimal retentionpercentage = null;
 
-            for (int i = 0; i < invoiceType.getTransaccion().getTransaccionLineasList().size(); i++) {
-                for (int j = 0; j < invoiceType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().size(); j++) {
-                    if (invoiceType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
-                        invoiceObj.setRetentionPercentage(invoiceType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getPorcentaje().setScale(1, RoundingMode.HALF_UP).toString());
-                        retentionpercentage = invoiceType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getPorcentaje();
+            for (int i = 0; i < invoiceType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
+                for (int j = 0; j < invoiceType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().size(); j++) {
+                    if (invoiceType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
+                        invoiceObj.setRetentionPercentage(invoiceType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje().setScale(1, RoundingMode.HALF_UP).toString());
+                        retentionpercentage = invoiceType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje();
                         break;
                     }
                 }
@@ -897,18 +915,18 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos de LINEAS personalizados." + invoiceType.getTransaccion().getTransaccionLineasList().size());
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos de LINEAS personalizados." + invoiceType.getTransaccion().getTransactionLineasDTOList().size());
             }
 
             // Cuotas
 
             List<WrapperItemObject> listaItemC = new ArrayList<>();
 
-            List<TransaccionCuotas> transaccionCuotas = invoiceType.getTransaccion().getTransaccionCuotas();
+            List<TransactionCuotasDTO> transaccionCuotas = invoiceType.getTransaccion().getTransactionCuotasDTOList();
 
             DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
-            BigDecimal montoRetencion = (invoiceType.getTransaccion().getMontoRetencion() != null ? invoiceType.getTransaccion().getMontoRetencion() : new BigDecimal("0.0"));
+            BigDecimal montoRetencion = (invoiceType.getTransaccion().getMontoRetencion() != null ? new BigDecimal(invoiceType.getTransaccion().getMontoRetencion()) : new BigDecimal("0.0"));
 
             Integer totalCuotas = 0;
             BigDecimal montoPendiente = BigDecimal.ZERO;
@@ -917,7 +935,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             String f1 = "", f2 = "", f3 = "";
             String c1 = "", c2 = "", c3 = "";
 
-            for (TransaccionCuotas transaccionCuota : transaccionCuotas) {
+            for (TransactionCuotasDTO transaccionCuota : transaccionCuotas) {
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
                 List<String> newlist = new ArrayList<>();
@@ -982,33 +1000,92 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             List<WrapperItemObject> listaItem = new ArrayList<>();
 
-            List<TransaccionLineas> transaccionLineas = invoiceType.getTransaccion().getTransaccionLineasList();
-            for (TransaccionLineas transaccionLinea : transaccionLineas) {
+            List<TransactionLineasDTO> transaccionLineas = invoiceType.getTransaccion().getTransactionLineasDTOList();
+            for (TransactionLineasDTO transaccionLinea : transaccionLineas) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateInvoicePDF() [" + this.docUUID + "] Agregando datos al HashMap" + transaccionLinea.getTransaccionLineasUsucamposList().size());
+                    logger.debug("generateInvoicePDF() [" + this.docUUID + "] Agregando datos al HashMap" + transaccionLinea.getTransaccionLineasCamposUsuario().size());
                 }
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
                 List<String> newlist = new ArrayList<>();
-                List<TransaccionLineasUsucampos> transaccionLineasUsucampos = transaccionLinea.getTransaccionLineasUsucamposList();
-                for (TransaccionLineasUsucampos lineasUsucampos : transaccionLineasUsucampos) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + lineasUsucampos.getUsuariocampos().getNombre());
-                    }
-                    itemObjectHash.put(lineasUsucampos.getUsuariocampos().getNombre(), lineasUsucampos.getValor());
-                    newlist.add(lineasUsucampos.getValor());
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
-                    }
+                Map<String, String> transaccionLineasCamposUsuario  = transaccionLinea.getTransaccionLineasCamposUsuario();
+                if (transaccionLineasCamposUsuario != null && !transaccionLineasCamposUsuario.isEmpty()) {
+                    for (Map.Entry<String, String> entry : transaccionLineasCamposUsuario.entrySet()) {
+                        String nombreCampo = entry.getKey();
+                        String valorCampo = entry.getValue();
 
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
+                        }
+
+                        itemObjectHash.put(nombreCampo, valorCampo);
+                        newlist.add(valorCampo);
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
+                        }
+                    }
                 }
 
-                List<TransaccionContractdocref> contractdocrefs = invoiceType.getTransaccion().getTransaccionContractdocrefList();
-                for (TransaccionContractdocref contractdocref : contractdocrefs) {
-                    itemObjectHash.put(contractdocref.getUsuariocampos().getNombre(), contractdocref.getValor());
-                    newlist.add(contractdocref.getValor());
+                List<Map<String, String>> contractDocRefs = invoiceType.getTransaccion().getTransactionContractDocRefListDTOS();
+                for (Map<String, String> contractDocRefMap : contractDocRefs) {
+                    // Asumimos que cada mapa en la lista contiene solo un par clave-valor para el campo y el valor.
+                    for (Map.Entry<String, String> entry : contractDocRefMap.entrySet()) {
+                        String nombreCampo = entry.getKey();
+                        String valorCampo = entry.getValue();
+
+                        itemObjectHash.put(nombreCampo, valorCampo);
+                        newlist.add(valorCampo);
+                    }
                 }
 
+
+                itemObject.setLstItemHashMap(itemObjectHash);
+                itemObject.setLstDinamicaItem(newlist);
+                listaItem.add(itemObject);
+            }
+
+            for (TransactionLineasDTO transaccionLinea : transaccionLineas) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("generateInvoicePDF() [" + this.docUUID + "] Agregando datos al HashMap");
+                }
+
+                WrapperItemObject itemObject = new WrapperItemObject();
+                Map<String, String> itemObjectHash = new HashMap<>();
+                List<String> newlist = new ArrayList<>();
+
+                // Obtener el mapa de campos de usuario desde transaccionLinea
+                Map<String, String> camposUsuarioMap = transaccionLinea.getTransaccionLineasCamposUsuario();
+
+                // Iterar sobre las entradas del mapa
+                for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
+                    String nombreCampo = entry.getKey();
+                    String valorCampo = entry.getValue();
+
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
+                    }
+
+                    itemObjectHash.put(nombreCampo, valorCampo);
+                    newlist.add(valorCampo);
+
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
+                    }
+                }
+
+                // Obtener el mapa de campos de contrato desde invoiceType
+                List<Map<String, String>> contractDocRefs = invoiceType.getTransaccion().getTransactionContractDocRefListDTOS();
+                for (Map<String, String> contractDocRefMap : contractDocRefs) {
+                    // Asumimos que cada mapa en la lista contiene solo un par clave-valor para el campo y el valor.
+                    for (Map.Entry<String, String> entry : contractDocRefMap.entrySet()) {
+                        String nombreCampo = entry.getKey();
+                        String valorCampo = entry.getValue();
+
+                        itemObjectHash.put(nombreCampo, valorCampo);
+                        newlist.add(valorCampo);
+                    }
+                }
 
                 itemObject.setLstItemHashMap(itemObjectHash);
                 itemObject.setLstDinamicaItem(newlist);
@@ -1025,27 +1102,34 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                     }
                 }
             }
-            BigDecimal subtotalValue = getTransaccionTotales(invoiceType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1005);
+            BigDecimal subtotalValue = getTransaccionTotales(invoiceType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1005);
             if (null != invoiceType.getInvoiceType().getPrepaidPayment() && !invoiceType.getInvoiceType().getPrepaidPayment().isEmpty() && null != invoiceType.getInvoiceType().getPrepaidPayment().get(0).getPaidAmount()) {
                 invoiceObj.setSubtotalValue(getCurrency(invoiceType.getInvoiceType().getLegalMonetaryTotal().getLineExtensionAmount().getValue(), currencyCode));
             } else {
                 invoiceObj.setSubtotalValue(getCurrency(subtotalValue, currencyCode));
             }
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + invoiceType.getTransaccion().getTransaccionContractdocrefList().size());
+                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + invoiceType.getTransaccion().getTransactionContractDocRefListDTOS().size());
             }
-            if (null != invoiceType.getTransaccion().getTransaccionContractdocrefList() && 0 < invoiceType.getTransaccion().getTransaccionContractdocrefList().size()) {
-                Map<String, String> hashedMap = new HashMap<String, String>();
-                for (int i = 0; i < invoiceType.getTransaccion().getTransaccionContractdocrefList().size(); i++) {
-                    hashedMap.put(invoiceType.getTransaccion().getTransaccionContractdocrefList().get(i).getUsuariocampos().getNombre(), invoiceType.getTransaccion().getTransaccionContractdocrefList().get(i).getValor());
+            if (null != invoiceType.getTransaccion().getTransactionContractDocRefListDTOS() && 0 < invoiceType.getTransaccion().getTransactionContractDocRefListDTOS().size()) {
+                Map<String, String> hashedMap = new HashMap<>();
+                List<Map<String, String>> contractDocRefs = invoiceType.getTransaccion().getTransactionContractDocRefListDTOS();
+                for (Map<String, String> contractDocRefMap : contractDocRefs) {
+                    // Asumimos que cada mapa en la lista contiene solo un par clave-valor para el campo y el valor.
+                    for (Map.Entry<String, String> entry : contractDocRefMap.entrySet()) {
+                        String nombreCampo = entry.getKey();
+                        String valorCampo = entry.getValue();
+
+                        hashedMap.put(nombreCampo, valorCampo);
+                    }
                 }
                 invoiceObj.setInvoicePersonalizacion(hashedMap);
             }
 
-            BigDecimal igvValue = getTaxTotalValue2(invoiceType.getTransaccion().getTransaccionImpuestosList(), IUBLConfig.TAX_TOTAL_IGV_ID);
+            BigDecimal igvValue = getTaxTotalValue2(invoiceType.getTransaccion().getTransactionImpuestosDTOList(), IUBLConfig.TAX_TOTAL_IGV_ID);
             invoiceObj.setIgvValue(getCurrency(igvValue, currencyCode));
 
-            BigDecimal iscValue = getTaxTotalValue2(invoiceType.getTransaccion().getTransaccionImpuestosList(), IUBLConfig.TAX_TOTAL_ISC_ID);
+            BigDecimal iscValue = getTaxTotalValue2(invoiceType.getTransaccion().getTransactionImpuestosDTOList(), IUBLConfig.TAX_TOTAL_ISC_ID);
             invoiceObj.setIscValue(getCurrency(iscValue, currencyCode));
 
             Optional<LineExtensionAmountType> optional = Optional.ofNullable(invoiceType.getInvoiceType().getLegalMonetaryTotal().getLineExtensionAmount());
@@ -1056,7 +1140,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 invoiceObj.setAmountValue(getCurrency(BigDecimal.ZERO, currencyCode));
             }
             BigDecimal descuento = null;
-            Transaccion transaccion = invoiceType.getTransaccion();
+            TransacctionDTO transaccion = invoiceType.getTransaccion();
             BigDecimal docDescuentoTotal = transaccion.getDOC_Descuento();
             if (BigDecimal.ZERO.compareTo(docDescuentoTotal) != 0) {
                 descuento = docDescuentoTotal.setScale(IUBLConfig.DECIMAL_MONETARYTOTAL_PAYABLEAMOUNT, RoundingMode.HALF_UP);
@@ -1069,16 +1153,16 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             BigDecimal payableAmount = invoiceType.getInvoiceType().getLegalMonetaryTotal().getPayableAmount().getValue();
             invoiceObj.setTotalAmountValue(getCurrency(payableAmount, currencyCode));
 
-            BigDecimal gravadaAmount = getTransaccionTotales(invoiceType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1001);
+            BigDecimal gravadaAmount = getTransaccionTotales(invoiceType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1001);
             invoiceObj.setGravadaAmountValue(getCurrency(gravadaAmount, currencyCode));
 
-            BigDecimal inafectaAmount = getTransaccionTotales(invoiceType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1002);
+            BigDecimal inafectaAmount = getTransaccionTotales(invoiceType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1002);
             invoiceObj.setInafectaAmountValue(getCurrency(inafectaAmount, currencyCode));
 
-            BigDecimal exoneradaAmount = getTransaccionTotales(invoiceType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1003);
+            BigDecimal exoneradaAmount = getTransaccionTotales(invoiceType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1003);
             invoiceObj.setExoneradaAmountValue(getCurrency(exoneradaAmount, currencyCode));
 
-            BigDecimal gratuitaAmount = getTransaccionTotales(invoiceType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
+            BigDecimal gratuitaAmount = getTransaccionTotales(invoiceType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
             if (!gratuitaAmount.equals(BigDecimal.ZERO)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("generateInvoicePDF() [" + this.docUUID + "] Existe Op. Gratuitas.");
@@ -1178,7 +1262,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
         return invoiceInBytes;
     } // generateInvoicePDF
 
-    public byte[] generateDebitNotePDF(UBLDocumentWRP debitNoteType, List<TransaccionTotales> transactionTotalList, ConfigData configData) throws PDFReportException {
+    public byte[] generateDebitNotePDF(UBLDocumentWRP debitNoteType, List<TransactionTotalesDTO> transactionTotalList, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
             logger.debug("+generateDebitNotePDF() [" + this.docUUID + "]");
         }
@@ -1235,7 +1319,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             debitNoteObj.setTypeOfDebitNote(debitNoteType.getTransaccion().getREFDOC_MotivCode());
             debitNoteObj.setDescOfDebitNote(debitNoteType.getDebitNoteType().getDiscrepancyResponse().get(0).getDescription().get(0).getValue().toUpperCase());
             debitNoteObj.setDocumentReferenceToCn(getDocumentReferenceValue(debitNoteType.getDebitNoteType().getBillingReference().get(0)));
-            debitNoteObj.setDateDocumentReference(debitNoteType.getTransaccion().getFechaDOCRef());
+            debitNoteObj.setDateDocumentReference(debitNoteType.getTransaccion().getFechaDOCRe());
 
             if (logger.isDebugEnabled()) {
                 logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
@@ -1255,40 +1339,55 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             debitNoteObj.setTelefono_1(debitNoteType.getTransaccion().getTelefono_1());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + debitNoteType.getTransaccion().getTransaccionContractdocrefList().size());
+                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + debitNoteType.getTransaccion().getTransactionContractDocRefListDTOS().size());
             }
-            if (null != debitNoteType.getTransaccion().getTransaccionContractdocrefList() && 0 < debitNoteType.getTransaccion().getTransaccionContractdocrefList().size()) {
+            if (null != debitNoteType.getTransaccion().getTransactionContractDocRefListDTOS()
+                    && 0 < debitNoteType.getTransaccion().getTransactionContractDocRefListDTOS().size()) {
                 Map<String, String> hashedMap = new HashMap<>();
-                for (int i = 0; i < debitNoteType.getTransaccion().getTransaccionContractdocrefList().size(); i++) {
-                    hashedMap.put(debitNoteType.getTransaccion().getTransaccionContractdocrefList().get(i).getUsuariocampos().getNombre(), debitNoteType.getTransaccion().getTransaccionContractdocrefList().get(i).getValor());
+                List<Map<String, String>> contractDocRefs = debitNoteType.getTransaccion().getTransactionContractDocRefListDTOS();
+
+                for (Map<String, String> contractDocRefMap : contractDocRefs) {
+                    // Asumimos que cada mapa en la lista contiene pares clave-valor para el nombre del campo y el valor
+                    hashedMap.putAll(contractDocRefMap);
                 }
+
                 debitNoteObj.setInvoicePersonalizacion(hashedMap);
             }
 
             List<WrapperItemObject> listaItem = new ArrayList<>();
 
-            for (int i = 0; i < debitNoteType.getTransaccion().getTransaccionLineasList().size(); i++) {
+            for (int i = 0; i < debitNoteType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Agregando datos al HashMap" + debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
+                    logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Agregando datos al HashMap");
                 }
+
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
                 List<String> newlist = new ArrayList<>();
-                for (int j = 0; j < debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size(); j++) {
+
+                // Obtener el mapa de transaccionLineasCamposUsuario
+                Map<String, String> camposUsuarioMap = debitNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransaccionLineasCamposUsuario();
+
+                // Iterar sobre las entradas del mapa
+                for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
+                    String nombreCampo = entry.getKey();
+                    String valorCampo = entry.getValue();
+
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
+                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
                     }
-                    itemObjectHash.put(debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre(), debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
-                    newlist.add(debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
+
+                    itemObjectHash.put(nombreCampo, valorCampo);
+                    newlist.add(valorCampo);
+
                     if (logger.isDebugEnabled()) {
                         logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
                     }
-
                 }
+
                 itemObject.setLstItemHashMap(itemObjectHash);
                 itemObject.setLstDinamicaItem(newlist);
                 listaItem.add(itemObject);
-
             }
 
             debitNoteObj.setItemsListDynamic(listaItem);
@@ -1341,7 +1440,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             BigDecimal subtotalValue = getSubtotalValueFromTransaction(transactionTotalList, debitNoteObj.getDocumentIdentifier());
 //
             debitNoteObj.setSubtotalValue(getCurrency(subtotalValue, currencyCode));
-            BigDecimal igvValue = getTaxTotalValue2(debitNoteType.getTransaccion().getTransaccionImpuestosList(), IUBLConfig.TAX_TOTAL_IGV_ID);
+            BigDecimal igvValue = getTaxTotalValue2(debitNoteType.getTransaccion().getTransactionImpuestosDTOList(), IUBLConfig.TAX_TOTAL_IGV_ID);
 
             debitNoteObj.setIgvValue(getCurrency(igvValue, currencyCode));
 
@@ -1354,12 +1453,12 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             BigDecimal percepctionAmount = null;
             BigDecimal perceptionPercentage = null;
-            for (int i = 0; i < debitNoteType.getTransaccion().getTransaccionTotalesList().size(); i++) {
-                if (debitNoteType.getTransaccion().getTransaccionTotalesList().get(i).getTransaccionTotalesPK().getId().equalsIgnoreCase("2001")) {
-                    percepctionAmount = debitNoteType.getTransaccion().getTransaccionTotalesList().get(i).getMonto();
-                    perceptionPercentage = debitNoteType.getTransaccion().getTransaccionTotalesList().get(i).getPrcnt();
-                    debitNoteObj.setPerceptionAmount(debitNoteType.getDebitNoteType().getDocumentCurrencyCode().getValue() + " " + debitNoteType.getTransaccion().getTransaccionTotalesList().get(i).getMonto().toString());
-                    debitNoteObj.setPerceptionPercentage(debitNoteType.getTransaccion().getTransaccionTotalesList().get(i).getPrcnt().toString() + "%");
+            for (int i = 0; i < debitNoteType.getTransaccion().getTransactionTotalesDTOList().size(); i++) {
+                if (debitNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getId().equalsIgnoreCase("2001")) {
+                    percepctionAmount = debitNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getMonto();
+                    perceptionPercentage = debitNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getPrcnt();
+                    debitNoteObj.setPerceptionAmount(debitNoteType.getDebitNoteType().getDocumentCurrencyCode().getValue() + " " + debitNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getMonto().toString());
+                    debitNoteObj.setPerceptionPercentage(debitNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getPrcnt().toString() + "%");
                 }
             }
 
@@ -1368,11 +1467,11 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             BigDecimal retentionpercentage = null;
 
-            for (int i = 0; i < debitNoteType.getTransaccion().getTransaccionLineasList().size(); i++) {
-                for (int j = 0; j < debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().size(); j++) {
-                    if (debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
-                        debitNoteObj.setISCPercetange(debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getPorcentaje().setScale(1, BigDecimal.ROUND_HALF_UP).toString());
-                        retentionpercentage = debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getPorcentaje();
+            for (int i = 0; i < debitNoteType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
+                for (int j = 0; j < debitNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().size(); j++) {
+                    if (debitNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
+                        debitNoteObj.setISCPercetange(debitNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje().setScale(1, BigDecimal.ROUND_HALF_UP).toString());
+                        retentionpercentage = debitNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje();
                         break;
                     }
                 }
@@ -1398,16 +1497,16 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             BigDecimal payableAmount = debitNoteType.getDebitNoteType().getRequestedMonetaryTotal().getPayableAmount().getValue();
             debitNoteObj.setTotalAmountValue(getCurrency(payableAmount, currencyCode));
 
-            BigDecimal gravadaAmount = getTransaccionTotales(debitNoteType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1001);
+            BigDecimal gravadaAmount = getTransaccionTotales(debitNoteType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1001);
             debitNoteObj.setGravadaAmountValue(getCurrency(gravadaAmount, currencyCode));
 
-            BigDecimal inafectaAmount = getTransaccionTotales(debitNoteType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1002);
+            BigDecimal inafectaAmount = getTransaccionTotales(debitNoteType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1002);
             debitNoteObj.setInafectaAmountValue(getCurrency(inafectaAmount, currencyCode));
 
-            BigDecimal exoneradaAmount = getTransaccionTotales(debitNoteType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1003);
+            BigDecimal exoneradaAmount = getTransaccionTotales(debitNoteType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1003);
             debitNoteObj.setExoneradaAmountValue(getCurrency(exoneradaAmount, currencyCode));
 
-            BigDecimal gratuitaAmount = getTransaccionTotales(debitNoteType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
+            BigDecimal gratuitaAmount = getTransaccionTotales(debitNoteType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
             if (!gratuitaAmount.equals(BigDecimal.ZERO)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Existe Op. Gratuitas.");
@@ -1501,7 +1600,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
         return debitNoteInBytes;
     } // generateDebitNotePDF
 
-    public byte[] generateCreditNotePDF(UBLDocumentWRP creditNoteType, List<TransaccionTotales> transaccionTotales, ConfigData configData) throws PDFReportException {
+    public byte[] generateCreditNotePDF(UBLDocumentWRP creditNoteType, List<TransactionTotalesDTO> transaccionTotales, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
             logger.debug("+generateCreditNotePDF() [" + this.docUUID + "]");
         }
@@ -1523,9 +1622,9 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (null != creditNoteType.getCreditNoteType().getNote() && 0 < creditNoteType.getCreditNoteType().getNote().size()) {
-                creditNoteObj.setDueDate(formatDueDate(creditNoteType.getTransaccion().getDOC_FechaVencimiento()));
+                creditNoteObj.setDueDate(formatDueDate(DateUtil.parseDate(creditNoteType.getTransaccion().getDOC_FechaVencimiento())));
             } else {
-                creditNoteObj.setDueDate(formatDueDate(creditNoteType.getTransaccion().getDOC_FechaVencimiento()));
+                creditNoteObj.setDueDate(formatDueDate(DateUtil.parseDate(creditNoteType.getTransaccion().getDOC_FechaVencimiento())));
             }
 
             /* Informacion de SUNATTransaction */
@@ -1551,23 +1650,30 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             if (logger.isInfoEnabled()) {
                 logger.info("generateCreditNotePDF() [" + this.docUUID + "]============= remision");
             }
-            creditNoteObj.setDateDocumentReference(creditNoteType.getTransaccion().getFechaDOCRef());
+            creditNoteObj.setDateDocumentReference(creditNoteType.getTransaccion().getFechaDOCRe());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + creditNoteType.getTransaccion().getTransaccionContractdocrefList().size());
+                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + creditNoteType.getTransaccion().getTransactionContractDocRefListDTOS().size());
             }
-            if (null != creditNoteType.getTransaccion().getTransaccionContractdocrefList() && 0 < creditNoteType.getTransaccion().getTransaccionContractdocrefList().size()) {
-                Map<String, String> hashedMap = new HashMap<String, String>();
-                for (int i = 0; i < creditNoteType.getTransaccion().getTransaccionContractdocrefList().size(); i++) {
-                    hashedMap.put(creditNoteType.getTransaccion().getTransaccionContractdocrefList().get(i).getUsuariocampos().getNombre(), creditNoteType.getTransaccion().getTransaccionContractdocrefList().get(i).getValor());
+            if (creditNoteType.getTransaccion().getTransactionContractDocRefListDTOS() != null
+                    && !creditNoteType.getTransaccion().getTransactionContractDocRefListDTOS().isEmpty()) {
+
+                Map<String, String> hashedMap = new HashMap<>();
+
+                for (Map<String, String> map : creditNoteType.getTransaccion().getTransactionContractDocRefListDTOS()) {
+                    // Asumiendo que cada mapa contiene un único par clave-valor
+                    for (Map.Entry<String, String> entry : map.entrySet()) {
+                        hashedMap.put(entry.getKey(), entry.getValue());
+                    }
                 }
+
                 creditNoteObj.setInvoicePersonalizacion(hashedMap);
             }
             // Cuotas
 
             List<WrapperItemObject> listaItemC = new ArrayList<>();
 
-            List<TransaccionCuotas> transaccionCuotas = creditNoteType.getTransaccion().getTransaccionCuotas();
+            List<TransactionCuotasDTO> transaccionCuotas = creditNoteType.getTransaccion().getTransactionCuotasDTOList();
 
             DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -1582,7 +1688,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             String f1 = "", f2 = "", f3 = "";
             String c1 = "", c2 = "", c3 = "";
 
-            for (TransaccionCuotas transaccionCuota : transaccionCuotas) {
+            for (TransactionCuotasDTO transaccionCuota : transaccionCuotas) {
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
                 List<String> newlist = new ArrayList<>();
@@ -1648,28 +1754,38 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
 
-            for (int i = 0; i < creditNoteType.getTransaccion().getTransaccionLineasList().size(); i++) {
+            for (int i = 0; i < creditNoteType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Agregando datos al HashMap" + creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
+                    logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Agregando datos al HashMap");
                 }
+
                 WrapperItemObject itemObject = new WrapperItemObject();
-                Map<String, String> itemObjectHash = new HashMap<String, String>();
-                List<String> newlist = new ArrayList<String>();
-                for (int j = 0; j < creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size(); j++) {
+                Map<String, String> itemObjectHash = new HashMap<>();
+                List<String> newlist = new ArrayList<>();
+
+                // Obtener el mapa de transaccionLineasCamposUsuario
+                Map<String, String> camposUsuarioMap = creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransaccionLineasCamposUsuario();
+
+                // Iterar sobre las entradas del mapa
+                for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
+                    String nombreCampo = entry.getKey();
+                    String valorCampo = entry.getValue();
+
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
+                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
                     }
-                    itemObjectHash.put(creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre(), creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
-                    newlist.add(creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
+
+                    itemObjectHash.put(nombreCampo, valorCampo);
+                    newlist.add(valorCampo);
+
                     if (logger.isDebugEnabled()) {
                         logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
                     }
-
                 }
+
                 itemObject.setLstItemHashMap(itemObjectHash);
                 itemObject.setLstDinamicaItem(newlist);
                 listaItem.add(itemObject);
-
             }
 
             creditNoteObj.setItemsListDynamic(listaItem);
@@ -1741,12 +1857,12 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             BigDecimal percepctionAmount = null;
             BigDecimal perceptionPercentage = null;
-            for (int i = 0; i < creditNoteType.getTransaccion().getTransaccionTotalesList().size(); i++) {
-                if (creditNoteType.getTransaccion().getTransaccionTotalesList().get(i).getTransaccionTotalesPK().getId().equalsIgnoreCase("2001")) {
-                    percepctionAmount = creditNoteType.getTransaccion().getTransaccionTotalesList().get(i).getMonto();
-                    perceptionPercentage = creditNoteType.getTransaccion().getTransaccionTotalesList().get(i).getPrcnt();
-                    creditNoteObj.setPerceptionAmount(creditNoteType.getCreditNoteType().getDocumentCurrencyCode().getValue() + " " + creditNoteType.getTransaccion().getTransaccionTotalesList().get(i).getMonto().toString());
-                    creditNoteObj.setPerceptionPercentage(creditNoteType.getTransaccion().getTransaccionTotalesList().get(i).getPrcnt().toString() + "%");
+            for (int i = 0; i < creditNoteType.getTransaccion().getTransactionTotalesDTOList().size(); i++) {
+                if (creditNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getId().equalsIgnoreCase("2001")) {
+                    percepctionAmount = creditNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getMonto();
+                    perceptionPercentage = creditNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getPrcnt();
+                    creditNoteObj.setPerceptionAmount(creditNoteType.getCreditNoteType().getDocumentCurrencyCode().getValue() + " " + creditNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getMonto().toString());
+                    creditNoteObj.setPerceptionPercentage(creditNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getPrcnt().toString() + "%");
                 }
             }
 
@@ -1755,11 +1871,11 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             BigDecimal retentionpercentage = null;
 
-            for (int i = 0; i < creditNoteType.getTransaccion().getTransaccionLineasList().size(); i++) {
-                for (int j = 0; j < creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().size(); j++) {
-                    if (creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
-                        creditNoteObj.setISCPercetange(creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getPorcentaje().setScale(1, BigDecimal.ROUND_HALF_UP).toString());
-                        retentionpercentage = creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineaImpuestosList().get(j).getPorcentaje();
+            for (int i = 0; i < creditNoteType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
+                for (int j = 0; j < creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().size(); j++) {
+                    if (creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
+                        creditNoteObj.setISCPercetange(creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje().setScale(1, BigDecimal.ROUND_HALF_UP).toString());
+                        retentionpercentage = creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje();
                         break;
                     }
                 }
@@ -1804,7 +1920,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             BigDecimal subtotalValue = getSubtotalValueFromTransaction(transaccionTotales, creditNoteObj.getDocumentIdentifier());
             creditNoteObj.setSubtotalValue(getCurrency(subtotalValue, currencyCode));
-            BigDecimal igvValue = getTaxTotalValue2(creditNoteType.getTransaccion().getTransaccionImpuestosList(), IUBLConfig.TAX_TOTAL_IGV_ID);
+            BigDecimal igvValue = getTaxTotalValue2(creditNoteType.getTransaccion().getTransactionImpuestosDTOList(), IUBLConfig.TAX_TOTAL_IGV_ID);
 
             creditNoteObj.setIgvValue(getCurrency(igvValue, currencyCode));
 
@@ -1825,16 +1941,16 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             BigDecimal payableAmount = creditNoteType.getCreditNoteType().getLegalMonetaryTotal().getPayableAmount().getValue();
             creditNoteObj.setTotalAmountValue(getCurrency(payableAmount, currencyCode));
 
-            BigDecimal gravadaAmount = getTransaccionTotales(creditNoteType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1001);
+            BigDecimal gravadaAmount = getTransaccionTotales(creditNoteType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1001);
             creditNoteObj.setGravadaAmountValue(getCurrency(gravadaAmount, currencyCode));
 
-            BigDecimal inafectaAmount = getTransaccionTotales(creditNoteType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1002);
+            BigDecimal inafectaAmount = getTransaccionTotales(creditNoteType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1002);
             creditNoteObj.setInafectaAmountValue(getCurrency(inafectaAmount, currencyCode));
 
-            BigDecimal exoneradaAmount = getTransaccionTotales(creditNoteType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1003);
+            BigDecimal exoneradaAmount = getTransaccionTotales(creditNoteType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1003);
             creditNoteObj.setExoneradaAmountValue(getCurrency(exoneradaAmount, currencyCode));
 
-            BigDecimal gratuitaAmount = getTransaccionTotales(creditNoteType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
+            BigDecimal gratuitaAmount = getTransaccionTotales(creditNoteType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
             if (!gratuitaAmount.equals(BigDecimal.ZERO)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Existe Op. Gratuitas.");
@@ -1944,72 +2060,90 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             if (logger.isDebugEnabled()) {
                 logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
             }
-            despatchAdviceObject.setCodigoEmbarque(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getCodigoPuerto());
-            despatchAdviceObject.setCodigoMotivoTraslado(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getCodigoMotivo());
-            despatchAdviceObject.setDescripcionMotivoTraslado(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getDescripcionMotivo());
+            despatchAdviceObject.setCodigoEmbarque(despatchAdvice.getTransaccion().getTransactionGuias().getCodigoPuerto());
+            despatchAdviceObject.setCodigoMotivoTraslado(despatchAdvice.getTransaccion().getTransactionGuias().getCodigoMotivo());
+            despatchAdviceObject.setDescripcionMotivoTraslado(despatchAdvice.getTransaccion().getTransactionGuias().getDescripcionMotivo());
             despatchAdviceObject.setDireccionDestino(despatchAdvice.getTransaccion().getSN_DIR_Direccion());
-            despatchAdviceObject.setDireccionPartida(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getDireccionPartida());
-            despatchAdviceObject.setDocumentoConductor(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getDocumentoConductor());
+            despatchAdviceObject.setDireccionPartida(despatchAdvice.getTransaccion().getTransactionGuias().getDireccionPartida());
+            despatchAdviceObject.setDocumentoConductor(despatchAdvice.getTransaccion().getTransactionGuias().getDocumentoConductor());
             DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
             String fechaEmision = format.format(despatchAdvice.getTransaccion().getDOC_FechaEmision());
             despatchAdviceObject.setFechaEmision(fechaEmision);
-            String fechaInicioTraslado = format.format(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getFechaInicioTraslado());
+            String fechaInicioTraslado = format.format(despatchAdvice.getTransaccion().getTransactionGuias().getFechaInicioTraslado());
             despatchAdviceObject.setFechaTraslado(fechaInicioTraslado);
-            despatchAdviceObject.setModalidadTraslado(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getModalidadTraslado());
+            despatchAdviceObject.setModalidadTraslado(despatchAdvice.getTransaccion().getTransactionGuias().getModalidadTraslado());
             despatchAdviceObject.setNombreConsumidor(despatchAdvice.getTransaccion().getSN_RazonSocial());
             despatchAdviceObject.setNombreEmisor(despatchAdvice.getTransaccion().getRazonSocial());
-            despatchAdviceObject.setNumeroBultos(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getNumeroBultos());
-            despatchAdviceObject.setNumeroContenedor(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getNumeroContenedor());
+            despatchAdviceObject.setNumeroBultos(despatchAdvice.getTransaccion().getTransactionGuias().getNumeroBultos());
+            despatchAdviceObject.setNumeroContenedor(despatchAdvice.getTransaccion().getTransactionGuias().getNumeroContenedor());
             despatchAdviceObject.setNumeroGuia(despatchAdvice.getTransaccion().getDOC_Serie() + "-" + despatchAdvice.getTransaccion().getDOC_Numero());
-            despatchAdviceObject.setObervaciones(despatchAdvice.getTransaccion().getObservaciones());
-            despatchAdviceObject.setPesoBruto(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getPeso());
-            despatchAdviceObject.setTipoDocumentoConductor(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getTipoDocConductor());
-            despatchAdviceObject.setTipoDocumentoTransportista(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getTipoDOCTransportista());
-            despatchAdviceObject.setUMPesoBruto(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getUnidadMedida());
+            despatchAdviceObject.setObervaciones(despatchAdvice.getTransaccion().getObservacione());
+            despatchAdviceObject.setPesoBruto(despatchAdvice.getTransaccion().getTransactionGuias().getPeso());
+            despatchAdviceObject.setTipoDocumentoConductor(despatchAdvice.getTransaccion().getTransactionGuias().getTipoDocConductor());
+            despatchAdviceObject.setTipoDocumentoTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getTipoDOCTransportista());
+            despatchAdviceObject.setUMPesoBruto(despatchAdvice.getTransaccion().getTransactionGuias().getUnidadMedida());
             despatchAdviceObject.setNumeroDocConsumidor(despatchAdvice.getTransaccion().getSN_DocIdentidad_Nro());
             despatchAdviceObject.setNumeroDocEmisor(despatchAdvice.getTransaccion().getDocIdentidad_Nro());
 
-            if (despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getModalidadTraslado().equalsIgnoreCase("01")) {
-                despatchAdviceObject.setPlacaVehiculo(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getPlacaVehiculo());
-                despatchAdviceObject.setLicenciaConducir(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getLicenciaConducir());
-                despatchAdviceObject.setRUCTransportista(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getRUCTransporista());
-                despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getNombreRazonTransportista());
+            if (despatchAdvice.getTransaccion().getTransactionGuias().getModalidadTraslado().equalsIgnoreCase("01")) {
+                despatchAdviceObject.setPlacaVehiculo(despatchAdvice.getTransaccion().getTransactionGuias().getPlacaVehiculo());
+                despatchAdviceObject.setLicenciaConducir(despatchAdvice.getTransaccion().getTransactionGuias().getLicenciaConductor());
+                despatchAdviceObject.setRUCTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getRUCTransporista());
+                despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getNombreRazonTransportista());
             } else {
-                despatchAdviceObject.setRUCTransportista(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getRUCTransporista());
-                despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getNombreRazonTransportista());
+                despatchAdviceObject.setRUCTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getRUCTransporista());
+                despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getNombreRazonTransportista());
             }
 
             List<WrapperItemObject> listaItem = new ArrayList<>();
 
-            for (int i = 0; i < despatchAdvice.getTransaccion().getTransaccionLineasList().size(); i++) {
+            for (int i = 0; i < despatchAdvice.getTransaccion().getTransactionLineasDTOList().size(); i++) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Agregando datos al HashMap" + despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
+                    logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Agregando datos al HashMap");
                 }
+
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
                 List<String> newlist = new ArrayList<>();
-                for (int j = 0; j < despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size(); j++) {
+
+                // Obtener el mapa de transaccionLineasCamposUsuario
+                Map<String, String> camposUsuarioMap = despatchAdvice.getTransaccion().getTransactionLineasDTOList().get(i).getTransaccionLineasCamposUsuario();
+
+                // Iterar sobre las entradas del mapa
+                for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
+                    String nombreCampo = entry.getKey();
+                    String valorCampo = entry.getValue();
+
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
-                    }
-                    itemObjectHash.put(despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre(), despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
-                    newlist.add(despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
+                        logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
                     }
 
+                    itemObjectHash.put(nombreCampo, valorCampo);
+                    newlist.add(valorCampo);
+
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
+                    }
                 }
+
                 itemObject.setLstItemHashMap(itemObjectHash);
                 itemObject.setLstDinamicaItem(newlist);
                 listaItem.add(itemObject);
-
             }
 
-            if (null != despatchAdvice.getTransaccion().getTransaccionContractdocrefList() && 0 < despatchAdvice.getTransaccion().getTransaccionContractdocrefList().size()) {
-                Map<String, String> hashedMap = new HashMap<String, String>();
-                for (int i = 0; i < despatchAdvice.getTransaccion().getTransaccionContractdocrefList().size(); i++) {
-                    hashedMap.put(despatchAdvice.getTransaccion().getTransaccionContractdocrefList().get(i).getUsuariocampos().getNombre(), despatchAdvice.getTransaccion().getTransaccionContractdocrefList().get(i).getValor());
+            if (despatchAdvice.getTransaccion().getTransactionContractDocRefListDTOS() != null
+                    && !despatchAdvice.getTransaccion().getTransactionContractDocRefListDTOS().isEmpty()) {
+
+                Map<String, String> hashedMap = new HashMap<>();
+
+                // Iterar sobre cada mapa en la lista
+                for (Map<String, String> map : despatchAdvice.getTransaccion().getTransactionContractDocRefListDTOS()) {
+                    // Asumimos que cada mapa contiene un único par clave-valor
+                    for (Map.Entry<String, String> entry : map.entrySet()) {
+                        hashedMap.put(entry.getKey(), entry.getValue());
+                    }
                 }
+
                 despatchAdviceObject.setDespatchAdvicePersonalizacion(hashedMap);
             }
 
@@ -2019,7 +2153,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             despatchAdviceObject.setTelefono1(despatchAdvice.getTransaccion().getTelefono_1());
             despatchAdviceObject.setEmail(despatchAdvice.getTransaccion().getEMail());
             despatchAdviceObject.setPaginaWeb(despatchAdvice.getTransaccion().getWeb());
-            despatchAdviceObject.setObervaciones(despatchAdvice.getTransaccion().getObservaciones());
+            despatchAdviceObject.setObervaciones(despatchAdvice.getTransaccion().getObservacione());
             despatchAdviceObject.setItemListDynamic(listaItem);
 
             for (int i = 0; i < despatchAdviceObject.getItemListDynamic().size(); i++) {
@@ -2079,11 +2213,11 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
         return despatchInBytes;
     }
 
-    private BigDecimal getSubtotalValueFromTransaction(List<TransaccionTotales> transactionTotalList, String identifier) throws UBLDocumentException {
+    private BigDecimal getSubtotalValueFromTransaction(List<TransactionTotalesDTO> transactionTotalList, String identifier) throws UBLDocumentException {
         if (null != transactionTotalList && !transactionTotalList.isEmpty()) {
             BigDecimal subtotal = BigDecimal.ZERO;
-            for (TransaccionTotales transaccionTotal : transactionTotalList) {
-                if (Objects.equals("1005", transaccionTotal.getTransaccionTotalesPK().getId())) {
+            for (TransactionTotalesDTO transaccionTotal : transactionTotalList) {
+                if (Objects.equals("1005", transaccionTotal.getId())) {
                     subtotal = transaccionTotal.getMonto();
                     break;
                 }
@@ -2136,23 +2270,46 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             perceptionObj.setPerceptionItems(getPerceptionItems(perceptionType.getPerceptionType().getSunatPerceptionDocumentReference(), new BigDecimal(perceptionType.getPerceptionType().getSunatPerceptionPercent().getValue())));
             List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
-            for (int i = 0; i < perceptionType.getTransaccion().getTransaccionComprobantePagoList().size(); i++) {
+            for (int i = 0; i < perceptionType.getTransaccion().getTransactionComprobantesDTOList().size(); i++) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Agregando datos al HashMap" + perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().size());
+                    logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Agregando datos al HashMap" + perceptionType.getTransaccion().getTransactionComprobantesDTOList().size());
                 }
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<String, String>();
                 List<String> newlist = new ArrayList<String>();
-                for (int j = 0; j < perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().size(); j++) {
+                /*for (int j = 0; j < perceptionType.getTransaccion().getTransactionComprobantesDTOList().size(); j++) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Extrayendo Campos " + perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre());
+                        logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Extrayendo Campos " + perceptionType.getTransaccion().getTransactionComprobantesDTOList().get(i));
                     }
                     itemObjectHash.put(perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre(), perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());
                     newlist.add(perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());
                     if (logger.isDebugEnabled()) {
                         logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
                     }
+                }*/
+                for (TransactionComprobantesDTO comprobantesDTO : perceptionType.getTransaccion().getTransactionComprobantesDTOList()) {
+                    // Obtener todas las variables del objeto TransactionComprobantesDTO
+                    Field[] fields = comprobantesDTO.getClass().getDeclaredFields();
+
+                    // Iterar sobre cada campo
+                    for (Field field : fields) {
+                        field.setAccessible(true); // Asegurarse de que el campo es accesible
+
+                        try {
+                            // Obtener el nombre del campo y su valor
+                            String nombreCampo = field.getName();
+                            Object valorCampo = field.get(comprobantesDTO);
+
+                            // Añadir el nombre y el valor al HashMap, convirtiendo el valor a String
+                            if (valorCampo != null) {
+                                itemObjectHash.put(nombreCampo, valorCampo.toString());
+                            }
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
+
                 itemObject.setLstItemHashMap(itemObjectHash);
                 itemObject.setLstDinamicaItem(newlist);
                 listaItem.add(itemObject);
@@ -2172,9 +2329,9 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
             }
             perceptionType.getTransaccion();
-            for (int i = 0; i < perceptionType.getTransaccion().getTransaccionPropiedadesList().size(); i++) {
-                if (perceptionType.getTransaccion().getTransaccionPropiedadesList().get(i).getTransaccionPropiedadesPK().getId().equalsIgnoreCase("1000")) {
-                    perceptionObj.setLetterAmountValue(perceptionType.getTransaccion().getTransaccionPropiedadesList().get(i).getValor());
+            for (int i = 0; i < perceptionType.getTransaccion().getTransactionPropertiesDTOList().size(); i++) {
+                if (perceptionType.getTransaccion().getTransactionPropertiesDTOList().get(i).getId().equalsIgnoreCase("1000")) {
+                    perceptionObj.setLetterAmountValue(perceptionType.getTransaccion().getTransactionPropertiesDTOList().get(i).getValor());
                 }
 
             }
@@ -2209,7 +2366,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             // perceptionObj.setLegends(getLegendList(legendsMap));
 
             perceptionObj.setResolutionCodeValue(this.resolutionCode);
-            perceptionObj.setImporteTexto(perceptionType.getTransaccion().getTransaccionPropiedadesList().get(0).getValor());
+            perceptionObj.setImporteTexto(perceptionType.getTransaccion().getTransactionPropertiesDTOList().get(0).getValor());
 
             /*
              * Generando el PDF de la FACTURA con la informacion recopilada.
