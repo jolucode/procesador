@@ -56,9 +56,7 @@ public class CloudService implements CloudInterface {
         try {
             Gson gson = new Gson();
             transacctionDTO = gson.fromJson(updatedJson, TransacctionDTO[].class);
-            for (int i = 0; i < transacctionDTO.length; i++) {
-                responseProcesor = procesarTransaccion(transacctionDTO[i], updatedJson);
-            }
+            responseProcesor = procesarTransaccion(transacctionDTO[0], updatedJson);
         } catch (Exception e) {
             logger.info("SE GENERO UN ERROR : " + e.getMessage());
         }
@@ -81,7 +79,7 @@ public class CloudService implements CloudInterface {
             TransaccionRespuesta tr = EnviarTransaccion(transaccion);
             OnPremiseImpl clientHanaService = new OnPremiseImpl();
             request = generateDataRequestHana(transaccion, tr);
-            //clientHanaService.anexarDocumentos(request);
+            clientHanaService.anexarDocumentos(request);
             logger.info("Ruc: " + request.getRuc() + " DocObject: " + request.getDocObject() + " DocEntry: " + request.getDocEntry());
             logger.info("Nombre Documento: " + request.getDocumentName());
 

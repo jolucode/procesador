@@ -299,16 +299,25 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                     try {
                         Object value = field.get(transaccion);
                         if (value != null) {
-                            itemObjectHash.put(field.getName(), value.toString());
+                            String fieldName = field.getName();
+
+                            // Si el nombre del campo comienza con "U_", corta los dos primeros caracteres
+                            if (fieldName.startsWith("U_")) {
+                                String newName = fieldName.substring(2);
+                                itemObjectHash.put(newName, value.toString());
+                            } else {
+                                itemObjectHash.put(fieldName, value.toString());
+                            }
+
                             newlist.add(value.toString());
                         }
-                        if(field.getName().equals("DOC_FechaEmision"))
-                        {
+
+                        // Conversiones específicas para fechas
+                        if (field.getName().equals("DOC_FechaEmision")) {
                             itemObjectHash.put("DOC_FechaEmision", DateConverter.convertToDate(value));
                         }
 
-                        if(field.getName().equals("CP_Fecha"))
-                        {
+                        if (field.getName().equals("CP_Fecha")) {
                             itemObjectHash.put("CP_Fecha", DateConverter.convertToDate(value));
                         }
                     } catch (IllegalAccessException e) {

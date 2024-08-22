@@ -80,4 +80,4 @@ ventura:
         passwordSunatGuias: 'Ventu2023'
 
 server:
-  port: 8082
+  port: 8083
