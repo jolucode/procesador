@@ -12,13 +12,10 @@ import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
-import service.cloud.request.clientRequest.proxy.ose.object.StatusResponse;
 import service.cloud.request.clientRequest.prueba.Client;
 import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.LoggerTrans;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
-import service.cloud.request.clientRequest.ws.WSConsumer;
-import service.cloud.request.clientRequest.ws.WSConsumerConsult;
 import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.applicationresponse_2.ApplicationResponseType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.DocumentResponseType;
@@ -101,8 +98,8 @@ public class ProcessorBajaImpl implements ProcessorBajaInterface {
                 .build();
 
         /**Se crea un nuevo objeto WS Consumidor*/
-        WSConsumerConsult wsConsumer = WSConsumerConsult.newInstance(docUUID);
-        wsConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion);
+        //WSConsumerConsult wsConsumer = WSConsumerConsult.newInstance(docUUID);
+        //wsConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion);
 
         /**obtener ticket de base datos, para consultar cdr documento baja*/
         String ticket = transaction.getTicket_Baja();
@@ -118,14 +115,14 @@ public class ProcessorBajaImpl implements ProcessorBajaInterface {
 
         if (configuracion.getIntegracionWs().equals("OSE")) {
             System.out.println("Es OSE");
-            WSConsumer oseConsumer = WSConsumer.newInstance(transaction.getFE_Id());
-            oseConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion);
+            //WSConsumer oseConsumer = WSConsumer.newInstance(transaction.getFE_Id());
+            //oseConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion);
 
             /**envia ticket a sunat para consultar zip*/
-            StatusResponse response = oseConsumer.getStatus(ticket, configuracion);
+            //StatusResponse response = oseConsumer.getStatus(ticket, configuracion);
 
             /**precesa mensaje, cdr, y xml */
-            TransaccionRespuesta transaccionRespuesta = processOseResponseBAJA(response.getContent(), transaction, documentName, configuracion);
+            TransaccionRespuesta transaccionRespuesta = null ;//processOseResponseBAJA(response.getContent(), transaction, documentName, configuracion);
 
             if (Optional.ofNullable(transaccionRespuesta).isPresent()) {
                 return transaccionRespuesta;

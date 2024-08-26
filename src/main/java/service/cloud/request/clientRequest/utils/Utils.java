@@ -3,7 +3,6 @@ package service.cloud.request.clientRequest.utils;
 import org.apache.log4j.Logger;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
-import service.cloud.request.clientRequest.ws.WSConsumer;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;

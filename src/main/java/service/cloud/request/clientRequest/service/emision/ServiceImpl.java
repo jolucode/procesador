@@ -26,7 +26,8 @@ import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
 import service.cloud.request.clientRequest.mongo.model.LogDTO;
-import service.cloud.request.clientRequest.proxy.object.StatusResponse;
+import service.cloud.request.clientRequest.ose.IOSEClient;
+import service.cloud.request.clientRequest.ose.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.prueba.Client;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
@@ -37,9 +38,6 @@ import service.cloud.request.clientRequest.utils.LoggerTrans;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
 import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
-import service.cloud.request.clientRequest.ws.WSConsumer;
-import service.cloud.request.clientRequest.ws.WSConsumerConsult;
-import service.cloud.request.clientRequest.ws.WSConsumerNew;
 import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.applicationresponse_2.ApplicationResponseType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.DocumentResponseType;
@@ -95,6 +93,9 @@ public class ServiceImpl implements ServiceInterface {
 
     @Autowired
     DocumentFormatInterface documentFormatInterface;
+
+    @Autowired
+    IOSEClient ioseClient;
 
 
     @Override
@@ -210,8 +211,8 @@ public class ServiceImpl implements ServiceInterface {
         logger.info("Clave Sol: " + configuracion.getClaveSol());
 
         if (null != zipDocument) {
-            WSConsumerNew wsConsumer = WSConsumerNew.newInstance(this.docUUID);
-            wsConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion, fileHandler, doctype);
+            //WSConsumerNew wsConsumer = WSConsumerNew.newInstance(this.docUUID);
+            //wsConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion, fileHandler, doctype);
             LoggerTrans.getCDThreadLogger().log(Level.INFO, "[" + this.docUUID + "] Enviando WS sendSummary.");
 
 
@@ -219,7 +220,7 @@ public class ServiceImpl implements ServiceInterface {
                 /**Generacion ticket en caso no este se genera uno nuevo*/
                 String ticket = "";
                 if (transaction.getTicket_Baja() == null || transaction.getTicket_Baja().isEmpty()) {
-                    ticket = wsConsumer.sendSummary(zipDocument, documentName, configuracion);
+                    //ticket = wsConsumer.sendSummary(zipDocument, documentName, configuracion);
                     //transaction.getTicket_Baja(ticket);
                     //transaccionRepository.save(transaction);
                 } else {
@@ -228,14 +229,14 @@ public class ServiceImpl implements ServiceInterface {
 
                 /**Enviamos ticket a Sunat*/
                 if (configuracion.getIntegracionWs().equals("OSE")) {
-                    WSConsumer oseConsumer = WSConsumer.newInstance(transaction.getFE_Id());
-                    oseConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion);
+                    //WSConsumer oseConsumer = WSConsumer.newInstance(transaction.getFE_Id());
+                    //oseConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion);
 
                     /**envia ticket a sunat para consultar zip*/
-                    service.cloud.request.clientRequest.proxy.ose.object.StatusResponse response = oseConsumer.getStatus(ticket, configuracion);
-                    if (response.getContent() != null) {
-                        transactionResponse = processOseResponseBAJA(response.getContent(), transaction, fileHandler, documentName, configuracion);
-                    }
+                    //service.cloud.request.clientRequest.proxy.ose.object.StatusResponse response = oseConsumer.getStatus(ticket, configuracion);
+                    //if (response.getContent() != null) {
+                        transactionResponse = null;//processOseResponseBAJA(response.getContent(), transaction, fileHandler, documentName, configuracion);
+                   // }
                 }
                 transactionResponse.setTicketRest(ticket);
                 transactionResponse.setIdentificador(documentName);
@@ -584,19 +585,18 @@ public class ServiceImpl implements ServiceInterface {
 
         if (null != zipDocument) {
             if (transaction.getFE_Estado().equalsIgnoreCase("N")) {
-                WSConsumerNew wsConsumer = WSConsumerNew.newInstance(this.docUUID);
-                wsConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion, fileHandler, doctype);
+                //WSConsumerNew wsConsumer = WSConsumerNew.newInstance(this.docUUID);
+                //wsConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion, fileHandler, doctype);
                 Thread.sleep(50);
 
                 log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
-                Response response = wsConsumer.sendBill(zipDocument, documentName, configuracion);
+                //Response response = wsConsumer.sendBill(zipDocument, documentName, configuracion);
                 log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
 
-                if (null != response.getResponse()) {
+                /**if (null != response.getResponse()) {
                     log.setThirdPartyResponseXml(new String(response.getResponse(), StandardCharsets.UTF_8));
                     transactionResponse = processorCoreInterface.processCDRResponseV2(response.getResponse(), signedXmlDocument, documentWRP, transaction, configuracion);
 
-                    /**Metodo para guardar en disco los documentos*/
                     saveAllFiles(transactionResponse, documentName, attachmentPath);
 
                     log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
@@ -604,12 +604,12 @@ public class ServiceImpl implements ServiceInterface {
                     log.setThirdPartyResponseXml(response.getErrorMessage());
                     transactionResponse = processorCoreInterface.processResponseService(transaction, response);
                     logger.error("Error: " + transactionResponse.getMensaje());
-                }
+                }*/
 
             } else {
                 if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
-                    WSConsumerConsult wsConsumer = WSConsumerConsult.newInstance(this.docUUID);
-                    wsConsumer.setConfiguration(configuracion, transaction.getDocIdentidad_Nro());
+                    //WSConsumerConsult wsConsumer = WSConsumerConsult.newInstance(this.docUUID);
+                    //wsConsumer.setConfiguration(configuracion, transaction.getDocIdentidad_Nro());
 
                     String documentRuc = transaction.getDocIdentidad_Nro();
                     String documentType = transaction.getDOC_Codigo();
@@ -617,7 +617,7 @@ public class ServiceImpl implements ServiceInterface {
                     Integer documentNumber = Integer.valueOf(transaction.getDOC_Numero());
 
                     log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
-                    StatusResponse statusResponse = wsConsumer.getStatusCDR(documentRuc, documentType, documentSerie, documentNumber, configuracion);
+                    CdrStatusResponse statusResponse = ioseClient.getStatusCDR(documentRuc, documentType, documentSerie, documentNumber/*, configuracion*/);
                     log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
                     log.setThirdPartyResponseXml(new String(statusResponse.getContent(), StandardCharsets.UTF_8));
 
