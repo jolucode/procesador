@@ -22,7 +22,7 @@ public class SecuritySOAPHandler implements SOAPHandler<SOAPMessageContext>  {
 
     private boolean printOption;
 
-    public SecuritySOAPHandler(Consumer consumer, boolean printOption) {
+    public SecuritySOAPHandler(Consumer consumer) {
         this.consumer = consumer;
         this.printOption = printOption;
     }
