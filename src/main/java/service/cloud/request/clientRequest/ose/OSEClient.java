@@ -5,16 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.common.util.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
+import service.cloud.request.clientRequest.dto.finalClass.Response;
 import service.cloud.request.clientRequest.exception.ExceptionProxy;
 import service.cloud.request.clientRequest.ose.model.Consumer;
 import service.cloud.request.clientRequest.ose.model.CdrStatusResponse;
 
+import javax.activation.DataHandler;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 @Service
-public class OSEClient implements IOSEClient{
+public class OSEClient implements IOSEClient {
 
     private final Logger logger = Logger.getLogger(OSEClient.class);
 
@@ -36,10 +38,40 @@ public class OSEClient implements IOSEClient{
         }
     }
 
+
+    @Override
+    public byte[] sendBill(String fileName, DataHandler contentFile) throws Exception {
+        long initTime = System.currentTimeMillis();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("+sendBill() fileName[" + fileName + "], contentFile[" + contentFile + "]");
+        }
+        byte[] response = null;
+        try {
+            response = getSecurityPort().sendBill(fileName, contentFile);
+        } catch (SOAPFaultException e) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ExceptionProxy exceptionProxy = objectMapper.readValue(e.getFault().getDetail().getTextContent(), ExceptionProxy.class);
+            Response.builder()
+                    .errorCode(e.getMessage())
+                    .errorMessage(exceptionProxy.getDescripcion())
+                    .build();
+
+            System.out.println("Value");
+        }
+
+
+        return response;
+    }
+
     protected BillService getSecurityPort() throws JsonProcessingException {
-        final String BASE_URL = "https://ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl";
+        /*final String BASE_URL = "https://ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl";
         final String USERNAME = "20552572565";
-        final String PASSWORD = "DTkXyEZi6v";
+        final String PASSWORD = "DTkXyEZi6v";*/
+
+        final String BASE_URL = "https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl";
+        final String USERNAME = "20510910517";
+        final String PASSWORD = "20510910517";
 
         try {
             // Configuración del servicio
@@ -51,8 +83,8 @@ public class OSEClient implements IOSEClient{
             consumer.setPassword(PASSWORD);
 
             // Configuración del handler
-            //HeaderHandlerResolver handlerResolver = new HeaderHandlerResolver(consumer);
-            //service.setHandlerResolver(handlerResolver);
+            HeaderHandlerResolver handlerResolver = new HeaderHandlerResolver(consumer);
+            service.setHandlerResolver(handlerResolver);
 
             return service.getBillServicePort();
         } catch (MalformedURLException e) {
@@ -65,4 +97,5 @@ public class OSEClient implements IOSEClient{
             throw new RuntimeException("Error al configurar el servicio OSE.");
         }
     }
+
 }

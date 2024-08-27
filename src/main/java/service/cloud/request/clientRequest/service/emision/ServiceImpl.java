@@ -27,6 +27,7 @@ import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
 import service.cloud.request.clientRequest.mongo.model.LogDTO;
 import service.cloud.request.clientRequest.ose.IOSEClient;
+import service.cloud.request.clientRequest.ose.OSEClient;
 import service.cloud.request.clientRequest.ose.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.prueba.Client;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
@@ -96,6 +97,7 @@ public class ServiceImpl implements ServiceInterface {
 
     @Autowired
     IOSEClient ioseClient;
+
 
 
     @Override
@@ -593,18 +595,20 @@ public class ServiceImpl implements ServiceInterface {
                 //Response response = wsConsumer.sendBill(zipDocument, documentName, configuracion);
                 log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
 
-                /**if (null != response.getResponse()) {
-                    log.setThirdPartyResponseXml(new String(response.getResponse(), StandardCharsets.UTF_8));
-                    transactionResponse = processorCoreInterface.processCDRResponseV2(response.getResponse(), signedXmlDocument, documentWRP, transaction, configuracion);
+
+                byte[] emisionOse =  ioseClient.sendBill(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
+                if (/*null != response.getResponse()*/emisionOse != null) {
+                    //log.setThirdPartyResponseXml(new String(response.getResponse(), StandardCharsets.UTF_8));
+                    transactionResponse = processorCoreInterface.processCDRResponseV2(emisionOse/*response.getResponse()*/, signedXmlDocument, documentWRP, transaction, configuracion);
 
                     saveAllFiles(transactionResponse, documentName, attachmentPath);
 
                     log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
                 } else {
-                    log.setThirdPartyResponseXml(response.getErrorMessage());
-                    transactionResponse = processorCoreInterface.processResponseService(transaction, response);
+                    //log.setThirdPartyResponseXml(emisionOse/*response.getErrorMessage()*/);
+                    //transactionResponse = processorCoreInterface.processResponseService(transaction, response);
                     logger.error("Error: " + transactionResponse.getMensaje());
-                }*/
+                }
 
             } else {
                 if (transaction.getFE_Estado().equalsIgnoreCase("C")) {

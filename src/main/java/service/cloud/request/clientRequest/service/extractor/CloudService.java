@@ -79,7 +79,7 @@ public class CloudService implements CloudInterface {
             TransaccionRespuesta tr = EnviarTransaccion(transaccion);
             OnPremiseImpl clientHanaService = new OnPremiseImpl();
             request = generateDataRequestHana(transaccion, tr);
-            clientHanaService.anexarDocumentos(request);
+            //clientHanaService.anexarDocumentos(request);
             logger.info("Ruc: " + request.getRuc() + " DocObject: " + request.getDocObject() + " DocEntry: " + request.getDocEntry());
             logger.info("Nombre Documento: " + request.getDocumentName());
 

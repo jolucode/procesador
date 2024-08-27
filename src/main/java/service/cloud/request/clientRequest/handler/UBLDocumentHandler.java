@@ -279,23 +279,19 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             List<Map<String, String>> contractdocrefs = transaction.getTransactionContractDocRefListDTOS();
             for (Map<String, String> contractMap : transaction.getTransactionContractDocRefListDTOS()) {
                 // Verificar y procesar "orden_venta"
-                if ("orden_venta".equalsIgnoreCase(contractMap.get("nombre"))) {
-                    String valor = contractMap.get("valor");
-                    if (valor != null && !valor.isEmpty()) {
-                        ublExtensions.getUBLExtension().add(getUBLExtensionTotalAndProperty2(valor));
-                        break; // Salir del bucle después de procesar el primer valor válido
-                    }
+                String valor = contractMap.get("orden_venta");
+                if (valor != null && !valor.isEmpty()) {
+                    ublExtensions.getUBLExtension().add(getUBLExtensionTotalAndProperty2(valor));
+                    break; // Salir del bucle después de procesar el primer valor válido
                 }
             }
 
             for (Map<String, String> contractMap : transaction.getTransactionContractDocRefListDTOS()) {
                 // Verificar y procesar "cerper_mensaje"
-                if ("cerper_mensaje".equalsIgnoreCase(contractMap.get("nombre"))) {
-                    String valor = contractMap.get("valor");
-                    if (valor != null && !valor.isEmpty()) {
-                        ublExtensions.getUBLExtension().add(getUBLExtensionTotalAndProperty3(valor));
-                        break; // Salir del bucle después de procesar el primer valor válido
-                    }
+                String valor = contractMap.get("cerper_mensaje");
+                if (valor != null && !valor.isEmpty()) {
+                    ublExtensions.getUBLExtension().add(getUBLExtensionTotalAndProperty2(valor));
+                    break; // Salir del bucle después de procesar el primer valor válido
                 }
             }
 
@@ -527,18 +523,14 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             /*
              * Agregar DETRACCIONES
              */
-            if ((new BigDecimal(transaction.getMontoDetraccion())).compareTo(BigDecimal.ZERO) > 0 && ((new BigDecimal(transaction.getPorcDetraccion())).compareTo(BigDecimal.ZERO)) > 0 && StringUtils.isNotBlank(transaction.getCuentaDetraccion())) {
+            /*if ((new BigDecimal(transaction.getMontoDetraccion())).compareTo(BigDecimal.ZERO) > 0 && ((new BigDecimal(transaction.getPorcDetraccion())).compareTo(BigDecimal.ZERO)) > 0 && StringUtils.isNotBlank(transaction.getCuentaDetraccion())) {
                 if (logger.isInfoEnabled()) {
                     logger.info("generateInvoiceType() [" + this.identifier + "] La transaccion contiene informacion de DETRACCIONES.");
                 }
                 invoiceType.getPaymentMeans().add(getPaymentMeans(transaction.getCuentaDetraccion(), transaction.getCodigoPago()));
                 invoiceType.getPaymentTerms().add(getPaymentTerms(transaction.getCodigoDetraccion(), new BigDecimal(transaction.getMontoDetraccion()), new BigDecimal(transaction.getPorcDetraccion())));
             }
-            /*
-             * ANTICIPOS RELACIONADOS al comprobante de pago
-             *
-             * <Invoice><cac:PrepaidPayment>
-             */
+
             if (null != transaction.getANTICIPO_Monto() && transaction.getANTICIPO_Monto().compareTo(BigDecimal.ZERO) > 0 && null != transaction.getTransactionActicipoDTOList() && 0 < transaction.getTransactionActicipoDTOList().size()) {
                 if (logger.isInfoEnabled()) {
                     logger.info("generateInvoiceType() [" + this.identifier + "] La transaccion contiene informacion de ANTICIPOS RELACIONADOS.");
@@ -546,7 +538,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 invoiceType.getPrepaidPayment().addAll(getPrepaidPaymentV21(transaction.getTransactionActicipoDTOList()));
                 invoiceType.getAllowanceCharge().add(getAllowanceCharge(transaction.getDOC_ImporteTotal(), transaction.getANTICIPO_Monto(), false, transaction.getDOC_PorDescuento(), transaction.getDOC_Descuento(), transaction.getDOC_ImporteTotal(), transaction.getDOC_MON_Codigo(), "04", new BigDecimal(transaction.getMontoRetencion()), transaction.getDOC_MontoTotal()));
 
-            }
+            }*/
             /*
              * Agregar DESCUENTO GLOBAL
              */
