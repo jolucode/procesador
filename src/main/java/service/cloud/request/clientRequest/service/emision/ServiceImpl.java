@@ -33,6 +33,7 @@ import service.cloud.request.clientRequest.prueba.Client;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.ServiceInterface;
+import service.cloud.request.clientRequest.sunat.IOSEClient2;
 import service.cloud.request.clientRequest.utils.CertificateUtils;
 import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.LoggerTrans;
@@ -95,9 +96,11 @@ public class ServiceImpl implements ServiceInterface {
     @Autowired
     DocumentFormatInterface documentFormatInterface;
 
+    //@Autowired
+    //IOSEClient ioseClient;
+
     @Autowired
     IOSEClient ioseClient;
-
 
 
     @Override
@@ -237,8 +240,8 @@ public class ServiceImpl implements ServiceInterface {
                     /**envia ticket a sunat para consultar zip*/
                     //service.cloud.request.clientRequest.proxy.ose.object.StatusResponse response = oseConsumer.getStatus(ticket, configuracion);
                     //if (response.getContent() != null) {
-                        transactionResponse = null;//processOseResponseBAJA(response.getContent(), transaction, fileHandler, documentName, configuracion);
-                   // }
+                    transactionResponse = null;//processOseResponseBAJA(response.getContent(), transaction, fileHandler, documentName, configuracion);
+                    // }
                 }
                 transactionResponse.setTicketRest(ticket);
                 transactionResponse.setIdentificador(documentName);
@@ -596,10 +599,11 @@ public class ServiceImpl implements ServiceInterface {
                 log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
 
 
-                byte[] emisionOse =  ioseClient.sendBill(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
-                if (/*null != response.getResponse()*/emisionOse != null) {
+                //byte[] emisionOse =
+                CdrStatusResponse cdrStatusResponse = ioseClient.sendBill(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
+                if (/*null != response.getResponse()*/cdrStatusResponse.getContent() != null) {
                     //log.setThirdPartyResponseXml(new String(response.getResponse(), StandardCharsets.UTF_8));
-                    transactionResponse = processorCoreInterface.processCDRResponseV2(emisionOse/*response.getResponse()*/, signedXmlDocument, documentWRP, transaction, configuracion);
+                    transactionResponse = processorCoreInterface.processCDRResponseV2(cdrStatusResponse.getContent()/*response.getResponse()*/, signedXmlDocument, documentWRP, transaction, configuracion);
 
                     saveAllFiles(transactionResponse, documentName, attachmentPath);
 
@@ -609,6 +613,7 @@ public class ServiceImpl implements ServiceInterface {
                     //transactionResponse = processorCoreInterface.processResponseService(transaction, response);
                     logger.error("Error: " + transactionResponse.getMensaje());
                 }
+
 
             } else {
                 if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
@@ -641,7 +646,7 @@ public class ServiceImpl implements ServiceInterface {
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
 
 
-        if (client.getPdfBorrador().equals("true")){
+        if (client.getPdfBorrador().equals("true")) {
             transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
         }
 

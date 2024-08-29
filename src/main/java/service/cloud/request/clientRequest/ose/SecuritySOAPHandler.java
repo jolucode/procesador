@@ -2,6 +2,7 @@ package service.cloud.request.clientRequest.ose;
 
 import org.apache.log4j.Logger;
 import service.cloud.request.clientRequest.ose.model.Consumer;
+import service.cloud.request.clientRequest.utils.IWSSecurityConfig;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPElement;

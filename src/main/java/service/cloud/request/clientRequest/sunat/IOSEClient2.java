@@ -1,11 +1,11 @@
-package service.cloud.request.clientRequest.ose;
+package service.cloud.request.clientRequest.sunat;
 
 
 import service.cloud.request.clientRequest.ose.model.CdrStatusResponse;
 
 import javax.activation.DataHandler;
 
-public interface IOSEClient {
+public interface IOSEClient2 {
 
 
     /**
@@ -17,7 +17,7 @@ public interface IOSEClient {
      * @return Retorna el CDR OSE de respuesta.
      * @throws Exception
      */
-    CdrStatusResponse sendBill(String fileName, DataHandler contentFile) throws Exception;
+    byte[] sendBill(String fileName, DataHandler contentFile) throws Exception;
 
 
     /**

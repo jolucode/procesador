@@ -1,4 +1,4 @@
-package service.cloud.request.clientRequest.ose;
+package service.cloud.request.clientRequest.utils;
 
 public interface IWSSecurityConfig {
 

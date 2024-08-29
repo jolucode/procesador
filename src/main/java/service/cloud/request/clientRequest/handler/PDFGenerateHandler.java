@@ -933,7 +933,11 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             List<TransactionCuotasDTO> transaccionCuotas = invoiceType.getTransaccion().getTransactionCuotasDTOList();
 
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+            // DateFormat para el formato de entrada (yyyy-MM-dd)
+            DateFormat dfEntrada = new SimpleDateFormat("yyyy-MM-dd");
+
+            // DateFormat para el formato de salida (dd/MM/yyyy)
+            DateFormat dfSalida  = new SimpleDateFormat("dd/MM/yyyy");
 
             BigDecimal montoRetencion = (invoiceType.getTransaccion().getMontoRetencion() != null ? new BigDecimal(invoiceType.getTransaccion().getMontoRetencion()) : new BigDecimal("0.0"));
 
@@ -951,8 +955,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
                 itemObjectHash.put("Cuota", transaccionCuota.getCuota().replaceAll("[^0-9]", ""));
                 newlist.add(transaccionCuota.getCuota().replaceAll("[^0-9]", ""));
-                itemObjectHash.put("FechaCuota", df.format(transaccionCuota.getFechaCuota()));
-                newlist.add(df.format(transaccionCuota.getFechaCuota()));
+                itemObjectHash.put("FechaCuota", dfSalida.format(dfEntrada.parse(transaccionCuota.getFechaCuota())));
+                newlist.add(dfSalida.format(dfEntrada.parse(transaccionCuota.getFechaCuota())));
                 itemObjectHash.put("MontoCuota", transaccionCuota.getMontoCuota().toString());
                 newlist.add(transaccionCuota.getMontoCuota().toString());
                 itemObjectHash.put("FormaPago", transaccionCuota.getFormaPago());
@@ -966,17 +970,17 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 if (totalCuotas == 1) {
                     metodoPago = transaccionCuota.getFormaPago();
                     m1 = transaccionCuota.getMontoCuota();
-                    f1 = df.format(transaccionCuota.getFechaCuota());
+                    f1 = dfSalida.format(dfEntrada.parse(transaccionCuota.getFechaCuota()));
                     c1 = transaccionCuota.getCuota().replaceAll("[^0-9]", "");
                 }
                 if (totalCuotas == 2) {
                     m2 = transaccionCuota.getMontoCuota();
-                    f2 = df.format(transaccionCuota.getFechaCuota());
+                    f2 = dfSalida.format(dfEntrada.parse(transaccionCuota.getFechaCuota()));
                     c2 = transaccionCuota.getCuota().replaceAll("[^0-9]", "");
                 }
                 if (totalCuotas == 3) {
                     m3 = transaccionCuota.getMontoCuota();
-                    f3 = df.format(transaccionCuota.getFechaCuota());
+                    f3 = dfSalida.format(dfEntrada.parse(transaccionCuota.getFechaCuota()));
                     c3 = transaccionCuota.getCuota().replaceAll("[^0-9]", "");
                 }
             }
@@ -1013,7 +1017,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             for (TransactionLineasDTO transaccionLinea : transaccionLineas) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("generateInvoicePDF() [" + this.docUUID + "] Agregando datos al HashMap" + transaccionLinea.getTransaccionLineasCamposUsuario().size());
-                }
+                } 
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
                 List<String> newlist = new ArrayList<>();
@@ -1027,6 +1031,10 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                             logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
                         }
 
+                        if (nombreCampo.startsWith("U_")) {
+                            // Cortar "U_" del nombreCampo
+                            nombreCampo = nombreCampo.substring(2);
+                        }
                         itemObjectHash.put(nombreCampo, valorCampo);
                         newlist.add(valorCampo);
 
