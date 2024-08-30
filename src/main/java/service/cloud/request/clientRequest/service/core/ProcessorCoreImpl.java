@@ -95,7 +95,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
         transactionResponse.setCodigo(TransaccionRespuesta.RQT_EMITIDO_EXCEPTION);
         transactionResponse.setMensaje(cdrStatusResponse.getStatusMessage());
 
-        logger.info("Respuesta del servicio invocado: " + cdrStatusResponse.getStatusMessage());
+        logger.warn("Respuesta del servicio invocado: " + cdrStatusResponse.getStatusMessage());
 
         if (logger.isDebugEnabled()) {
             logger.debug("-processCDRResponse() [" + this.docUUID + "]");
