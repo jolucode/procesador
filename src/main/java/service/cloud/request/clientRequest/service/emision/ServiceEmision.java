@@ -27,7 +27,10 @@ import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
 import service.cloud.request.clientRequest.utils.CertificateUtils;
 
+import service.cloud.request.clientRequest.utils.DocumentNameUtils;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
+import service.cloud.request.clientRequest.utils.exception.ConfigurationException;
+import service.cloud.request.clientRequest.utils.exception.SignerDocumentException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.creditnote_2.CreditNoteType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.debitnote_2.DebitNoteType;
@@ -41,10 +44,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -75,203 +75,75 @@ public class ServiceEmision implements IServiceEmision {
     DocumentFormatInterface documentFormatInterface;
 
     @Override
-    public TransaccionRespuesta transactionDocument(TransacctionDTO transaction, String doctype)
-            throws Exception {
+    public TransaccionRespuesta transactionDocument(TransacctionDTO transaction, String doctype) throws Exception {
 
         TransaccionRespuesta transactionResponse = null;
 
-        String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
-        boolean isContingencia = false;
-        List<Map<String, String>> contractdocrefs = transaction.getTransactionContractDocRefListDTOS();
-        /**revisar*/
-        /*for (Map<String, String> contractdocref : contractdocrefs) {
-            if ("cu31".equalsIgnoreCase(contractdocref.getUsuariocampos().getNombre())) {
-                isContingencia = "Si".equalsIgnoreCase(contractdocref.getValor());
-                break;
-            }
-        }¨*/
 
-
+        boolean isContingencia = isContingencia(transaction);
         ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
         validationHandler.checkBasicInformation(transaction.getDOC_Id(), transaction.getDocIdentidad_Nro(), transaction.getDOC_FechaEmision(), transaction.getSN_EMail(), transaction.getEMail(), isContingencia);
 
-        Client client = clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
-        byte[] certificado = CertificateUtils.getCertificateInBytes(applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator
-                + client.getCertificadoName());
-        String certiPassword = client.getCertificadoPassword();
-        String ksProvider = client.getCertificadoProveedor();
-        String ksType = client.getCertificadoTipoKeystore();
-
-        CertificateUtils.checkDigitalCertificateV2(certificado, certiPassword, ksProvider, ksType);
+        // Obtiene datos del cliente y valida certificado
+        Client client = getClientData(transaction);
+        byte[] certificado = loadCertificate(client, transaction.getDocIdentidad_Nro());
+        validateCertificate(certificado, client);
 
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
-        InvoiceType invoiceType = null;
-        CreditNoteType creditNoteType = null;
-        DebitNoteType debitNoteType = null;
-        PerceptionType perceptionType = null;
-        RetentionType retentionType = null;
-        String documentName = "";
+
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
         UBLDocumentWRP documentWRP = UBLDocumentWRP.getInstance();
         String digestValue = "";
         String barcodeValue = "";
         PDFBasicGenerateHandler db = new PDFBasicGenerateHandler(docUUID);
 
-        Calendar fecha = Calendar.getInstance();
-        fecha.setTime(transaction.getDOC_FechaEmision());
-        int anio = fecha.get(Calendar.YEAR);
-        int mes = fecha.get(Calendar.MONTH) + 1;
-        int dia = fecha.get(Calendar.DAY_OF_MONTH);
-
-        String attachmentPath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() +
-                File.separator + "anexo" + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
+        // Configura la ruta de almacenamiento del archivo
+        String attachmentPath = getAttachmentPath(transaction, doctype);
         fileHandler.setBaseDirectory(attachmentPath);
+
+
+        String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
+
         byte[] signedXmlDocument = null;
+        SignerHandler signerHandler = SignerHandler.newInstance();
+        signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), client.getCertificadoTipoKeystore(), client.getCertificadoProveedor(), signerName);
 
-        Object ublDocument = null;
         if (doctype.equals("07")) {
-            creditNoteType = ublHandler.generateCreditNoteType(transaction, signerName);
-            documentName = DocumentNameHandler.getInstance().getCreditNoteName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
-            // Convert the creditNoteType to a byte array
-            byte[] xmlDocument = convertDocumentToBytes(creditNoteType);
-            SignerHandler signerHandler = SignerHandler.newInstance();
-            signerHandler.setConfiguration(certificado, certiPassword, ksType, ksProvider, signerName);
-            // Sign the xmlDocument in memory
+            CreditNoteType creditNoteType = ublHandler.generateCreditNoteType(transaction, signerName);
+            byte[] xmlDocument = convertDocumentToBytes(creditNoteType); //generico
             signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
-            // Convert the signedXmlDocument back to a CreditNoteType object
-            ublDocument = getSignedDocumentV(signedXmlDocument, transaction.getDOC_Codigo());
-            documentWRP.setTransaccion(transaction);
-            documentWRP.setCreditNoteType((CreditNoteType) ublDocument);
-
-            digestValue = db.generateDigestValue(documentWRP.getCreditNoteType().getUBLExtensions());
-            barcodeValue = db.generateBarCodeInfoString(
-                    documentWRP.getTransaccion().getDocIdentidad_Nro(),
-                    documentWRP.getTransaccion().getDOC_Codigo(),
-                    documentWRP.getTransaccion().getDOC_Serie(),
-                    documentWRP.getTransaccion().getDOC_Numero(),
-                    documentWRP.getCreditNoteType().getTaxTotal(),
-                    formatIssueDate(creditNoteType.getIssueDate().getValue()),
-                    documentWRP.getTransaccion().getDOC_MontoTotal().toString(),
-                    documentWRP.getTransaccion().getSN_DocIdentidad_Tipo(),
-                    documentWRP.getTransaccion().getSN_DocIdentidad_Nro(),
-                    documentWRP.getCreditNoteType().getUBLExtensions());
-
         } else if (doctype.equals("08")) {
-            debitNoteType = ublHandler.generateDebitNoteType(transaction, signerName);
-            documentName = DocumentNameHandler.getInstance().getDebitNoteName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
-            // Convert the debitNoteType to a byte array
+            DebitNoteType debitNoteType = ublHandler.generateDebitNoteType(transaction, signerName);
             byte[] xmlDocument = convertDocumentToBytes(debitNoteType);
-            SignerHandler signerHandler = SignerHandler.newInstance();
-            signerHandler.setConfiguration(certificado, certiPassword, ksType, ksProvider, signerName);
-            // Sign the xmlDocument in memory
             signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
-            // Convert the signedXmlDocument back to a DebitNoteType object
-            ublDocument = getSignedDocumentV(signedXmlDocument, transaction.getDOC_Codigo());
-            documentWRP.setTransaccion(transaction);
-            documentWRP.setDebitNoteType((DebitNoteType) ublDocument);
-
-            digestValue = db.generateDigestValue(documentWRP.getDebitNoteType().getUBLExtensions());
-            barcodeValue = db.generateBarCodeInfoString(
-                    documentWRP.getTransaccion().getDocIdentidad_Nro(),
-                    documentWRP.getTransaccion().getDOC_Codigo(),
-                    documentWRP.getTransaccion().getDOC_Serie(),
-                    documentWRP.getTransaccion().getDOC_Numero(),
-                    documentWRP.getDebitNoteType().getTaxTotal(),
-                    documentWRP.getTransaccion().getDOC_FechaVencimiento().toString(),
-                    documentWRP.getTransaccion().getDOC_MontoTotal().toString(),
-                    documentWRP.getTransaccion().getSN_DocIdentidad_Tipo(),
-                    documentWRP.getTransaccion().getSN_DocIdentidad_Nro(),
-                    documentWRP.getDebitNoteType().getUBLExtensions());
-
-        } else if (doctype.equals("01") || doctype.equals("03")) {
-            invoiceType = ublHandler.generateInvoiceType(transaction, signerName);
-            documentName = DocumentNameHandler.getInstance().getInvoiceName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
-            // Convert the invoiceType to a byte array
+        } else if (doctype.equals("01")) {
+            InvoiceType invoiceType = ublHandler.generateInvoiceType(transaction, signerName);
             byte[] xmlDocument = convertDocumentToBytes(invoiceType);
-            SignerHandler signerHandler = SignerHandler.newInstance();
-            signerHandler.setConfiguration(certificado, certiPassword, ksType, ksProvider, signerName);
-            // Sign the xmlDocument in memory
             signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
-            // Convert the signedXmlDocument back to an InvoiceType object
-            ublDocument = getSignedDocumentV(signedXmlDocument, transaction.getDOC_Codigo());
-            //InvoiceType signedInvoiceType = convertBytesToInvoiceType(signedXmlDocument);
-            documentWRP.setTransaccion(transaction);
-            //documentWRP.setInvoiceType(signedInvoiceType);
-            documentWRP.setInvoiceType((InvoiceType) ublDocument);
-
-            if (doctype.equals("03")) {
-                digestValue = db.generateDigestValue(documentWRP.getInvoiceType().getUBLExtensions());
-                barcodeValue = db.generateBarCodeInfoString(
-                        documentWRP.getTransaccion().getDocIdentidad_Nro(),
-                        documentWRP.getTransaccion().getDOC_Codigo(),
-                        documentWRP.getTransaccion().getDOC_Serie(),
-                        documentWRP.getTransaccion().getDOC_Numero(),
-                        documentWRP.getInvoiceType().getTaxTotal(),
-                        documentWRP.getTransaccion().getDOC_FechaVencimiento().toString(),
-                        documentWRP.getTransaccion().getDOC_MontoTotal().toString(),
-                        documentWRP.getTransaccion().getSN_DocIdentidad_Tipo(),
-                        documentWRP.getTransaccion().getSN_DocIdentidad_Nro(),
-                        documentWRP.getInvoiceType().getUBLExtensions());
-            } else {
-                digestValue = db.generateDigestValue(documentWRP.getInvoiceType().getUBLExtensions());
-                barcodeValue = db.generateBarCodeInfoString(documentWRP.getTransaccion().getDocIdentidad_Nro(), documentWRP.getTransaccion().getDOC_Codigo(), documentWRP.getTransaccion().getDOC_Serie(), documentWRP.getTransaccion().getDOC_Numero(),
-                        documentWRP.getInvoiceType().getTaxTotal(), formatIssueDate(invoiceType.getIssueDate().getValue()), documentWRP.getTransaccion().getDOC_MontoTotal().toString(), documentWRP.getTransaccion().getSN_DocIdentidad_Tipo(),
-                        documentWRP.getTransaccion().getSN_DocIdentidad_Nro(), documentWRP.getInvoiceType().getUBLExtensions());
-            }
+        } else if (doctype.equals("03")) {
+            InvoiceType invoiceType = ublHandler.generateInvoiceType(transaction, signerName);
+            byte[] xmlDocument = convertDocumentToBytes(invoiceType);
+            signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
         } else if (doctype.equals("40")) {
-            perceptionType = ublHandler.generatePerceptionType(transaction, signerName);
+            PerceptionType perceptionType = ublHandler.generatePerceptionType(transaction, signerName);
             validationHandler.checkPerceptionDocument(perceptionType);
-            documentName = DocumentNameHandler.getInstance().getPerceptionName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
-            // Convert the perceptionType to a byte array
             byte[] xmlDocument = convertDocumentToBytes(perceptionType);
-            SignerHandler signerHandler = SignerHandler.newInstance();
-            signerHandler.setConfiguration(certificado, certiPassword, ksType, ksProvider, signerName);
-            // Sign the xmlDocument in memory
             signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
-            // Convert the signedXmlDocument back to a PerceptionType object
-            ublDocument = getSignedDocumentV(signedXmlDocument, transaction.getDOC_Codigo());
-            documentWRP.setTransaccion(transaction);
-            documentWRP.setPerceptionType((PerceptionType) ublDocument);
-
-            digestValue = db.generateDigestValue(documentWRP.getPerceptionType().getUblExtensions());
-            barcodeValue = db.generateBarcodeInfoV2(
-                    documentWRP.getRetentionType().getId().getValue(),
-                    IUBLConfig.DOC_RETENTION_CODE,
-                    formatIssueDate(perceptionType.getIssueDate().getValue()),
-                    documentWRP.getPerceptionType().getTotalInvoiceAmount().getValue(),
-                    BigDecimal.ZERO,
-                    documentWRP.getPerceptionType().getAgentParty(),
-                    documentWRP.getPerceptionType().getReceiverParty(),
-                    documentWRP.getPerceptionType().getUblExtensions());
         } else if (doctype.equals("20")) {
-            retentionType = ublHandler.generateRetentionType(transaction, signerName);
+            RetentionType retentionType = ublHandler.generateRetentionType(transaction, signerName);
             validationHandler.checkRetentionDocument(retentionType);
-            documentName = DocumentNameHandler.getInstance().getRetentionName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
-            // Convert the retentionType to a byte array
             byte[] xmlDocument = convertDocumentToBytes(retentionType);
-            SignerHandler signerHandler = SignerHandler.newInstance();
-            signerHandler.setConfiguration(certificado, certiPassword, ksType, ksProvider, signerName);
-            // Sign the xmlDocument in memory
             signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
-            // Convert the signedXmlDocument back to a RetentionType object
-            ublDocument = getSignedDocumentV(signedXmlDocument, transaction.getDOC_Codigo());
-            documentWRP.setTransaccion(transaction);
-            documentWRP.setRetentionType((RetentionType) ublDocument);
-
-            digestValue = db.generateDigestValue(documentWRP.getRetentionType().getUblExtensions());
-            barcodeValue = db.generateBarcodeInfoV2(
-                    documentWRP.getRetentionType().getId().getValue(),
-                    IUBLConfig.DOC_RETENTION_CODE,
-                    formatIssueDate(retentionType.getIssueDate().getValue()),
-                    documentWRP.getRetentionType().getTotalInvoiceAmount().getValue(),
-                    BigDecimal.ZERO,
-                    documentWRP.getRetentionType().getAgentParty(),
-                    documentWRP.getRetentionType().getReceiverParty(),
-                    documentWRP.getRetentionType().getUblExtensions());
         }
+
+        String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
+        documentWRP = configureDocumentWRP(documentWRP, signedXmlDocument, transaction.getDOC_Codigo(), doctype);
+        documentWRP.setTransaccion(transaction);
+        Object ublDocument = getSignedDocumentV(signedXmlDocument, transaction.getDOC_Codigo());
 
         /**Guardando el documento xml UBL en DISCO*/
         String documentPath = fileHandler.storeDocumentInDisk(ublDocument, documentName);
+
         logger.info("Documento XML guardado en disco : " + documentPath);
 
         /*String valor = transaction.getTransaccionContractdocrefList().stream()
@@ -280,26 +152,10 @@ public class ServiceEmision implements IServiceEmision {
                 .findFirst()
                 .orElse("No");*/
 
-        ConfigData configuracion = ConfigData
-                .builder()
-                .usuarioSol(client.getUsuarioSol())
-                .claveSol(client.getClaveSol())
-                .integracionWs(client.getIntegracionWs())
-                .ambiente(applicationProperties.getAmbiente())
-                .mostrarSoap(client.getMostrarSoap())
-                .pdfBorrador(client.getPdfBorrador())
-                .impresionPDF(client.getImpresion())
-                .rutaBaseDoc(applicationProperties.getRutaBaseDoc())
+        ConfigData configuracion = ConfigData.builder().usuarioSol(client.getUsuarioSol()).claveSol(client.getClaveSol()).integracionWs(client.getIntegracionWs()).ambiente(applicationProperties.getAmbiente()).mostrarSoap(client.getMostrarSoap()).pdfBorrador(client.getPdfBorrador()).impresionPDF(client.getImpresion()).rutaBaseDoc(applicationProperties.getRutaBaseDoc())
                 //.pdfIngles(valor)
                 .build();
 
-        if (configuracion.getIntegracionWs().equals("OSE"))
-            logger.info("Url Service: " + applicationProperties.getUrlOse());
-        else if (configuracion.getIntegracionWs().equals("SUNAT"))
-            logger.info("Url Service: " + applicationProperties.getUrlSunat());
-
-
-        // Compress the signedXmlDocument in memory
         DataHandler zipDocument = compressUBLDocumentv2(signedXmlDocument, documentName + ".xml");
 
         if (null != zipDocument) {
@@ -308,7 +164,7 @@ public class ServiceEmision implements IServiceEmision {
 
                 CdrStatusResponse cdrStatusResponse = ioseClient.sendBill(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
                 if (cdrStatusResponse.getContent() != null) {
-                    transactionResponse = processorCoreInterface.processCDRResponseV2(cdrStatusResponse.getContent()/*response.getResponse()*/, signedXmlDocument, documentWRP, transaction, configuracion);
+                    transactionResponse = processorCoreInterface.processCDRResponseV2(cdrStatusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion);
                     saveAllFiles(transactionResponse, documentName, attachmentPath);
                 } else {
                     logger.error("Error: " + transactionResponse.getMensaje());
@@ -320,7 +176,7 @@ public class ServiceEmision implements IServiceEmision {
                     String documentType = transaction.getDOC_Codigo();
                     String documentSerie = transaction.getDOC_Serie();
                     Integer documentNumber = Integer.valueOf(transaction.getDOC_Numero());
-                    CdrStatusResponse statusResponse = ioseClient.getStatusCDR(documentRuc, documentType, documentSerie, documentNumber/*, configuracion*/);
+                    CdrStatusResponse statusResponse = ioseClient.getStatusCDR(documentRuc, documentType, documentSerie, documentNumber);
                     if (statusResponse.getContent() != null) {
                         transactionResponse = processorCoreInterface.processCDRResponseV2(statusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion);
                         saveAllFiles(transactionResponse, documentName, attachmentPath);
@@ -342,6 +198,69 @@ public class ServiceEmision implements IServiceEmision {
         return transactionResponse;
     }
 
+    private boolean isContingencia(TransacctionDTO transaction) {
+        List<Map<String, String>> contractdocrefs = transaction.getTransactionContractDocRefListDTOS();
+        for (Map<String, String> contractdocref : contractdocrefs) {
+            //if ("cu31".equalsIgnoreCase(contractdocref.get("Usuariocampos").get("Nombre"))) {
+            //    return "Si".equalsIgnoreCase(contractdocref.get("Valor"));
+           // }
+        }
+        return false;
+    }
+
+
+    private String getAttachmentPath(TransacctionDTO transaction, String doctype) {
+        Calendar fecha = Calendar.getInstance();
+        fecha.setTime(transaction.getDOC_FechaEmision());
+        int anio = fecha.get(Calendar.YEAR);
+        int mes = fecha.get(Calendar.MONTH) + 1;
+        int dia = fecha.get(Calendar.DAY_OF_MONTH);
+
+        return applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + "anexo"
+                + File.separator + anio + File.separator + mes + File.separator + dia
+                + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
+    }
+
+    private Client getClientData(TransacctionDTO transaction) {
+        return clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
+    }
+
+    private byte[] loadCertificate(Client client, String docIdentidadNuumero) throws ConfigurationException, FileNotFoundException {
+        String certificatePath = applicationProperties.getRutaBaseDoc() + docIdentidadNuumero
+                + File.separator + client.getCertificadoName();
+        return CertificateUtils.getCertificateInBytes(certificatePath);
+    }
+
+    private void validateCertificate(byte[] certificate, Client client) throws SignerDocumentException {
+        CertificateUtils.checkDigitalCertificateV2(certificate, client.getCertificadoPassword(),
+                client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
+    }
+
+    private UBLDocumentWRP configureDocumentWRP(UBLDocumentWRP documentWRP, byte[] signedXmlDocument, String docCodigo, String doctype) throws Exception {
+        Object ublDocument = getSignedDocumentV(signedXmlDocument, docCodigo);
+
+        switch (doctype) {
+            case "07":
+                documentWRP.setCreditNoteType((CreditNoteType) ublDocument);
+                break;
+            case "08":
+                documentWRP.setDebitNoteType((DebitNoteType) ublDocument);
+                break;
+            case "01":
+            case "03":
+                documentWRP.setInvoiceType((InvoiceType) ublDocument);
+                break;
+            case "40":
+                documentWRP.setPerceptionType((PerceptionType) ublDocument);
+                break;
+            case "20":
+                documentWRP.setRetentionType((RetentionType) ublDocument);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid document type: " + doctype);
+        }
+        return documentWRP;
+    }
 
 
     private DataHandler compressUBLDocumentv2(byte[] document, String documentName) throws IOException {
