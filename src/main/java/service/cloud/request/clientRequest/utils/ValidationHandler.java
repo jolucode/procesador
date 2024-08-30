@@ -1,7 +1,8 @@
 package service.cloud.request.clientRequest.utils;
 
 import io.micrometer.common.util.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
 import service.cloud.request.clientRequest.utils.exception.ValidationException;
 import service.cloud.request.clientRequest.utils.exception.error.ErrorObj;
@@ -33,7 +34,9 @@ import java.util.Optional;
  */
 public class ValidationHandler {
 
-    private final Logger logger = Logger.getLogger(ValidationHandler.class);
+    //private final Logger logger = Logger.getLogger(ValidationHandler.class);
+    //private final Logger logger = Logger.getLogger(ValidationHandler.class);}
+    private final Logger logger = LoggerFactory.getLogger(ValidationHandler.class);
 
     private List<String> totalIDList = null;
 

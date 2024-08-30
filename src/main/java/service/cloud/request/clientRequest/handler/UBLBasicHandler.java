@@ -2,7 +2,8 @@ package service.cloud.request.clientRequest.handler;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.cloud.request.clientRequest.dto.dto.*;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.utils.DateUtil;
@@ -30,7 +31,7 @@ import java.util.*;
 
 public abstract class UBLBasicHandler {
 
-    private final Logger logger = Logger.getLogger(UBLBasicHandler.class);
+    Logger logger = LoggerFactory.getLogger(UBLBasicHandler.class);
 
     /* Identificador de la transaccion */
     protected String identifier;

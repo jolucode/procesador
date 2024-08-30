@@ -1,8 +1,9 @@
 package service.cloud.request.clientRequest.service.core;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
 import org.eclipse.persistence.internal.oxm.ByteArraySource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 @Service
 public class ProcessorCoreImpl implements ProcessorCoreInterface {
 
-    Logger logger = Logger.getLogger(ProcessorCoreImpl.class);
+    Logger logger = LoggerFactory.getLogger(ProcessorCoreImpl.class);
 
     private final String docUUID = Constants.DOC_UUID;
 
@@ -45,16 +46,17 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
 
     @Override
     public TransaccionRespuesta processCDRResponseV2(byte[] cdrConstancy, byte[] signedDocument,
-                                                   UBLDocumentWRP documentWRP,
-                                                     TransacctionDTO transaction, ConfigData configuracion,String  documentName, String attachmentPath) throws Exception {
+                                                     UBLDocumentWRP documentWRP,
+                                                     TransacctionDTO transaction, ConfigData configuracion, String documentName, String attachmentPath) throws Exception {
 
         TransaccionRespuesta transactionResponse = null;
         TransaccionRespuesta.Sunat sunatResponse = proccessResponse(cdrConstancy, transaction, configuracion.getIntegracionWs());
 
         if ((IVenturaError.ERROR_0.getId() == sunatResponse.getCodigo()) || (4000 <= sunatResponse.getCodigo())) {
-            byte[] pdfBytes = documentFormatInterface.createPDFDocument(  documentWRP, transaction, configuracion);
+            byte[] pdfBytes = documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion);
             transactionResponse = new TransaccionRespuesta();
             transactionResponse.setCodigo(TransaccionRespuesta.RQT_EMITDO_ESPERA);
+
             transactionResponse.setMensaje(sunatResponse.getMensaje());
             transactionResponse.setSunat(sunatResponse);
             transactionResponse.setXml(signedDocument);
@@ -65,6 +67,9 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
             transactionResponse.setXml(signedDocument);
             transactionResponse.setZip(cdrConstancy);
         }
+
+        logger.info("Respuesta del servicio invocado: " + sunatResponse.getMensaje());
+
         saveAllFiles(transactionResponse, documentName, attachmentPath);
         return transactionResponse;
     } //processCDRResponse
@@ -72,9 +77,11 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
     private void saveAllFiles(TransaccionRespuesta transactionResponse, String documentName, String attachmentPath) throws Exception {
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
         fileHandler.setBaseDirectory(attachmentPath);
+
         fileHandler.storeDocumentInDisk(transactionResponse.getXml(), documentName, "xml");
         fileHandler.storeDocumentInDisk(transactionResponse.getPdf(), documentName, "pdf");
         fileHandler.storeDocumentInDisk(transactionResponse.getZip(), documentName, "zip");
+
     }
 
     @Override
@@ -87,6 +94,8 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
         transactionResponse = new TransaccionRespuesta();
         transactionResponse.setCodigo(TransaccionRespuesta.RQT_EMITIDO_EXCEPTION);
         transactionResponse.setMensaje(cdrStatusResponse.getStatusMessage());
+
+        logger.info("Respuesta del servicio invocado: " + cdrStatusResponse.getStatusMessage());
 
         if (logger.isDebugEnabled()) {
             logger.debug("-processCDRResponse() [" + this.docUUID + "]");
@@ -105,7 +114,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
         }
 
         try {
-            pdfBytes = documentFormatInterface.createPDFDocument( documentWRP, transaccion, configuracion);
+            pdfBytes = documentFormatInterface.createPDFDocument(documentWRP, transaccion, configuracion);
 
             if (null != pdfBytes && 0 < pdfBytes.length) {
                 if (logger.isDebugEnabled()) {
@@ -175,7 +184,6 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
                     }
                 }
                 descripcionRespuesta = descripcion.toString();
-                logger.info("Respuesta servicio consumido : " + descripcionRespuesta);
                 TransaccionRespuesta.Sunat sunatResponse = new TransaccionRespuesta.Sunat();
                 sunatResponse.setListaObs(observaciones);
                 sunatResponse.setId(identificador);

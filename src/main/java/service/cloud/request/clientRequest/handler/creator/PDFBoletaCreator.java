@@ -6,10 +6,12 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.extras.pdf.DocumentCreator;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
+import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.object.legend.BoletaObject;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
@@ -26,7 +28,7 @@ import java.util.Map;
  */
 public class PDFBoletaCreator extends DocumentCreator {
 
-    private final Logger logger = Logger.getLogger(PDFBoletaCreator.class);
+    Logger logger = LoggerFactory.getLogger(PDFBoletaCreator.class);
 
     /* Patron SINGLETON */
     private static PDFBoletaCreator instance = null;

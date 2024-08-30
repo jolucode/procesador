@@ -1,8 +1,11 @@
 package service.cloud.request.clientRequest.utils;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
+import service.cloud.request.clientRequest.service.emision.ServiceEmision;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -15,7 +18,7 @@ import java.util.Locale;
 
 public class Utils {
 
-    private static final Logger logger = Logger.getLogger(Utils.class);
+    static Logger logger = LoggerFactory.getLogger(Utils.class);
 
     public static final XMLGregorianCalendar stringDateToDateGregory(Date date) {
         XMLGregorianCalendar xmlDate = null;

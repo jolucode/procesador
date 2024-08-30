@@ -549,7 +549,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             String socioDocIdentidad = transaction.getSN_DocIdentidad_Tipo();
             BigDecimal otrosCargosValue = new BigDecimal(transaction.getDOC_OtrosCargos());
             String formSap = transaction.getFE_FormSAP();
-            System.out.println("*******************************************************************************************************************************************************************************");
+
             if (socioDocIdentidad.equalsIgnoreCase("0") && formSap.contains("exportacion")) {
                 logger.info("Entro a esta parte de la validacion");
                 lineExtensionAmount = transaction.getDOC_MontoTotal();
@@ -557,7 +557,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 if (Objects.nonNull(otrosCargosValue)) payableAmount = taxInclusiveAmount.add(otrosCargosValue);
             }
             BigDecimal docDescuentoTotal = transaction.getDOC_DescuentoTotal();
-            System.out.println("*******************************************************************************************************************************************************************************");
             invoiceType.setLegalMonetaryTotal(getMonetaryTotal(transaction, lineExtensionAmount, taxInclusiveAmount, noContainsFreeItem, otrosCargosValue, transaction.getANTICIPO_Monto(), payableAmount, docDescuentoTotal, transaction.getDOC_MON_Codigo(), true));
             if (logger.isInfoEnabled()) {
                 logger.info("generateInvoiceType() [" + this.identifier + "] xxxxxxxxxxxxxxxxxxx LegalMonetaryTotal - IMPORTES TOTALES xxxxxxxxxxxxxxxxxxx");

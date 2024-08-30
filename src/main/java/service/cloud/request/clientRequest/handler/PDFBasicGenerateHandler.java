@@ -1,12 +1,14 @@
 package service.cloud.request.clientRequest.handler;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
 import service.cloud.request.clientRequest.dto.dto.TransactionImpuestosDTO;
 import service.cloud.request.clientRequest.dto.dto.TransactionTotalesDTO;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
+import service.cloud.request.clientRequest.extras.pdf.PDFInvoiceCreator;
 import service.cloud.request.clientRequest.handler.object.item.InvoiceItemObject;
 import service.cloud.request.clientRequest.handler.object.item.RetentionItemObject;
 import service.cloud.request.clientRequest.handler.object.legend.LegendObject;
@@ -28,8 +30,7 @@ import java.util.*;
 
 public class PDFBasicGenerateHandler {
 
-    private final Logger logger = Logger
-            .getLogger(PDFBasicGenerateHandler.class);
+    Logger logger = LoggerFactory.getLogger(PDFBasicGenerateHandler.class);
 
     /* Identificador del documento */
     protected String docUUID;

@@ -131,7 +131,6 @@ public class ServiceEmision implements IServiceEmision {
         Object ublDocument = getSignedDocumentV(signedXmlDocument, transaction.getDOC_Codigo());
 
         String documentPath = fileHandler.storeDocumentInDisk(ublDocument, documentName);
-        logger.info("Documento XML guardado en disco : " + documentPath);
 
         ConfigData configuracion = createConfigData(client);
 

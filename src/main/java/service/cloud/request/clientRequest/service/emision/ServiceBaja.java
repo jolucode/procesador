@@ -122,12 +122,10 @@ public class ServiceBaja implements IServiceBaja {
             summaryVoidedDocumentType = ublHandler.generateSummaryDocumentsTypeV2(transaction, signerName);
             /**Guardando el documento UBL en DISCO*/
             documentPath = fileHandler.storeDocumentInDisk(summaryVoidedDocumentType, documentName);
-            logger.info("Documento XML guardado en disco : " + documentPath);
         } else {
             voidedDocumentType = ublHandler.generateVoidedDocumentType(transaction, signerName);
             /**Guardando el documento UBL en DISCO*/
             documentPath = fileHandler.storeDocumentInDisk(voidedDocumentType, documentName);
-            logger.info("Documento XML guardado en disco : " + documentPath);
         }
         LoggerTrans.getCDThreadLogger().log(Level.INFO, "[" + this.docUUID + "] Se genero el objeto VoidedDocumentsType de la COMUNICACION DE BAJA.");
 

@@ -54,10 +54,18 @@ public class CloudService implements CloudInterface {
         RequestPost responseProcesor = null;
         String datePattern = "(\"\\w+\":\\s*\"\\d{4}-\\d{2}-\\d{2}) \\d{2}:\\d{2}:\\d{2}\\.\\d\"";
         String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
+
+
+
+
         try {
             Gson gson = new Gson();
             transacctionDTO = gson.fromJson(updatedJson, TransacctionDTO[].class);
             responseProcesor = procesarTransaccion(transacctionDTO[0]);
+
+
+            System.out.println("*******************************************************************************************************************************************************************************");
+
         } catch (Exception e) {
             logger.info("SE GENERO UN ERROR : " + e.getMessage());
         }
@@ -117,6 +125,9 @@ public class CloudService implements CloudInterface {
     }
 
     public RequestPost procesarTransaccion(TransacctionDTO transaccion) throws Exception {
+        System.out.println("*******************************************************************************************************************************************************************************");
+        logger.info("Ruc: " + transaccion.getDocIdentidad_Nro() + " DocObject: " + transaccion.getFE_ObjectType() + " DocEntry: " + transaccion.getFE_DocEntry());
+
         TransaccionRespuesta tr = enviarTransaccion(transaccion);
         RequestPost request = new RequestPost();
         request = generateDataRequestHana(transaccion, tr);

@@ -61,7 +61,6 @@ public class OSEClient implements IOSEClient {
             ExceptionProxy exceptionProxy = objectMapper.readValue(e.getFault().getDetail().getTextContent(), ExceptionProxy.class);
             Response.builder().errorCode(e.getMessage()).errorMessage(exceptionProxy.getDescripcion()).build();
             cdrStatusResponse.setStatusMessage(exceptionProxy.getDescripcion());
-            System.out.println("Value");
         }
         return cdrStatusResponse;
     }

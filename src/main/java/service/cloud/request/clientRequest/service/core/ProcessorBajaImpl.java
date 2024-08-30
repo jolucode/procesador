@@ -191,7 +191,6 @@ public class ProcessorBajaImpl implements ProcessorBajaInterface {
                 }
                 descripcionRespuesta = descripcion.toString();
                 System.out.println(descripcionRespuesta);
-                logger.info("Respuesta servicio consumido : " + descripcionRespuesta);
                 TransaccionRespuesta.Sunat sunatResponse = new TransaccionRespuesta.Sunat();
                 sunatResponse.setListaObs(observaciones);
                 sunatResponse.setId(identificador);

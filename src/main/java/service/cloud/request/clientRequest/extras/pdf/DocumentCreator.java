@@ -1,7 +1,9 @@
 package service.cloud.request.clientRequest.extras.pdf;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import service.cloud.request.clientRequest.utils.Utils;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 
@@ -10,7 +12,7 @@ import java.io.InputStream;
 
 public class DocumentCreator {
 
-    private final Logger logger = Logger.getLogger(DocumentCreator.class);
+    Logger logger = LoggerFactory.getLogger(DocumentCreator.class);
 
     protected final String USER_TEMPORARY_PATH = System.getProperty("java.io.tmpdir");
 

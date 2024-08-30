@@ -6,7 +6,8 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.extras.pdf.DocumentCreator;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
@@ -20,7 +21,7 @@ import java.util.Map;
 
 public class PDFRetentionCreator extends DocumentCreator {
 
-    private final Logger logger = Logger.getLogger(PDFRetentionCreator.class);
+    Logger logger = LoggerFactory.getLogger(PDFRetentionCreator.class);
 
     private static PDFRetentionCreator instance = null;
 

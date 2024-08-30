@@ -1,8 +1,8 @@
 package service.cloud.request.clientRequest.handler;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
-import org.eclipse.persistence.internal.oxm.ByteArrayDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.utils.exceptions.VenturaExcepcion;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
@@ -23,8 +23,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -35,8 +33,7 @@ import java.util.zip.ZipOutputStream;
  */
 public class FileHandler {
 
-    private final Logger logger = Logger.getLogger(FileHandler.class);
-
+    Logger logger = LoggerFactory.getLogger(FileHandler.class);
     private String baseDirectory;
 
     private final String xmlDirectory = "XML";
@@ -89,9 +86,6 @@ public class FileHandler {
             String separator = File.separator;
             documentPath = this.baseDirectory + separator + documentName + "." + fileExtension;
 
-            if (logger.isDebugEnabled()) {
-                logger.info("storeDocumentInDisk() [" + this.docUUID + "] Se guardo el documento en: " + documentPath);
-            }
             File file = new File(this.baseDirectory);
             if (!file.exists()) {
                 file.mkdirs();
@@ -101,9 +95,8 @@ public class FileHandler {
                 fos.write(fileData);
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("storeDocumentInDisk() [" + this.docUUID + "] Se guardo el documento en: " + documentPath);
-            }
+            logger.info("Se guardo el documento " + fileExtension + " : " + documentPath);
+
         } catch (IOException e) {
             e.printStackTrace();
             logger.error("storeDocumentInDisk() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_454.getMessage() + e.getMessage());
@@ -127,20 +120,18 @@ public class FileHandler {
     public String storeDocumentInDisk(Object ublDocument, String documentName) throws Exception {
 
 
-
-
         if (logger.isDebugEnabled()) {
             logger.debug("+storeDocumentInDisk() [" + this.docUUID + "]");
         }
         String documentPath = null;
         try {
             String separator = File.separator;
-            documentPath = this.baseDirectory + separator +documentName + ISunatConnectorConfig.EE_XML;
+            documentPath = this.baseDirectory + separator + documentName + ISunatConnectorConfig.EE_XML;
 
             if (logger.isDebugEnabled()) {
                 logger.info("storeDocumentInDisk() [" + this.docUUID + "] Se guardo el documento UBL en: " + documentPath);
             }
-            File file = new File(this.baseDirectory );
+            File file = new File(this.baseDirectory);
             if (!file.exists()) {
                 file.mkdirs();
             }
@@ -165,8 +156,6 @@ public class FileHandler {
     } //storeDocumentInDisk
 
 
-
-
     /**
      * Este metodo comprime el documento UBL en formato ZIP.
      *
@@ -184,7 +173,7 @@ public class FileHandler {
         try {
             String separator = File.separator;
             File zip = new File(this.baseDirectory + separator + documentName + ISunatConnectorConfig.EE_ZIP);
-            File file = new File(this.baseDirectory );
+            File file = new File(this.baseDirectory);
 
             if (!file.exists()) {
                 file.mkdir();
@@ -216,7 +205,7 @@ public class FileHandler {
         return zipDocument;
     } //compressUBLDocument
 
-     //compressUBLDocument
+    //compressUBLDocument
 
     /**
      * Este metodo convierte un archivo, que se encuentra en una ruta
