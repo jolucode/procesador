@@ -1,4 +1,4 @@
-package service.cloud.request.clientRequest.proxy.ose.model;
+package service.cloud.request.clientRequest.proxy.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

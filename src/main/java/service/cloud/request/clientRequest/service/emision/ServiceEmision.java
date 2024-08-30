@@ -19,7 +19,7 @@ import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
 import service.cloud.request.clientRequest.proxy.ose.IOSEClient;
-import service.cloud.request.clientRequest.proxy.ose.model.CdrStatusResponse;
+import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
@@ -174,7 +174,7 @@ public class ServiceEmision implements IServiceEmision {
         if (configuracion.getIntegracionWs().equals("OSE")) {
             cdrStatusResponse = ioseClient.sendBill(transaction.getDocIdentidad_Nro(), DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
         } else {
-            cdrStatusResponse = isunatClient.sendBill(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
+            cdrStatusResponse = isunatClient.sendBill(transaction.getDocIdentidad_Nro(), DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
         }
 
         if (cdrStatusResponse.getContent() != null) {

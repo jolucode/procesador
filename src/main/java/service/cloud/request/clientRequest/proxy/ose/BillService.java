@@ -1,7 +1,7 @@
 package service.cloud.request.clientRequest.proxy.ose;
 
-import service.cloud.request.clientRequest.proxy.ose.model.CdrStatusResponse;
-import service.cloud.request.clientRequest.proxy.ose.object.ObjectFactory;
+import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
+import service.cloud.request.clientRequest.proxy.object.ObjectFactory;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;

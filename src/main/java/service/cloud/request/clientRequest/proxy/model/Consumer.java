@@ -1,4 +1,4 @@
-package service.cloud.request.clientRequest.proxy.ose.model;
+package service.cloud.request.clientRequest.proxy.model;
 
 /**
  * Este clase representa el objeto consumidor que contiene la

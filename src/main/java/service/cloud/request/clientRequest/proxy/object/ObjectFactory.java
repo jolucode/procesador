@@ -1,4 +1,4 @@
-package service.cloud.request.clientRequest.proxy.ose.object;
+package service.cloud.request.clientRequest.proxy.object;
 
 import javax.xml.bind.annotation.XmlRegistry;
 

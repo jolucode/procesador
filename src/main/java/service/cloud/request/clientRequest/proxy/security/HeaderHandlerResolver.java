@@ -1,7 +1,7 @@
-package service.cloud.request.clientRequest.proxy.ose;
+package service.cloud.request.clientRequest.proxy.security;
 
 
-import service.cloud.request.clientRequest.proxy.ose.model.Consumer;
+import service.cloud.request.clientRequest.proxy.model.Consumer;
 
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.HandlerResolver;

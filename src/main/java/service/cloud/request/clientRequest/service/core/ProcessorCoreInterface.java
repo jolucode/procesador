@@ -5,7 +5,7 @@ import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
 import service.cloud.request.clientRequest.handler.FileHandler;
-import service.cloud.request.clientRequest.proxy.ose.model.CdrStatusResponse;
+import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
 
 import java.io.File;
 

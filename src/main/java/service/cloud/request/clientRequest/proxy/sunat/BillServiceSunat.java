@@ -1,6 +1,6 @@
 package service.cloud.request.clientRequest.proxy.sunat;
 
-import service.cloud.request.clientRequest.proxy.ose.object.ObjectFactory;
+import service.cloud.request.clientRequest.proxy.object.ObjectFactory;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -12,7 +12,7 @@ import javax.xml.ws.ResponseWrapper;
 
 @WebService(targetNamespace = "http://service.sunat.gob.pe", name = "billService")
 @XmlSeeAlso({ObjectFactory.class})
-public interface BillService2 {
+public interface BillServiceSunat {
 
     @WebMethod(action = "urn:sendBill")
     @RequestWrapper(localName = "sendBill", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.SendBill")

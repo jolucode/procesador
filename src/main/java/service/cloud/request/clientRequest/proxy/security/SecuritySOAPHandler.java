@@ -1,7 +1,7 @@
-package service.cloud.request.clientRequest.proxy.ose;
+package service.cloud.request.clientRequest.proxy.security;
 
 import org.apache.log4j.Logger;
-import service.cloud.request.clientRequest.proxy.ose.model.Consumer;
+import service.cloud.request.clientRequest.proxy.model.Consumer;
 import service.cloud.request.clientRequest.utils.IWSSecurityConfig;
 
 import javax.xml.namespace.QName;

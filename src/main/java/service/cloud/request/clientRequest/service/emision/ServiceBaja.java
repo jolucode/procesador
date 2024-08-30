@@ -187,7 +187,7 @@ public class ServiceBaja implements IServiceBaja {
                     //oseConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion);
 
                     /**envia ticket a sunat para consultar zip*/
-                    //service.cloud.request.clientRequest.proxy.ose.object.StatusResponse response = oseConsumer.getStatus(ticket, configuracion);
+                    //service.cloud.request.clientRequest.proxy.object.StatusResponse response = oseConsumer.getStatus(ticket, configuracion);
                     //if (response.getContent() != null) {
                     transactionResponse = null;//processOseResponseBAJA(response.getContent(), transaction, fileHandler, documentName, configuracion);
                     // }

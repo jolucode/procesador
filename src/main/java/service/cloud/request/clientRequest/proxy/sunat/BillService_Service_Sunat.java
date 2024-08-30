@@ -7,15 +7,15 @@ import javax.xml.ws.WebServiceClient;
 import java.net.URL;
 
 @WebServiceClient(name = "billService")
-public class BillService_Service2 extends Service {
+public class BillService_Service_Sunat extends Service {
 
-    public BillService_Service2(URL wsdlLocation, QName serviceName) {
+    public BillService_Service_Sunat(URL wsdlLocation, QName serviceName) {
         super(wsdlLocation, serviceName);
     }
 
     @WebEndpoint(name = "BillServicePort")
-    public BillService2 getBillServicePort(QName portName) {
-        return super.getPort(portName, BillService2.class);
+    public BillServiceSunat getBillServicePort(QName portName) {
+        return super.getPort(portName, BillServiceSunat.class);
     }
 }
 

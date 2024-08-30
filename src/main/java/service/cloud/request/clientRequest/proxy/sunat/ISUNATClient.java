@@ -1,7 +1,7 @@
 package service.cloud.request.clientRequest.proxy.sunat;
 
 
-import service.cloud.request.clientRequest.proxy.ose.model.CdrStatusResponse;
+import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
 
 import javax.activation.DataHandler;
 
@@ -17,7 +17,7 @@ public interface ISUNATClient {
      * @return Retorna el CDR OSE de respuesta.
      * @throws Exception
      */
-    CdrStatusResponse sendBill(String fileName, DataHandler contentFile) throws Exception;
+    CdrStatusResponse sendBill(String ruc, String fileName, DataHandler contentFile) throws Exception;
 
 
     /**

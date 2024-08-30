@@ -10,8 +10,9 @@ import service.cloud.request.clientRequest.config.ClientProperties;
 import service.cloud.request.clientRequest.dto.finalClass.Response;
 import service.cloud.request.clientRequest.exception.ExceptionProxy;
 import service.cloud.request.clientRequest.model.Client;
-import service.cloud.request.clientRequest.proxy.ose.model.Consumer;
-import service.cloud.request.clientRequest.proxy.ose.model.CdrStatusResponse;
+import service.cloud.request.clientRequest.proxy.model.Consumer;
+import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
+import service.cloud.request.clientRequest.proxy.security.HeaderHandlerResolver;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
