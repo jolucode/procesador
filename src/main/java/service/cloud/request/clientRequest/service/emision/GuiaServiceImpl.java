@@ -83,18 +83,8 @@ public class GuiaServiceImpl implements GuiaInterface {
         }
         TransaccionRespuesta transactionResponse = null;
 
-        /* Extrayendo la informacion del archivo de configuracion 'config.xml' */
-        //Configuracion configuration = ApplicationConfiguration.getInstance().getConfiguration();
-
-        /* Generando el nombre del firmante */
         String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
 
-        /*
-         * Validando informacion basica
-         * - Serie y correlativo
-         * - RUC del emisor
-         * - Fecha de emision
-         */
         boolean isContingencia = false;
         /*List<TransaccionContractdocref> contractdocrefs = transaction.getTransaccionContractdocrefList();
         for (TransaccionContractdocref contractdocref : contractdocrefs) {
@@ -110,6 +100,7 @@ public class GuiaServiceImpl implements GuiaInterface {
                 break;
             }
         }
+
         ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
         validationHandler.checkBasicInformation(
                 transaction.getDOC_Id(),
@@ -187,12 +178,6 @@ public class GuiaServiceImpl implements GuiaInterface {
 
         PDFBasicGenerateHandler db = new PDFBasicGenerateHandler(docUUID);
 
-        /* Agregar código de Barra */
-        //Date docFechaVencimiento = transaction.getDOC_FechaVencimiento();
-        /*Date docFechaVencimiento = transaction.getDOC_FechaVencimiento();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String fecha = simpleDateFormat.format(docFechaVencimiento);
-        DespatchAdviceType guia = documentWRP.getAdviceType();*/
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String fecha = simpleDateFormat.format(transaction.getDOC_FechaVencimiento());
         DespatchAdviceType guia = documentWRP.getAdviceType();
@@ -253,7 +238,6 @@ public class GuiaServiceImpl implements GuiaInterface {
                     responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
                 }
 
-                //sendQR(transaction.getDOCCodigo(), documentWRP);
                 Thread.sleep(5000);
 
                 //CONSULT
@@ -482,105 +466,5 @@ public class GuiaServiceImpl implements GuiaInterface {
 
         //transactionResponse.setCodigoWS(Integer.parseInt(responseDTO.getCodRespuesta()));
         return transactionResponse;
-    }
-
-
-    public String generateBarCodeInfoString(String RUC_emisor_electronico,
-                                            String documentType, String serie,
-                                            String correlativo, List<TaxTotalType> taxTotalList,
-                                            String issueDate, String Importe_total_venta,
-                                            String Tipo_documento_adquiriente, String Numero_documento_adquiriente,
-                                            UBLExtensionsType ublExtensions) throws PDFReportException {
-        String barcodeValue = "";
-        try {
-
-            String digestValue = getDigestValue(ublExtensions);
-            String Sumatoria_IGV = getTaxTotalValueV21(taxTotalList).toString();
-            barcodeValue = MessageFormat.format(IPDFCreatorConfig.BARCODE_PATTERN, RUC_emisor_electronico,
-                    documentType, serie, correlativo, Sumatoria_IGV, Importe_total_venta, issueDate,
-                    Tipo_documento_adquiriente, Numero_documento_adquiriente, digestValue);
-
-        } catch (PDFReportException e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
-                    + e.getError().getId() + "-" + e.getError().getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
-                    + IVenturaError.ERROR_418.getMessage());
-            throw new PDFReportException(IVenturaError.ERROR_418);
-        }
-
-        return barcodeValue;
-    }
-
-    private String getDigestValue(UBLExtensionsType ublExtensions)
-            throws PDFReportException, Exception {
-        String digestValue = null;
-        try {
-            int lastIndex = ublExtensions.getUBLExtension().size() - 1;
-            UBLExtensionType ublExtension = ublExtensions.getUBLExtension()
-                    .get(lastIndex);
-
-            NodeList nodeList = ublExtension.getExtensionContent().getAny()
-                    .getElementsByTagName(IUBLConfig.UBL_DIGESTVALUE_TAG);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i).getNodeName()
-                        .equalsIgnoreCase(IUBLConfig.UBL_DIGESTVALUE_TAG)) {
-                    digestValue = nodeList.item(i).getTextContent();
-                    break;
-                }
-            }
-
-            if (StringUtils.isBlank(digestValue)) {
-                throw new PDFReportException(IVenturaError.ERROR_423);
-            }
-        } catch (PDFReportException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("getDigestValue() Exception -->" + e.getMessage());
-            throw e;
-        }
-        return digestValue;
-    } // getDigestValue
-
-    protected BigDecimal getTaxTotalValueV21(List<TaxTotalType> taxTotalList) {
-
-        if (taxTotalList != null) {
-            for (int i = 0; i < taxTotalList.size(); i++) {
-                for (int j = 0; j < taxTotalList.get(i).getTaxSubtotal().size(); j++) {
-                    if (taxTotalList.get(i).getTaxSubtotal().get(j).getTaxCategory().getTaxScheme().getID().getValue().equalsIgnoreCase("1000")) {
-                        return taxTotalList.get(i).getTaxAmount().getValue();
-                    }
-                }
-
-            }
-        }
-
-        return BigDecimal.ZERO;
-    }
-
-    public static InputStream generateQRCode(String qrCodeData, String filePath) {
-
-        try {
-
-            String charset = "utf-8"; // or "ISO-8859-1"
-            Map hintMap = new HashMap();
-
-            hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.Q);
-            createQRCode(qrCodeData, filePath, charset, hintMap, 200, 200);
-
-            FileInputStream fis = new FileInputStream(filePath);
-            InputStream is = fis;
-            return is;
-
-        } catch (WriterException | IOException ex) {
-            java.util.logging.Logger.getLogger(PDFGenerateHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-
-    public static void createQRCode(String qrCodeData, String filePath, String charset, Map hintMap, int qrCodeheight, int qrCodewidth) throws WriterException, IOException {
-        BitMatrix matrix = new MultiFormatWriter().encode(new String(qrCodeData.getBytes(charset), charset), BarcodeFormat.QR_CODE, qrCodewidth, qrCodeheight, hintMap);
-        MatrixToImageWriter.writeToFile(matrix, filePath.substring(filePath.lastIndexOf('.') + 1), new File(filePath));
     }
 }

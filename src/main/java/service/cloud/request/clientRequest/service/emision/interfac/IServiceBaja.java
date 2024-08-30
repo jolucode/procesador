@@ -5,11 +5,8 @@ import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 
 @Component
-public interface ServiceInterface {
+public interface IServiceBaja {
 
-
-    /**emision*/
-    public TransaccionRespuesta transactionDocument(TransacctionDTO transaction, String doctype) throws Exception;
 
     /**dar de baja*/
     public TransaccionRespuesta transactionVoidedDocument(TransacctionDTO transaction, String doctype) throws Exception ;
