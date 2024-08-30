@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-import service.cloud.request.clientRequest.ose.OSEClient;
-import service.cloud.request.clientRequest.ose.model.CdrStatusResponse;
+import service.cloud.request.clientRequest.proxy.ose.OSEClient;
+import service.cloud.request.clientRequest.proxy.ose.model.CdrStatusResponse;
 
 @RestController
 @RequestMapping("/ose")

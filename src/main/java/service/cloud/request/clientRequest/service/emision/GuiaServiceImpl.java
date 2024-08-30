@@ -2,22 +2,13 @@ package service.cloud.request.clientRequest.service.emision;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import io.joshworks.restclient.http.HttpResponse;
 import io.joshworks.restclient.http.Unirest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.NodeList;
 import service.cloud.request.clientRequest.config.ApplicationProperties;
 import service.cloud.request.clientRequest.config.ClientProperties;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
@@ -26,32 +17,25 @@ import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
 import service.cloud.request.clientRequest.extras.ISignerConfig;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
-import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
 import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.handler.PDFBasicGenerateHandler;
-import service.cloud.request.clientRequest.handler.PDFGenerateHandler;
 import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
-import service.cloud.request.clientRequest.prueba.Client;
-import service.cloud.request.clientRequest.prueba.model.ResponseDTO;
-import service.cloud.request.clientRequest.prueba.model.ResponseDTOAuth;
+import service.cloud.request.clientRequest.model.Client;
+import service.cloud.request.clientRequest.model.model.ResponseDTO;
+import service.cloud.request.clientRequest.model.model.ResponseDTOAuth;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
 import service.cloud.request.clientRequest.utils.CertificateUtils;
 import service.cloud.request.clientRequest.utils.LoggerTrans;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
-import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.TaxTotalType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonextensioncomponents_2.UBLExtensionType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonextensioncomponents_2.UBLExtensionsType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
 
 import javax.activation.DataHandler;
 import java.io.*;
 import java.math.BigDecimal;
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -143,21 +127,11 @@ public class GuiaServiceImpl implements GuiaInterface {
         String attachmentPath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() +
                 File.separator + "anexo"  + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
         fileHandler.setBaseDirectory(attachmentPath);
-        if (logger.isDebugEnabled()) {
-            logger.debug("transactionCreditNoteDocument() [" + this.docUUID + "] Ruta para los archivos adjuntos: " + attachmentPath);
-        }
+
         fileHandler.setBaseDirectory(attachmentPath);
-        if (logger.isDebugEnabled()) {
-            logger.debug("transactionRemissionGuideDocument() [" + this.docUUID + "] Ruta para los archivos adjuntos: " + attachmentPath);
-        }
 
         String documentPath = null;
         documentPath = fileHandler.storeDocumentInDisk(despatchAdviceType, documentName);
-
-        if (logger.isInfoEnabled()) {
-            logger.info("transactionRemissionGuideDocument() [" + this.docUUID + "] El documento [" + documentName + "] fue guardado en DISCO en: " + documentPath);
-        }
-
 
         SignerHandler signerHandler = SignerHandler.newInstance();
         signerHandler.setConfiguration(certificado, certiPassword, ksType, ksProvider, signerName);
@@ -165,9 +139,6 @@ public class GuiaServiceImpl implements GuiaInterface {
         File signedDocument = null;
         signedDocument = signerHandler.signDocument(documentPath, docUUID);
 
-        if (logger.isInfoEnabled()) {
-            logger.info("transactionRemissionGuideDocument() [" + this.docUUID + "] El documento [" + documentName + "] fue firmado correctamente en: " + signedDocument.getAbsolutePath());
-        }
         LoggerTrans.getCDThreadLogger().log(Level.INFO, "[" + this.docUUID + "] El documento [" + documentName + "] fue firmado correctamente en: " + signedDocument.getAbsolutePath());
 
         Object ublDocument = fileHandler.getSignedDocument(signedDocument, transaction.getDOC_Codigo());
@@ -183,12 +154,6 @@ public class GuiaServiceImpl implements GuiaInterface {
         DespatchAdviceType guia = documentWRP.getAdviceType();
 
         DataHandler zipDocument = fileHandler.compressUBLDocument(signedDocument, documentName, transaction.getSN_DocIdentidad_Nro(), transaction.getDocIdentidad_Nro());
-
-        if (logger.isInfoEnabled()) {
-            logger.info("transactionRemissionGuideDocument() [" + this.docUUID + "] El documento UBL fue convertido a formato ZIP.");
-        }
-
-        logger.error("ERRROR +++++++++ ==========" + zipDocument.toString());
 
         ConfigData configuracion = ConfigData
                 .builder()

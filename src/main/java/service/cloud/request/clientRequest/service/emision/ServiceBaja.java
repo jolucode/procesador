@@ -18,7 +18,7 @@ import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
-import service.cloud.request.clientRequest.prueba.Client;
+import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
 import service.cloud.request.clientRequest.utils.CertificateUtils;

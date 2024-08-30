@@ -10,10 +10,7 @@ import reactor.core.publisher.Mono;
 import service.cloud.request.clientRequest.config.ClientProperties;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
-import service.cloud.request.clientRequest.dto.dto.internal.PublicardocWs;
-import service.cloud.request.clientRequest.prueba.Client;
-
-import java.util.Optional;
+import service.cloud.request.clientRequest.model.Client;
 
 @Service
 public class PublicacionManager {
@@ -26,15 +23,8 @@ public class PublicacionManager {
     public void publicarDocumento( TransacctionDTO transacctionDTO, String feId, TransaccionRespuesta transaccionRespuesta) {
         try {
             Client client = clientProperties.listaClientesOf(transacctionDTO.getDocIdentidad_Nro());
-            //Optional<PublicardocWs> optionalPublicardocWs = null;// documentService.obtenerDocumentoPorId(feId);
-
-            //((if (optionalPublicardocWs.isPresent()) {
-            //PublicardocWs publicardocWs = optionalPublicardocWs.get();
             DocumentoPublicado documentoPublicado = new DocumentoPublicado(client, transacctionDTO, transaccionRespuesta);
             realizarPublicacion(client, documentoPublicado);
-            //} else {
-            //    System.err.println("El documento con ID " + feId + " no fue encontrado.");
-            //}
         } catch (Exception e) {
             System.err.println("Error durante la publicación: " + e.getMessage());
         }

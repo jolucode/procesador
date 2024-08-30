@@ -7,12 +7,8 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExceptionProxy {
-
     private String traza;
-
     private String descripcion;
-
-
 }
 
 

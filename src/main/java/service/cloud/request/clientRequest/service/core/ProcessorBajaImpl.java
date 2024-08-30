@@ -12,7 +12,7 @@ import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
-import service.cloud.request.clientRequest.prueba.Client;
+import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.LoggerTrans;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;

@@ -1198,7 +1198,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             String barcodeValue = generateBarCodeInfoString(invoiceType.getTransaccion().getDocIdentidad_Nro(), invoiceType.getTransaccion().getDOC_Codigo(), invoiceType.getTransaccion().getDOC_Serie(), invoiceType.getTransaccion().getDOC_Numero(), taxTotal, invoiceObj.getIssueDate(), invoiceType.getTransaccion().getDOC_MontoTotal().toString(), invoiceType.getTransaccion().getSN_DocIdentidad_Tipo(), invoiceType.getTransaccion().getSN_DocIdentidad_Nro(), invoiceType.getInvoiceType().getUBLExtensions());
 
-//            String barcodeValue = generateBarCodeInfoString(invoiceType.getInvoiceType().getID().getValue(), invoiceType.getInvoiceType().getInvoiceTypeCode().getValue(),invoiceObj.getIssueDate(), invoiceType.getInvoiceType().getLegalMonetaryTotal().getPayableAmount().getValue(), invoiceType.getInvoiceType().getTaxTotal(), invoiceType.getInvoiceType().getAccountingSupplierParty(), invoiceType.getInvoiceType().getAccountingCustomerParty(),invoiceType.getInvoiceType().getUBLExtensions());
+//          String barcodeValue = generateBarCodeInfoString(invoiceType.getInvoiceType().getID().getValue(), invoiceType.getInvoiceType().getInvoiceTypeCode().getValue(),invoiceObj.getIssueDate(), invoiceType.getInvoiceType().getLegalMonetaryTotal().getPayableAmount().getValue(), invoiceType.getInvoiceType().getTaxTotal(), invoiceType.getInvoiceType().getAccountingSupplierParty(), invoiceType.getInvoiceType().getAccountingCustomerParty(),invoiceType.getInvoiceType().getUBLExtensions());
             if (logger.isInfoEnabled()) {
                 logger.info("generateInvoicePDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
             }
@@ -1237,15 +1237,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             Map<String, LegendObject> legendsMap = null;
 
-            //if (TipoVersionUBL.factura.equals("21")) {
             legendsMap = getaddLeyends(invoiceType.getInvoiceType().getNote());
-            //} else if (TipoVersionUBL.factura.equals("20")) {
-            //    legendsMap = getAdditionalProperties(invoiceType.getInvoiceType().getUBLExtensions().getUBLExtension());
-
-            /*
-            Map<String, LegendObject> legendsMap = getAdditionalProperties(invoiceType
-                    .getInvoiceType().getUBLExtensions().getUBLExtension());
-             */
 
             if (logger.isDebugEnabled()) {
                 logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");

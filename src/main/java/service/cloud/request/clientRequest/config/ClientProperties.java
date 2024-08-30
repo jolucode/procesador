@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import service.cloud.request.clientRequest.prueba.Client;
+import service.cloud.request.clientRequest.model.Client;
 
 import java.util.HashMap;
 import java.util.Optional;

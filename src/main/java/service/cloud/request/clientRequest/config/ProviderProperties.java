@@ -2,9 +2,7 @@ package service.cloud.request.clientRequest.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import service.cloud.request.clientRequest.config.ApplicationProperties;
-import service.cloud.request.clientRequest.prueba.Client;
-import service.cloud.request.clientRequest.config.ClientProperties;
+import service.cloud.request.clientRequest.model.Client;
 
 import java.util.Optional;
 

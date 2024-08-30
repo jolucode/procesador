@@ -8,10 +8,9 @@ import org.springframework.stereotype.Service;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
-import service.cloud.request.clientRequest.dto.finalClass.Response;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
 import service.cloud.request.clientRequest.handler.FileHandler;
-import service.cloud.request.clientRequest.ose.model.CdrStatusResponse;
+import service.cloud.request.clientRequest.proxy.ose.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
@@ -28,7 +27,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,15 +46,9 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
     @Override
     public TransaccionRespuesta processCDRResponseV2(byte[] cdrConstancy, byte[] signedDocument,
                                                    UBLDocumentWRP documentWRP,
-                                                     TransacctionDTO transaction, ConfigData configuracion) throws IOException {
+                                                     TransacctionDTO transaction, ConfigData configuracion,String  documentName, String attachmentPath) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("+processCDRResponse() [" + this.docUUID + "]");
-        }
         TransaccionRespuesta transactionResponse = null;
-
-        byte[] documentBytes = signedDocument;
-
         TransaccionRespuesta.Sunat sunatResponse = proccessResponse(cdrConstancy, transaction, configuracion.getIntegracionWs());
 
         if ((IVenturaError.ERROR_0.getId() == sunatResponse.getCodigo()) || (4000 <= sunatResponse.getCodigo())) {
@@ -65,32 +57,36 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
             transactionResponse.setCodigo(TransaccionRespuesta.RQT_EMITDO_ESPERA);
             transactionResponse.setMensaje(sunatResponse.getMensaje());
             transactionResponse.setSunat(sunatResponse);
-            transactionResponse.setXml(documentBytes);
+            transactionResponse.setXml(signedDocument);
             transactionResponse.setZip(cdrConstancy);
             transactionResponse.setPdf(pdfBytes);
-
         } else {
             //documento rechazado
-            transactionResponse.setXml(documentBytes);
+            transactionResponse.setXml(signedDocument);
             transactionResponse.setZip(cdrConstancy);
         }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("-processCDRResponse() [" + this.docUUID + "]");
-        }
+        saveAllFiles(transactionResponse, documentName, attachmentPath);
         return transactionResponse;
     } //processCDRResponse
 
+    private void saveAllFiles(TransaccionRespuesta transactionResponse, String documentName, String attachmentPath) throws Exception {
+        FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
+        fileHandler.setBaseDirectory(attachmentPath);
+        fileHandler.storeDocumentInDisk(transactionResponse.getXml(), documentName, "xml");
+        fileHandler.storeDocumentInDisk(transactionResponse.getPdf(), documentName, "pdf");
+        fileHandler.storeDocumentInDisk(transactionResponse.getZip(), documentName, "zip");
+    }
+
     @Override
     //interface nueva:
-    public TransaccionRespuesta processResponseSinCDR(TransacctionDTO transaction) {
+    public TransaccionRespuesta processResponseSinCDR(TransacctionDTO transaction, CdrStatusResponse cdrStatusResponse) {
         if (logger.isDebugEnabled()) {
             logger.debug("+processResponseSinResponse() [" + this.docUUID + "]");
         }
         TransaccionRespuesta transactionResponse = null;
         transactionResponse = new TransaccionRespuesta();
         transactionResponse.setCodigo(TransaccionRespuesta.RQT_EMITIDO_EXCEPTION);
-        transactionResponse.setMensaje(IVenturaError.ERROR_458.getMessage());
+        transactionResponse.setMensaje(cdrStatusResponse.getStatusMessage());
 
         if (logger.isDebugEnabled()) {
             logger.debug("-processCDRResponse() [" + this.docUUID + "]");
@@ -193,11 +189,4 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
         }
         return new TransaccionRespuesta.Sunat();
     }
-
-    public TransaccionRespuesta processResponseService(TransacctionDTO transaction, CdrStatusResponse response) {
-        TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
-        transactionResponse.setMensaje(response.getStatusMessage());
-        return transactionResponse;
-    }
-
 }

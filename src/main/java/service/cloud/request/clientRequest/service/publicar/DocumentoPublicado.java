@@ -3,7 +3,7 @@ package service.cloud.request.clientRequest.service.publicar;
 import lombok.Data;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
-import service.cloud.request.clientRequest.prueba.Client;
+import service.cloud.request.clientRequest.model.Client;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

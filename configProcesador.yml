@@ -26,7 +26,7 @@ ventura:
 
         wsUsuario: 'admin'
         wsClave: 'ventura'
-        wsLocation: 'http://04082022harol.vsperufe.com/'
+        wsLocation: 'http://facturacion.vsperufe.com/'
 
         emisorElecRs: '205454844881/SUNAT'
         usuarioSol: '20510910517'
@@ -37,7 +37,7 @@ ventura:
         certificadoProveedor: 'SunJSSE'
         certificadoTipoKeystore: 'Pkcs12'
 
-        integracionWs: OSE
+        integracionWs: SUNAT
         mostrarSoap: 'true'
         pdfBorrador: 'true'
         impresion: 'Codigo QR'

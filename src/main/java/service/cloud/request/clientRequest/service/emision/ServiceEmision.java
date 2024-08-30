@@ -18,12 +18,13 @@ import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
-import service.cloud.request.clientRequest.ose.IOSEClient;
-import service.cloud.request.clientRequest.ose.model.CdrStatusResponse;
-import service.cloud.request.clientRequest.prueba.Client;
+import service.cloud.request.clientRequest.proxy.ose.IOSEClient;
+import service.cloud.request.clientRequest.proxy.ose.model.CdrStatusResponse;
+import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
+import service.cloud.request.clientRequest.proxy.sunat.ISUNATClient;
 import service.cloud.request.clientRequest.utils.CertificateUtils;
 
 import service.cloud.request.clientRequest.utils.DocumentNameUtils;
@@ -64,6 +65,9 @@ public class ServiceEmision implements IServiceEmision {
 
     @Autowired
     IOSEClient ioseClient;
+
+    @Autowired
+    ISUNATClient isunatClient;
 
     @Autowired
     ProcessorCoreInterface processorCoreInterface;
@@ -151,40 +155,50 @@ public class ServiceEmision implements IServiceEmision {
             return null;
         }
 
-        if (transaction.getFE_Estado().equalsIgnoreCase("N")) {
-            Thread.sleep(50);
-            TransaccionRespuesta transactionResponse = null;
-            CdrStatusResponse cdrStatusResponse = ioseClient.sendBill(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
-
-            if (cdrStatusResponse.getContent() != null) {
-                transactionResponse = processorCoreInterface.processCDRResponseV2(cdrStatusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion);
-                saveAllFiles(transactionResponse, documentName, attachmentPath);
-                return transactionResponse;
-            } else {
-                logger.error("Error: " + cdrStatusResponse.getStatusMessage());
-                transactionResponse = processorCoreInterface.processResponseService(transaction, cdrStatusResponse);
-                return transactionResponse;
-            }
-        } else if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
-            String documentRuc = transaction.getDocIdentidad_Nro();
-            String documentType = transaction.getDOC_Codigo();
-            String documentSerie = transaction.getDOC_Serie();
-            Integer documentNumber = Integer.valueOf(transaction.getDOC_Numero());
-
-            CdrStatusResponse statusResponse = ioseClient.getStatusCDR(documentRuc, documentType, documentSerie, documentNumber);
-            if (statusResponse.getContent() != null) {
-                TransaccionRespuesta transactionResponse = processorCoreInterface.processCDRResponseV2(statusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion);
-                saveAllFiles(transactionResponse, documentName, attachmentPath);
-                return transactionResponse;
-            } else {
-                return processorCoreInterface.processResponseSinCDR(transaction);
-            }
-        } else {
-            logger.error("Error: Unknown transaction status");
-            return null;
+        String estado = transaction.getFE_Estado().toUpperCase();
+        switch (estado) {
+            case "N":
+                return processNewTransaction(transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath, zipDocument);
+            case "C":
+                return processCancelledTransaction(transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
+            default:
+                logger.error("Error: Unknown transaction status");
+                return null;
         }
     }
 
+    private TransaccionRespuesta processNewTransaction(TransacctionDTO transaction, byte[] signedXmlDocument, UBLDocumentWRP documentWRP, ConfigData configuracion, String documentName, String attachmentPath, DataHandler zipDocument) throws Exception {
+        Thread.sleep(50);
+
+        CdrStatusResponse cdrStatusResponse = null;
+        if (configuracion.getIntegracionWs().equals("OSE")) {
+            cdrStatusResponse = ioseClient.sendBill(transaction.getDocIdentidad_Nro(), DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
+        } else {
+            cdrStatusResponse = isunatClient.sendBill(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
+        }
+
+        if (cdrStatusResponse.getContent() != null) {
+            return processorCoreInterface.processCDRResponseV2(cdrStatusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion, documentName, attachmentPath);
+        } else {
+            return processorCoreInterface.processResponseSinCDR(transaction, cdrStatusResponse);
+        }
+    }
+
+    private TransaccionRespuesta processCancelledTransaction(TransacctionDTO transaction, byte[] signedXmlDocument, UBLDocumentWRP documentWRP, ConfigData configuracion, String documentName, String attachmentPath) throws Exception {
+
+        CdrStatusResponse statusResponse = null;
+        if (configuracion.getIntegracionWs().equals("OSE")) {
+            statusResponse = ioseClient.getStatusCDR(transaction.getDocIdentidad_Nro(), transaction.getDOC_Codigo(), transaction.getDOC_Serie(), Integer.valueOf(transaction.getDOC_Numero()));
+        } else {
+            statusResponse = isunatClient.getStatusCDR(transaction.getDocIdentidad_Nro(), transaction.getDOC_Codigo(), transaction.getDOC_Serie(), Integer.valueOf(transaction.getDOC_Numero()));
+        }
+
+        if (statusResponse.getContent() != null) {
+            return processorCoreInterface.processCDRResponseV2(statusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion, documentName, attachmentPath);
+        } else {
+            return processorCoreInterface.processResponseSinCDR(transaction, statusResponse);
+        }
+    }
 
     private ConfigData createConfigData(Client client) {
         /*String valor = transaction.getTransaccionContractdocrefList().stream()
@@ -269,27 +283,33 @@ public class ServiceEmision implements IServiceEmision {
         if (logger.isDebugEnabled()) {
             logger.debug("+compressUBLDocument() [" + this.docUUID + "]");
         }
-
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-             ZipOutputStream zos = new ZipOutputStream(bos)) {
-            zos.putNextEntry(new ZipEntry(documentName));
-            zos.write(document);
-            zos.closeEntry();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("compressUBLDocument() [" + this.docUUID + "] El documento UBL fue convertido a formato ZIP correctamente.");
+        DataHandler zipDocument = null;
+        try {
+            try (ByteArrayInputStream bis = new ByteArrayInputStream(document)) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                try (ZipOutputStream zos = new ZipOutputStream(bos)) {
+                    byte[] array = new byte[10000];
+                    int read = 0;
+                    zos.putNextEntry(new ZipEntry(documentName));
+                    while ((read = bis.read(array, 0, array.length)) != -1) {
+                        zos.write(array, 0, read);
+                    }
+                    zos.closeEntry();
+                }
+                /* Retornando el objeto DATAHANDLER */
+                zipDocument = new DataHandler(new ByteArrayDataSource(bos.toByteArray(), "application/zip"));
+                if (logger.isDebugEnabled()) {
+                    logger.debug("compressUBLDocument() [" + this.docUUID + "] El documento UBL fue convertido a formato ZIP correctamente.");
+                }
             }
-            return new DataHandler(new ByteArrayDataSource(bos.toByteArray(), "application/zip"));
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("compressUBLDocument() [" + this.docUUID + "] " + e.getMessage());
-            throw new IOException(IVenturaError.ERROR_455.getMessage(), e);
-        } finally {
-            if (logger.isDebugEnabled()) {
-                logger.debug("-compressUBLDocument() [" + this.docUUID + "]");
-            }
+            throw new IOException(IVenturaError.ERROR_455.getMessage());
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("-compressUBLDocument() [" + this.docUUID + "]");
+        }
+        return zipDocument;
     }
 
 
@@ -350,12 +370,5 @@ public class ServiceEmision implements IServiceEmision {
         }
     }
 
-    private void saveAllFiles(TransaccionRespuesta transactionResponse, String documentName, String attachmentPath) throws Exception {
-        FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
-        fileHandler.setBaseDirectory(attachmentPath);
-        fileHandler.storeDocumentInDisk(transactionResponse.getXml(), documentName, "xml");
-        fileHandler.storeDocumentInDisk(transactionResponse.getPdf(), documentName, "pdf");
-        fileHandler.storeDocumentInDisk(transactionResponse.getZip(), documentName, "zip");
-    }
 
 }

@@ -164,6 +164,9 @@ public class FileHandler {
         return documentPath;
     } //storeDocumentInDisk
 
+
+
+
     /**
      * Este metodo comprime el documento UBL en formato ZIP.
      *
