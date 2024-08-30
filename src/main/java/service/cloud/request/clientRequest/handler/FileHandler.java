@@ -183,8 +183,6 @@ public class FileHandler {
         DataHandler zipDocument = null;
         try {
             String separator = File.separator;
-            //File zip = new File(this.baseDirectory + separator + this.xmlDirectory + separator + rucEmpresa + separator + rucCliente + separator + documentName + ISunatConnectorConfig.EE_ZIP);
-            //File file = new File(this.baseDirectory + separator + this.xmlDirectory + separator + rucEmpresa + separator + rucCliente);
             File zip = new File(this.baseDirectory + separator + documentName + ISunatConnectorConfig.EE_ZIP);
             File file = new File(this.baseDirectory );
 
@@ -219,72 +217,6 @@ public class FileHandler {
     } //compressUBLDocument
 
      //compressUBLDocument
-
-    /**
-     * Este metodo guarda la constancia de recepcion de Sunat (CDR) en DISCO.
-     *
-     * @param cdrResponse      Constancia de recepcion de Sunat (CDR).
-     * @param cdrConstancyName El nombre de la constancia de recepcion.
-     * @return Retorna un valor booleano que indica si la constancia fue
-     * guardada correctamente o no.
-     * @throws Exception
-     */
-    public boolean saveCDRConstancy(byte[] cdrResponse, String cdrConstancyName, String rucCliente, String rucEmpresa) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+saveCDRConstancy() [" + this.docUUID + "]");
-        }
-        boolean flag = false;
-        try {
-            String separator = File.separator;
-            String cdrDirectory = this.baseDirectory + separator + this.cdrDirectory + separator + rucEmpresa + separator + rucCliente;
-            File zipDocument = new File(cdrDirectory + separator + cdrConstancyName + ISunatConnectorConfig.EE_ZIP);
-            File file = new File(cdrDirectory);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            /*
-             * Guardando el CDR de respuesta en el File
-             * de salida.
-             */
-            saveBytesToFile(cdrResponse, zipDocument);
-            if (logger.isDebugEnabled()) {
-                logger.debug("saveCDRConstancy() [" + this.docUUID + "] Se guardo la constancia CDR en DISCO, RUTA: " + zipDocument.getAbsolutePath());
-            }
-            flag = true;
-        } catch (Exception e) {
-            logger.error("saveCDRConstancy() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
-            throw e;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-saveCDRConstancy() [" + this.docUUID + "]");
-        }
-        return flag;
-    } //saveCDRConstancy
-
-    /**
-     * Este metodo guarda un archivo que se encuentra en bytes ha una ruta
-     * especifica.
-     *
-     * @param bytes El archivo en bytes.
-     * @param file  La ruta en donde se guardara el archivo.
-     * @throws FileNotFoundException
-     * @throws Exception
-     */
-    public void saveBytesToFile(byte[] bytes, File file) throws FileNotFoundException, Exception {
-        try {
-            Path path = Paths.get(file.toURI());
-            Files.write(path, bytes);
-        } catch (FileNotFoundException e) {
-            logger.error("saveBytesToFile() [" + this.docUUID + "] FileNotFoundException - ERROR: " + e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("El CDR obtenido por parte de SUNAT es NULO");
-            if (logger.isDebugEnabled() || logger.isInfoEnabled()) {
-                logger.error("saveBytesToFile() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
-            }
-            throw e;
-        }
-    } //saveBytesToFile
 
     /**
      * Este metodo convierte un archivo, que se encuentra en una ruta

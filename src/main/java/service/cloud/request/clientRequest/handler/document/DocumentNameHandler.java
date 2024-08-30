@@ -39,17 +39,6 @@ public class DocumentNameHandler {
     } // newInstance
 
     /**
-     * Este metodo obtiene el nombre de un documento de tipo PERCEPCION.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento (Serie y correlativo).
-     * @return Retorna el nombre del documento de tipo PERCEPCION.
-     */
-    public String getPerceptionName(String senderRUC, String docIdentifier) {
-        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC, IUBLConfig.DOC_PERCEPTION_CODE, docIdentifier);
-    } // getPerceptionName
-
-    /**
      * Este metodo obtiene el nombre de un documento de tipo RETENCION.
      *
      * @param senderRUC     Numero de RUC del emisor.
@@ -60,55 +49,6 @@ public class DocumentNameHandler {
         return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
                 IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE, docIdentifier);
     }
-
-    /**
-     * Este metodo obtiene el nombre de un documento de tipo RETENCION.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento (Serie y correlativo).
-     * @return Retorna el nombre del documento de tipo RETENCION.
-     */
-    public String getRetentionName(String senderRUC, String docIdentifier) {
-        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
-                IUBLConfig.DOC_RETENTION_CODE, docIdentifier);
-    }
-
-    /**
-     * Este metodo obtiene el nombre de un documento de tipo FACTURA.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento (Serie y correlativo).
-     * @return Retorna el nombre del documento de tipo FACTURA.
-     */
-    public String getInvoiceName(String senderRUC, String docIdentifier, String docType) {
-        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
-                docType, docIdentifier);
-    } // getInvoiceName
-
-
-    /**
-     * Este metodo obtiene el nombre de un documento de tipo NOTA DE CREDITO.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento (Serie y correlativo).
-     * @return Retorna el nombre del documento de tipo NOTA DE CREDITO.
-     */
-    public String getCreditNoteName(String senderRUC, String docIdentifier) {
-        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
-                IUBLConfig.DOC_CREDIT_NOTE_CODE, docIdentifier);
-    } // getCreditNoteName
-
-    /**
-     * Este metodo obtiene el nombre de un documento de tipo NOTA DE DEBITO.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento (Serie y correlativo).
-     * @return Retorna el nombre del documento de tipo NOTA DE DEBITO.
-     */
-    public String getDebitNoteName(String senderRUC, String docIdentifier) {
-        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
-                IUBLConfig.DOC_DEBIT_NOTE_CODE, docIdentifier);
-    } // getDebitNoteName
 
     /**
      * Este metodo obtiene el nombre de un documento de tipo COMUNICACION DE

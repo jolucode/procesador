@@ -1070,87 +1070,6 @@ public abstract class UBLBasicHandler {
     }
 
 
-    protected List<PaymentTermsType> getPaymentTermsNoteCreditLast(boolean contado, TransacctionDTO transaccion) {
-        List<PaymentTermsType> paymentTermsTypes = new ArrayList<>();
-        try {
-            PaymentTermsType paymentTermsType = null;
-            PaymentTermsType paymentTermsType1 = null;
-            PaymentTermsType paymentTermsType2 = null;
-
-            if (contado) {
-                List<PaymentMeansIDType> paymentMeansIDList = new ArrayList<>();
-                paymentTermsType = new PaymentTermsType();
-                IDType idType = new IDType();
-                idType.setValue("FormaPago");
-                PaymentMeansIDType paymentMeansIDType = new PaymentMeansIDType();
-                paymentMeansIDType.setValue("Contado");
-                paymentMeansIDList.add(paymentMeansIDType);
-                paymentTermsType.setID(idType);
-                paymentTermsType.setPaymentMeansID(paymentMeansIDList);
-                paymentTermsTypes.add(paymentTermsType);
-            } else {
-                paymentTermsType1 = new PaymentTermsType();
-                paymentTermsType2 = new PaymentTermsType();
-                List<PaymentMeansIDType> paymentMeansIDList1 = new ArrayList<>();
-                IDType idType = new IDType();
-                idType.setValue("FormaPago");
-                PaymentMeansIDType paymentMeansIDType = new PaymentMeansIDType();
-                paymentMeansIDType.setValue("Credito");
-                paymentMeansIDList1.add(paymentMeansIDType);
-                AmountType amountType = new AmountType();
-                amountType.setCurrencyID(transaccion.getDOC_MON_Codigo());
-                if (transaccion.getDOC_Codigo().equals("07")) {
-                    BigDecimal pago = Optional.ofNullable(transaccion.getImporteDOCRef()).orElse(BigDecimal.ZERO);
-                    amountType.setValue(pago.setScale(2, RoundingMode.HALF_UP));
-                }
-                /*} else {
-                    BigDecimal pago = Optional.<BigDecimal>ofNullable(transaccion.getDOCMontoTotal().setScale(2, 4)).orElse(BigDecimal.ZERO);
-                    BigDecimal montoDetraccion = Optional.<BigDecimal>ofNullable(transaccion.getMontoDetraccion()).orElse(BigDecimal.ZERO);
-                    amountType.setValue(pago.subtract(montoDetraccion).setScale(2, 4));
-                }*/
-                paymentTermsType1.setID(idType);
-                paymentTermsType1.setPaymentMeansID(paymentMeansIDList1);
-                paymentTermsType1.setAmount(amountType);
-                List<PaymentMeansIDType> paymentMeansIDList2 = new ArrayList<>();
-                PaymentMeansIDType paymentMeansIDType2 = new PaymentMeansIDType();
-                paymentMeansIDType2.setValue("Cuota001");
-                paymentMeansIDList2.add(paymentMeansIDType2);
-                PaymentDueDateType paymentDueDateType = new PaymentDueDateType();
-                paymentTermsType2.setID(idType);
-                paymentTermsType2.setPaymentMeansID(paymentMeansIDList2);
-                paymentTermsType2.setAmount(amountType);
-                String FORMATER = "yyyy-MM-dd";
-                SimpleDateFormat FORMATERRef = new SimpleDateFormat("dd/MM/yyyy");
-                /*if (transaccion.getDOCCodigo().equals("01")) {
-                    Date date = new Date();
-                    DateFormat format = new SimpleDateFormat(FORMATER);
-                    XMLGregorianCalendar xmlDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(date));
-                    paymentDueDateType.setValue(xmlDate);
-                    paymentTermsType2.setPaymentDueDate(paymentDueDateType);
-                } else*/
-                if (transaccion.getDOC_Codigo().equals("07")) {
-                    if (transaccion.getREFDOC_MotivCode().equals("13")) {
-                        Date fechaVencref = FORMATERRef.parse(transaccion.getFechaVenDOCRef());
-                        DateFormat format = new SimpleDateFormat(FORMATER);
-                        XMLGregorianCalendar xmlDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(fechaVencref));
-                        paymentDueDateType.setValue(xmlDate);
-                        paymentTermsType2.setPaymentDueDate(paymentDueDateType);
-                    } else {
-                        Date fechaVencimientoEmis = FORMATERRef.parse(transaccion.getFechaVenDOCRef());
-                        DateFormat format = new SimpleDateFormat(FORMATER);
-                        XMLGregorianCalendar xmlDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(fechaVencimientoEmis));
-                        paymentDueDateType.setValue(xmlDate);
-                        paymentTermsType2.setPaymentDueDate(paymentDueDateType);
-                    }
-                }
-                paymentTermsTypes.add(paymentTermsType1);
-                paymentTermsTypes.add(paymentTermsType2);
-            }
-        } catch (Exception e) {
-            this.logger.trace("Se presenta un error aqu" + e.getMessage() + e.getLocalizedMessage());
-        }
-        return paymentTermsTypes;
-    }
 
     protected CustomerPartyType getAccountingCustomerPartyV21(String identifier, String identifierType, String socialReason, String commercialName, String fiscalAddress,
                                                               String department, String province, String district, String ubigeo, String countryCode, String contactName, String electronicMail) throws UBLDocumentException {
@@ -2533,26 +2452,6 @@ public abstract class UBLBasicHandler {
         pricingReference.getAlternativeConditionPrice().add(alternativeConditionPrice);
         return pricingReference;
     } //getPricingReference
-
-    protected PriceType getAlternativeConditionPrice(String priceTypeCodeValue, BigDecimal priceAmountValue, String currencyCode) {
-        PriceType alternativeConditionPrice = new PriceType();
-
-        /* <cac:AlternativeConditionPrice><cbc:PriceAmount> */
-        PriceAmountType priceAmount = new PriceAmountType();
-        priceAmount.setValue(priceAmountValue.setScale(IUBLConfig.DECIMAL_LINE_REFERENCE_VALUE, RoundingMode.HALF_UP));
-        priceAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
-        alternativeConditionPrice.setPriceAmount(priceAmount);
-
-        /* <cac:AlternativeConditionPrice><cbc:PriceTypeCode> */
-        PriceTypeCodeType priceTypeCode = new PriceTypeCodeType();
-        priceTypeCode.setValue(priceTypeCodeValue);
-        priceTypeCode.setListAgencyName(IUBLConfig.LIST_AGENCY_NAME_PE_SUNAT);
-        priceTypeCode.setListName("Tipo de Precio");
-        priceTypeCode.setListURI(IUBLConfig.URI_CATALOG_16);
-        alternativeConditionPrice.setPriceTypeCode(priceTypeCode);
-
-        return alternativeConditionPrice;
-    } //getAlternativeConditionPrice
 
     protected DeliveryType getDeliveryForLine(String codUbigeoDestino, String direccionDestino, String codUbigeoOrigen, String direccionOrigen, String detalleViaje,
                                               BigDecimal valorCargaEfectiva, BigDecimal valorCargaUtil, BigDecimal valorTransporte, String confVehicular, BigDecimal cUtilVehiculo, BigDecimal cEfectivaVehiculo,

@@ -92,9 +92,6 @@ public class PDFDebitNoteCreator extends DocumentCreator {
      * @throws PDFReportException
      */
     public static PDFDebitNoteCreator getInstance(String debitNoteReportPath, String legendSubReportPath) throws PDFReportException {
-        /*if (null == instance) {
-            instance = new PDFDebitNoteCreator(debitNoteReportPath, legendSubReportPath);
-        }*/
         instance = new PDFDebitNoteCreator(debitNoteReportPath, legendSubReportPath);
         return instance;
     } //getInstance
