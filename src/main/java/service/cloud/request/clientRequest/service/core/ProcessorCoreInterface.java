@@ -6,6 +6,7 @@ import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.finalClass.Response;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
 import service.cloud.request.clientRequest.handler.FileHandler;
+import service.cloud.request.clientRequest.ose.model.CdrStatusResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +26,6 @@ public interface ProcessorCoreInterface {
 
   public TransaccionRespuesta.Sunat proccessResponse(byte[] cdrConstancy, TransacctionDTO transaction, String sunatType);
 
-  public TransaccionRespuesta processResponseService(TransacctionDTO transaction, Response response);
+  public TransaccionRespuesta processResponseService(TransacctionDTO transaction, CdrStatusResponse response);
 
 }

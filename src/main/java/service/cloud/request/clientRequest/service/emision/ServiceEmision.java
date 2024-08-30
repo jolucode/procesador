@@ -15,7 +15,6 @@ import service.cloud.request.clientRequest.extras.ISignerConfig;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
 import service.cloud.request.clientRequest.handler.FileHandler;
-import service.cloud.request.clientRequest.handler.PDFBasicGenerateHandler;
 import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
@@ -45,7 +44,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.*;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -70,15 +68,11 @@ public class ServiceEmision implements IServiceEmision {
     @Autowired
     ProcessorCoreInterface processorCoreInterface;
 
-
     @Autowired
     DocumentFormatInterface documentFormatInterface;
 
     @Override
     public TransaccionRespuesta transactionDocument(TransacctionDTO transaction, String doctype) throws Exception {
-
-        TransaccionRespuesta transactionResponse = null;
-
 
         boolean isContingencia = isContingencia(transaction);
         ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
@@ -90,112 +84,124 @@ public class ServiceEmision implements IServiceEmision {
         validateCertificate(certificado, client);
 
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
-
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
         UBLDocumentWRP documentWRP = UBLDocumentWRP.getInstance();
-        String digestValue = "";
-        String barcodeValue = "";
-        PDFBasicGenerateHandler db = new PDFBasicGenerateHandler(docUUID);
 
         // Configura la ruta de almacenamiento del archivo
         String attachmentPath = getAttachmentPath(transaction, doctype);
         fileHandler.setBaseDirectory(attachmentPath);
 
-
         String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
 
-        byte[] signedXmlDocument = null;
-        SignerHandler signerHandler = SignerHandler.newInstance();
-        signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), client.getCertificadoTipoKeystore(), client.getCertificadoProveedor(), signerName);
+        byte[] xmlDocument = null;
 
         if (doctype.equals("07")) {
             CreditNoteType creditNoteType = ublHandler.generateCreditNoteType(transaction, signerName);
-            byte[] xmlDocument = convertDocumentToBytes(creditNoteType); //generico
-            signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+            xmlDocument = convertDocumentToBytes(creditNoteType); //generico
         } else if (doctype.equals("08")) {
             DebitNoteType debitNoteType = ublHandler.generateDebitNoteType(transaction, signerName);
-            byte[] xmlDocument = convertDocumentToBytes(debitNoteType);
-            signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+            xmlDocument = convertDocumentToBytes(debitNoteType);
         } else if (doctype.equals("01")) {
             InvoiceType invoiceType = ublHandler.generateInvoiceType(transaction, signerName);
-            byte[] xmlDocument = convertDocumentToBytes(invoiceType);
-            signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+            xmlDocument = convertDocumentToBytes(invoiceType);
         } else if (doctype.equals("03")) {
             InvoiceType invoiceType = ublHandler.generateInvoiceType(transaction, signerName);
-            byte[] xmlDocument = convertDocumentToBytes(invoiceType);
-            signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+            xmlDocument = convertDocumentToBytes(invoiceType);
         } else if (doctype.equals("40")) {
             PerceptionType perceptionType = ublHandler.generatePerceptionType(transaction, signerName);
             validationHandler.checkPerceptionDocument(perceptionType);
-            byte[] xmlDocument = convertDocumentToBytes(perceptionType);
-            signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+            xmlDocument = convertDocumentToBytes(perceptionType);
         } else if (doctype.equals("20")) {
             RetentionType retentionType = ublHandler.generateRetentionType(transaction, signerName);
             validationHandler.checkRetentionDocument(retentionType);
-            byte[] xmlDocument = convertDocumentToBytes(retentionType);
-            signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+            xmlDocument = convertDocumentToBytes(retentionType);
         }
 
+        SignerHandler signerHandler = SignerHandler.newInstance();
+        signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), client.getCertificadoTipoKeystore(), client.getCertificadoProveedor(), signerName);
+
+        byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
         String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
         documentWRP = configureDocumentWRP(documentWRP, signedXmlDocument, transaction.getDOC_Codigo(), doctype);
         documentWRP.setTransaccion(transaction);
         Object ublDocument = getSignedDocumentV(signedXmlDocument, transaction.getDOC_Codigo());
 
-        /**Guardando el documento xml UBL en DISCO*/
         String documentPath = fileHandler.storeDocumentInDisk(ublDocument, documentName);
-
         logger.info("Documento XML guardado en disco : " + documentPath);
 
-        /*String valor = transaction.getTransaccionContractdocrefList().stream()
-                .filter(x -> x.getUsuariocampos().getNombre().equals("pdfadicional"))
-                .map(x -> x.getValor())
-                .findFirst()
-                .orElse("No");*/
-
-        ConfigData configuracion = ConfigData.builder().usuarioSol(client.getUsuarioSol()).claveSol(client.getClaveSol()).integracionWs(client.getIntegracionWs()).ambiente(applicationProperties.getAmbiente()).mostrarSoap(client.getMostrarSoap()).pdfBorrador(client.getPdfBorrador()).impresionPDF(client.getImpresion()).rutaBaseDoc(applicationProperties.getRutaBaseDoc())
-                //.pdfIngles(valor)
-                .build();
+        ConfigData configuracion = createConfigData(client);
 
         DataHandler zipDocument = compressUBLDocumentv2(signedXmlDocument, documentName + ".xml");
 
-        if (null != zipDocument) {
-            if (transaction.getFE_Estado().equalsIgnoreCase("N")) {
-                Thread.sleep(50);
-
-                CdrStatusResponse cdrStatusResponse = ioseClient.sendBill(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
-                if (cdrStatusResponse.getContent() != null) {
-                    transactionResponse = processorCoreInterface.processCDRResponseV2(cdrStatusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion);
-                    saveAllFiles(transactionResponse, documentName, attachmentPath);
-                } else {
-                    logger.error("Error: " + transactionResponse.getMensaje());
-                }
-            } else {
-                if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
-
-                    String documentRuc = transaction.getDocIdentidad_Nro();
-                    String documentType = transaction.getDOC_Codigo();
-                    String documentSerie = transaction.getDOC_Serie();
-                    Integer documentNumber = Integer.valueOf(transaction.getDOC_Numero());
-                    CdrStatusResponse statusResponse = ioseClient.getStatusCDR(documentRuc, documentType, documentSerie, documentNumber);
-                    if (statusResponse.getContent() != null) {
-                        transactionResponse = processorCoreInterface.processCDRResponseV2(statusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion);
-                        saveAllFiles(transactionResponse, documentName, attachmentPath);
-                    } else {
-                        transactionResponse = processorCoreInterface.processResponseSinCDR(transaction);
-                    }
-
-                }
-            }
-        }
+        TransaccionRespuesta transactionResponse = handleTransactionStatus(transaction, zipDocument, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
 
         if (client.getPdfBorrador().equals("true")) {
             transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
         }
 
-        transactionResponse.setIdentificador(documentName);
-        transactionResponse.setDigestValue(digestValue);
-        transactionResponse.setBarcodeValue(barcodeValue);
         return transactionResponse;
+    }
+
+    private TransaccionRespuesta handleTransactionStatus(TransacctionDTO transaction, DataHandler zipDocument,
+                                                         byte[] signedXmlDocument, UBLDocumentWRP documentWRP,
+                                                         ConfigData configuracion, String documentName,
+                                                         String attachmentPath) throws Exception {
+        if (zipDocument == null) {
+            logger.error("Error: Zip document is null");
+            return null;
+        }
+
+        if (transaction.getFE_Estado().equalsIgnoreCase("N")) {
+            Thread.sleep(50);
+            TransaccionRespuesta transactionResponse = null;
+            CdrStatusResponse cdrStatusResponse = ioseClient.sendBill(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
+
+            if (cdrStatusResponse.getContent() != null) {
+                transactionResponse = processorCoreInterface.processCDRResponseV2(cdrStatusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion);
+                saveAllFiles(transactionResponse, documentName, attachmentPath);
+                return transactionResponse;
+            } else {
+                logger.error("Error: " + cdrStatusResponse.getStatusMessage());
+                transactionResponse = processorCoreInterface.processResponseService(transaction, cdrStatusResponse);
+                return transactionResponse;
+            }
+        } else if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
+            String documentRuc = transaction.getDocIdentidad_Nro();
+            String documentType = transaction.getDOC_Codigo();
+            String documentSerie = transaction.getDOC_Serie();
+            Integer documentNumber = Integer.valueOf(transaction.getDOC_Numero());
+
+            CdrStatusResponse statusResponse = ioseClient.getStatusCDR(documentRuc, documentType, documentSerie, documentNumber);
+            if (statusResponse.getContent() != null) {
+                TransaccionRespuesta transactionResponse = processorCoreInterface.processCDRResponseV2(statusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion);
+                saveAllFiles(transactionResponse, documentName, attachmentPath);
+                return transactionResponse;
+            } else {
+                return processorCoreInterface.processResponseSinCDR(transaction);
+            }
+        } else {
+            logger.error("Error: Unknown transaction status");
+            return null;
+        }
+    }
+
+
+    private ConfigData createConfigData(Client client) {
+        /*String valor = transaction.getTransaccionContractdocrefList().stream()
+                .filter(x -> x.getUsuariocampos().getNombre().equals("pdfadicional"))
+                .map(x -> x.getValor())
+                .findFirst()
+                .orElse("No");*/
+        return ConfigData.builder()
+                .usuarioSol(client.getUsuarioSol())
+                .claveSol(client.getClaveSol())
+                .integracionWs(client.getIntegracionWs())
+                .ambiente(applicationProperties.getAmbiente())
+                .mostrarSoap(client.getMostrarSoap())
+                .pdfBorrador(client.getPdfBorrador())
+                .impresionPDF(client.getImpresion())
+                .rutaBaseDoc(applicationProperties.getRutaBaseDoc())
+                .build();
     }
 
     private boolean isContingencia(TransacctionDTO transaction) {
@@ -203,7 +209,7 @@ public class ServiceEmision implements IServiceEmision {
         for (Map<String, String> contractdocref : contractdocrefs) {
             //if ("cu31".equalsIgnoreCase(contractdocref.get("Usuariocampos").get("Nombre"))) {
             //    return "Si".equalsIgnoreCase(contractdocref.get("Valor"));
-           // }
+            // }
         }
         return false;
     }
@@ -216,9 +222,7 @@ public class ServiceEmision implements IServiceEmision {
         int mes = fecha.get(Calendar.MONTH) + 1;
         int dia = fecha.get(Calendar.DAY_OF_MONTH);
 
-        return applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + "anexo"
-                + File.separator + anio + File.separator + mes + File.separator + dia
-                + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
+        return applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + "anexo" + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
     }
 
     private Client getClientData(TransacctionDTO transaction) {
@@ -226,14 +230,12 @@ public class ServiceEmision implements IServiceEmision {
     }
 
     private byte[] loadCertificate(Client client, String docIdentidadNuumero) throws ConfigurationException, FileNotFoundException {
-        String certificatePath = applicationProperties.getRutaBaseDoc() + docIdentidadNuumero
-                + File.separator + client.getCertificadoName();
+        String certificatePath = applicationProperties.getRutaBaseDoc() + docIdentidadNuumero + File.separator + client.getCertificadoName();
         return CertificateUtils.getCertificateInBytes(certificatePath);
     }
 
     private void validateCertificate(byte[] certificate, Client client) throws SignerDocumentException {
-        CertificateUtils.checkDigitalCertificateV2(certificate, client.getCertificadoPassword(),
-                client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
+        CertificateUtils.checkDigitalCertificateV2(certificate, client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
     }
 
     private UBLDocumentWRP configureDocumentWRP(UBLDocumentWRP documentWRP, byte[] signedXmlDocument, String docCodigo, String doctype) throws Exception {

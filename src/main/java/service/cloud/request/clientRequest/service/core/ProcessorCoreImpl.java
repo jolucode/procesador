@@ -11,6 +11,7 @@ import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.finalClass.Response;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
 import service.cloud.request.clientRequest.handler.FileHandler;
+import service.cloud.request.clientRequest.ose.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
@@ -68,13 +69,11 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
             transactionResponse.setZip(cdrConstancy);
             transactionResponse.setPdf(pdfBytes);
 
-
         } else {
             //documento rechazado
             transactionResponse.setXml(documentBytes);
             transactionResponse.setZip(cdrConstancy);
         }
-
 
         if (logger.isDebugEnabled()) {
             logger.debug("-processCDRResponse() [" + this.docUUID + "]");
@@ -194,11 +193,10 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
         }
         return new TransaccionRespuesta.Sunat();
     }
-    public TransaccionRespuesta processResponseService(TransacctionDTO transaction, Response response) {
 
+    public TransaccionRespuesta processResponseService(TransacctionDTO transaction, CdrStatusResponse response) {
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
-        transactionResponse.setMensaje(response.getErrorMessage());
-
+        transactionResponse.setMensaje(response.getStatusMessage());
         return transactionResponse;
     }
 
