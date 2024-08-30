@@ -20,13 +20,13 @@ public class PublicacionManager {
     @Autowired
     ClientProperties clientProperties;
 
-    public void publicarDocumento( TransacctionDTO transacctionDTO, String feId, TransaccionRespuesta transaccionRespuesta) {
+    public void publicarDocumento(TransacctionDTO transacctionDTO, String feId, TransaccionRespuesta transaccionRespuesta) {
         try {
             Client client = clientProperties.listaClientesOf(transacctionDTO.getDocIdentidad_Nro());
             DocumentoPublicado documentoPublicado = new DocumentoPublicado(client, transacctionDTO, transaccionRespuesta);
             realizarPublicacion(client, documentoPublicado);
         } catch (Exception e) {
-            System.err.println("Error durante la publicación: " + e.getMessage());
+            logger.error("Error al intentar publicar el documento: " + e.getMessage());
         }
     }
 
@@ -36,14 +36,15 @@ public class PublicacionManager {
                 .doOnError(error -> logError("Error en la publicación", error))
                 .block();
 
-        if (respuesta.contains("correctamente")) {
+        if (respuesta != null && respuesta.contains("correctamente")) {
             logger.info("Publicación exitosa: " + respuesta);
             logger.info("Publicado en: " + client.getWsLocation());
         }
     }
 
+
     private void logError(String message, Throwable error) {
-        System.err.println(message + ": " + error.getMessage());
+        logger.error(message + ": " + error.getMessage());
     }
 
     public Mono<String> publicarDocumentoWs(String apiUrl, DocumentoPublicado documentoPublicado) {
