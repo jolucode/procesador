@@ -15,13 +15,20 @@ import service.cloud.request.clientRequest.dto.request.RequestPost;
 import service.cloud.request.clientRequest.dto.response.Data;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
+import service.cloud.request.clientRequest.mongo.model.TransaccionBaja;
+import service.cloud.request.clientRequest.mongo.repo.ITransaccionBajaRepository;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
 import service.cloud.request.clientRequest.service.publicar.PublicacionManager;
 import service.cloud.request.clientRequest.utils.LoggerTrans;
+import service.cloud.request.clientRequest.utils.Utils;
 
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -47,6 +54,9 @@ public class CloudService implements CloudInterface {
 
     @Autowired
     IServiceEmision iServiceEmision;
+
+    @Autowired
+    ITransaccionBajaRepository iTransaccionBajaRepository;
 
     @Override
     public ResponseEntity<RequestPost> proccessDocument(String stringRequestOnpremise) {
@@ -151,7 +161,6 @@ public class CloudService implements CloudInterface {
                 return iServiceEmision.transactionDocument(transaction, codigoDocumento);
 
             case ISunatConnectorConfig.FE_TIPO_TRANS_BAJA:
-                transaction.setANTICIPO_Id(GenerarIDyFecha(transaction));
                 return iServiceBaja.transactionVoidedDocument(transaction, codigoDocumento);
 
             default:
@@ -230,62 +239,7 @@ public class CloudService implements CloudInterface {
         return request;
     }
 
-    public String GenerarIDyFecha(TransacctionDTO tr) {
-        String serie = "";
-        try {
-            if (tr.getFE_TipoTrans().compareTo("E") == 0) {
-                return "";
-            }
-            /*TransaccionBaja trb = transaccionBajaRepository.getLastRow();
-            LocalDateTime date = LocalDateTime.now();
-            Date fecha = Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-            TransaccionBaja nuevaBaja = new TransaccionBaja();
 
-            if (trb != null) {
-                int indexOf = trb.getSerie().lastIndexOf("-");
-                String fin = trb.getSerie().substring(indexOf + 1);
-                if (simpleDateFormat.format(fecha).equals(trb.getFecha().toString())) {
-                    int numero = Integer.parseInt(fin);
-                    numero++;
-                    String nuevoId = String.format("%05d", numero);
-                    serie = "RA-" + simpleDateFormat.format(fecha) + "-" + nuevoId;
-                    tr.setANTICIPO_Id(serie);
-
-                    trb.setFecha(Long.valueOf(simpleDateFormat.format(fecha)));
-                    trb.setId(numero);
-                    trb.setSerie(serie);
-                    //transaccionBajaRepository.saveAndFlush(trb);
-                } else {
-                    String nuevoId = String.format("%05d", 1);
-                    serie = "RA-" + simpleDateFormat.format(fecha) + "-" + nuevoId;
-
-                    TransaccionBaja nuevaBaja2 = new TransaccionBaja();
-                    nuevaBaja2.setFecha(Long.valueOf(simpleDateFormat.format(fecha)));
-                    nuevaBaja2.setId(1);
-                    nuevaBaja2.setSerie(serie);
-
-                    //transaccionBajaRepository.saveAndFlush(nuevaBaja2);
-                }
-            } else {
-                int numero = 0;
-                numero++;
-                String nuevoId = String.format("%05d", numero);
-                serie = "RA-" + simpleDateFormat.format(fecha) + "-" + nuevoId;
-                tr.setANTICIPO_Id(serie);
-
-                nuevaBaja.setSerie(serie);
-                nuevaBaja.setFecha(Long.valueOf(simpleDateFormat.format(fecha)));
-                nuevaBaja.setId(numero);
-            }
-            tr.setANTICIPO_Id(serie);*/
-            //transaccionRepository.save(tr);
-
-        } catch (Exception ex) {
-            LoggerTrans.getCDThreadLogger().log(Level.SEVERE, ex.getMessage());
-        }
-        return serie;
-    }
 
 
 }

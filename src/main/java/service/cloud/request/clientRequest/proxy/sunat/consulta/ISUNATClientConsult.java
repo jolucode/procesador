@@ -1,11 +1,11 @@
-package service.cloud.request.clientRequest.proxy.ose;
+package service.cloud.request.clientRequest.proxy.sunat.consulta;
 
 
 import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
 
 import javax.activation.DataHandler;
 
-public interface IOSEClient {
+public interface ISUNATClientConsult {
 
 
     /**
@@ -17,8 +17,7 @@ public interface IOSEClient {
      * @return Retorna el CDR OSE de respuesta.
      * @throws Exception
      */
-    CdrStatusResponse sendBill(String ruc, String fileName, DataHandler contentFile) throws Exception;
-
+    //CdrStatusResponse sendBill(String ruc, String fileName, DataHandler contentFile) throws Exception;
 
     /**
      * Este metodo ha implementar enviara el documento ('Resumen Diario' o 'Comunicacion de Baja') al
@@ -29,7 +28,7 @@ public interface IOSEClient {
      * @return Retorna el numero de ticket.
      * @throws Exception
      */
-    String sendSummary(String ruc, String fileName, DataHandler contentFile) throws Exception;
+    //String sendSummary(String ruc, String fileName, DataHandler contentFile) throws Exception;
 
 
     /**
@@ -42,6 +41,7 @@ public interface IOSEClient {
      * @throws Exception
      */
     CdrStatusResponse getStatus(String ruc, String ticket) throws Exception;
+
 
     /**
      * Este metodo ha implementar consultara el estado de un CDR OSE, retornando un objeto CdrStatusResponse

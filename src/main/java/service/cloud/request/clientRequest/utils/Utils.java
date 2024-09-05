@@ -79,5 +79,7 @@ public class Utils {
         return value;
     }
 
-
+    public static boolean isNullOrTrimmedEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
 }

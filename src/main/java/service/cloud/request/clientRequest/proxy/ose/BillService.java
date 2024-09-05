@@ -27,11 +27,35 @@ public interface BillService {
             javax.activation.DataHandler contentFile
     );
 
+
+    @WebMethod(action = "urn:sendSummary")
+    @RequestWrapper(localName = "sendSummary", targetNamespace = "http://service.sunat.gob.pe", className = "service.cloud.request.clientRequest.proxy.ose.object.SendSummary")
+    @ResponseWrapper(localName = "sendSummaryResponse", targetNamespace = "http://service.sunat.gob.pe", className = "service.cloud.request.clientRequest.proxy.ose.object.SendSummaryResponse")
+    @WebResult(name = "ticket", targetNamespace = "")
+    String sendSummary(
+
+            @WebParam(name = "fileName", targetNamespace = "")
+            String fileName,
+            @WebParam(name = "contentFile", targetNamespace = "")
+            javax.activation.DataHandler contentFile
+    );
+
+
+    @WebMethod(action = "urn:getStatus")
+    @RequestWrapper(localName = "getStatus", targetNamespace = "http://service.sunat.gob.pe", className = "service.cloud.request.clientRequest.proxy.ose.object.GetStatus")
+    @ResponseWrapper(localName = "getStatusResponse", targetNamespace = "http://service.sunat.gob.pe", className = "service.cloud.request.clientRequest.proxy.ose.object.GetStatusResponse")
+    @WebResult(name = "status", targetNamespace = "")
+    CdrStatusResponse getStatus(
+            @WebParam(name = "ticket", targetNamespace = "")
+            String ticket
+    );
+
+
     @WebMethod(action = "urn:getStatusCdr")
     @RequestWrapper(localName = "getStatusCdr", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.GetStatusCdr")
     @ResponseWrapper(localName = "getStatusCdrResponse", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.GetStatusCdrResponse")
     @WebResult(name = "status", targetNamespace = "")
-    public CdrStatusResponse getStatusCdr(
+    CdrStatusResponse getStatusCdr(
             @WebParam(name = "rucComprobante", targetNamespace = "")
             String rucComprobante,
             @WebParam(name = "tipoComprobante", targetNamespace = "")

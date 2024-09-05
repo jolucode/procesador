@@ -21,6 +21,7 @@ import service.cloud.request.clientRequest.handler.document.SignerHandler;
 import service.cloud.request.clientRequest.proxy.ose.IOSEClient;
 import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.model.Client;
+import service.cloud.request.clientRequest.proxy.sunat.consulta.ISUNATClientConsult;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
@@ -65,6 +66,9 @@ public class ServiceEmision implements IServiceEmision {
 
     @Autowired
     IOSEClient ioseClient;
+
+    @Autowired
+    ISUNATClientConsult isunatClientConsult;
 
     @Autowired
     ISUNATClient isunatClient;
@@ -189,7 +193,7 @@ public class ServiceEmision implements IServiceEmision {
         if (configuracion.getIntegracionWs().equals("OSE")) {
             statusResponse = ioseClient.getStatusCDR(transaction.getDocIdentidad_Nro(), transaction.getDOC_Codigo(), transaction.getDOC_Serie(), Integer.valueOf(transaction.getDOC_Numero()));
         } else {
-            statusResponse = isunatClient.getStatusCDR(transaction.getDocIdentidad_Nro(), transaction.getDOC_Codigo(), transaction.getDOC_Serie(), Integer.valueOf(transaction.getDOC_Numero()));
+            statusResponse = isunatClientConsult.getStatusCDR(transaction.getDocIdentidad_Nro(), transaction.getDOC_Codigo(), transaction.getDOC_Serie(), Integer.valueOf(transaction.getDOC_Numero()));
         }
 
         if (statusResponse.getContent() != null) {

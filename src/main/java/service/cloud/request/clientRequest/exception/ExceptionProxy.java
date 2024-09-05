@@ -9,6 +9,16 @@ import lombok.Data;
 public class ExceptionProxy {
     private String traza;
     private String descripcion;
+
+    @JsonProperty("descripcion-adicional")
+    private DescripcionAdicional descripcionAdicional;
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class DescripcionAdicional {
+        private String descripcion;
+    }
+
 }
 
 

@@ -48,7 +48,6 @@ public class OSEClient implements IOSEClient {
 
     @Override
     public CdrStatusResponse sendBill(String ruc, String fileName, DataHandler contentFile) throws Exception {
-        long initTime = System.currentTimeMillis();
 
         if (logger.isDebugEnabled()) {
             logger.debug("+sendBill() fileName[" + fileName + "], contentFile[" + contentFile + "]");
@@ -63,6 +62,18 @@ public class OSEClient implements IOSEClient {
             cdrStatusResponse.setStatusMessage(exceptionProxy.getDescripcion());
         }
         return cdrStatusResponse;
+    }
+
+    @Override
+    public String sendSummary(String ruc, String fileName, DataHandler contentFile) throws Exception {
+        String ticket = getSecurityPort(ruc).sendSummary(fileName, contentFile);
+        return ticket;
+    } //sendSummary
+
+    @Override
+    public CdrStatusResponse getStatus(String ruc, String ticket) throws Exception {
+        CdrStatusResponse response = getSecurityPort(ruc).getStatus(ticket);
+        return response;
     }
 
     protected BillService getSecurityPort(String ruc) throws JsonProcessingException {

@@ -125,7 +125,7 @@ public class GuiaServiceImpl implements GuiaInterface {
         int dia = fecha2.get(Calendar.DAY_OF_MONTH);
 
         String attachmentPath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() +
-                File.separator + "anexo"  + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
+                File.separator + "anexo" + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
         fileHandler.setBaseDirectory(attachmentPath);
 
         fileHandler.setBaseDirectory(attachmentPath);
@@ -173,8 +173,8 @@ public class GuiaServiceImpl implements GuiaInterface {
                 .build();
 
         logger.info("Se esta apuntando al ambiente : " + configuracion.getAmbiente() + " - " + configuracion.getIntegracionWs());
-        if(configuracion.getIntegracionWs().equals("OSE")) logger.info("Url Service: "+ applicationProperties.getUrlOse());
-        else if(configuracion.getIntegracionWs().equals("SUNAT")) logger.info("Url Service: "+ applicationProperties.getUrlSunat());
+        //if(configuracion.getIntegracionWs().equals("OSE")) logger.info("Url Service: "+ applicationProperties.getUrlOse());
+        //else if(configuracion.getIntegracionWs().equals("SUNAT")) logger.info("Url Service: "+ applicationProperties.getUrlSunat());
         logger.info("Usuario Sol: " + configuracion.getUserNameSunatSunat());
         logger.info("Clave Sol: " + configuracion.getPasswordSunatSunat());
         logger.info("Client id: " + configuracion.getClientId());

@@ -15,7 +15,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.io.ByteArrayOutputStream;
 import java.util.Set;
 
-public class SecuritySOAPHandler implements SOAPHandler<SOAPMessageContext>  {
+public class SecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> {
 
     private final Logger logger = Logger.getLogger(SecuritySOAPHandler.class);
 

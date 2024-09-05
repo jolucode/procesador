@@ -15,8 +15,11 @@ public class ApplicationProperties {
     @Value("${application.rutas.rutaBaseDoc}")
     public String rutaBaseDoc;
 
-    @Value("${application.soap-client.sunat.base-url}")
-    public String urlSunat;
+    @Value("${application.soap-client.sunat.base-url-emision}")
+    public String urlSunatEmision;
+
+    @Value("${application.soap-client.sunat.base-url-consulta}")
+    public String urlSunatConsulta;
 
     @Value("${application.soap-client.ose.base-url}")
     public String urlOse;

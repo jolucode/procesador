@@ -24,29 +24,12 @@ public class SUNATClient implements ISUNATClient {
 
     private final Logger logger = Logger.getLogger(SUNATClient.class);
 
-    @Value("${application.soap-client.sunat.base-url}")
-    private String sunatBaseUrl;
+    @Value("${application.soap-client.sunat.base-url-emision}")
+    private String sunatBaseUrlEmision;
+
 
     @Autowired
     ClientProperties clientProperties;
-
-    @Override
-    public CdrStatusResponse getStatusCDR(String rucComprobante, String tipoComprobante, String serieComprobante,
-                                          Integer numeroComprobante) throws Exception {
-        long initTime = System.currentTimeMillis();
-        try {
-            //CdrStatusResponse response = getSecurityPort().getStatusCdr(rucComprobante, tipoComprobante, serieComprobante, numeroComprobante);
-            //return response;
-            return null;
-        } catch (SOAPFaultException e) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            ExceptionProxy exceptionProxy = objectMapper.readValue(e.getFault().getDetail().getTextContent(), ExceptionProxy.class);
-            CdrStatusResponse response = new CdrStatusResponse();
-            response.setStatusMessage(exceptionProxy.getDescripcion());
-            return response;
-
-        }
-    }
 
 
     @Override
@@ -63,15 +46,21 @@ public class SUNATClient implements ISUNATClient {
         return cdrStatusResponse;
     }
 
+
+    @Override
+    public String sendSummary(String ruc, String fileName, DataHandler contentFile) throws Exception {
+        String ticket = getSecurityPort(ruc).sendSummary(fileName, contentFile);
+        return ticket;
+    }
+
     protected BillServiceSunat getSecurityPort(String ruc) throws JsonProcessingException {
 
         final QName SERVICE = new QName("http://service.gem.factura.comppago.registro.servicio.sunat.gob.pe/", "billService");
         final QName BillServicePort = new QName("http://service.gem.factura.comppago.registro.servicio.sunat.gob.pe/", "BillServicePort");
-
         Client client = clientProperties.listaClientesOf(ruc);
 
         try {
-            BillService_Service_Sunat service = new BillService_Service_Sunat(new URL(sunatBaseUrl), SERVICE);
+            BillService_Service_Sunat service = new BillService_Service_Sunat(new URL(sunatBaseUrlEmision), SERVICE);
 
             Consumer consumer = new Consumer();
             consumer.setUsername(client.getUsuarioSol());
@@ -82,7 +71,7 @@ public class SUNATClient implements ISUNATClient {
 
             return service.getBillServicePort(BillServicePort);
         } catch (MalformedURLException e) {
-            logger.error("URL malformada: " + sunatBaseUrl, e);
+            logger.error("URL malformada: " + sunatBaseUrlEmision, e);
             throw new RuntimeException("Error al configurar el servicio OSE: URL malformada.");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());

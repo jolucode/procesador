@@ -1,5 +1,6 @@
 package service.cloud.request.clientRequest.proxy.sunat;
 
+import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.proxy.object.ObjectFactory;
 
 import javax.jws.WebMethod;
@@ -19,6 +20,17 @@ public interface BillServiceSunat {
     @ResponseWrapper(localName = "sendBillResponse", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.SendBillResponse")
     @WebResult(name = "applicationResponse", targetNamespace = "")
     byte[] sendBill(
+            @WebParam(name = "fileName", targetNamespace = "")
+            String fileName,
+            @WebParam(name = "contentFile", targetNamespace = "")
+            javax.activation.DataHandler contentFile
+    );
+
+    @WebResult(name = "ticket", targetNamespace = "")
+    @RequestWrapper(localName = "sendSummary", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.SendSummary")
+    @WebMethod(action = "urn:sendSummary")
+    @ResponseWrapper(localName = "sendSummaryResponse2", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.SendSummaryResponse")
+    String sendSummary(
             @WebParam(name = "fileName", targetNamespace = "")
             String fileName,
             @WebParam(name = "contentFile", targetNamespace = "")
