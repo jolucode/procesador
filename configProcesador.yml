@@ -14,7 +14,7 @@ application:
   soap-client:
     sunat:
       base-url-emision: 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService?wsdl'
-      base-url-consulta: 'https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl'
+      base-url-consulta: 'https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl--'
     ose:
       base-url: 'https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl'
 

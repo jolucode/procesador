@@ -43,9 +43,6 @@ public class SecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> {
 
         if (outboundProperty.booleanValue()) {
             SOAPMessage message = context.getMessage();
-//            if (logger.isInfoEnabled()) {
-//                logger.info("handleMessage() message: " + message);
-//            }
             try {
                 SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
                 if (null != envelope.getHeader()) {
@@ -69,37 +66,21 @@ public class SecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> {
                 context.getMessage().saveChanges();
 
                 if (printOption) {
-                    /* Imprime el mensaje SOAP Request en System.out */
-                    //message.writeTo(System.out);
-                    System.out.println("");
-
-                    /* Imprime el mensaje SOAP Request en LOG4J */
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     message.writeTo(baos);
-//                    if (logger.isInfoEnabled()) {
-//                        logger.info("handleMessage() [REQUEST] Mensaje SOAP: \n" + baos.toString());
-//                    }
                 }
             } catch (Exception e) {
                 logger.error("handleMessage() ERROR: " + e.getMessage());
-                //logger.error("handleMessage() Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             }
         } else {
             try {
                 if (printOption) {
-                    /* Imprime el mensaje SOAP Response en System.out */
                     SOAPMessage message = context.getMessage();
-//                    message.writeTo(System.out);
-                    /* Imprime el mensaje SOAP Response en LOG4J */
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     message.writeTo(baos);
-//                    if (logger.isInfoEnabled()) {
-//                        logger.info("handleMessage() [RESPONSE] Mensaje SOAP: \n" + baos.toString());
-//                    }
                 }
             } catch (Exception e) {
                 logger.error("handleMessage() ERROR: " + e.getMessage());
-                //logger.error("handleMessage() Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             }
         }
         return outboundProperty;
