@@ -57,6 +57,4 @@ public interface ISUNATClient {
      */
     /*CdrStatusResponse getStatusCDR(String rucComprobante,
                                    String tipoComprobante, String serieComprobante, Integer numeroComprobante) throws Exception;*/
-
-
 }

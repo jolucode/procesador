@@ -29,7 +29,7 @@ public interface BillServiceSunat {
     @WebResult(name = "ticket", targetNamespace = "")
     @RequestWrapper(localName = "sendSummary", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.SendSummary")
     @WebMethod(action = "urn:sendSummary")
-    @ResponseWrapper(localName = "sendSummaryResponse2", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.SendSummaryResponse")
+    @ResponseWrapper(localName = "sendSummaryResponse", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.SendSummaryResponse")
     String sendSummary(
             @WebParam(name = "fileName", targetNamespace = "")
             String fileName,

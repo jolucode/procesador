@@ -82,4 +82,11 @@ public class Utils {
     public static boolean isNullOrTrimmedEmpty(String str) {
         return str == null || str.trim().isEmpty();
     }
+
+
+    public static String construirSerie(String fecha, String nuevoId) {
+        return "RA-" + fecha + "-" + nuevoId;
+    }
+
+
 }

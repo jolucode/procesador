@@ -65,17 +65,12 @@ public class CloudService implements CloudInterface {
         String datePattern = "(\"\\w+\":\\s*\"\\d{4}-\\d{2}-\\d{2}) \\d{2}:\\d{2}:\\d{2}\\.\\d\"";
         String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
 
-
-
-
         try {
             Gson gson = new Gson();
             transacctionDTO = gson.fromJson(updatedJson, TransacctionDTO[].class);
             responseProcesor = procesarTransaccion(transacctionDTO[0]);
 
-
             System.out.println("*******************************************************************************************************************************************************************************");
-
         } catch (Exception e) {
             logger.info("SE GENERO UN ERROR : " + e.getMessage());
         }

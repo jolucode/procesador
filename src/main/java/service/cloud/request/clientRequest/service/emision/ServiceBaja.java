@@ -95,9 +95,14 @@ public class ServiceBaja implements IServiceBaja {
     @Override
     public TransaccionRespuesta transactionVoidedDocument(TransacctionDTO transaction, String doctype) throws Exception {
 
+
+        UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
+        String attachmentPath = getAttachmentPath(transaction, doctype);
+        FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
+        fileHandler.setBaseDirectory(attachmentPath);
+
+
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
-
-
         Client client = clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
         ConfigData configuracion = createConfigData(client);
         CdrStatusResponse cdrStatusResponse = null;
@@ -113,6 +118,8 @@ public class ServiceBaja implements IServiceBaja {
                     cdrStatusResponse = isunatClientConsult.getStatus(transaction.getDocIdentidad_Nro(), transaction.getTicket_Baja());
                     System.out.println(Arrays.toString(cdrStatusResponse.getContent()));
                 }
+                String documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
+                TransaccionRespuesta transaccionRespuesta = processOseResponseBAJA(cdrStatusResponse.getContent(), transaction, fileHandler,documentName, configuracion);
             } else {
                 transaction.setANTICIPO_Id(generarIDyFecha(transaction));
                 if (transaction.getFE_Comentario().isEmpty()) {
@@ -124,8 +131,7 @@ public class ServiceBaja implements IServiceBaja {
                 byte[] certificado = loadCertificate(client, transaction.getDocIdentidad_Nro());
                 validateCertificate(certificado, client);
 
-                UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
-                String attachmentPath = getAttachmentPath(transaction, doctype);
+
 
                 String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
                 ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
@@ -141,8 +147,6 @@ public class ServiceBaja implements IServiceBaja {
                 String documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id());
                 DataHandler zipDocument = compressUBLDocumentv2(signedXmlDocument, documentName + ".xml");
 
-                FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
-                fileHandler.setBaseDirectory(attachmentPath);
 
                 if (null != zipDocument) {
                     LoggerTrans.getCDThreadLogger().log(Level.INFO, "[" + this.docUUID + "] Enviando WS sendSummary.");
@@ -161,6 +165,10 @@ public class ServiceBaja implements IServiceBaja {
                         cdrStatusResponse = isunatClientConsult.getStatus(transaction.getDocIdentidad_Nro(), ticket);
                         System.out.println(Arrays.toString(cdrStatusResponse.getContent()));
                     }
+
+                    documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
+                    TransaccionRespuesta transaccionRespuesta = processOseResponseBAJA(cdrStatusResponse.getContent(), transaction, fileHandler,documentName, configuracion);
+
                     System.out.println("Hola mundo");
 
                 }
@@ -376,20 +384,20 @@ public class ServiceBaja implements IServiceBaja {
                 if (fechaActual.equals(fechaUltimoRegistro)) {
                     // Actualizar el último registro
                     String nuevoId = generarNuevoId(trb.getSerie());
-                    serie = construirSerie(fechaActual, nuevoId);
+                    serie = Utils.construirSerie(fechaActual, nuevoId);
 
                     //actualizarRegistro(trb, fechaActual, nuevoId);
                     trb = crearNuevoRegistro(tr.getDocIdentidad_Nro(), trb.getIdd(), fechaActual, serie);
                 } else {
                     // Crear un nuevo registro
-                    serie = construirSerie(fechaActual, "00001");
+                    serie = Utils.construirSerie(fechaActual, "00001");
                     trb.setIdd(0);
                     trb = crearNuevoRegistro(tr.getDocIdentidad_Nro(), trb.getIdd(), fechaActual, serie);
                 }
                 trb.setTicketBaja(tr.getTicket_Baja());
             } else {
                 // Crear el primer registro para la empresa
-                serie = construirSerie(fechaActual, "00001");
+                serie = Utils.construirSerie(fechaActual, "00001");
                 trb = crearNuevoRegistro(tr.getDocIdentidad_Nro(), 0, fechaActual, serie);
             }
 

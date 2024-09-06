@@ -9,29 +9,6 @@ public interface ISUNATClientConsult {
 
 
     /**
-     * Este metodo ha implementar enviara el documento ('Factura', 'Boleta', 'Nota de Credito' o
-     * 'Nota de Debito') al Servicio Web OSE de TCI, retornando un CDR OSE de respuesta.
-     *
-     * @param fileName    El nombre del archivo adjunto
-     * @param contentFile El archivo ZIP adjunto.
-     * @return Retorna el CDR OSE de respuesta.
-     * @throws Exception
-     */
-    //CdrStatusResponse sendBill(String ruc, String fileName, DataHandler contentFile) throws Exception;
-
-    /**
-     * Este metodo ha implementar enviara el documento ('Resumen Diario' o 'Comunicacion de Baja') al
-     * Servicio Web OSE de TCI, retornando un numero de ticket.
-     *
-     * @param fileName    El nombre del archivo adjunto
-     * @param contentFile El archivo ZIP adjunto.
-     * @return Retorna el numero de ticket.
-     * @throws Exception
-     */
-    //String sendSummary(String ruc, String fileName, DataHandler contentFile) throws Exception;
-
-
-    /**
      * Este metodo ha implementar consultara el estado de un documento ('Factura', 'Nota de Credito'
      * o 'Nota de Debito'), retornando un objeto StatusResponse que contiene el CDR OSE de respuesta
      * y el codigo de respuesta.

@@ -35,7 +35,7 @@ public class SUNATClientConsult implements ISUNATClientConsult {
 
     @Override
     public CdrStatusResponse getStatus(String ruc, String ticket) throws Exception {
-        return null;
+        return getSecurityPort(ruc).getStatus(ticket);
     }
 
     @Override
