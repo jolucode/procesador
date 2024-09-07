@@ -15,7 +15,7 @@ public class ListOfMapProperties {
 
 
     public void imprimirdatos() {
-        System.out.println(miscellaneous.get(0));
+        //System.out.println(miscellaneous.get(0));
     }
 
     // Constructor, Getter, and Setter methods

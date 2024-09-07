@@ -184,24 +184,9 @@ public class PDFRetentionCreator extends DocumentCreator {
                  * electronica
                  */
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(iJasperReport, parameterMap, new JRBeanCollectionDataSource(retentionObject.getItemListDynamic()));
-
-                /*
-                 * Exportar el reporte PDF en una ruta en DISCO
-                 */
-                outputPath = USER_TEMPORARY_PATH + File.separator + docUUID + IPDFCreatorConfig.EE_PDF;
-                JasperExportManager.exportReportToPdfFile(iJasperPrint, outputPath);
-                if (logger.isInfoEnabled()) {
-                    logger.info("createInvoicePDF() [" + docUUID + "] Se guardo el PDF en una ruta temportal: " + outputPath);
-                }
-
-                /*
-                 * Convirtiendo el documento PDF generado en bytes.
-                 */
-                pdfDocument = convertFileInBytes(outputPath);
-                if (logger.isInfoEnabled()) {
-                    logger.info("createInvoicePDF() [" + docUUID + "] Se convirtio el PDF en bytes: " + pdfDocument);
-                }
-
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
+                pdfDocument =  outputStream.toByteArray();;
             } catch (Exception e) {
                 logger.error("createInvoicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
                 logger.error("createInvoicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));

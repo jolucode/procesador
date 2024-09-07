@@ -169,7 +169,6 @@ public class ServiceBaja implements IServiceBaja {
                     documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
                     TransaccionRespuesta transaccionRespuesta = processOseResponseBAJA(cdrStatusResponse.getContent(), transaction, fileHandler,documentName, configuracion);
 
-                    System.out.println("Hola mundo");
 
                 }
             }
