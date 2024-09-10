@@ -49,7 +49,7 @@ public interface BillService {
     @RequestWrapper(localName = "getStatus", targetNamespace = "http://service.sunat.gob.pe", className = "service.cloud.request.clientRequest.proxy.object.GetStatus")
     @WebMethod(action = "urn:getStatus")
     @ResponseWrapper(localName = "getStatusResponse", targetNamespace = "http://service.sunat.gob.pe", className = "service.cloud.request.clientRequest.proxy.object.GetStatusResponse")
-    StatusResponse getStatus(
+    public StatusResponse getStatus(
             @WebParam(name = "ticket", targetNamespace = "")
             String ticket
     );

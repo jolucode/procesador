@@ -49,7 +49,7 @@ public class TestClient extends TestWSClient {
      * Este metodo envia una 'Comunicacion de Baja' o 'Resumen Diario' al servicio web de la
      * Sunat, retornando un numero de ticket.
      */
-    /*@Override
+    @Override
     public String sendSummary(String fileName, DataHandler contentFile) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+sendSummary() [TEST] fileName: " + fileName + " contentFile: " + contentFile);
@@ -62,7 +62,7 @@ public class TestClient extends TestWSClient {
             logger.debug("-sendSummary() [TEST]");
         }
         return response;
-    }*/ //sendSummary
+    }//sendSummary
 
     /**
      * Este metodo envia un documento al servicio web de la Sunat, retornando un numero de
@@ -87,13 +87,12 @@ public class TestClient extends TestWSClient {
      * Este metodo envia el ticket al servicio web de la Sunat, retornando un objeto que contiene
      * el codigo de respuesta y el CDR de respuesta.
      */
-    //@Override
+    @Override
     public StatusResponse getStatus(String ticket) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+getStatus() [TEST] ticket: " + ticket);
         }
-
-        //StatusResponse response = getSecurityPort().getStatus(ticket);
+        StatusResponse response = getSecurityPort().getStatus(ticket);
 
         if (logger.isDebugEnabled()) {
             logger.debug("-getStatus() [TEST]");
@@ -101,5 +100,6 @@ public class TestClient extends TestWSClient {
         return null;
         //return response;
     } //getStatus
+
 
 } //TestClient

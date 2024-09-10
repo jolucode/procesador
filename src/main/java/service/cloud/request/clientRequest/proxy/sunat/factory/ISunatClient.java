@@ -16,12 +16,13 @@ public interface ISunatClient {
 
     byte[] sendBill(String fileName, DataHandler contentFile) throws Exception;
 
-    public abstract StatusResponse getStatusCDR(String rucComprobante, String tipoComprobante, String serieComprobante, Integer numeroComprobante) throws Exception;
+    public  StatusResponse getStatusCDR(String rucComprobante, String tipoComprobante, String serieComprobante, Integer numeroComprobante) throws Exception;
 
     void setConsumer(Consumer consumer);
 
     void printSOAP(boolean printOption);
 
+    public String sendSummary(String fileName, DataHandler contentFile) throws Exception;
 
-
+    StatusResponse getStatus(String ticket) throws Exception;
 } //ISunatClient

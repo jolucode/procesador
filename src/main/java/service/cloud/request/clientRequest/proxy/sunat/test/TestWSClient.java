@@ -58,34 +58,30 @@ public abstract class TestWSClient implements ISunatClient {
      * @throws JAXBException
      */
 
+
     protected BillService getSecurityPort(String documentType) throws JAXBException, MalformedURLException {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Estoy en getSecurityPort()");
-        }
-
-
-
         if (Utils.isRegularDocument(documentType)) {
             URL baseURL = BillService_Service.class.getResource(".");
             WSDL_LOCATION = new URL(baseURL, "https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService?wsdl");
-            ;
             SERVICE = new QName("http://service.gem.factura.comppago.registro.servicio.sunat.gob.pe/", "billService");
         } else {
             URL baseURL = BillService_Service.class.getResource(".");
             WSDL_LOCATION = new URL(baseURL, "https://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService?wsdl");
             SERVICE = new QName("http://service.gem.factura.comppago.registro.servicio.sunat.gob.pe/", "billService");
         }
-
-
         BillService_Service service = new BillService_Service(WSDL_LOCATION, SERVICE);
-
         HeaderHandlerResolver handlerResolver = new HeaderHandlerResolver(consumer);
         handlerResolver.setPrintSOAP(printOption);
-
         service.setHandlerResolver(handlerResolver);
         return service.getBillServicePort();
     } //getSecurityPort
 
+    protected BillService getSecurityPort() throws JAXBException {
+        BillService_Service service = new BillService_Service();
+        HeaderHandlerResolver handlerResolver = new HeaderHandlerResolver(consumer);
+        handlerResolver.setPrintSOAP(printOption);
+        service.setHandlerResolver(handlerResolver);
+        return service.getBillServicePort();
+    }
 
 }
