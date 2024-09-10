@@ -41,7 +41,7 @@ public class ProductionCPEClient extends ProductionWSCPEClient {
         HeaderHandlerResolver handlerResolver = new HeaderHandlerResolver();
         handlerResolver.addHandlers(soapConsultInterceptor);
         billService.setHandlerResolver(handlerResolver);
-        service.cloud.request.clientRequest.proxy.sunat.production.consult.BillService consultServicePort = billService.getBillConsultServicePort();
+        service.cloud.request.clientRequest.proxy.sunat.production.consult.BillServiceCon consultServicePort = billService.getBillConsultServicePort();
         StatusResponse statusResponse = consultServicePort.getStatusCdr(rucComprobante, tipoComprobante, serieComprobante, numeroComprobante);
         return new StatusResponse(statusResponse.getContent(), statusResponse.getStatusCode(), statusResponse.getStatusMessage());
     }

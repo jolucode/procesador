@@ -51,8 +51,8 @@ public class BillConsultService extends Service {
      * @return Returns the bill service port.
      */
     @WebEndpoint(name = "BillConsultServicePort")
-    public BillService getBillConsultServicePort() {
-        return super.getPort(BillConsultServicePort, BillService.class);
+    public BillServiceCon getBillConsultServicePort() {
+        return super.getPort(BillConsultServicePort, BillServiceCon.class);
     }
 
 
