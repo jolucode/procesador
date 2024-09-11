@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import service.cloud.request.clientRequest.config.ProviderProperties;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
+import service.cloud.request.clientRequest.dto.dto.TransactionImpuestosDTO;
+import service.cloud.request.clientRequest.dto.dto.TransactionLineasDTO;
+import service.cloud.request.clientRequest.dto.dto.TransactionLineasImpuestoDTO;
 import service.cloud.request.clientRequest.dto.request.RequestPost;
 import service.cloud.request.clientRequest.dto.response.Data;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
@@ -21,23 +24,25 @@ import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterfac
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
 import service.cloud.request.clientRequest.service.publicar.PublicacionManager;
+import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.LoggerTrans;
 import service.cloud.request.clientRequest.utils.Utils;
 
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.logging.Level;
+
+import static java.math.BigDecimal.valueOf;
 
 @Service
 public class CloudService implements CloudInterface {
 
     Logger logger = LoggerFactory.getLogger(CloudService.class);
-
 
 
     @Autowired
@@ -68,13 +73,64 @@ public class CloudService implements CloudInterface {
         try {
             Gson gson = new Gson();
             transacctionDTO = gson.fromJson(updatedJson, TransacctionDTO[].class);
-            responseProcesor = procesarTransaccion(transacctionDTO[0]);
+            responseProcesor = procesarTransaccion(insertarImpuestoBolsa(transacctionDTO[0]));
 
             System.out.println("*******************************************************************************************************************************************************************************");
         } catch (Exception e) {
             logger.info("SE GENERO UN ERROR : " + e.getMessage());
         }
         return ResponseEntity.ok(responseProcesor);
+    }
+
+    private TransacctionDTO insertarImpuestoBolsa(TransacctionDTO transaccion) {
+        String impuestoBolsa = "I", itemBolsa = "A";
+        Optional<TransactionLineasDTO> lineasOptional =transaccion.getTransactionLineasDTOList().stream().filter(linea -> linea.getItmBolsa().equals(itemBolsa)).findAny();
+
+        lineasOptional.ifPresent(lineaBolsa -> {
+            Optional<TransactionLineasDTO> impuestoBolsaOptional = transaccion.getTransactionLineasDTOList().stream().filter(linea -> linea.getItmBolsa().equals(impuestoBolsa)).findAny();
+
+            TransactionImpuestosDTO transaccionImpuesto = new TransactionImpuestosDTO();
+            transaccionImpuesto.setAbreviatura(Constants.TAX_TOTAL_OTH_CODE);
+            transaccionImpuesto.setMoneda(transaccion.getDOC_MON_Codigo());
+            BigDecimal precioRefMonto = impuestoBolsaOptional.map(TransactionLineasDTO::getPrecioRef_Monto).orElseGet(lineaBolsa::getPrecioRef_Monto);
+            BigDecimal totalBruto = impuestoBolsaOptional.map(TransactionLineasDTO::getTotalBruto).orElseGet(lineaBolsa::getTotalBruto);
+            transaccionImpuesto.setMonto(precioRefMonto);
+            transaccionImpuesto.setValorVenta(totalBruto);
+            transaccionImpuesto.setPorcentaje(BigDecimal.valueOf(100));
+            transaccionImpuesto.setTipoTributo(Constants.TAX_TOTAL_BPT_ID);
+            transaccionImpuesto.setCodigo("C");
+            transaccionImpuesto.setNombre(Constants.TAX_TOTAL_BPT_NAME);
+
+
+
+
+            transaccion.getTransactionImpuestosDTOList().add(transaccionImpuesto);
+
+            Optional<TransactionImpuestosDTO> impuestosOptional = transaccion.getTransactionImpuestosDTOList().stream().filter(impuestoTotal -> impuestoTotal.getNombre().isEmpty()).findAny();
+            impuestosOptional.ifPresent(transaccion.getTransactionImpuestosDTOList()::remove);
+
+            TransactionLineasImpuestoDTO transaccionLineaImpuesto = new TransactionLineasImpuestoDTO();
+            transaccionLineaImpuesto.setAbreviatura(Constants.TAX_TOTAL_OTH_CODE);
+            transaccionLineaImpuesto.setMoneda(transaccion.getDOC_MON_Codigo());
+            transaccionLineaImpuesto.setMonto(precioRefMonto);
+            transaccionLineaImpuesto.setValorVenta(totalBruto);
+            transaccionLineaImpuesto.setPorcentaje(BigDecimal.valueOf(100));
+            transaccionLineaImpuesto.setTipoTributo(Constants.TAX_TOTAL_BPT_ID);
+            transaccionLineaImpuesto.setCodigo("C");
+            transaccionLineaImpuesto.setNombre(Constants.TAX_TOTAL_BPT_NAME);
+
+            // *** Aquí se añade la cantidad de la línea ***
+            transaccionLineaImpuesto.setCantidad(lineaBolsa.getCantidad());
+            transaccionLineaImpuesto.setUnidadSunat(lineaBolsa.getUnidadSunat());
+
+            lineaBolsa.getTransactionLineasImpuestoListDTO().add(transaccionLineaImpuesto);
+            impuestoBolsaOptional.ifPresent(transaccion.getTransactionLineasDTOList()::remove);
+            Predicate<TransactionImpuestosDTO> predicate = impuesto -> impuesto.getPorcentaje().compareTo(valueOf(100)) == 0 && impuesto.getValorVenta().compareTo(totalBruto) == 0 && !Constants.TAX_TOTAL_BPT_NAME.equalsIgnoreCase(impuesto.getNombre());
+            ArrayList<TransactionImpuestosDTO> transaccionImpuestos = new ArrayList<>(transaccion.getTransactionImpuestosDTOList());
+            Optional<TransactionImpuestosDTO> optional = transaccionImpuestos.stream().filter(predicate).findAny();
+            optional.ifPresent(transaccion.getTransactionImpuestosDTOList()::remove);
+        });
+        return transaccion;
     }
 
 
@@ -111,7 +167,6 @@ public class CloudService implements CloudInterface {
         }
         return request;
     }*/
-
     public int anexarDocumentos(RequestPost request) {
         HttpResponse<String> response = null;
         try {
@@ -233,8 +288,6 @@ public class CloudService implements CloudInterface {
         }
         return request;
     }
-
-
 
 
 }

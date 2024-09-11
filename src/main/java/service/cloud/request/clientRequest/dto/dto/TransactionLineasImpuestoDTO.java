@@ -31,4 +31,8 @@ public class TransactionLineasImpuestoDTO {
     private String TipoAfectacion;
 
     private String TierRange;
+
+    private BigDecimal cantidad;
+
+    private String unidadSunat;
 }

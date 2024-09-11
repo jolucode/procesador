@@ -61,15 +61,15 @@ ventura:
         wsLocation: 'http://facturacion.vsperufe.com/'
 
         emisorElecRs: '205454844881/SUNAT'
-        usuarioSol: '20538492028MODDATOS'
-        claveSol: 'moddatos'
+        usuarioSol: '20538492028'
+        claveSol: '20538492028'
 
         certificadoName: "CERTIFICATE_TEST.pfx"
         certificadoPassword: '1234'
         certificadoProveedor: 'SunJSSE'
         certificadoTipoKeystore: 'Pkcs12'
 
-        integracionWs: SUNAT
+        integracionWs: OSE
         mostrarSoap: 'true'
         pdfBorrador: 'true'
         impresion: 'Codigo QR'
@@ -83,4 +83,4 @@ ventura:
         passwordSunatGuias: 'Ventu2023'
 
 server:
-  port: 8082
+  port: 8083

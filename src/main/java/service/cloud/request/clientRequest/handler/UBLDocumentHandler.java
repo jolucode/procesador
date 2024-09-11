@@ -7,6 +7,7 @@ import org.w3c.dom.Document;
 import service.cloud.request.clientRequest.dto.dto.*;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.utils.DateUtil;
+import service.cloud.request.clientRequest.utils.Utils;
 import service.cloud.request.clientRequest.utils.exception.UBLDocumentException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.codelist.specification._54217._2001.CurrencyCodeContentType;
@@ -143,8 +144,8 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                     ValueType value = new ValueType();
                     value.setValue(objecto.get("incoterms"));
 
-                            /* Agregar ID y Value al objeto */
-                            additionalProperty.setID(id);
+                    /* Agregar ID y Value al objeto */
+                    additionalProperty.setID(id);
                     additionalProperty.setValue(value);
 
                     /* Agregar el objeto AdditionalPropertyType a la lista */
@@ -493,7 +494,8 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             /*
              * Agregar DETRACCIONES
              */
-            /*if ((new BigDecimal(transaction.getMontoDetraccion())).compareTo(BigDecimal.ZERO) > 0 && ((new BigDecimal(transaction.getPorcDetraccion())).compareTo(BigDecimal.ZERO)) > 0 && StringUtils.isNotBlank(transaction.getCuentaDetraccion())) {
+
+            if ((!Utils.isNullOrTrimmedEmpty(transaction.getMontoDetraccion())) && ((new BigDecimal(transaction.getMontoDetraccion())).compareTo(BigDecimal.ZERO) > 0) && ((new BigDecimal(transaction.getPorcDetraccion())).compareTo(BigDecimal.ZERO) > 0) && StringUtils.isNotBlank(transaction.getCuentaDetraccion())) {
                 if (logger.isInfoEnabled()) {
                     logger.info("generateInvoiceType() [" + this.identifier + "] La transaccion contiene informacion de DETRACCIONES.");
                 }
@@ -501,6 +503,11 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 invoiceType.getPaymentTerms().add(getPaymentTerms(transaction.getCodigoDetraccion(), new BigDecimal(transaction.getMontoDetraccion()), new BigDecimal(transaction.getPorcDetraccion())));
             }
 
+            /*
+             * ANTICIPOS RELACIONADOS al comprobante de pago
+             *
+             * <Invoice><cac:PrepaidPayment>
+             */
             if (null != transaction.getANTICIPO_Monto() && transaction.getANTICIPO_Monto().compareTo(BigDecimal.ZERO) > 0 && null != transaction.getTransactionActicipoDTOList() && 0 < transaction.getTransactionActicipoDTOList().size()) {
                 if (logger.isInfoEnabled()) {
                     logger.info("generateInvoiceType() [" + this.identifier + "] La transaccion contiene informacion de ANTICIPOS RELACIONADOS.");
@@ -508,7 +515,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 invoiceType.getPrepaidPayment().addAll(getPrepaidPaymentV21(transaction.getTransactionActicipoDTOList()));
                 invoiceType.getAllowanceCharge().add(getAllowanceCharge(transaction.getDOC_ImporteTotal(), transaction.getANTICIPO_Monto(), false, transaction.getDOC_PorDescuento(), transaction.getDOC_Descuento(), transaction.getDOC_ImporteTotal(), transaction.getDOC_MON_Codigo(), "04", new BigDecimal(transaction.getMontoRetencion()), transaction.getDOC_MontoTotal()));
 
-            }*/
+            }
             /*
              * Agregar DESCUENTO GLOBAL
              */

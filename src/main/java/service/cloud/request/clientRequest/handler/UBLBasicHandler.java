@@ -2662,7 +2662,8 @@ public abstract class UBLBasicHandler {
                     taxTotal.getTaxSubtotal().add(taxSubtotal);
                 } else if (tributo.equalsIgnoreCase(IUBLConfig.TAX_TOTAL_BPT_ID)) {
                     /**revisar*/
-                    BigDecimal cantidad = null;// lineaImpuesto.getTransaccionLineas().getCantidad();
+                    //BigDecimal cantidad =  lineaImpuesto.getTransaccionLineas().getCantidad();
+                    BigDecimal cantidad =  lineaImpuesto.getCantidad();
 
                     TaxSubtotalType taxSubtotal = new TaxSubtotalType();
                     TaxAmountType bolsaTaxAmount = new TaxAmountType();
@@ -2672,7 +2673,8 @@ public abstract class UBLBasicHandler {
                     taxSubtotal.setTaxAmount(bolsaTaxAmount);
 
                     BaseUnitMeasureType baseUnitMeasure = new BaseUnitMeasureType();
-                    baseUnitMeasure.setUnitCode(null/*lineaImpuesto.getTransaccionLineas().getUnidadSunat()*/); /**revisar*/
+                    //baseUnitMeasure.setUnitCode(lineaImpuesto.getTransaccionLineas().getUnidadSunat()); /**revisar*/
+                    baseUnitMeasure.setUnitCode(lineaImpuesto.getUnidadSunat()); /**revisar*/
                     baseUnitMeasure.setValue(cantidad.setScale(0, RoundingMode.HALF_UP));
 
                     taxSubtotal.setBaseUnitMeasure(baseUnitMeasure);
