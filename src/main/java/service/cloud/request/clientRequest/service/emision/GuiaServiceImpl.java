@@ -37,6 +37,7 @@ import service.cloud.request.clientRequest.handler.document.SignerHandler;
 import service.cloud.request.clientRequest.prueba.Client;
 import service.cloud.request.clientRequest.prueba.model.ResponseDTO;
 import service.cloud.request.clientRequest.prueba.model.ResponseDTOAuth;
+import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
 import service.cloud.request.clientRequest.utils.CertificateUtils;
@@ -72,6 +73,9 @@ public class GuiaServiceImpl implements GuiaInterface {
 
     @Autowired
     ProcessorCoreInterface processorCoreInterface;
+
+    @Autowired
+    DocumentFormatInterface documentFormatInterface;
 
     @Override
     public TransaccionRespuesta transactionRemissionGuideDocumentRest(Transaccion transaction, String doctype) throws Exception {
@@ -329,6 +333,9 @@ public class GuiaServiceImpl implements GuiaInterface {
             logger.debug("-transactionRemissionGuideDocument() [" + this.docUUID + "]");
         }
 
+        if (client.getPdfBorrador().equals("true")){
+            transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
+        }
         transactionResponse.setDigestValue(digestValue);
         transactionResponse.setBarcodeValue(barcodeValue);
         transactionResponse.setIdentificador(documentName);
