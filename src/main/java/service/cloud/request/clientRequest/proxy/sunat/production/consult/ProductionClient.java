@@ -51,7 +51,7 @@ public class ProductionClient extends ProductionWSClient {
         HeaderHandlerResolver handlerResolver = new HeaderHandlerResolver();
         handlerResolver.addHandlers(soapConsultInterceptor);
         billService.setHandlerResolver(handlerResolver);
-        BillService consultServicePort = billService.getBillConsultServicePort();
+        BillServiceCon consultServicePort = billService.getBillConsultServicePort();
         StatusResponse statusResponse = consultServicePort.getStatusCdr(rucComprobante, tipoComprobante, serieComprobante, numeroComprobante);
         return new StatusResponse(statusResponse.getContent(), statusResponse.getStatusCode(), statusResponse.getStatusMessage());
     }
