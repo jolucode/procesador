@@ -639,13 +639,15 @@ public class ServiceImpl implements ServiceInterface {
                     log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
                     StatusResponse statusResponse = wsConsumer.getStatusCDR(documentRuc, documentType, documentSerie, documentNumber, configuracion);
                     log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
-                    log.setThirdPartyResponseXml(new String(statusResponse.getContent(), StandardCharsets.UTF_8));
+
 
                     if (statusResponse.getContent() != null) {
                         transactionResponse = processorCoreInterface.processCDRResponseV2(statusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion);
                         saveAllFiles(transactionResponse, documentName, attachmentPath);
+                        log.setThirdPartyResponseXml(new String(statusResponse.getContent(), StandardCharsets.UTF_8));
                     } else {
                         transactionResponse = processorCoreInterface.processResponseSinCDR(transaction);
+                        transactionResponse.setMensaje(statusResponse.getStatusMessage());
                     }
 
                 }
