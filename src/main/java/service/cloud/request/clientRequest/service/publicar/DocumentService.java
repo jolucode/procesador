@@ -6,6 +6,7 @@ import service.cloud.request.clientRequest.dao.PublicardocRepository;
 import service.cloud.request.clientRequest.entity.PublicardocWs;
 import service.cloud.request.clientRequest.entity.Transaccion;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class DocumentService {
         System.out.println("****************************************************************************************");
         publicardocWs.setFechaPublicacionPortal(calendar.getTime());
         publicardocWs.setDOCFechaEmision(tc.getDOC_FechaEmision());
-        publicardocWs.setDOCMontoTotal(tc.getDOC_MontoTotal());
+        publicardocWs.setDOCMontoTotal(tc.getDOC_MontoTotal() == null ? BigDecimal.ZERO : tc.getDOC_MontoTotal());
         publicardocWs.setDOCCodigo(tc.getDOC_Codigo());
         publicardocWs.setSNDocIdentidadNro(tc.getSN_DocIdentidad_Nro());
         publicardocWs.setSNRazonSocial(tc.getSN_RazonSocial());
