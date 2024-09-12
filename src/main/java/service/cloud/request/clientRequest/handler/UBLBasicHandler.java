@@ -2481,7 +2481,7 @@ public abstract class UBLBasicHandler {
 
     protected DeliveredQuantityType getDeliveredQuantity(BigDecimal value, String unitCodeValue) throws Exception {
         DeliveredQuantityType deliveredQuantity = new DeliveredQuantityType();
-        sdeliveredQuantity.setUnitCode(unitCodeValue);
+        deliveredQuantity.setUnitCode(unitCodeValue);
         deliveredQuantity.setUnitCodeListID("UN/ECE rec 20");
         deliveredQuantity.setUnitCodeListAgencyName(IUBLConfig.LIST_AGENCY_NAME_UNECE);
         //deliveredQuantity.setValue(value.setScale(0, RoundingMode.HALF_UP));

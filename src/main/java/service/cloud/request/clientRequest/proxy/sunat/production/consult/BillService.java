@@ -35,4 +35,29 @@ public interface BillService {
     @ResponseWrapper(localName = "getStatusCdrResponse", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.service.consult.GetStatusCdrResponse")
     public StatusResponse getStatusCdr(@WebParam(name = "rucComprobante", targetNamespace = "") String rucComprobante, @WebParam(name = "tipoComprobante", targetNamespace = "") String tipoComprobante, @WebParam(name = "serieComprobante", targetNamespace = "") String serieComprobante, @WebParam(name = "numeroComprobante", targetNamespace = "") Integer numeroComprobante);
 
+    @WebMethod(action = "urn:sendSummary")
+    @WebResult(name = "ticket", targetNamespace = "")
+    @RequestWrapper(localName = "sendSummary", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.service.SendSummary")
+    @ResponseWrapper(localName = "sendSummaryResponse", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.service.SendSummaryResponse")
+    public String sendSummary(
+            @WebParam(name = "fileName", targetNamespace = "")
+            String fileName,
+            @WebParam(name = "contentFile", targetNamespace = "")
+            javax.activation.DataHandler contentFile
+    );
+
+    /**
+     * This method sent a ticket to Sunat WS.
+     *
+     * @param ticket The ticket of request.
+     * @return Returns an object than contains the response code an the CDR response.
+     */
+    @WebMethod(action = "urn:getStatus")
+    @WebResult(name = "status", targetNamespace = "")
+    @RequestWrapper(localName = "getStatus", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.service.GetStatus")
+    @ResponseWrapper(localName = "getStatusResponse", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.service.GetStatusResponse")
+    public StatusResponse getStatus(
+            @WebParam(name = "ticket", targetNamespace = "")
+            String ticket
+    );
 } //BillService

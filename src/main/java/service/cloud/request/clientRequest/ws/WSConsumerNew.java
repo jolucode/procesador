@@ -9,6 +9,7 @@ import service.cloud.request.clientRequest.exception.ExceptionProxy;
 import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.proxy.consumer.Consumer;
+import service.cloud.request.clientRequest.proxy.object.StatusResponse;
 import service.cloud.request.clientRequest.proxy.ose.IOSEClient;
 import service.cloud.request.clientRequest.proxy.ose.OSEClient;
 import service.cloud.request.clientRequest.proxy.sunat.factory.ISunatClient;
@@ -171,27 +172,6 @@ public class WSConsumerNew {
     }
 
 
-    /*public String sendSummary(DataHandler zipDocument, String documentName, ConfigData configuracion) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+sendSummary() [" + this.docUUID + "]");
-        }
-
-        validarConnectionInternet();
-
-        String ticket = null;
-        if (configuracion.getIntegracionWs().equalsIgnoreCase("SUNAT")) {
-            ticket = sunatClient.sendSummary(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
-        }
-        if (configuracion.getIntegracionWs().equalsIgnoreCase("OSE")) {
-            ticket = oseClient.sendSummary(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("-sendSummary() [" + this.docUUID + "]");
-        }
-        return ticket;
-    } *///sendSummary
-
     private void validarConnectionInternet() throws ConectionSunatException {
         try {
             LoggerTrans.getCDThreadLogger().log(Level.INFO, "Verificando conexion a internet...");
@@ -217,9 +197,9 @@ public class WSConsumerNew {
         validarConnectionInternet();
 
         String ticket = null;
-        /*if (configuracion.getIntegracionWs().equalsIgnoreCase("SUNAT")) {
+        if (configuracion.getIntegracionWs().equalsIgnoreCase("SUNAT")) {
             ticket = sunatClient.sendSummary(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
-        }*/
+        }
         if (configuracion.getIntegracionWs().equalsIgnoreCase("OSE")) {
             ticket = oseClient.sendSummary(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
         }
@@ -230,5 +210,21 @@ public class WSConsumerNew {
         return ticket;
     }
 
+    public StatusResponse getStatus(String ticket, ConfigData configuracion) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+getStatus() [" + this.docUUID + "]");
+        }
+        StatusResponse statusResponse = new StatusResponse();
+        if (configuracion.getIntegracionWs().equalsIgnoreCase("SUNAT")) {
+            statusResponse = sunatClient.getStatus(ticket);
+        }
+        if (configuracion.getIntegracionWs().equalsIgnoreCase("OSE")) {
+
+            //StatusResponse statusResponseCONOSE = oseClient.getStatus(ticket);
+            //statusResponse = getStatusResponse(statusResponseCONOSE);
+        }
+
+        return statusResponse;
+    }
 
 } //WSConsumer

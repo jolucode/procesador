@@ -45,7 +45,7 @@ public interface BillService {
     @WebResult(name = "status", targetNamespace = "")
     @RequestWrapper(localName = "getStatus", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.GetStatus")
     @WebMethod(action = "urn:getStatus")
-    @ResponseWrapper(localName = "getStatusResponse2", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.GetStatusResponse")
+    @ResponseWrapper(localName = "getStatusResponse", targetNamespace = "http://service.sunat.gob.pe", className = "pe.gob.sunat.GetStatusResponse")
     StatusResponse getStatus(
             @WebParam(name = "ticket", targetNamespace = "")
             String ticket

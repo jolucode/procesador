@@ -66,6 +66,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.soap.Detail;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -241,13 +242,29 @@ public class ServiceImpl implements ServiceInterface {
                     if (response.getContent() != null) {
                         transactionResponse = processOseResponseBAJA(response.getContent(), transaction, fileHandler, documentName, configuracion);
                     }
+                }else if(configuracion.getIntegracionWs().equals("SUNAT")){
+
+                    /**envia ticket a sunat para consultar zip*/
+                    StatusResponse response = wsConsumer.getStatus(ticket, configuracion);
+                    if (response.getContent() != null) {
+                        transactionResponse = processOseResponseBAJA(response.getContent(), transaction, fileHandler, documentName, configuracion);
+                    }
                 }
                 transactionResponse.setTicketRest(ticket);
                 transactionResponse.setIdentificador(documentName);
             } catch (SOAPFaultException e) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                ExceptionProxy exceptionProxy = objectMapper.readValue(e.getFault().getDetail().getTextContent(), ExceptionProxy.class);
-                transactionResponse.setMensaje(exceptionProxy.getDescripcion());
+                if (configuracion.getIntegracionWs().equalsIgnoreCase("SUNAT")) {
+                    Detail detail = e.getFault().getDetail();
+                    if (null != detail) {
+                        transactionResponse.setMensaje(detail.getTextContent());
+
+                    }
+
+                } else if (configuracion.getIntegracionWs().equalsIgnoreCase("OSE")) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    ExceptionProxy exceptionProxy = objectMapper.readValue(e.getFault().getDetail().getTextContent(), ExceptionProxy.class);
+                    transactionResponse.setMensaje(exceptionProxy.getDescripcion());
+                }
             }
         }
 

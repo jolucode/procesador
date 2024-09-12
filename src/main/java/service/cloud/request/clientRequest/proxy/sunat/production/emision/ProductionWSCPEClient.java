@@ -4,6 +4,7 @@ package service.cloud.request.clientRequest.proxy.sunat.production.emision;
 import org.apache.log4j.Logger;
 import service.cloud.request.clientRequest.proxy.consumer.Consumer;
 import service.cloud.request.clientRequest.proxy.sunat.factory.ISunatClient;
+import javax.xml.bind.JAXBException;
 
 public abstract class ProductionWSCPEClient implements ISunatClient {
 
@@ -37,4 +38,14 @@ public abstract class ProductionWSCPEClient implements ISunatClient {
             logger.debug("PrintSoap" + this.printOption);
         }
     } //printSOAP
+
+    protected BillService getSecurityPort() {
+        BillService_Service service = new BillService_Service();
+
+        HeaderHandlerResolver handlerResolver = new HeaderHandlerResolver(consumer);
+        handlerResolver.setPrintSOAP(printOption);
+
+        service.setHandlerResolver(handlerResolver);
+        return service.getBillServicePort();
+    } //getSecurityPort
 }

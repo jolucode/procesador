@@ -59,9 +59,8 @@ public class ProductionClient extends ProductionWSClient {
     /**
      * Este metodo envia una 'Comunicacion de Baja' o 'Resumen Diario' al servicio web de la
      * Sunat, retornando un numero de ticket.
-     */
-    //@Override
-   /* public String sendSummary(String fileName, DataHandler contentFile) throws Exception {
+     */@Override
+   public String sendSummary(String fileName, DataHandler contentFile) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+sendSummary() [PRODUCTION] fileName: " + fileName + " contentFile: " + contentFile);
         }
@@ -72,7 +71,7 @@ public class ProductionClient extends ProductionWSClient {
             logger.debug("-sendSummary() [PRODUCTION]");
         }
         return response;
-    }*///sendSummary
+    }//sendSummary
 
     /**
      * Este metodo envia un documento al servicio web de la Sunat, retornando un numero de
@@ -96,7 +95,7 @@ public class ProductionClient extends ProductionWSClient {
      * Este metodo envia el ticket al servicio web de la Sunat, retornando un objeto que contiene
      * el codigo de respuesta y el CDR de respuesta.
      */
-    /*@Override
+    @Override
     public StatusResponse getStatus(String ticket) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+getStatus() [PRODUCTION] ticket: " + ticket);
@@ -108,7 +107,7 @@ public class ProductionClient extends ProductionWSClient {
             logger.debug("-getStatus() [PRODUCTION]");
         }
         return response;
-    }*/ //getStatus
+    } //getStatus
     private URL getLocationForConsultService() throws MalformedURLException {
         String urlWebService = "https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl";
         return new URL(urlWebService);

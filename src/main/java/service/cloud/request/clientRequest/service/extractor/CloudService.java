@@ -103,6 +103,7 @@ public class CloudService implements CloudInterface {
             transaccion.setTransaccionComprobantePagoList(ExtraerTransaccionComprobantes(transacctionDTO));
             transaccion.setTransaccionAnticipoList(extraerTransaccionAnticipos(transacctionDTO));
             transaccion.setDOC_DescuentoTotal(transaccion.getDOC_Descuento());
+            transaccion.setTicketBaja(transacctionDTO.getTicket_Baja());
             //transaccion.setKey_sociedad(transaccion.getSN_DocIdentidad_Nro());
         } catch (Exception e) {
             throw new Exception(e.getMessage());

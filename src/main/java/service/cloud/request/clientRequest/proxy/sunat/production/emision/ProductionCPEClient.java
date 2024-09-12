@@ -46,6 +46,49 @@ public class ProductionCPEClient extends ProductionWSCPEClient {
         return new StatusResponse(statusResponse.getContent(), statusResponse.getStatusCode(), statusResponse.getStatusMessage());
     }
 
+    @Override
+    public String sendSummary(String fileName, DataHandler contentFile)
+            throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+sendSummary() [PRODUCTION] fileName: " + fileName
+                    + " contentFile: " + contentFile);
+        }
+
+        //String response = getSecurityPort().sendSummary(fileName, contentFile);
+        SunatSoapInterceptor soapInterceptor = new SunatSoapInterceptor(consumer);
+        BillServiceImpl billService = new BillServiceImpl(getLocationForService());
+        HeaderHandlerResolver handlerResolver = new HeaderHandlerResolver();
+        handlerResolver.addHandlers(soapInterceptor);
+        billService.setHandlerResolver(handlerResolver);
+        BillService billServicePort = billService.getBillServicePort();
+        String response = billServicePort.sendSummary(fileName, contentFile);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("-sendSummary() [PRODUCTION]");
+        }
+        return response;
+    }
+
+    @Override
+    public StatusResponse getStatus(String ticket) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+getStatus() [PRODUCTION] ticket: " + ticket);
+        }
+
+        SunatSoapInterceptor soapInterceptor = new SunatSoapInterceptor(consumer);
+        BillServiceImpl billService = new BillServiceImpl(getLocationForService());
+        HeaderHandlerResolver handlerResolver = new HeaderHandlerResolver();
+        handlerResolver.addHandlers(soapInterceptor);
+        billService.setHandlerResolver(handlerResolver);
+        BillService billServicePort = billService.getBillServicePort();
+        StatusResponse response = billServicePort.getStatus(ticket);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("-getStatus() [PRODUCTION]");
+        }
+        return response;
+    }
+
     private URL getLocationForConsultService() throws MalformedURLException {
         String urlWebService = "https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl";
         return new URL(urlWebService);
