@@ -78,14 +78,6 @@ public class PDFRetentionCreator extends DocumentCreator {
         }
     } // PDFInv
 
-    /**
-     * Este metodo obtiene la instancia actual del objeto PDFInvoiceCreator.
-     *
-     * @param perceptionReportPath Ruta de la plantilla de la PERCEPCION.
-     * @param legendSubReportPath  Ruta del subreporte de legendas.
-     * @return Retorna la instancia de la clase PDFPerceptionCreator.
-     * @throws PDFReportException
-     */
     public static PDFRetentionCreator getInstance(String retentionReportPath,
                                                   String legendSubReportPath) throws PDFReportException {
         /*if (null == instance) {
@@ -95,15 +87,6 @@ public class PDFRetentionCreator extends DocumentCreator {
         return instance;
     }
 
-    /**
-     * Este metodo crea un PDF que es la representacion impresa de la factura
-     * electronica.
-     *
-     * @param invoiceObj Objeto que contiene informacion de la percepcion.
-     * @param docUUID    Identificador unica de la percepcion.
-     * @return Retorna un PDF en bytes.
-     * @throws PDFReportException
-     */
     public byte[] createRetentionPDF(RetentionObject retentionObject,
                                      String docUUID, ConfigData configData) throws PDFReportException {
 
@@ -198,6 +181,11 @@ public class PDFRetentionCreator extends DocumentCreator {
                  * Generar el reporte con la informacion de la factura
                  * electronica
                  */
+                JasperPrint iJasperPrint = JasperFillManager.fillReport(iJasperReport, parameterMap, new JRBeanCollectionDataSource(retentionObject.getItemListDynamic()));
+
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
+                pdfDocument =  outputStream.toByteArray();;
 
             } catch (Exception e) {
                 logger.error("createInvoicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
