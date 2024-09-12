@@ -226,23 +226,9 @@ public class PDFDebitNoteCreator extends DocumentCreator {
                  */
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(dnJasperReport, parameterMap,
                         new JRBeanCollectionDataSource(debitNoteObj.getItemsListDynamic()));
-
-                /*
-                 * Exportar el reporte PDF en una ruta en DISCO
-                 */
-                String outputPath = USER_TEMPORARY_PATH + File.separator + docUUID + IPDFCreatorConfig.EE_PDF;
-                JasperExportManager.exportReportToPdfFile(iJasperPrint, outputPath);
-                if (logger.isInfoEnabled()) {
-                    logger.info("createDebitNotePDF() [" + docUUID + "] Se guardo el PDF en una ruta temportal: " + outputPath);
-                }
-
-                /*
-                 * Convirtiendo el documento PDF generado en bytes.
-                 */
-                pdfDocument = convertFileInBytes(outputPath);
-                if (logger.isInfoEnabled()) {
-                    logger.info("createDebitNotePDF() [" + docUUID + "] Se convirtio el PDF en bytes: " + pdfDocument);
-                }
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
+                pdfDocument =  outputStream.toByteArray();;
             } catch (Exception e) {
                 logger.error("createDebitNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
                 logger.error("createDebitNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));

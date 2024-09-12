@@ -258,23 +258,9 @@ public class PDFCreditNoteCreator extends DocumentCreator {
                  */
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(cnJasperReport, parameterMap,
                         new JRBeanCollectionDataSource(creditNoteObj.getItemsListDynamic()));
-
-                /*
-                 * Exportar el reporte PDF en una ruta en DISCO
-                 */
-                String outputPath = USER_TEMPORARY_PATH + File.separator + docUUID + IPDFCreatorConfig.EE_PDF;
-                JasperExportManager.exportReportToPdfFile(iJasperPrint, outputPath);
-                if (logger.isInfoEnabled()) {
-                    logger.info("createCreditNotePDF() [" + docUUID + "] Se guardo el PDF en una ruta temportal: " + outputPath);
-                }
-
-                /*
-                 * Convirtiendo el documento PDF generado en bytes.
-                 */
-                pdfDocument = convertFileInBytes(outputPath);
-                if (logger.isInfoEnabled()) {
-                    logger.info("createCreditNotePDF() [" + docUUID + "] Se convirtio el PDF en bytes: " + pdfDocument);
-                }
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
+                pdfDocument =  outputStream.toByteArray();;
             } catch (Exception e) {
                 logger.error("createCreditNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
                 logger.error("createCreditNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
