@@ -72,11 +72,9 @@ public class ServicePrincipal implements InterfacePrincipal {
      * @return la lista de trnsacciones pendientes de envio. Es decir las que
      * tengan el estado [N]uevo,[C]orregido,[E]nviado
      */
-
-    public RequestPost EnviarTransacciones(Transaccion transaccion, String stringRequestOnpremise) throws Exception {
+    public RequestPost EnviarTransacciones(Transaccion transaccion, String requestOnPremise) throws Exception {
         RequestPost request = new RequestPost();
 
-        //request.getLogMdb().setRequest(new Gson().toJson(transaccion));
         logger.info("Documento extraido de la intermedia es : " + transaccion.getDocIdentidad_Nro() + " - " + transaccion.getDOC_Id());
         try {
 
@@ -91,7 +89,10 @@ public class ServicePrincipal implements InterfacePrincipal {
                 logger.info("Mensaje Documento: " + request.getResponseRequest().getServiceResponse());
             }
 
-            //logEntryService.saveLogEntryToMongoDB(convertToEntity(tr.getLogDTO())).subscribe();
+            if(tr.getLogDTO()!=null) {
+                tr.getLogDTO().setRequest(requestOnPremise);
+                logEntryService.saveLogEntryToMongoDB(convertToEntity(tr.getLogDTO())).subscribe();
+            }
 
             logger.info("Se realizo de manera exitosa la actualizacion del documento :" + transaccion.getFE_Id());
             logger.info("Se anexo de manera correcta los documentos en SAP");
@@ -220,7 +221,6 @@ public class ServicePrincipal implements InterfacePrincipal {
             request.setTicketBaja(tr.getTicketRest());
 
 
-            request.setDbName(tc.getDbName());
             request.setUrlOnpremise(providerProperties.getUrlOnpremise(tc.getDocIdentidad_Nro()));
 
             if (tr.getMensaje().contains("ha sido aceptad") || tr.getMensaje().contains("aprobado")) {
