@@ -225,6 +225,8 @@ public class ServicePrincipal implements InterfacePrincipal {
 
             if (tr.getMensaje().contains("ha sido aceptad") || tr.getMensaje().contains("aprobado")) {
 
+                tr.setPdf(tr.getPdfBorrador());
+
                 Map<String, Data.ResponseDocument> listMapDocuments = new HashMap<>();
                 if (tr.getMensaje().contains("Baja")) {
                     Data.ResponseDocument document4 = new Data.ResponseDocument("zip", tr.getZip());
