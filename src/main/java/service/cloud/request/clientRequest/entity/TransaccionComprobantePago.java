@@ -35,6 +35,9 @@ public class TransaccionComprobantePago implements Serializable {
     @Column(name = "DOC_Tipo")
     private String DOC_Tipo;
 
+    @Column(name = "TipoComprobante")
+    private String TipoComprobante;
+
     @Column(name = "DOC_Numero")
     private String DOC_Numero;
 
@@ -47,7 +50,7 @@ public class TransaccionComprobantePago implements Serializable {
     private BigDecimal DOC_Importe;
 
     @Column(name = "DOC_Moneda")
-    private String dOCMoneda;
+    private String DOC_Moneda;
 
     @Column(name = "PagoFecha")
     @Temporal(TemporalType.DATE)
@@ -57,7 +60,7 @@ public class TransaccionComprobantePago implements Serializable {
     private String PagoNumero;
 
     @Column(name = "PagoImporteSR")
-    private BigDecimal Importe_Pago_Soles;
+    private BigDecimal PagoImporteSR;
 
     @Column(name = "PagoMoneda")
     private String pagoMoneda;
@@ -76,10 +79,13 @@ public class TransaccionComprobantePago implements Serializable {
 
     @Column(name = "CP_Fecha")
     @Temporal(TemporalType.DATE)
-    private Date cPFecha;
+    private Date CP_Fecha;
 
     @Column(name = "CP_ImporteTotal")
     private BigDecimal CP_ImporteTotal;
+
+    @Column(name = "Importe_Pago_Soles")
+    private BigDecimal Importe_Pago_Soles;
 
     @Column(name = "CP_MonedaMontoNeto")
     private String cPMonedaMontoNeto;

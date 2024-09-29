@@ -305,6 +305,11 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                         {
                             itemObjectHash.put("DOC_FechaEmision", DateConverter.convertToDate(value));
                         }
+
+                        if(field.getName().equals("CP_Fecha"))
+                        {
+                            itemObjectHash.put("CP_Fecha", DateConverter.convertToDate(value));
+                        }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }

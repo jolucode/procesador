@@ -2485,7 +2485,6 @@ public abstract class UBLBasicHandler {
         deliveredQuantity.setUnitCodeListID("UN/ECE rec 20");
         deliveredQuantity.setUnitCodeListAgencyName(IUBLConfig.LIST_AGENCY_NAME_UNECE);
         deliveredQuantity.setValue(value);
-        //deliveredQuantity.setValue(value.setScale(0, RoundingMode.HALF_UP));
         return deliveredQuantity;
     } //getDeliveredQuantity
 

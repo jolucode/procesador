@@ -1874,15 +1874,15 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
                 /* Agregar <sac:SUNATPerceptionDocumentReference><cbc:TotalInvoiceAmount> */
                 if (logger.isDebugEnabled()) {
-                    logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando DOC_IMPORTE(" + transaccionComprobantePago.getDOC_Importe() + ") DOC_MONEDA(" + transaccionComprobantePago.getDOCMoneda() + ") - TAG TotalInvoiceAmount.");
+                    logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando DOC_IMPORTE(" + transaccionComprobantePago.getDOC_Importe() + ") DOC_MONEDA(" + transaccionComprobantePago.getDOC_Moneda() + ") - TAG TotalInvoiceAmount.");
                 }
-                sunatPerceptionDocReference.setTotalInvoiceAmount(getTotalInvoiceAmount(transaccionComprobantePago.getDOC_Importe(), transaccionComprobantePago.getDOCMoneda()));
+                sunatPerceptionDocReference.setTotalInvoiceAmount(getTotalInvoiceAmount(transaccionComprobantePago.getDOC_Importe(), transaccionComprobantePago.getDOC_Moneda()));
 
                 /* Agregar <sac:SUNATPerceptionDocumentReference><cac:Payment> */
                 if (logger.isDebugEnabled()) {
-                    logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando PAGO_NUMERO(" + transaccionComprobantePago.getPagoNumero() + ") PAGO_IMPORTE_SR(" + transaccionComprobantePago.getImporte_Pago_Soles() + ") PAGO_MONEDA(" + transaccionComprobantePago.getPagoMoneda() + ") PAGO_FECHA(" + transaccionComprobantePago.getPagoFecha() + ") - TAG Payment.");
+                    logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando PAGO_NUMERO(" + transaccionComprobantePago.getPagoNumero() + ") PAGO_IMPORTE_SR(" + transaccionComprobantePago.getPagoImporteSR() + ") PAGO_MONEDA(" + transaccionComprobantePago.getPagoMoneda() + ") PAGO_FECHA(" + transaccionComprobantePago.getPagoFecha() + ") - TAG Payment.");
                 }
-                sunatPerceptionDocReference.setPayment(getPaymentForLine(transaccionComprobantePago.getPagoNumero(), transaccionComprobantePago.getImporte_Pago_Soles(), transaccionComprobantePago.getPagoMoneda(), transaccionComprobantePago.getPagoFecha()));
+                sunatPerceptionDocReference.setPayment(getPaymentForLine(transaccionComprobantePago.getPagoNumero(), transaccionComprobantePago.getPagoImporteSR(), transaccionComprobantePago.getPagoMoneda(), transaccionComprobantePago.getPagoFecha()));
 
                 /* Agregar <sac:SUNATPerceptionDocumentReference><sac:SUNATPerceptionInformation> */
                 SUNATPerceptionInformationType sunatPerceptionInformation = new SUNATPerceptionInformationType();
@@ -1898,9 +1898,9 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
                     /* <sac:SUNATPerceptionDocumentReference><sac:SUNATPerceptionInformation><sac:SUNATPerceptionDate> */
                     if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando CP_FECHA(" + transaccionComprobantePago.getCPFecha() + ") - TAG SUNATPerceptionInformation_SUNATPerceptionDate.");
+                        logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando CP_FECHA(" + transaccionComprobantePago.getCP_Fecha() + ") - TAG SUNATPerceptionInformation_SUNATPerceptionDate.");
                     }
-                    sunatPerceptionInformation.setPerceptionDate(getSUNATPerceptionDate(transaccionComprobantePago.getCPFecha()));
+                    sunatPerceptionInformation.setPerceptionDate(getSUNATPerceptionDate(transaccionComprobantePago.getCP_Fecha()));
 
                     /* <sac:SUNATPerceptionDocumentReference><sac:SUNATPerceptionInformation><sac:SUNATNetTotalCashed> */
                     if (logger.isDebugEnabled()) {
@@ -1983,15 +1983,15 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
                 /* Agregar <sac:SUNATRetentionDocumentReference><cbc:TotalInvoiceAmount> */
                 if (logger.isDebugEnabled()) {
-                    logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando DOC_IMPORTE(" + transaccionComprobantePago.getDOC_Importe() + ") DOC_MONEDA(" + transaccionComprobantePago.getDOCMoneda() + ") - TAG TotalInvoiceAmount.");
+                    logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando DOC_IMPORTE(" + transaccionComprobantePago.getDOC_Importe() + ") DOC_MONEDA(" + transaccionComprobantePago.getDOC_Moneda() + ") - TAG TotalInvoiceAmount.");
                 }
-                sunatRetentionDocReference.setTotalInvoiceAmount(getTotalInvoiceAmount(transaccionComprobantePago.getDOC_Importe(), transaccionComprobantePago.getDOCMoneda()));
+                sunatRetentionDocReference.setTotalInvoiceAmount(getTotalInvoiceAmount(transaccionComprobantePago.getDOC_Importe(), transaccionComprobantePago.getDOC_Moneda()));
 
                 /* Agregar <sac:SUNATRetentionDocumentReference><cac:Payment> */
                 if (logger.isDebugEnabled()) {
-                    logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando PAGO_NUMERO(" + transaccionComprobantePago.getPagoNumero() + ") PAGO_IMPORTE_SR(" + transaccionComprobantePago.getImporte_Pago_Soles() + ") PAGO_MONEDA(" + transaccionComprobantePago.getPagoMoneda() + ") PAGO_FECHA(" + transaccionComprobantePago.getPagoFecha() + ") - TAG Payment.");
+                    logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando PAGO_NUMERO(" + transaccionComprobantePago.getPagoNumero() + ") PAGO_IMPORTE_SR(" + transaccionComprobantePago.getPagoImporteSR() + ") PAGO_MONEDA(" + transaccionComprobantePago.getPagoMoneda() + ") PAGO_FECHA(" + transaccionComprobantePago.getPagoFecha() + ") - TAG Payment.");
                 }
-                sunatRetentionDocReference.setPayment(getPaymentForLine(transaccionComprobantePago.getPagoNumero(), transaccionComprobantePago.getImporte_Pago_Soles(), transaccionComprobantePago.getPagoMoneda(), transaccionComprobantePago.getPagoFecha()));
+                sunatRetentionDocReference.setPayment(getPaymentForLine(transaccionComprobantePago.getPagoNumero(), transaccionComprobantePago.getPagoImporteSR(), transaccionComprobantePago.getPagoMoneda(), transaccionComprobantePago.getPagoFecha()));
 
                 /* Agregar <sac:SUNATRetentionDocumentReference><sac:SUNATRetentionInformation> */
                 SUNATRetentionInformationType sunatRetentionInformation = new SUNATRetentionInformationType();
@@ -2007,9 +2007,9 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
                     /* <sac:SUNATRetentionDocumentReference><sac:SUNATRetentionInformation><sac:SUNATRetentionDate> */
                     if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando CP_FECHA(" + transaccionComprobantePago.getCPFecha() + ") - TAG SUNATRetentionInformation_SUNATRetentionDate.");
+                        logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando CP_FECHA(" + transaccionComprobantePago.getCP_Fecha() + ") - TAG SUNATRetentionInformation_SUNATRetentionDate.");
                     }
-                    sunatRetentionInformation.setSunatRetentionDate(getSUNATRetentionDate(transaccionComprobantePago.getCPFecha()));
+                    sunatRetentionInformation.setSunatRetentionDate(getSUNATRetentionDate(transaccionComprobantePago.getCP_Fecha()));
 
                     /* <sac:SUNATRetentionDocumentReference><sac:SUNATRetentionInformation><sac:SUNATNetTotalPaid> */
                     if (logger.isDebugEnabled()) {
