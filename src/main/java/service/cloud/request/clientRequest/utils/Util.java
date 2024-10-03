@@ -65,23 +65,35 @@ public class Util {
 
 
     public static Date returnDate(String dateString) {
+        // Formatos de fecha existentes
         SimpleDateFormat originalDateFormatFull = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
         SimpleDateFormat originalDateFormatShort = new SimpleDateFormat("yyyy-MM-dd");
+
+        // Nuevo formato para fechas en formato dd/MM/yyyy
+        SimpleDateFormat newDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
         SimpleDateFormat desiredDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         Date date;
         try {
+            // Intentar con el formato completo
             date = originalDateFormatFull.parse(dateString);
         } catch (ParseException e) {
-            // Try the shorter date format if the full format fails
+            // Intentar con el formato corto yyyy-MM-dd
             try {
                 date = originalDateFormatShort.parse(dateString);
             } catch (ParseException ex) {
-                ex.printStackTrace();
-                return null;
+                // Intentar con el nuevo formato dd/MM/yyyy
+                try {
+                    date = newDateFormat.parse(dateString);
+                } catch (ParseException exc) {
+                    exc.printStackTrace();
+                    return null;
+                }
             }
         }
 
+        // Convertir la fecha al formato deseado yyyy-MM-dd
         String formattedDateString = desiredDateFormat.format(date);
         try {
             return desiredDateFormat.parse(formattedDateString);
