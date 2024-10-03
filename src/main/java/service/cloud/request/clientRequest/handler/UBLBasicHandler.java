@@ -2416,7 +2416,12 @@ public abstract class UBLBasicHandler {
             }
             final PrepaidAmountType prepaidAmount = new PrepaidAmountType();
             final BigDecimal b3 = new BigDecimal("1.18");
-            prepaidAmount.setValue(prepaidAmountValue.multiply(b3).setScale(2, RoundingMode.HALF_UP));
+            /***/
+            BigDecimal totalAnticipos = transaccion.getTransaccionAnticipoList().stream()
+                    .map(TransaccionAnticipo::getAnticipoMonto)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            prepaidAmount.setValue(totalAnticipos);
+            /***/
             prepaidAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
             monetaryTotal.setPrepaidAmount(prepaidAmount);
         }
