@@ -55,9 +55,6 @@ public class PDFRetentionCreator extends DocumentCreator {
             /* Compila el reporte */
             iJasperReport = JasperCompileManager.compileReport(iJasperDesign);
 
-            /*
-             * Guardando en la instancia la ruta del subreporte de leyendas
-             */
             this.legendSubReportPath = legendSubReportPath;
         } catch (FileNotFoundException e) {
             logger.error("PDFRetentionCreator() FileNotFoundException - ERROR: "
@@ -80,9 +77,6 @@ public class PDFRetentionCreator extends DocumentCreator {
 
     public static PDFRetentionCreator getInstance(String retentionReportPath,
                                                   String legendSubReportPath) throws PDFReportException {
-        /*if (null == instance) {
-         instance = new PDFRetentionCreator(retentionReportPath,legendSubReportPath);
-         }*/
         instance = new PDFRetentionCreator(retentionReportPath, legendSubReportPath);
         return instance;
     }

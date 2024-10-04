@@ -84,9 +84,6 @@ public class PDFDespatchAdviceCreator extends DocumentCreator {
      * @throws PDFReportException
      */
     public static PDFDespatchAdviceCreator getInstance(String despatchAdviceReportPath, String legendSubReportPath) throws PDFReportException {
-        /*if (null == instance) {
-         instance = new PDFInvoiceCreator(invoiceReportPath, legendSubReportPath);
-         }*/
         instance = new PDFDespatchAdviceCreator(despatchAdviceReportPath, legendSubReportPath);
         return instance;
     } //getInstance

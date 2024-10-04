@@ -97,9 +97,6 @@ public class PDFCreditNoteCreator extends DocumentCreator {
      * @throws PDFReportException
      */
     public static PDFCreditNoteCreator getInstance(String creditNoteReportPath, String legendSubReportPath, String paymentDetailReportPath) throws PDFReportException {
-        /*if (null == instance) {
-            instance = new PDFCreditNoteCreator(creditNoteReportPath, legendSubReportPath);
-        }*/
         instance = new PDFCreditNoteCreator(creditNoteReportPath, legendSubReportPath, paymentDetailReportPath);
         return instance;
     } //getInstance
@@ -124,35 +121,26 @@ public class PDFCreditNoteCreator extends DocumentCreator {
             throw new PDFReportException(IVenturaError.ERROR_408);
         } else {
             try {
-                /* Crea instancia del MAP */
                 parameterMap = new HashMap<String, Object>();
-
                 cuotasMap = new HashMap<>();
 
-                //================================================================================================
-                //================================= AGREGANDO INFORMACION AL MAP =================================
-                //================================================================================================
                 parameterMap.put(IPDFCreatorConfig.DOCUMENT_IDENTIFIER, creditNoteObj.getDocumentIdentifier());
                 parameterMap.put(IPDFCreatorConfig.ISSUE_DATE, creditNoteObj.getIssueDate());
                 parameterMap.put(IPDFCreatorConfig.DUE_DATE, creditNoteObj.getDueDate());
                 parameterMap.put(IPDFCreatorConfig.CURRENCY_VALUE, creditNoteObj.getCurrencyValue());
-
                 if (StringUtils.isNotBlank(creditNoteObj.getSunatTransaction())) {
                     parameterMap.put(IPDFCreatorConfig.OPERATION_TYPE_LABEL, IPDFCreatorConfig.OPERATION_TYPE_DSC);
                     parameterMap.put(IPDFCreatorConfig.OPERATION_TYPE_VALUE, creditNoteObj.getSunatTransaction());
                 }
-
                 parameterMap.put(IPDFCreatorConfig.PAYMENT_CONDITION, creditNoteObj.getPaymentCondition());
                 parameterMap.put(IPDFCreatorConfig.SELL_ORDER, creditNoteObj.getSellOrder());
                 parameterMap.put(IPDFCreatorConfig.SELLER_NAME, creditNoteObj.getSellerName());
                 parameterMap.put(IPDFCreatorConfig.REMISSION_GUIDE, creditNoteObj.getRemissionGuides());
                 parameterMap.put(IPDFCreatorConfig.PORCIGV, creditNoteObj.getPorcentajeIGV());
-
                 parameterMap.put(IPDFCreatorConfig.CREDIT_NOTE_TYPE_VALUE, creditNoteObj.getTypeOfCreditNote());
                 parameterMap.put(IPDFCreatorConfig.CREDIT_NOTE_DESC_VALUE, creditNoteObj.getDescOfCreditNote());
                 parameterMap.put(IPDFCreatorConfig.REFERENCE_DOC_VALUE, creditNoteObj.getDocumentReferenceToCn());
                 parameterMap.put(IPDFCreatorConfig.DATE_REFERENCE_DOC_VALUE, creditNoteObj.getDateDocumentReference());
-
                 parameterMap.put(IPDFCreatorConfig.SENDER_SOCIAL_REASON, creditNoteObj.getSenderSocialReason());
                 parameterMap.put(IPDFCreatorConfig.SENDER_RUC, creditNoteObj.getSenderRuc());
                 parameterMap.put(IPDFCreatorConfig.SENDER_FISCAL_ADDRESS, creditNoteObj.getSenderFiscalAddress());
@@ -164,18 +152,14 @@ public class PDFCreditNoteCreator extends DocumentCreator {
                 parameterMap.put(IPDFCreatorConfig.SENDER_TEL_1, creditNoteObj.getTelefono1());
                 parameterMap.put(IPDFCreatorConfig.SENDER_WEB, creditNoteObj.getWeb());
                 parameterMap.put(IPDFCreatorConfig.COMMENTS, creditNoteObj.getComentarios());
-
                 parameterMap.put(IPDFCreatorConfig.VALIDEZPDF, creditNoteObj.getValidezPDF());
-
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_REGISTRATION_NAME, creditNoteObj.getReceiverRegistrationName());
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_IDENTIFIER, creditNoteObj.getReceiverIdentifier());
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_IDENTIFIER_TYPE, creditNoteObj.getReceiverIdentifierType());
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_FISCAL_ADDRESS, creditNoteObj.getReceiverFiscalAddress());
-
                 parameterMap.put(IPDFCreatorConfig.PERCENTAGE_PERCEPTION, creditNoteObj.getPerceptionPercentage());
                 parameterMap.put(IPDFCreatorConfig.AMOUNT_PERCEPTION, creditNoteObj.getPerceptionAmount());
                 parameterMap.put(IPDFCreatorConfig.PORCISC, creditNoteObj.getISCPercetange());
-
                 parameterMap.put(IPDFCreatorConfig.SUBTOTAL_VALUE, creditNoteObj.getSubtotalValue());
                 parameterMap.put(IPDFCreatorConfig.IGV_VALUE, creditNoteObj.getIgvValue());
                 parameterMap.put(IPDFCreatorConfig.ISC_VALUE, creditNoteObj.getIscValue());
@@ -211,17 +195,8 @@ public class PDFCreditNoteCreator extends DocumentCreator {
                 }
 
                 parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, creditNoteObj.getLetterAmountValue());
-
-                /*
-                 * IMPORTANTE!!
-                 *
-                 * Agregar la ruta del directorio en donde se encuentran los
-                 * sub-reportes en formato (.jasper)
-                 */
-
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DIR, this.paymentDetailReportPath);
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DATASOURCE, new JRBeanCollectionDataSource(creditNoteObj.getItemListDynamicC()));
-
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, this.legendSubReportPath);
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(creditNoteObj.getLegends()));
 
@@ -230,19 +205,15 @@ public class PDFCreditNoteCreator extends DocumentCreator {
                 legendMap.put(IPDFCreatorConfig.RESOLUTION_CODE_VALUE, creditNoteObj.getResolutionCodeValue());
 
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_MAP, legendMap);
-
                 cuotasMap.put("M1", creditNoteObj.getM1());
                 cuotasMap.put("M2", creditNoteObj.getM2());
                 cuotasMap.put("M3", creditNoteObj.getM3());
-
                 cuotasMap.put("C1", creditNoteObj.getC1());
                 cuotasMap.put("C2", creditNoteObj.getC2());
                 cuotasMap.put("C3", creditNoteObj.getC3());
-
                 cuotasMap.put("F1", creditNoteObj.getF1());
                 cuotasMap.put("F2", creditNoteObj.getF2());
                 cuotasMap.put("F3", creditNoteObj.getF3());
-
                 cuotasMap.put("totalCuotas", creditNoteObj.getTotalCuotas());
                 cuotasMap.put("metodoPago", creditNoteObj.getMetodoPago());
                 cuotasMap.put("baseImponibleRetencion", creditNoteObj.getBaseImponibleRetencion());
@@ -251,11 +222,7 @@ public class PDFCreditNoteCreator extends DocumentCreator {
                 cuotasMap.put("montoPendiente", creditNoteObj.getMontoPendiente());
 
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_CUOTAS_MAP, cuotasMap); // parametros subreporte de cuotas (se pasa como HashMap)
-                /*
 
-                 * Generar el reporte con la informacion de la nota
-                 * de credito electronica
-                 */
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(cnJasperReport, parameterMap,
                         new JRBeanCollectionDataSource(creditNoteObj.getItemsListDynamic()));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

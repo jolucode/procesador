@@ -92,9 +92,6 @@ public class PDFDebitNoteCreator extends DocumentCreator {
      * @throws PDFReportException
      */
     public static PDFDebitNoteCreator getInstance(String debitNoteReportPath, String legendSubReportPath) throws PDFReportException {
-        /*if (null == instance) {
-            instance = new PDFDebitNoteCreator(debitNoteReportPath, legendSubReportPath);
-        }*/
         instance = new PDFDebitNoteCreator(debitNoteReportPath, legendSubReportPath);
         return instance;
     } //getInstance
@@ -120,10 +117,6 @@ public class PDFDebitNoteCreator extends DocumentCreator {
             try {
                 /* Crea instancia del MAP */
                 parameterMap = new HashMap<String, Object>();
-
-                //================================================================================================
-                //================================= AGREGANDO INFORMACION AL MAP =================================
-                //================================================================================================
                 parameterMap.put(IPDFCreatorConfig.DOCUMENT_IDENTIFIER, debitNoteObj.getDocumentIdentifier());
                 parameterMap.put(IPDFCreatorConfig.ISSUE_DATE, debitNoteObj.getIssueDate());
                 parameterMap.put(IPDFCreatorConfig.DUE_DATE, debitNoteObj.getDueDate());
@@ -139,12 +132,10 @@ public class PDFDebitNoteCreator extends DocumentCreator {
                 parameterMap.put(IPDFCreatorConfig.SELLER_NAME, debitNoteObj.getSellerName());
                 parameterMap.put(IPDFCreatorConfig.REMISSION_GUIDE, debitNoteObj.getRemissionGuides());
                 parameterMap.put(IPDFCreatorConfig.PORCIGV, debitNoteObj.getPorcentajeIGV());
-
                 parameterMap.put(IPDFCreatorConfig.DEBIT_NOTE_TYPE_VALUE, debitNoteObj.getTypeOfDebitNote());
                 parameterMap.put(IPDFCreatorConfig.DEBIT_NOTE_DESC_VALUE, debitNoteObj.getDescOfDebitNote());
                 parameterMap.put(IPDFCreatorConfig.REFERENCE_DOC_VALUE, debitNoteObj.getDocumentReferenceToCn());
                 parameterMap.put(IPDFCreatorConfig.DATE_REFERENCE_DOC_VALUE, debitNoteObj.getDateDocumentReference());
-
                 parameterMap.put(IPDFCreatorConfig.SENDER_SOCIAL_REASON, debitNoteObj.getSenderSocialReason());
                 parameterMap.put(IPDFCreatorConfig.SENDER_RUC, debitNoteObj.getSenderRuc());
                 parameterMap.put(IPDFCreatorConfig.SENDER_FISCAL_ADDRESS, debitNoteObj.getSenderFiscalAddress());
@@ -156,19 +147,15 @@ public class PDFDebitNoteCreator extends DocumentCreator {
                 parameterMap.put(IPDFCreatorConfig.SENDER_TEL_1, debitNoteObj.getTelefono_1());
                 parameterMap.put(IPDFCreatorConfig.SENDER_WEB, debitNoteObj.getWeb());
                 parameterMap.put(IPDFCreatorConfig.COMMENTS, debitNoteObj.getComentarios());
-
                 parameterMap.put(IPDFCreatorConfig.VALIDEZPDF, debitNoteObj.getValidezPDF());
-
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_REGISTRATION_NAME, debitNoteObj.getReceiverRegistrationName());
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_IDENTIFIER, debitNoteObj.getReceiverIdentifier());
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_IDENTIFIER_TYPE, debitNoteObj.getReceiverIdentifierType());
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_FISCAL_ADDRESS, debitNoteObj.getReceiverFiscalAddress());
                 parameterMap.put(IPDFCreatorConfig.CAMPOS_USUARIO_CAB, debitNoteObj.getInvoicePersonalizacion());
-
                 parameterMap.put(IPDFCreatorConfig.PERCENTAGE_PERCEPTION, debitNoteObj.getPerceptionPercentage());
                 parameterMap.put(IPDFCreatorConfig.AMOUNT_PERCEPTION, debitNoteObj.getPerceptionAmount());
                 parameterMap.put(IPDFCreatorConfig.PORCISC, debitNoteObj.getISCPercetange());
-
                 parameterMap.put(IPDFCreatorConfig.SUBTOTAL_VALUE, debitNoteObj.getSubtotalValue());
                 parameterMap.put(IPDFCreatorConfig.IGV_VALUE, debitNoteObj.getIgvValue());
                 parameterMap.put(IPDFCreatorConfig.ISC_VALUE, debitNoteObj.getIscValue());
@@ -183,7 +170,6 @@ public class PDFDebitNoteCreator extends DocumentCreator {
                     parameterMap.put(IPDFCreatorConfig.GRATUITA_AMOUNT_LABEL, IPDFCreatorConfig.GRATUITA_AMOUNT_LABEL_DSC);
                     parameterMap.put(IPDFCreatorConfig.GRATUITA_AMOUNT_VALUE, debitNoteObj.getGratuitaAmountValue());
                 }
-
 
                 if (configData.getImpresionPDF().equalsIgnoreCase("Codigo QR")) {
                     parameterMap.put(IPDFCreatorConfig.CODEQR, debitNoteObj.getCodeQR());
@@ -204,26 +190,14 @@ public class PDFDebitNoteCreator extends DocumentCreator {
                 }
 
                 parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, debitNoteObj.getLetterAmountValue());
-
-                /*
-                 * IMPORTANTE!!
-                 *
-                 * Agregar la ruta del directorio en donde se encuentran los
-                 * sub-reportes en formato (.jasper)
-                 */
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, this.legendSubReportPath);
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(debitNoteObj.getLegends()));
 
                 Map<String, String> legendMap = new HashMap<String, String>();
                 legendMap.put(IPDFCreatorConfig.LEGEND_DOCUMENT_TYPE, IPDFCreatorConfig.LEGEND_DEBIT_NOTE_DOCUMENT);
                 legendMap.put(IPDFCreatorConfig.RESOLUTION_CODE_VALUE, debitNoteObj.getResolutionCodeValue());
-
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_MAP, legendMap);
 
-                /*
-                 * Generar el reporte con la informacion de la nota
-                 * de debito electronica
-                 */
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(dnJasperReport, parameterMap,
                         new JRBeanCollectionDataSource(debitNoteObj.getItemsListDynamic()));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
