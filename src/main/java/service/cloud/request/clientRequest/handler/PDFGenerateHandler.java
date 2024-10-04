@@ -11,12 +11,13 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
 import service.cloud.request.clientRequest.entity.*;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
-import service.cloud.request.clientRequest.extras.pdf.PDFInvoiceCreator;
-import service.cloud.request.clientRequest.handler.creator.*;
+import service.cloud.request.clientRequest.extras.pdf.*;
 import service.cloud.request.clientRequest.handler.object.*;
 import service.cloud.request.clientRequest.handler.object.item.PerceptionItemObject;
 import service.cloud.request.clientRequest.handler.object.legend.BoletaObject;
@@ -35,11 +36,9 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccompone
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.TaxableAmountType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.sunataggregatecomponents_1.SUNATPerceptionDocumentReferenceType;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -50,62 +49,29 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+@Service
 public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
     private final Logger logger = Logger.getLogger(PDFGenerateHandler.class);
 
-    /*
-     * Ruta de los templates de reportes
-     */
-    private String documentReportPath;
+    @Autowired
+    PDFInvoiceCreator pdfInvoiceCreator;
 
-    private String legendSubReportPath;
+    @Autowired
+    PDFDebitNoteCreator pdfDebitNoteCreator;
 
-    private String paymentDetailReportPath;
+    @Autowired
+    PDFBoletaCreator pdfBoletaCreator;
 
-    /* Logo del emisor electronico */
-    private String senderLogo;
+    @Autowired
+    PDFCreditNoteCreator pdfCreditNoteCreator;
 
-    /*
-     * Codigo de resolucion del emisor electronico
-     */
-    private String resolutionCode;
+    @Autowired
+    PDFPerceptionCreator pdfPerceptionCreator;
 
-    /**
-     * Constructor privador para evitar instancias.
-     *
-     * @param docUUID UUID identificador del documento
-     */
-    private PDFGenerateHandler(String docUUID) {
-        super(docUUID);
-    } // PDFGenerateHandler
+    @Autowired
+    PDFRetentionCreator pdfRetentionCreator;
 
-    /**
-     * Este metodo obtiene la instancia de la clase PDFGenerateHandler.
-     *
-     * @param docUUID UUID identificador del documento.
-     * @return Retorna la instancia de la clase PDFGenerateHandler.
-     */
-    public static synchronized PDFGenerateHandler newInstance(String docUUID) {
-        return new PDFGenerateHandler(docUUID);
-    } // newInstance
-
-    /**
-     * Este metodo guarda las ruta de los templates de reportes.
-     *
-     * @param documentReportPath  Ruta del template del documento, del cual se
-     *                            generara el PDF.
-     * @param legendSubReportPath Ruta del template del subreporte de legendas.
-     * @param senderLogo          El logo del emisor electronico
-     * @param resolutionCode      Codigo de resolucion del emisor electronico
-     */
-    public void setConfiguration(String documentReportPath, String legendSubReportPath, String paymentDetailReportPath, String senderLogo, String resolutionCode) {
-        this.documentReportPath = documentReportPath;
-        this.legendSubReportPath = legendSubReportPath;
-        this.paymentDetailReportPath = paymentDetailReportPath;
-        this.senderLogo = senderLogo;
-        this.resolutionCode = resolutionCode;
-    } // setConfiguration
 
     public static InputStream generateQRCode(String qrCodeData, String filePath) {
 
@@ -127,10 +93,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
         return null;
     }
 
-    public static InputStream generatePDF417Code(String qrCodeData, String filePath, int width, int height, int margin) {
-
+    public static void generatePDF417Code(String qrCodeData, OutputStream outputStream, int width, int height, int margin) {
         try {
-            BitMatrix bitMatrixFromEncoder = null;
             PDF417 objPdf417 = new PDF417();
             objPdf417.generateBarcodeLogic(qrCodeData, 5);
             objPdf417.setEncoding(StandardCharsets.UTF_8);
@@ -145,52 +109,42 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             int scaleX = width / originalScale[0].length;
             int scaleY = height / originalScale.length;
+            int scale = Math.min(scaleX, scaleY);
 
-            int scale;
-            if (scaleX < scaleY) {
-                scale = scaleX;
-            } else {
-                scale = scaleY;
-            }
+            BufferedImage bufferedImage;
 
             if (scale > 1) {
                 byte[][] scaledMatrix = objPdf417.getBarcodeMatrix().getScaledMatrix(scale, scale * aspectRatio);
                 if (rotated) {
                     scaledMatrix = rotateArray(scaledMatrix);
                 }
-                bitMatrixFromEncoder = bitMatrixFromBitArray(scaledMatrix, margin);
+                bufferedImage = createBufferedImageFromMatrix(scaledMatrix, margin);
+            } else {
+                bufferedImage = createBufferedImageFromMatrix(originalScale, margin);
             }
-            bitMatrixFromEncoder = bitMatrixFromBitArray(originalScale, margin);
 
-            MatrixToImageWriter.writeToFile(bitMatrixFromEncoder, filePath.substring(filePath.lastIndexOf('.') + 1), new File(filePath));
-
-            FileInputStream fis = new FileInputStream(filePath);
-            InputStream is = fis;
-            return is;
-
-        } catch (WriterException ex) {
-
-        } catch (IOException ex) {
+            // Escribir la imagen en el OutputStream
+            ImageIO.write(bufferedImage, "png", outputStream); // Escribe como PNG o el formato que necesites
+        } catch (WriterException | IOException ex) {
             java.util.logging.Logger.getLogger(PDFGenerateHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
-
     }
 
-    private static BitMatrix bitMatrixFromBitArray(byte[][] input, int margin) {
-        // Creates the bit matrix with extra space for whitespace
-        BitMatrix output = new BitMatrix(input[0].length + 2 * margin, input.length + 2 * margin);
-        output.clear();
-        for (int y = 0, yOutput = output.getHeight() - margin - 1; y < input.length; y++, yOutput--) {
-            byte[] inputY = input[y];
-            for (int x = 0; x < input[0].length; x++) {
-                // Zero is white in the byte matrix
-                if (inputY[x] == 1) {
-                    output.set(x + margin, yOutput);
-                }
+    // Método auxiliar para crear BufferedImage desde el byte[][] (matriz del código)
+    private static BufferedImage createBufferedImageFromMatrix(byte[][] matrix, int margin) {
+        int width = matrix[0].length + 2 * margin; // Margen izquierdo y derecho
+        int height = matrix.length + 2 * margin; // Margen superior e inferior
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        // Rellenar la imagen
+        for (int y = 0; y < matrix.length; y++) {
+            for (int x = 0; x < matrix[y].length; x++) {
+                // Establece el color de cada píxel según la matriz
+                image.setRGB(x + margin, y + margin, matrix[y][x] == 1 ? 0xFF000000 : 0xFFFFFFFF); // Negro o blanco
             }
         }
-        return output;
+
+        return image;
     }
 
     private static byte[][] rotateArray(byte[][] bitarray) {
@@ -213,7 +167,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
     public synchronized byte[] generateRetentionPDF(UBLDocumentWRP retentionType, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+generateRetentionPDF() [" + this.docUUID + "]");
+            logger.debug("+generateRetentionPDF() [" + "]");
         }
         byte[] perceptionBytes = null;
 
@@ -221,21 +175,21 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             RetentionObject retentionObject = new RetentionObject();
             if (logger.isDebugEnabled()) {
-                logger.debug("generateRetentionPDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
+                logger.debug("generateRetentionPDF() [" + "] Extrayendo informacion GENERAL del documento.");
             }
             retentionObject.setDocumentIdentifier(retentionType.getRetentionType().getId().getValue());
             retentionObject.setIssueDate(formatIssueDate(retentionType.getRetentionType().getIssueDate().getValue()));
 
             /* Informacion de SUNATTransaction */
             if (logger.isDebugEnabled()) {
-                logger.debug("generateRetentionPDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
+                logger.debug("generateRetentionPDF() [" + "] Extrayendo informacion del EMISOR del documento.");
             }
 
             retentionObject.setSenderSocialReason(retentionType.getRetentionType().getAgentParty().getPartyLegalEntity().get(0).getRegistrationName().getValue().toUpperCase());
             retentionObject.setSenderRuc(retentionType.getRetentionType().getAgentParty().getPartyIdentification().get(0).getID().getValue());
             retentionObject.setSenderFiscalAddress(retentionType.getRetentionType().getAgentParty().getPostalAddress().getStreetName().getValue());
             retentionObject.setSenderDepProvDist(formatDepProvDist(retentionType.getRetentionType().getAgentParty().getPostalAddress()));
-            retentionObject.setSenderLogo(this.senderLogo);
+            retentionObject.setSenderLogo(configData.getSenderLogo());
 
             retentionObject.setComentarios(retentionType.getTransaccion().getFE_Comentario());
             retentionObject.setTel(retentionType.getTransaccion().getTelefono());
@@ -244,13 +198,13 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             retentionObject.setWeb(retentionType.getTransaccion().getWeb());
             retentionObject.setRegimenRET(retentionType.getTransaccion().getRET_Tasa());
             if (logger.isDebugEnabled()) {
-                logger.debug("generateRetentionPDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
+                logger.debug("generateRetentionPDF() [" + "] Extrayendo informacion del RECEPTOR del documento.");
             }
             retentionObject.setReceiverSocialReason(retentionType.getRetentionType().getReceiverParty().getPartyLegalEntity().get(0).getRegistrationName().getValue().toUpperCase());
             retentionObject.setReceiverRuc(retentionType.getRetentionType().getReceiverParty().getPartyIdentification().get(0).getID().getValue());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion de los ITEMS.");
             }
             retentionObject.setRetentionItems(getRetentionItems(retentionType.getRetentionType().getSunatRetentionDocumentReference(), retentionType.getRetentionType().getSunatRetentionPercent().getValue()));
 
@@ -275,7 +229,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             retentionObject.setTotal_doc_value(importeDocumento.toString());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
+                logger.debug("generateInvoicePDF() [" + "] Colocando el importe en LETRAS.");
             }
             for (int i = 0; i < retentionType.getTransaccion().getTransaccionPropiedadesList().size(); i++) {
                 if (retentionType.getTransaccion().getTransaccionPropiedadesList().get(i).getTransaccionPropiedadesPK().getId().equalsIgnoreCase("1000")) {
@@ -301,13 +255,11 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                             itemObjectHash.put(field.getName(), value.toString());
                             newlist.add(value.toString());
                         }
-                        if(field.getName().equals("DOC_FechaEmision"))
-                        {
+                        if (field.getName().equals("DOC_FechaEmision")) {
                             itemObjectHash.put("DOC_FechaEmision", DateConverter.convertToDate(value));
                         }
 
-                        if(field.getName().equals("CP_Fecha"))
-                        {
+                        if (field.getName().equals("CP_Fecha")) {
                             itemObjectHash.put("CP_Fecha", DateConverter.convertToDate(value));
                         }
                     } catch (IllegalAccessException e) {
@@ -324,67 +276,51 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             retentionObject.setItemListDynamic(listaItem);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
+                logger.debug("generateInvoicePDF() [" + "] Colocando la lista de LEYENDAS.");
             }
             // retentionObject.setLegends(getLegendList(legendsMap));
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion del CODIGO DE BARRAS.");
             }
 
             String barcodeValue = generateBarcodeInfoV2(retentionType.getRetentionType().getId().getValue(), IUBLConfig.DOC_RETENTION_CODE, retentionObject.getIssueDate(), retentionType.getRetentionType().getTotalInvoiceAmount().getValue(), BigDecimal.ZERO, retentionType.getRetentionType().getAgentParty(), retentionType.getRetentionType().getReceiverParty(), retentionType.getRetentionType().getUblExtensions());
 
             if (logger.isInfoEnabled()) {
-                logger.info("generateInvoicePDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
+                logger.info("generateInvoicePDF() [" + "] BARCODE: \n" + barcodeValue);
             }
 
-            InputStream inputStream;
-            InputStream inputStreamPDF;
+            ByteArrayOutputStream qrOutputStream = new ByteArrayOutputStream();
 
-            String rutaPath = configData.getRutaBaseDoc() + File.separator + retentionType.getTransaccion().getDocIdentidad_Nro() + File.separator + "CodigoQR" + File.separator + retentionType.getRetentionType().getId().getValue() + ".png";
-            File f = new File(configData.getRutaBaseDoc() + File.separator + retentionType.getTransaccion().getDocIdentidad_Nro() + File.separator + "CodigoQR");
-            if (!f.exists()) {
-                f.mkdirs();
-            }
+            InputStream qrInputStream = new ByteArrayInputStream(qrOutputStream.toByteArray());  // Convertir OutputStream a InputStream
+            retentionObject.setCodeQR(qrInputStream);  // Asignar el InputStream a la factura
 
-            inputStream = generateQRCode(barcodeValue, rutaPath);
-
-            retentionObject.setCodeQR(inputStream);
-
-            f = new File(configData.getRutaBaseDoc() + File.separator + retentionType.getTransaccion().getDocIdentidad_Nro() + File.separator + "CodigoPDF417");
-            rutaPath = configData.getRutaBaseDoc() + File.separator + retentionType.getTransaccion().getDocIdentidad_Nro() + File.separator + "CodigoPDF417" + File.separator + retentionType.getRetentionType().getId().getValue() + ".png";
-            if (!f.exists()) {
-                f.mkdirs();
-            }
-            inputStreamPDF = generatePDF417Code(barcodeValue, rutaPath, 200, 200, 1);
-
-            retentionObject.setBarcodeValue(inputStreamPDF);
-
+            ByteArrayOutputStream pdf417OutputStream = new ByteArrayOutputStream();
+            generatePDF417Code(barcodeValue, pdf417OutputStream, 200, 200, 1);  // Genera el PDF417 directamente en el OutputStream
+            InputStream pdf417InputStream = new ByteArrayInputStream(pdf417OutputStream.toByteArray());  // Convertir OutputStream a InputStream
+            retentionObject.setBarcodeValue(pdf417InputStream);  // Asignar el InputStream a la factura
             String digestValue = generateDigestValue(retentionType.getRetentionType().getUblExtensions());
 
             if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "] VALOR RESUMEN: \n" + digestValue);
+                logger.info("generateBoletaPDF() [" + "] VALOR RESUMEN: \n" + digestValue);
             }
 
             retentionObject.setDigestValue(digestValue);
 
-            retentionObject.setResolutionCodeValue(this.resolutionCode);
+            retentionObject.setResolutionCodeValue(configData.getResolutionCode());
 
-            /*
-             * Generando el PDF de la FACTURA con la informacion recopilada.
-             */
-            perceptionBytes = PDFRetentionCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createRetentionPDF(retentionObject, docUUID, configData);
-
+            //perceptionBytes = PDFRetentionCreator.getInstance(configData.getDocumentReportPath(), configData.getLegendSubReportPath()).createRetentionPDF(retentionObject, configData);
+            perceptionBytes = pdfRetentionCreator.createRetentionPDF(retentionObject, configData);
         } catch (PDFReportException e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+            logger.error("generateInvoicePDF() [" + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
+            logger.error("generateInvoicePDF() [" + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
             throw new PDFReportException(error);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("-generateInvoicePDF() [" + this.docUUID + "]");
+            logger.debug("-generateInvoicePDF() [" + "]");
         }
         return perceptionBytes;
 
@@ -392,7 +328,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
     public synchronized byte[] generateBoletaPDF(UBLDocumentWRP boletaType, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+generateBoletaPDF() [" + this.docUUID + "]");
+            logger.debug("+generateBoletaPDF() [" + "]");
         }
         byte[] boletaInBytes = null;
 
@@ -400,7 +336,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             BoletaObject boletaObj = new BoletaObject();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
+                logger.debug("generateBoletaPDF() [" + "] Extrayendo informacion GENERAL del documento.");
             }
             boletaObj.setDocumentIdentifier(boletaType.getInvoiceType().getID().getValue());
             boletaObj.setIssueDate(formatIssueDate(boletaType.getInvoiceType().getIssueDate().getValue()));
@@ -417,7 +353,6 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 boletaObj.setDueDate(formatDueDate(boletaType.getTransaccion().getDOC_FechaVencimiento()));
             } else {
                 boletaObj.setDueDate(formatDueDate(boletaType.getTransaccion().getDOC_FechaVencimiento()));
-                //boletaObj.setDueDate(IPDFCreatorConfig.EMPTY_VALUE);
             }
             List<TaxTotalType> taxTotal = boletaType.getInvoiceType().getTaxTotal();
             for (TaxTotalType taxTotalType : taxTotal) {
@@ -441,23 +376,19 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo guias de remision.");
+                logger.debug("generateBoletaPDF() [" + "] Extrayendo guias de remision.");
             }
             boletaObj.setRemissionGuides(getRemissionGuides(boletaType.getInvoiceType().getDespatchDocumentReference()));
 
             if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "] Guias de remision: " + boletaObj.getRemissionGuides());
+                logger.info("generateBoletaPDF() [" + "] Guias de remision: " + boletaObj.getRemissionGuides());
             }
             if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "]============= remision");
+                logger.info("generateBoletaPDF() [" + "]============= remision");
             }
             boletaObj.setPaymentCondition(boletaType.getTransaccion().getDOC_CondPago());
-            // No se encontraron impuestos en uno de los items de la transaccion.
-            //boletaObj.setPaymentCondition(getContractDocumentReference(boletaType.getBoletaType().getContractDocumentReference(),
-            // IUBLConfig.CONTRACT_DOC_REF_PAYMENT_COND_CODE));
-
             if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "] Condicion_pago: " + boletaObj.getPaymentCondition());
+                logger.info("generateBoletaPDF() [" + "] Condicion_pago: " + boletaObj.getPaymentCondition());
             }
 
             if (null != boletaType.getTransaccion().getTransaccionContractdocrefList() && 0 < boletaType.getTransaccion().getTransaccionContractdocrefList().size()) {
@@ -472,19 +403,19 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             for (int i = 0; i < boletaType.getTransaccion().getTransaccionLineasList().size(); i++) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateBoletaPDF() [" + this.docUUID + "] Agregando datos al HashMap" + boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
+                    logger.debug("generateBoletaPDF() [" + "] Agregando datos al HashMap" + boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
                 }
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<String, String>();
                 List<String> newlist = new ArrayList<String>();
                 for (int j = 0; j < boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size(); j++) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
+                        logger.debug("generateInvoicePDF() [" + "] Extrayendo Campos " + boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
                     }
                     itemObjectHash.put(boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre(), boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
                     newlist.add(boletaType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
+                        logger.debug("generateInvoicePDF() [" + "] Nuevo Tamanio " + newlist.size());
                     }
 
                 }
@@ -501,22 +432,22 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 for (int j = 0; j < boletaObj.getItemsDynamic().get(i).getLstDinamicaItem().size(); j++) {
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Columna " + j);
+                        logger.debug("generateInvoicePDF() [" + "] Fila " + i + " Columna " + j);
                     }
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Contenido " + boletaObj.getItemsDynamic().get(i).getLstDinamicaItem().get(j));
+                        logger.debug("generateInvoicePDF() [" + "] Fila " + i + " Contenido " + boletaObj.getItemsDynamic().get(i).getLstDinamicaItem().get(j));
                     }
 
                 }
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion de los MONTOS.");
+                logger.debug("generateBoletaPDF() [" + "] Extrayendo informacion de los MONTOS.");
             }
             String currencyCode = boletaType.getInvoiceType().getDocumentCurrencyCode().getValue();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo monto de Percepcion.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo monto de Percepcion.");
             }
             BigDecimal percepctionAmount = null;
             BigDecimal perceptionPercentage = null;
@@ -530,7 +461,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo monto de ISC.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo monto de ISC.");
             }
             BigDecimal retentionpercentage = null;
 
@@ -556,19 +487,16 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             BigDecimal prepaidAmount = null;
-            /* Agregando el monto de ANTICIPO con valor NEGATIVO */
-
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo monto de Anticipo. " + boletaType.getTransaccion().getANTICIPO_Monto());
+                logger.debug("generateBoletaPDF() [" + "] Extrayendo monto de Anticipo. " + boletaType.getTransaccion().getANTICIPO_Monto());
             }
 
             if (null != boletaType.getInvoiceType().getPrepaidPayment() && !boletaType.getInvoiceType().getPrepaidPayment().isEmpty() && null != boletaType.getInvoiceType().getPrepaidPayment().get(0).getPaidAmount()) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateBoletaPDF() [" + this.docUUID + "] Monto de Anticipo Mayor a 0. ");
+                    logger.debug("generateBoletaPDF() [" + "] Monto de Anticipo Mayor a 0. ");
                 }
 
                 prepaidAmount = boletaType.getInvoiceType().getLegalMonetaryTotal().getPrepaidAmount().getValue().negate();
-                // invoiceType.getInvoiceType().getPrepaidPayment().get(0).getPaidAmount().getValue().negate();
                 boletaObj.setPrepaidAmountValue(getCurrencyV3(prepaidAmount, currencyCode));
             } else {
                 boletaObj.setPrepaidAmountValue(currencyCode + " 0.00");
@@ -576,7 +504,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
+                logger.debug("generateBoletaPDF() [" + "] Extrayendo informacion del EMISOR del documento.");
             }
             boletaObj.setSenderSocialReason(boletaType.getTransaccion().getRazonSocial());
             boletaObj.setSenderRuc(boletaType.getTransaccion().getDocIdentidad_Nro());
@@ -584,14 +512,13 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             boletaObj.setSenderDepProvDist(boletaType.getTransaccion().getDIR_Distrito() + " " + boletaType.getTransaccion().getDIR_Provincia() + " " + boletaType.getTransaccion().getDIR_Departamento());
             boletaObj.setSenderContact(boletaType.getTransaccion().getPersonContacto());
             boletaObj.setSenderMail(boletaType.getTransaccion().getEMail());
-            boletaObj.setSenderLogo(this.senderLogo);
+            boletaObj.setSenderLogo(configData.getSenderLogo());
             boletaObj.setTelefono(boletaType.getTransaccion().getTelefono());
             boletaObj.setTelefono_1(boletaType.getTransaccion().getTelefono_1());
             boletaObj.setWeb(boletaType.getTransaccion().getWeb());
             boletaObj.setWeb(boletaType.getTransaccion().getWeb());
             boletaObj.setPorcentajeIGV(boletaType.getTransaccion().getDOC_PorcImpuesto());
             boletaObj.setComentarios(boletaType.getTransaccion().getFE_Comentario());
-//            boletaObj.setImpuestoBolsa(boletaType.getBoletaType());
 
             if (Boolean.parseBoolean(configData.getPdfBorrador())) {
                 boletaObj.setValidezPDF("Este documento no tiene validez fiscal.");
@@ -600,23 +527,18 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             List<TransaccionAnticipo> anticipoList = boletaType.getTransaccion().getTransaccionAnticipoList();
             String anticipos = anticipoList.parallelStream().map(TransaccionAnticipo::getAntiDOCSerieCorrelativo).collect(Collectors.joining(" "));
-//            String Anticipos = "";
-//            for (int i = 0; i < boletaType.getTransaccion().getTransaccionAnticipoList().size(); i++) {
-//                Anticipos.concat(boletaType.getTransaccion().getTransaccionAnticipoList().get(i).getAntiDOCSerieCorrelativo() + " ");
-//            }
             boletaObj.setAnticipos(anticipos);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
+                logger.debug("generateBoletaPDF() [" + "] Extrayendo informacion del RECEPTOR del documento.");
             }
             boletaObj.setReceiverFullname(boletaType.getTransaccion().getSN_RazonSocial());
             boletaObj.setReceiverIdentifier(boletaType.getTransaccion().getSN_DocIdentidad_Nro());
             boletaObj.setReceiverIdentifierType(boletaType.getTransaccion().getSN_DocIdentidad_Tipo());
             boletaObj.setReceiverFiscalAddress(boletaType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
+                logger.debug("generateBoletaPDF() [" + "] Extrayendo informacion de los ITEMS.");
             }
-            // boletaObj.setBoletaItems(getBoletaItems(boletaType.getBoletaType().getInvoiceLine()));
 
             BigDecimal subtotalValue = getTransaccionTotales(boletaType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1005);
             if (null != boletaType.getInvoiceType().getPrepaidPayment() && !boletaType.getInvoiceType().getPrepaidPayment().isEmpty() && null != boletaType.getInvoiceType().getPrepaidPayment().get(0).getPaidAmount()) {
@@ -626,7 +548,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + boletaType.getTransaccion().getTransaccionContractdocrefList().size());
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo Campos de usuarios personalizados." + boletaType.getTransaccion().getTransaccionContractdocrefList().size());
             }
 
             BigDecimal igvValue = getTaxTotalValue2(boletaType.getTransaccion().getTransaccionImpuestosList(), IUBLConfig.TAX_TOTAL_IGV_ID);
@@ -644,20 +566,16 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             BigDecimal payableAmount = boletaType.getInvoiceType().getLegalMonetaryTotal().getPayableAmount().getValue();
             boletaObj.setTotalAmountValue(getCurrency(payableAmount, currencyCode));
-
             BigDecimal gravadaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1001);
             boletaObj.setGravadaAmountValue(getCurrency(gravadaAmount, currencyCode));
-
             BigDecimal inafectaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1002);
             boletaObj.setInafectaAmountValue(getCurrency(inafectaAmount, currencyCode));
-
             BigDecimal exoneradaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1003);
             boletaObj.setExoneradaAmountValue(getCurrency(exoneradaAmount, currencyCode));
-
             BigDecimal gratuitaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
             if (!gratuitaAmount.equals(BigDecimal.ZERO)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateBoletaPDF() [" + this.docUUID + "] Existe Op. Gratuitas.");
+                    logger.debug("generateBoletaPDF() [" + "] Existe Op. Gratuitas.");
                 }
                 boletaObj.setGratuitaAmountValue(getCurrency(gratuitaAmount, currencyCode));
             } else {
@@ -665,18 +583,14 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
+                logger.debug("generateBoletaPDF() [" + "] Extrayendo informacion del CODIGO DE BARRAS.");
             }
 
             String barcodeValue = generateBarCodeInfoString(boletaType.getTransaccion().getDocIdentidad_Nro(), boletaType.getTransaccion().getDOC_Codigo(), boletaType.getTransaccion().getDOC_Serie(), boletaType.getTransaccion().getDOC_Numero(), boletaType.getInvoiceType().getTaxTotal(), boletaObj.getIssueDate(), boletaType.getTransaccion().getDOC_MontoTotal().toString(), boletaType.getTransaccion().getSN_DocIdentidad_Tipo(), boletaType.getTransaccion().getSN_DocIdentidad_Nro(), boletaType.getInvoiceType().getUBLExtensions());
 
-//            String barcodeValue = generateBarCodeInfoString(invoiceType.getInvoiceType().getID().getValue(), invoiceType.getInvoiceType().getInvoiceTypeCode().getValue(),invoiceObj.getIssueDate(), invoiceType.getInvoiceType().getLegalMonetaryTotal().getPayableAmount().getValue(), invoiceType.getInvoiceType().getTaxTotal(), invoiceType.getInvoiceType().getAccountingSupplierParty(), invoiceType.getInvoiceType().getAccountingCustomerParty(),invoiceType.getInvoiceType().getUBLExtensions());
             if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
+                logger.info("generateBoletaPDF() [" + "] BARCODE: \n" + barcodeValue);
             }
-            //invoiceObj.setBarcodeValue(barcodeValue);
-
-
             String rutaPath = configData.getRutaBaseDoc() + File.separator + boletaType.getTransaccion().getDocIdentidad_Nro() + File.separator + "CodigoQR" + File.separator + "03" + File.separator + boletaType.getInvoiceType().getID().getValue() + ".png";
             File f = new File(configData.getRutaBaseDoc() + File.separator + boletaType.getTransaccion().getDocIdentidad_Nro() + File.separator + "CodigoQR" + File.separator + "03");
             if (!f.exists()) {
@@ -684,66 +598,58 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             InputStream inputStream = generateQRCode(barcodeValue, rutaPath);
-            boletaObj.setCodeQR(inputStream);
+            boletaObj.setCodeQR(inputStream);  // Asignar el InputStream a la factura
 
-            f = new File(configData.getRutaBaseDoc() + File.separator + boletaType.getTransaccion().getDocIdentidad_Nro() + File.separator + "CodigoPDF417" + File.separator + "03");
-            rutaPath = configData.getRutaBaseDoc() + File.separator + boletaType.getTransaccion().getDocIdentidad_Nro() + File.separator + "CodigoPDF417" + File.separator + "03" + File.separator + boletaType.getInvoiceType().getID().getValue() + ".png";
-            if (!f.exists()) {
-                f.mkdirs();
-            }
-            InputStream inputStreamPDF = generatePDF417Code(barcodeValue, rutaPath, 200, 200, 1);
+            // Generar el código PDF417 en memoria
+            ByteArrayOutputStream pdf417OutputStream = new ByteArrayOutputStream();
+            generatePDF417Code(barcodeValue, pdf417OutputStream, 200, 200, 1);  // Genera el PDF417 directamente en el OutputStream
+            InputStream pdf417InputStream = new ByteArrayInputStream(pdf417OutputStream.toByteArray());  // Convertir OutputStream a InputStream
+            boletaObj.setBarcodeValue(pdf417InputStream);  // Asignar el InputStream a la factura
 
-            boletaObj.setBarcodeValue(inputStreamPDF);
+
             String digestValue = generateDigestValue(boletaType.getInvoiceType().getUBLExtensions());
 
             if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "] VALOR RESUMEN: \n" + digestValue);
+                logger.info("generateBoletaPDF() [" + "] VALOR RESUMEN: \n" + digestValue);
             }
 
             boletaObj.setDigestValue(digestValue);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
+                logger.debug("generateBoletaPDF() [" + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
             }
 
-            Map<String, LegendObject> legendsMap = null;
-
-            //if (TipoVersionUBL.boleta.equals("21")) {
-            legendsMap = getaddLeyends(boletaType.getInvoiceType().getNote());
-            /*} else if (TipoVersionUBL.boleta.equals("20")) {
-                legendsMap = getAdditionalProperties(boletaType.getInvoiceType().getUBLExtensions().getUBLExtension());
-            }*/
-            /*
-            Map<String, LegendObject> legendsMap = getaddLeyends(boletaType.getBoletaType().getNote());
-             */
+            Map<String, LegendObject> legendsMap = getaddLeyends(boletaType.getInvoiceType().getNote());
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
+                logger.debug("generateBoletaPDF() [" + "] Colocando el importe en LETRAS.");
             }
             LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
             boletaObj.setLetterAmountValue(legendLetters.getLegendValue());
             legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
+                logger.debug("generateBoletaPDF() [" + "] Colocando la lista de LEYENDAS.");
             }
             boletaObj.setLegends(getLegendList(legendsMap));
 
-            boletaObj.setResolutionCodeValue(this.resolutionCode);
+            boletaObj.setResolutionCodeValue(configData.getResolutionCode());
 
             /*
              * Generando el PDF de la FACTURA con la informacion recopilada.
              */
-            boletaInBytes = PDFBoletaCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createBoletaPDF(boletaObj, docUUID, configData);
+            //boletaInBytes = PDFBoletaCreator.getInstance(configData.getDocumentReportPath(),configData.getLegendSubReportPath()).createBoletaPDF(boletaObj, configData);
+
+            boletaInBytes = pdfBoletaCreator.createBoletaPDF(boletaObj, configData);
         } catch (PDFReportException e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+            logger.error("generateInvoicePDF() [" + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
+            logger.error("generateInvoicePDF() [" + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
             throw new PDFReportException(error);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("-generateInvoicePDF() [" + this.docUUID + "]");
+            logger.debug("-generateInvoicePDF() [" + "]");
         }
         return boletaInBytes;
     } // generateBoletaPDF
@@ -751,13 +657,13 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
     public synchronized byte[] generateInvoicePDF(UBLDocumentWRP invoiceType, ConfigData configuracion) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+generateInvoicePDF() [" + this.docUUID + "]");
+            logger.debug("+generateInvoicePDF() [" + "]");
         }
         byte[] invoiceInBytes = null;
         try {
             InvoiceObject invoiceObj = new InvoiceObject();
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion GENERAL del documento.");
             }
             invoiceObj.setDocumentIdentifier(invoiceType.getInvoiceType().getID().getValue());
             invoiceObj.setIssueDate(formatIssueDate(invoiceType.getInvoiceType().getIssueDate().getValue()));
@@ -795,15 +701,15 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             invoiceObj.setAnticipos(Anticipos);
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo guias de remision.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo guias de remision.");
             }
             invoiceObj.setRemissionGuides(getRemissionGuides(invoiceType.getInvoiceType().getDespatchDocumentReference()));
             if (logger.isInfoEnabled()) {
-                logger.info("generateInvoicePDF() [" + this.docUUID + "]============= condicion pago------");
+                logger.info("generateInvoicePDF() [" + "]============= condicion pago------");
             }
             invoiceObj.setPaymentCondition(invoiceType.getTransaccion().getDOC_CondPago());
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion del EMISOR del documento.");
             }
 
             invoiceObj.setSenderSocialReason(invoiceType.getTransaccion().getRazonSocial());
@@ -812,7 +718,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             invoiceObj.setSenderDepProvDist(invoiceType.getTransaccion().getDIR_Distrito() + " " + invoiceType.getTransaccion().getDIR_Provincia() + " " + invoiceType.getTransaccion().getDIR_Departamento());
             invoiceObj.setSenderContact(invoiceType.getTransaccion().getPersonContacto());
             invoiceObj.setSenderMail(invoiceType.getTransaccion().getEMail());
-            invoiceObj.setSenderLogo(this.senderLogo);
+            invoiceObj.setSenderLogo(configuracion.getSenderLogo());
             invoiceObj.setTelefono(invoiceType.getTransaccion().getTelefono());
             invoiceObj.setTelefono_1(invoiceType.getTransaccion().getTelefono_1());
             invoiceObj.setWeb(invoiceType.getTransaccion().getWeb());
@@ -820,21 +726,21 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             invoiceObj.setComentarios(invoiceType.getTransaccion().getFE_Comentario());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion del RECEPTOR del documento.");
             }
             invoiceObj.setReceiverSocialReason(invoiceType.getTransaccion().getSN_RazonSocial());
             invoiceObj.setReceiverRuc(invoiceType.getTransaccion().getSN_DocIdentidad_Nro());
             invoiceObj.setReceiverFiscalAddress(invoiceType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + invoiceType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + invoiceType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + invoiceType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion de los ITEMS.");
             }
             invoiceObj.setInvoiceItems(getInvoiceItems(invoiceType.getInvoiceType().getInvoiceLine()));
 
             String currencyCode = invoiceType.getInvoiceType().getDocumentCurrencyCode().getValue();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo monto de Percepcion.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo monto de Percepcion.");
             }
 
             if (Boolean.parseBoolean(configuracion.getPdfBorrador())) {
@@ -855,7 +761,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo monto de ISC.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo monto de ISC.");
             }
             BigDecimal retentionpercentage = null;
 
@@ -881,7 +787,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de los MONTOS.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion de los MONTOS.");
             }
 
             BigDecimal prepaidAmount = null;
@@ -889,7 +795,6 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             /* Agregando el monto de ANTICIPO con valor NEGATIVO */
             if (null != invoiceType.getInvoiceType().getPrepaidPayment() && !invoiceType.getInvoiceType().getPrepaidPayment().isEmpty() && null != invoiceType.getInvoiceType().getPrepaidPayment().get(0).getPaidAmount()) {
                 prepaidAmount = invoiceType.getInvoiceType().getLegalMonetaryTotal().getPrepaidAmount().getValue().negate();
-                // invoiceType.getInvoiceType().getPrepaidPayment().get(0).getPaidAmount().getValue().negate();
                 invoiceObj.setPrepaidAmountValue(getCurrencyV3(prepaidAmount, currencyCode));
             } else {
                 invoiceObj.setPrepaidAmountValue(currencyCode + " 0.00");
@@ -897,7 +802,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos de LINEAS personalizados." + invoiceType.getTransaccion().getTransaccionLineasList().size());
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo Campos de LINEAS personalizados." + invoiceType.getTransaccion().getTransaccionLineasList().size());
             }
 
             // Cuotas
@@ -985,7 +890,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             List<TransaccionLineas> transaccionLineas = invoiceType.getTransaccion().getTransaccionLineasList();
             for (TransaccionLineas transaccionLinea : transaccionLineas) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateInvoicePDF() [" + this.docUUID + "] Agregando datos al HashMap" + transaccionLinea.getTransaccionLineasUsucamposList().size());
+                    logger.debug("generateInvoicePDF() [" + "] Agregando datos al HashMap" + transaccionLinea.getTransaccionLineasUsucamposList().size());
                 }
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
@@ -993,12 +898,12 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 List<TransaccionLineasUsucampos> transaccionLineasUsucampos = transaccionLinea.getTransaccionLineasUsucamposList();
                 for (TransaccionLineasUsucampos lineasUsucampos : transaccionLineasUsucampos) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + lineasUsucampos.getUsuariocampos().getNombre());
+                        logger.debug("generateInvoicePDF() [" + "] Extrayendo Campos " + lineasUsucampos.getUsuariocampos().getNombre());
                     }
                     itemObjectHash.put(lineasUsucampos.getUsuariocampos().getNombre(), lineasUsucampos.getValor());
                     newlist.add(lineasUsucampos.getValor());
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
+                        logger.debug("generateInvoicePDF() [" + "] Nuevo Tamanio " + newlist.size());
                     }
 
                 }
@@ -1018,10 +923,10 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             for (int i = 0; i < invoiceObj.getItemListDynamic().size(); i++) {
                 for (int j = 0; j < invoiceObj.getItemListDynamic().get(i).getLstDinamicaItem().size(); j++) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Columna " + j);
+                        logger.debug("generateInvoicePDF() [" + "] Fila " + i + " Columna " + j);
                     }
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Contenido " + invoiceObj.getItemListDynamic().get(i).getLstDinamicaItem().get(j));
+                        logger.debug("generateInvoicePDF() [" + "] Fila " + i + " Contenido " + invoiceObj.getItemListDynamic().get(i).getLstDinamicaItem().get(j));
                     }
                 }
             }
@@ -1032,7 +937,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 invoiceObj.setSubtotalValue(getCurrency(subtotalValue, currencyCode));
             }
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + invoiceType.getTransaccion().getTransaccionContractdocrefList().size());
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo Campos de usuarios personalizados." + invoiceType.getTransaccion().getTransaccionContractdocrefList().size());
             }
             if (null != invoiceType.getTransaccion().getTransaccionContractdocrefList() && 0 < invoiceType.getTransaccion().getTransaccionContractdocrefList().size()) {
                 Map<String, String> hashedMap = new HashMap<String, String>();
@@ -1081,7 +986,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             BigDecimal gratuitaAmount = getTransaccionTotales(invoiceType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
             if (!gratuitaAmount.equals(BigDecimal.ZERO)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateInvoicePDF() [" + this.docUUID + "] Existe Op. Gratuitas.");
+                    logger.debug("generateInvoicePDF() [" + "] Existe Op. Gratuitas.");
                 }
                 invoiceObj.setGratuitaAmountValue(getCurrency(gratuitaAmount, currencyCode));
             }
@@ -1092,95 +997,79 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             invoiceObj.setNuevoCalculo(getCurrency(subtotalValue.add(prepaidAmount.multiply(BigDecimal.ONE.negate()).add(prepaidAmount).subtract(descuento)), currencyCode));
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion del CODIGO DE BARRAS.");
             }
 
             String barcodeValue = generateBarCodeInfoString(invoiceType.getTransaccion().getDocIdentidad_Nro(), invoiceType.getTransaccion().getDOC_Codigo(), invoiceType.getTransaccion().getDOC_Serie(), invoiceType.getTransaccion().getDOC_Numero(), taxTotal, invoiceObj.getIssueDate(), invoiceType.getTransaccion().getDOC_MontoTotal().toString(), invoiceType.getTransaccion().getSN_DocIdentidad_Tipo(), invoiceType.getTransaccion().getSN_DocIdentidad_Nro(), invoiceType.getInvoiceType().getUBLExtensions());
 
-//            String barcodeValue = generateBarCodeInfoString(invoiceType.getInvoiceType().getID().getValue(), invoiceType.getInvoiceType().getInvoiceTypeCode().getValue(),invoiceObj.getIssueDate(), invoiceType.getInvoiceType().getLegalMonetaryTotal().getPayableAmount().getValue(), invoiceType.getInvoiceType().getTaxTotal(), invoiceType.getInvoiceType().getAccountingSupplierParty(), invoiceType.getInvoiceType().getAccountingCustomerParty(),invoiceType.getInvoiceType().getUBLExtensions());
             if (logger.isInfoEnabled()) {
-                logger.info("generateInvoicePDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
+                logger.info("generateInvoicePDF() [" + "] BARCODE: \n" + barcodeValue);
             }
-            //invoiceObj.setBarcodeValue(barcodeValue);
 
-            InputStream inputStream;
+            // Generar el código QR en memoria
             InputStream inputStreamPDF;
-            String rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "01" + File.separator + invoiceType.getInvoiceType().getID().getValue() + ".png";
-            File f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "01");
+            String rutaPath = ".." + File.separator + "CodigoQR" + File.separator + "01" + File.separator + invoiceType.getInvoiceType().getID().getValue() + ".png";
+            File f = new File(".." + File.separator + "CodigoQR" + File.separator + "01");
             if (!f.exists()) {
                 f.mkdirs();
             }
-
+            InputStream inputStream;
             inputStream = generateQRCode(barcodeValue, rutaPath);
-
             invoiceObj.setCodeQR(inputStream);
 
-            f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "01");
-            rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "01" + File.separator + invoiceType.getInvoiceType().getID().getValue() + ".png";
-            if (!f.exists()) {
-                f.mkdirs();
-            }
-            inputStreamPDF = generatePDF417Code(barcodeValue, rutaPath, 200, 200, 1);
 
-            invoiceObj.setBarcodeValue(inputStreamPDF);
+            ByteArrayOutputStream pdf417OutputStream = new ByteArrayOutputStream();
+            generatePDF417Code(barcodeValue, pdf417OutputStream, 200, 200, 1);  // Genera el PDF417 directamente en el OutputStream
+            InputStream pdf417InputStream = new ByteArrayInputStream(pdf417OutputStream.toByteArray());  // Convertir OutputStream a InputStream
+            invoiceObj.setBarcodeValue(pdf417InputStream);  // Asignar el InputStream a la factura
+
             String digestValue = generateDigestValue(invoiceType.getInvoiceType().getUBLExtensions());
 
             if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "] VALOR RESUMEN: \n" + digestValue);
+                logger.info("generateBoletaPDF() [" + "] VALOR RESUMEN: \n" + digestValue);
             }
 
             invoiceObj.setDigestValue(digestValue);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
             }
-            Map<String, LegendObject> legendsMap = null;
+            Map<String, LegendObject> legendsMap = getaddLeyends(invoiceType.getInvoiceType().getNote());
 
-            //if (TipoVersionUBL.factura.equals("21")) {
-            legendsMap = getaddLeyends(invoiceType.getInvoiceType().getNote());
-            //} else if (TipoVersionUBL.factura.equals("20")) {
-            //    legendsMap = getAdditionalProperties(invoiceType.getInvoiceType().getUBLExtensions().getUBLExtension());
-
-            /*
-            Map<String, LegendObject> legendsMap = getAdditionalProperties(invoiceType
-                    .getInvoiceType().getUBLExtensions().getUBLExtension());
-             */
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
+                logger.debug("generateInvoicePDF() [" + "] Colocando el importe en LETRAS.");
             }
             LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
             invoiceObj.setLetterAmountValue(legendLetters.getLegendValue());
             legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
+                logger.debug("generateInvoicePDF() [" + "] Colocando la lista de LEYENDAS.");
             }
             invoiceObj.setLegends(getLegendList(legendsMap));
 
-            invoiceObj.setResolutionCodeValue(this.resolutionCode);
+            invoiceObj.setResolutionCodeValue(configuracion.getResolutionCode());
 
-            /*
-             * Generando el PDF de la FACTURA con la informacion recopilada.
-             */
-            invoiceInBytes = PDFInvoiceCreator.getInstance(this.documentReportPath, this.legendSubReportPath, this.paymentDetailReportPath).createInvoicePDF(invoiceObj, docUUID, configuracion);
+            //invoiceInBytes = createInvoicePDF(invoiceObj, configuracion);//PDFInvoiceCreator.getInstance(configuracion.getDocumentReportPath(),configuracion.getLegendSubReportPath() ,configuracion.getPaymentDetailReportPath()).createInvoicePDF(invoiceObj, configuracion);
+            invoiceInBytes = pdfInvoiceCreator.createInvoicePDF(invoiceObj, configuracion);
         } catch (PDFReportException e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+            logger.error("generateInvoicePDF() [" + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
+            logger.error("generateInvoicePDF() [" + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
             throw new PDFReportException(error);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("-generateInvoicePDF() [" + this.docUUID + "]");
+            logger.debug("-generateInvoicePDF() [" + "]");
         }
         return invoiceInBytes;
     } // generateInvoicePDF
 
     public synchronized byte[] generateDebitNotePDF(UBLDocumentWRP debitNoteType, List<TransaccionTotales> transactionTotalList, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+generateDebitNotePDF() [" + this.docUUID + "]");
+            logger.debug("+generateDebitNotePDF() [" + "]");
         }
         byte[] debitNoteInBytes = null;
 
@@ -1188,7 +1077,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             DebitNoteObject debitNoteObj = new DebitNoteObject();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
+                logger.debug("generateDebitNotePDF() [" + "] Extrayendo informacion GENERAL del documento.");
             }
             debitNoteObj.setDocumentIdentifier(debitNoteType.getDebitNoteType().getID().getValue());
             debitNoteObj.setIssueDate(formatIssueDate(debitNoteType.getDebitNoteType().getIssueDate().getValue()));
@@ -1199,38 +1088,37 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 debitNoteObj.setCurrencyValue(debitNoteType.getTransaccion().getDOC_MON_Nombre().toUpperCase());
             }
 
-            /* Informacion de SUNATTransaction */
             String sunatTransInfo = getSunatTransactionInfo(debitNoteType.getDebitNoteType().getUBLExtensions().getUBLExtension());
             if (StringUtils.isNotBlank(sunatTransInfo)) {
                 debitNoteObj.setSunatTransaction(sunatTransInfo);
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo guias de remision.");
+                logger.debug("generateDebitNotePDF() [" + "] Extrayendo guias de remision.");
             }
             debitNoteObj.setRemissionGuides(getRemissionGuides(debitNoteType.getDebitNoteType().getDespatchDocumentReference()));
 
             if (logger.isInfoEnabled()) {
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "] Guias de remision: " + debitNoteObj.getRemissionGuides());
+                logger.info("generateDebitNotePDF() [" + "] Guias de remision: " + debitNoteObj.getRemissionGuides());
             }
             if (logger.isInfoEnabled()) {
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "]============= remision");
+                logger.info("generateDebitNotePDF() [" + "]============= remision");
             }
 
             debitNoteObj.setPaymentCondition(debitNoteType.getTransaccion().getDOC_CondPago());
 
             debitNoteObj.setSellOrder(getContractDocumentReference(debitNoteType.getDebitNoteType().getContractDocumentReference(), IUBLConfig.CONTRACT_DOC_REF_SELL_ORDER_CODE));
             if (logger.isInfoEnabled()) {
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "] Condicion_pago: " + debitNoteObj.getPaymentCondition());
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "] Orden de venta: " + debitNoteObj.getSellOrder());
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "] Nombre_vendedor: " + debitNoteObj.getSellerName());
+                logger.info("generateDebitNotePDF() [" + "] Condicion_pago: " + debitNoteObj.getPaymentCondition());
+                logger.info("generateDebitNotePDF() [" + "] Orden de venta: " + debitNoteObj.getSellOrder());
+                logger.info("generateDebitNotePDF() [" + "] Nombre_vendedor: " + debitNoteObj.getSellerName());
             }
             if (logger.isInfoEnabled()) {
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "]============= condicion pago------");
+                logger.info("generateDebitNotePDF() [" + "]============= condicion pago------");
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion de la NOTA DE DEBITO");
+                logger.debug("generateDebitNotePDF() [" + "] Extrayendo informacion de la NOTA DE DEBITO");
             }
             debitNoteObj.setTypeOfDebitNote(debitNoteType.getTransaccion().getREFDOC_MotivCode());
             debitNoteObj.setDescOfDebitNote(debitNoteType.getDebitNoteType().getDiscrepancyResponse().get(0).getDescription().get(0).getValue().toUpperCase());
@@ -1238,7 +1126,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             debitNoteObj.setDateDocumentReference(debitNoteType.getTransaccion().getFechaDOCRef());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
+                logger.debug("generateDebitNotePDF() [" + "] Extrayendo informacion del EMISOR del documento.");
             }
             debitNoteObj.setSenderSocialReason(debitNoteType.getTransaccion().getRazonSocial());
             debitNoteObj.setSenderRuc(debitNoteType.getTransaccion().getDocIdentidad_Nro());
@@ -1246,16 +1134,15 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             debitNoteObj.setSenderDepProvDist(debitNoteType.getTransaccion().getDIR_Distrito() + " " + debitNoteType.getTransaccion().getDIR_Provincia() + " " + debitNoteType.getTransaccion().getDIR_Departamento());
             debitNoteObj.setSenderContact(debitNoteType.getTransaccion().getPersonContacto());
             debitNoteObj.setSenderMail(debitNoteType.getTransaccion().getEMail());
-            debitNoteObj.setSenderLogo(this.senderLogo);
+            debitNoteObj.setSenderLogo(configData.getSenderLogo());
             debitNoteObj.setWeb(debitNoteType.getTransaccion().getWeb());
             debitNoteObj.setPorcentajeIGV(debitNoteType.getTransaccion().getDOC_PorcImpuesto());
             debitNoteObj.setComentarios(debitNoteType.getTransaccion().getFE_Comentario());
-
             debitNoteObj.setTelefono(debitNoteType.getTransaccion().getTelefono());
             debitNoteObj.setTelefono_1(debitNoteType.getTransaccion().getTelefono_1());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + debitNoteType.getTransaccion().getTransaccionContractdocrefList().size());
+                logger.debug("generateDebitNotePDF() [" + "] Extrayendo Campos de usuarios personalizados." + debitNoteType.getTransaccion().getTransaccionContractdocrefList().size());
             }
             if (null != debitNoteType.getTransaccion().getTransaccionContractdocrefList() && 0 < debitNoteType.getTransaccion().getTransaccionContractdocrefList().size()) {
                 Map<String, String> hashedMap = new HashMap<>();
@@ -1269,19 +1156,19 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             for (int i = 0; i < debitNoteType.getTransaccion().getTransaccionLineasList().size(); i++) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Agregando datos al HashMap" + debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
+                    logger.debug("generateDebitNotePDF() [" + "] Agregando datos al HashMap" + debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
                 }
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
                 List<String> newlist = new ArrayList<>();
                 for (int j = 0; j < debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size(); j++) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
+                        logger.debug("generateInvoicePDF() [" + "] Extrayendo Campos " + debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
                     }
                     itemObjectHash.put(debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre(), debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
                     newlist.add(debitNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
+                        logger.debug("generateInvoicePDF() [" + "] Nuevo Tamanio " + newlist.size());
                     }
 
                 }
@@ -1298,17 +1185,17 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 for (int j = 0; j < debitNoteObj.getItemsListDynamic().get(i).getLstDinamicaItem().size(); j++) {
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Columna " + j);
+                        logger.debug("generateInvoicePDF() [" + "] Fila " + i + " Columna " + j);
                     }
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Contenido " + debitNoteObj.getItemsListDynamic().get(i).getLstDinamicaItem().get(j));
+                        logger.debug("generateInvoicePDF() [" + "] Fila " + i + " Contenido " + debitNoteObj.getItemsListDynamic().get(i).getLstDinamicaItem().get(j));
                     }
 
                 }
 
             }
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
+                logger.debug("generateDebitNotePDF() [" + "] Extrayendo informacion del RECEPTOR del documento.");
             }
             debitNoteObj.setReceiverRegistrationName(debitNoteType.getTransaccion().getSN_RazonSocial());
             debitNoteObj.setReceiverIdentifier(debitNoteType.getTransaccion().getSN_DocIdentidad_Nro());
@@ -1316,30 +1203,28 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             if (debitNoteType.getDebitNoteType().getID().getValue().startsWith(IUBLConfig.INVOICE_SERIE_PREFIX)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateDebitNotePDF() [" + this.docUUID + "] El receptor es de un documento afectado de tipo FACTURA.");
+                    logger.debug("generateDebitNotePDF() [" + "] El receptor es de un documento afectado de tipo FACTURA.");
                 }
                 debitNoteObj.setReceiverFiscalAddress(debitNoteType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
             } else if (debitNoteType.getDebitNoteType().getID().getValue().startsWith(IUBLConfig.BOLETA_SERIE_PREFIX)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateDebitNotePDF() [" + this.docUUID + "] El receptor es de un documento afectado de tipo BOLETA.");
+                    logger.debug("generateDebitNotePDF() [" + "] El receptor es de un documento afectado de tipo BOLETA.");
                 }
                 debitNoteObj.setReceiverFiscalAddress(debitNoteType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
             } else {
-                logger.error("generateDebitNotePDF() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_431.getMessage());
+                logger.error("generateDebitNotePDF() [" + "] ERROR: " + IVenturaError.ERROR_431.getMessage());
                 throw new PDFReportException(IVenturaError.ERROR_431);
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
+                logger.debug("generateDebitNotePDF() [" + "] Extrayendo informacion de los ITEMS.");
             }
-            // debitNoteObj.setDebitNoteItems(getDebitNoteItems(debitNoteType.getDebitNoteType().getDebitNoteLine()));
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion de los MONTOS.");
+                logger.debug("generateDebitNotePDF() [" + "] Extrayendo informacion de los MONTOS.");
             }
             String currencyCode = debitNoteType.getTransaccion().getDOC_MON_Codigo();
             BigDecimal subtotalValue = getSubtotalValueFromTransaction(transactionTotalList, debitNoteObj.getDocumentIdentifier());
-//
             debitNoteObj.setSubtotalValue(getCurrency(subtotalValue, currencyCode));
             BigDecimal igvValue = getTaxTotalValue2(debitNoteType.getTransaccion().getTransaccionImpuestosList(), IUBLConfig.TAX_TOTAL_IGV_ID);
 
@@ -1349,7 +1234,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             debitNoteObj.setIscValue(getCurrency(iscValue, currencyCode));
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion de la percepción.");
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo informacion de la percepción.");
             }
 
             BigDecimal percepctionAmount = null;
@@ -1364,7 +1249,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo monto de ISC.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo monto de ISC.");
             }
             BigDecimal retentionpercentage = null;
 
@@ -1410,7 +1295,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             BigDecimal gratuitaAmount = getTransaccionTotales(debitNoteType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
             if (!gratuitaAmount.equals(BigDecimal.ZERO)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Existe Op. Gratuitas.");
+                    logger.debug("generateDebitNotePDF() [" + "] Existe Op. Gratuitas.");
                 }
                 debitNoteObj.setGratuitaAmountValue(getCurrency(gratuitaAmount, currencyCode));
             } else {
@@ -1418,44 +1303,34 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
+                logger.debug("generateDebitNotePDF() [" + "] Extrayendo informacion del CODIGO DE BARRAS.");
             }
 
             String barcodeValue = generateBarCodeInfoString(debitNoteType.getTransaccion().getDocIdentidad_Nro(), debitNoteType.getTransaccion().getDOC_Codigo(), debitNoteType.getTransaccion().getDOC_Serie(), debitNoteType.getTransaccion().getDOC_Numero(), debitNoteType.getDebitNoteType().getTaxTotal(), debitNoteObj.getIssueDate(), debitNoteType.getTransaccion().getDOC_MontoTotal().toString(), debitNoteType.getTransaccion().getSN_DocIdentidad_Tipo(), debitNoteType.getTransaccion().getSN_DocIdentidad_Nro(), debitNoteType.getDebitNoteType().getUBLExtensions());
 
-            if (logger.isInfoEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
-            }
 
             InputStream inputStream;
             InputStream inputStreamPDF;
-            String rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "08" + File.separator + debitNoteType.getDebitNoteType().getID().getValue() + ".png";
-            File f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "08");
+            String rutaPath = ".." + File.separator + "CodigoQR" + File.separator + "08" + File.separator + debitNoteType.getDebitNoteType().getID().getValue() + ".png";
+            File f = new File(".." + File.separator + "CodigoQR" + File.separator + "08");
             if (!f.exists()) {
                 f.mkdirs();
             }
 
-            if (logger.isInfoEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] rutaPath: \n" + rutaPath);
-            }
 
             inputStream = generateQRCode(barcodeValue, rutaPath);
+            debitNoteObj.setCodeQR(inputStream);  // Asignar el InputStream a la factura
 
-            debitNoteObj.setCodeQR(inputStream);
-
-            f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "08");
-            rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + debitNoteType.getDebitNoteType().getID().getValue() + ".png";
-            if (!f.exists()) {
-                f.mkdirs();
-            }
-            inputStreamPDF = generatePDF417Code(barcodeValue, rutaPath, 200, 200, 1);
-
-            debitNoteObj.setBarcodeValue(inputStreamPDF);
+            // Generar el código PDF417 en memoria
+            ByteArrayOutputStream pdf417OutputStream = new ByteArrayOutputStream();
+            generatePDF417Code(barcodeValue, pdf417OutputStream, 200, 200, 1);  // Genera el PDF417 directamente en el OutputStream
+            InputStream pdf417InputStream = new ByteArrayInputStream(pdf417OutputStream.toByteArray());  // Convertir OutputStream a InputStream
+            debitNoteObj.setBarcodeValue(pdf417InputStream);  // Asignar el InputStream a la factura
 
             String digestValue = generateDigestValue(debitNoteType.getDebitNoteType().getUBLExtensions());
 
             if (logger.isInfoEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] VALOR RESUMEN: \n" + digestValue);
+                logger.debug("generateBoletaPDF() [" + "] VALOR RESUMEN: \n" + digestValue);
             }
 
             debitNoteObj.setDigestValue(digestValue);
@@ -1467,43 +1342,45 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
+                logger.debug("generateDebitNotePDF() [" + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
             }
 
             Map<String, LegendObject> legendsMap = null;
             legendsMap = getaddLeyends(debitNoteType.getDebitNoteType().getNote());
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
+                logger.debug("generateDebitNotePDF() [" + "] Colocando el importe en LETRAS.");
             }
             LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
             debitNoteObj.setLetterAmountValue(legendLetters.getLegendValue());
             legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
+                logger.debug("generateDebitNotePDF() [" + "] Colocando la lista de LEYENDAS.");
             }
             debitNoteObj.setLegends(getLegendList(legendsMap));
 
-            debitNoteObj.setResolutionCodeValue(this.resolutionCode);
+            debitNoteObj.setResolutionCodeValue(configData.getResolutionCode());
 
-            debitNoteInBytes = PDFDebitNoteCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createDebitNotePDF(debitNoteObj, docUUID, configData);
+            //debitNoteInBytes = PDFDebitNoteCreator.getInstance(configData.getDocumentReportPath(),configData.getLegendSubReportPath() ).createDebitNotePDF(debitNoteObj, configData);
+            debitNoteInBytes = pdfDebitNoteCreator.createDebitNotePDF(debitNoteObj, configData);
+
         } catch (PDFReportException e) {
-            logger.error("generateDebitNotePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+            logger.error("generateDebitNotePDF() [" + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateDebitNotePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
+            logger.error("generateDebitNotePDF() [" + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
             throw new PDFReportException(error);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("-generateDebitNotePDF() [" + this.docUUID + "]");
+            logger.debug("-generateDebitNotePDF() [" + "]");
         }
         return debitNoteInBytes;
     } // generateDebitNotePDF
 
     public synchronized byte[] generateCreditNotePDF(UBLDocumentWRP creditNoteType, List<TransaccionTotales> transaccionTotales, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+generateCreditNotePDF() [" + this.docUUID + "]");
+            logger.debug("+generateCreditNotePDF() [" + "]");
         }
         byte[] creditNoteInBytes = null;
 
@@ -1511,7 +1388,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             CreditNoteObject creditNoteObj = new CreditNoteObject();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo informacion GENERAL del documento.");
             }
             creditNoteObj.setDocumentIdentifier(creditNoteType.getCreditNoteType().getID().getValue());
             creditNoteObj.setIssueDate(formatIssueDate(creditNoteType.getCreditNoteType().getIssueDate().getValue()));
@@ -1535,26 +1412,26 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo guias de remision.");
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo guias de remision.");
             }
             creditNoteObj.setRemissionGuides(getRemissionGuides(creditNoteType.getCreditNoteType().getDespatchDocumentReference()));
 
             if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "] Guias de remision: " + creditNoteObj.getRemissionGuides());
+                logger.info("generateCreditNotePDF() [" + "] Guias de remision: " + creditNoteObj.getRemissionGuides());
             }
             if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "]============= remision");
+                logger.info("generateCreditNotePDF() [" + "]============= remision");
             }
 
             creditNoteObj.setPaymentCondition(creditNoteType.getTransaccion().getDOC_CondPago());
 
             if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "]============= remision");
+                logger.info("generateCreditNotePDF() [" + "]============= remision");
             }
             creditNoteObj.setDateDocumentReference(creditNoteType.getTransaccion().getFechaDOCRef());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + creditNoteType.getTransaccion().getTransaccionContractdocrefList().size());
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo Campos de usuarios personalizados." + creditNoteType.getTransaccion().getTransaccionContractdocrefList().size());
             }
             if (null != creditNoteType.getTransaccion().getTransaccionContractdocrefList() && 0 < creditNoteType.getTransaccion().getTransaccionContractdocrefList().size()) {
                 Map<String, String> hashedMap = new HashMap<String, String>();
@@ -1571,7 +1448,6 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
-            //BigDecimal montoRetencion  = (creditNoteType.getTransaccion().getMontoRetencion() != null ? creditNoteType.getTransaccion().getMontoRetencion() : new BigDecimal(0.0));
             BigDecimal montoRetencion = BigDecimal.ZERO; // ocultar retencion en el subreporte
 
 
@@ -1631,38 +1507,28 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             creditNoteObj.setC1(c1);
             creditNoteObj.setC2(c2);
             creditNoteObj.setC3(c3);
-            //creditNoteObj.setPorcentajeRetencion( retentionpercentage == null ? BigDecimal.ZERO : retentionpercentage);
             creditNoteObj.setPorcentajeRetencion(BigDecimal.ZERO);
             creditNoteObj.setMontoRetencion(montoRetencion);
             BigDecimal baseImponibleRetencion = BigDecimal.ZERO;
-
-            /*if (creditNoteObj.getPorcentajeRetencion()!=BigDecimal.ZERO){
-                baseImponibleRetencion = montoRetencion.divide(creditNoteObj.getPorcentajeRetencion().divide(new BigDecimal(100.0)));
-            } else {
-                baseImponibleRetencion = BigDecimal.ZERO;
-            }*/
-
             creditNoteObj.setBaseImponibleRetencion(baseImponibleRetencion);
-
-            // fin Cuotas
 
             List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
 
             for (int i = 0; i < creditNoteType.getTransaccion().getTransaccionLineasList().size(); i++) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Agregando datos al HashMap" + creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
+                    logger.debug("generateCreditNotePDF() [" + "] Agregando datos al HashMap" + creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
                 }
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<String, String>();
                 List<String> newlist = new ArrayList<String>();
                 for (int j = 0; j < creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size(); j++) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
+                        logger.debug("generateInvoicePDF() [" + "] Extrayendo Campos " + creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
                     }
                     itemObjectHash.put(creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre(), creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
                     newlist.add(creditNoteType.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
+                        logger.debug("generateInvoicePDF() [" + "] Nuevo Tamanio " + newlist.size());
                     }
 
                 }
@@ -1679,10 +1545,10 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 for (int j = 0; j < creditNoteObj.getItemsListDynamic().get(i).getLstDinamicaItem().size(); j++) {
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Columna " + j);
+                        logger.debug("generateInvoicePDF() [" + "] Fila " + i + " Columna " + j);
                     }
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Contenido " + creditNoteObj.getItemsListDynamic().get(i).getLstDinamicaItem().get(j));
+                        logger.debug("generateInvoicePDF() [" + "] Fila " + i + " Contenido " + creditNoteObj.getItemsListDynamic().get(i).getLstDinamicaItem().get(j));
                     }
 
                 }
@@ -1690,15 +1556,15 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "] Condicion_pago: " + creditNoteObj.getPaymentCondition());
+                logger.info("generateCreditNotePDF() [" + "] Condicion_pago: " + creditNoteObj.getPaymentCondition());
 
             }
             if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "]============= condicion pago------");
+                logger.info("generateCreditNotePDF() [" + "]============= condicion pago------");
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion de la NOTA DE CREDITO");
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo informacion de la NOTA DE CREDITO");
             }
 
             if (Boolean.parseBoolean(configData.getPdfBorrador())) {
@@ -1712,7 +1578,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             creditNoteObj.setDocumentReferenceToCn(getDocumentReferenceValue(creditNoteType.getCreditNoteType().getBillingReference().get(0)));
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo informacion del EMISOR del documento.");
             }
             creditNoteObj.setSenderSocialReason(creditNoteType.getTransaccion().getRazonSocial());
             creditNoteObj.setSenderRuc(creditNoteType.getTransaccion().getDocIdentidad_Nro());
@@ -1720,7 +1586,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             creditNoteObj.setSenderDepProvDist(creditNoteType.getTransaccion().getDIR_Distrito() + " " + creditNoteType.getTransaccion().getDIR_Provincia() + " " + creditNoteType.getTransaccion().getDIR_Departamento());
             creditNoteObj.setSenderContact(creditNoteType.getTransaccion().getPersonContacto());
             creditNoteObj.setSenderMail(creditNoteType.getTransaccion().getEMail());
-            creditNoteObj.setSenderLogo(this.senderLogo);
+            creditNoteObj.setSenderLogo(configData.getSenderLogo());
             creditNoteObj.setWeb(creditNoteType.getTransaccion().getWeb());
             creditNoteObj.setPorcentajeIGV(creditNoteType.getTransaccion().getDOC_PorcImpuesto());
             creditNoteObj.setComentarios(creditNoteType.getTransaccion().getFE_Comentario());
@@ -1729,14 +1595,14 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             creditNoteObj.setTelefono1(creditNoteType.getTransaccion().getTelefono_1());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo informacion del RECEPTOR del documento.");
             }
             creditNoteObj.setReceiverRegistrationName(creditNoteType.getTransaccion().getSN_RazonSocial());
             creditNoteObj.setReceiverIdentifier(creditNoteType.getTransaccion().getSN_DocIdentidad_Nro());
             creditNoteObj.setReceiverIdentifierType(creditNoteType.getTransaccion().getSN_DocIdentidad_Tipo());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion de la percepción.");
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo informacion de la percepción.");
             }
 
             BigDecimal percepctionAmount = null;
@@ -1751,7 +1617,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo monto de ISC.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo monto de ISC.");
             }
             BigDecimal retentionpercentage = null;
 
@@ -1778,27 +1644,26 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             if (creditNoteType.getCreditNoteType().getID().getValue().startsWith(IUBLConfig.INVOICE_SERIE_PREFIX)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateCreditNotePDF() [" + this.docUUID + "] El receptor es de un documento afectado de tipo FACTURA.");
+                    logger.debug("generateCreditNotePDF() [" + "] El receptor es de un documento afectado de tipo FACTURA.");
                 }
                 creditNoteObj.setReceiverFiscalAddress(creditNoteType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
 
             } else if (creditNoteType.getCreditNoteType().getID().getValue().startsWith(IUBLConfig.BOLETA_SERIE_PREFIX)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateCreditNotePDF() [" + this.docUUID + "] El receptor es de un documento afectado de tipo BOLETA.");
+                    logger.debug("generateCreditNotePDF() [" + "] El receptor es de un documento afectado de tipo BOLETA.");
                 }
                 creditNoteObj.setReceiverFiscalAddress(creditNoteType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
             } else {
-                logger.error("generateCreditNotePDF() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_431.getMessage());
+                logger.error("generateCreditNotePDF() [" + "] ERROR: " + IVenturaError.ERROR_431.getMessage());
                 throw new PDFReportException(IVenturaError.ERROR_431);
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo informacion de los ITEMS.");
             }
-            // creditNoteObj.setCreditNoteItems(getCreditNoteItems(creditNoteType.getCreditNoteType().getCreditNoteLine()));
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion de los MONTOS.");
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo informacion de los MONTOS.");
             }
             String currencyCode = creditNoteType.getCreditNoteType().getDocumentCurrencyCode().getValue();
 
@@ -1810,11 +1675,6 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             BigDecimal iscValue = getTaxTotalValue(creditNoteType.getCreditNoteType().getTaxTotal(), IUBLConfig.TAX_TOTAL_ISC_ID);
             creditNoteObj.setIscValue(getCurrency(iscValue, currencyCode));
-//
-//            BigDecimal lineExtensionAmount = creditNoteType.getCreditNoteType()
-//                    .getLegalMonetaryTotal().getLineExtensionAmount()
-//                    .getValue();
-//            creditNoteObj.setAmountValue(getCurrency(lineExtensionAmount, currencyCode));
 
             if (null != creditNoteType.getCreditNoteType().getLegalMonetaryTotal().getAllowanceTotalAmount() && null != creditNoteType.getCreditNoteType().getLegalMonetaryTotal().getAllowanceTotalAmount().getValue()) {
                 creditNoteObj.setDiscountValue(getCurrency(creditNoteType.getCreditNoteType().getLegalMonetaryTotal().getAllowanceTotalAmount().getValue(), currencyCode));
@@ -1837,7 +1697,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             BigDecimal gratuitaAmount = getTransaccionTotales(creditNoteType.getTransaccion().getTransaccionTotalesList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
             if (!gratuitaAmount.equals(BigDecimal.ZERO)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Existe Op. Gratuitas.");
+                    logger.debug("generateCreditNotePDF() [" + "] Existe Op. Gratuitas.");
                 }
                 creditNoteObj.setGratuitaAmountValue(getCurrency(gratuitaAmount, currencyCode));
             } else {
@@ -1845,88 +1705,72 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo informacion del CODIGO DE BARRAS.");
             }
 
             String barcodeValue = generateBarCodeInfoString(creditNoteType.getTransaccion().getDocIdentidad_Nro(), creditNoteType.getTransaccion().getDOC_Codigo(), creditNoteType.getTransaccion().getDOC_Serie(), creditNoteType.getTransaccion().getDOC_Numero(), creditNoteType.getCreditNoteType().getTaxTotal(), creditNoteObj.getIssueDate(), creditNoteType.getTransaccion().getDOC_MontoTotal().toString(), creditNoteType.getTransaccion().getSN_DocIdentidad_Tipo(), creditNoteType.getTransaccion().getSN_DocIdentidad_Nro(), creditNoteType.getCreditNoteType().getUBLExtensions());
 
-//            String barcodeValue = generateBarCodeInfoString(invoiceType.getInvoiceType().getID().getValue(), invoiceType.getInvoiceType().getInvoiceTypeCode().getValue(),invoiceObj.getIssueDate(), invoiceType.getInvoiceType().getLegalMonetaryTotal().getPayableAmount().getValue(), invoiceType.getInvoiceType().getTaxTotal(), invoiceType.getInvoiceType().getAccountingSupplierParty(), invoiceType.getInvoiceType().getAccountingCustomerParty(),invoiceType.getInvoiceType().getUBLExtensions());
             if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
+                logger.info("generateCreditNotePDF() [" + "] BARCODE: \n" + barcodeValue);
             }
-            //invoiceObj.setBarcodeValue(barcodeValue);
 
             InputStream inputStream;
             InputStream inputStreamPDF;
-            String rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "07" + File.separator + creditNoteType.getCreditNoteType().getID().getValue() + ".png";
-            File f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "07");
+            String rutaPath = ".." + File.separator + "CodigoQR" + File.separator + "07" + File.separator + creditNoteType.getCreditNoteType().getID().getValue() + ".png";
+            File f = new File(".." + File.separator + "CodigoQR" + File.separator + "07");
             if (!f.exists()) {
                 f.mkdirs();
             }
-
             inputStream = generateQRCode(barcodeValue, rutaPath);
+            creditNoteObj.setCodeQR(inputStream);  // Asignar el InputStream a la factura
 
-            creditNoteObj.setCodeQR(inputStream);
-
-            f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "07");
-            rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "07" + File.separator + creditNoteType.getCreditNoteType().getID().getValue() + ".png";
-            if (!f.exists()) {
-                f.mkdirs();
-            }
-            inputStreamPDF = generatePDF417Code(barcodeValue, rutaPath, 200, 200, 1);
-
-            creditNoteObj.setBarcodeValue(inputStreamPDF);
+            // Generar el código PDF417 en memoria
+            ByteArrayOutputStream pdf417OutputStream = new ByteArrayOutputStream();
+            generatePDF417Code(barcodeValue, pdf417OutputStream, 200, 200, 1);  // Genera el PDF417 directamente en el OutputStream
+            InputStream pdf417InputStream = new ByteArrayInputStream(pdf417OutputStream.toByteArray());  // Convertir OutputStream a InputStream
+            creditNoteObj.setBarcodeValue(pdf417InputStream);  // Asignar el InputStream a la factura
             String digestValue = generateDigestValue(creditNoteType.getCreditNoteType().getUBLExtensions());
 
             if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "] VALOR RESUMEN: \n" + digestValue);
+                logger.info("generateCreditNotePDF() [" + "] VALOR RESUMEN: \n" + digestValue);
             }
 
             creditNoteObj.setDigestValue(digestValue);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
+                logger.debug("generateCreditNotePDF() [" + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
             }
 
-            /*
-            Map<String, LegendObject> legendsMap = getaddLeyends(creditNoteType.getCreditNoteType().getNote());
-             */
             Map<String, LegendObject> legendsMap = null;
 
-            //if (TipoVersionUBL.notacredito.equals("21")) {
             legendsMap = getaddLeyends(creditNoteType.getCreditNoteType().getNote());
-            /*} else if (TipoVersionUBL.notadebito.equals("20")) {
-                legendsMap = getAdditionalProperties(creditNoteType.getCreditNoteType().getUBLExtensions().getUBLExtension());
-            }*/
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
+                logger.debug("generateCreditNotePDF() [" + "] Colocando el importe en LETRAS.");
             }
             LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
             creditNoteObj.setLetterAmountValue(legendLetters.getLegendValue());
             legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
+                logger.debug("generateBoletaPDF() [" + "] Colocando la lista de LEYENDAS.");
             }
             creditNoteObj.setLegends(getLegendList(legendsMap));
 
-            creditNoteObj.setResolutionCodeValue(this.resolutionCode);
+            creditNoteObj.setResolutionCodeValue(configData.getResolutionCode());
 
-            /*
-             * Generando el PDF de la FACTURA con la informacion recopilada.
-             */
-            creditNoteInBytes = PDFCreditNoteCreator.getInstance(this.documentReportPath, this.legendSubReportPath, this.paymentDetailReportPath).createCreditNotePDF(creditNoteObj, docUUID, configData);
+            //creditNoteInBytes = PDFCreditNoteCreator.getInstance(configData.getDocumentReportPath(),configData.getLegendSubReportPath() , configData.getPaymentDetailReportPath()).createCreditNotePDF(creditNoteObj, configData);
+            creditNoteInBytes = pdfCreditNoteCreator.createCreditNotePDF(creditNoteObj, configData);
         } catch (PDFReportException e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+            logger.error("generateInvoicePDF() [" + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
+            logger.error("generateInvoicePDF() [" + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
             throw new PDFReportException(error);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("-generateInvoicePDF() [" + this.docUUID + "]");
+            logger.debug("-generateInvoicePDF() [" + "]");
         }
         return creditNoteInBytes;
     } // generateCreditNotePDF
@@ -1934,7 +1778,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
     public synchronized byte[] generateDespatchAdvicePDF(UBLDocumentWRP despatchAdvice, ConfigData configData) throws PDFReportException {
 
         if (logger.isDebugEnabled()) {
-            logger.debug("+generateDespatchAdvicePDF() [" + this.docUUID + "]");
+            logger.debug("+generateDespatchAdvicePDF() [" + "]");
         }
         byte[] despatchInBytes = null;
 
@@ -1942,7 +1786,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             DespatchAdviceObject despatchAdviceObject = new DespatchAdviceObject();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
+                logger.debug("generateDespatchAdvicePDF() [" + "] Extrayendo informacion GENERAL del documento.");
             }
             despatchAdviceObject.setCodigoEmbarque(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getCodigoPuerto());
             despatchAdviceObject.setCodigoMotivoTraslado(despatchAdvice.getTransaccion().getTransaccionGuiaRemision().getCodigoMotivo());
@@ -1983,19 +1827,19 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             for (int i = 0; i < despatchAdvice.getTransaccion().getTransaccionLineasList().size(); i++) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Agregando datos al HashMap" + despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
+                    logger.debug("generateDespatchAdvicePDF() [" + "] Agregando datos al HashMap" + despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size());
                 }
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
                 List<String> newlist = new ArrayList<>();
                 for (int j = 0; j < despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().size(); j++) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
+                        logger.debug("generateInvoicePDF() [" + "] Extrayendo Campos " + despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre());
                     }
                     itemObjectHash.put(despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getUsuariocampos().getNombre(), despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
                     newlist.add(despatchAdvice.getTransaccion().getTransaccionLineasList().get(i).getTransaccionLineasUsucamposList().get(j).getValor());
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
+                        logger.debug("generateInvoicePDF() [" + "] Nuevo Tamanio " + newlist.size());
                     }
 
                 }
@@ -2027,10 +1871,10 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 for (int j = 0; j < despatchAdviceObject.getItemListDynamic().get(i).getLstDinamicaItem().size(); j++) {
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Fila " + i + " Columna " + j);
+                        logger.debug("generateDespatchAdvicePDF() [" + "] Fila " + i + " Columna " + j);
                     }
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Contenido " + despatchAdviceObject.getItemListDynamic().get(i).getLstDinamicaItem().get(j));
+                        logger.debug("generateInvoicePDF() [" + "] Fila " + i + " Contenido " + despatchAdviceObject.getItemListDynamic().get(i).getLstDinamicaItem().get(j));
                     }
 
                 }
@@ -2038,22 +1882,10 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             String barcodeValue = generateBarCodeInfoString(despatchAdvice.getTransaccion().getDocIdentidad_Nro(), despatchAdvice.getTransaccion().getDOC_Codigo(), despatchAdvice.getTransaccion().getDOC_Serie(), despatchAdvice.getTransaccion().getDOC_Numero(), null, despatchAdvice.getTransaccion().getDOC_FechaEmision().toString(), "00", despatchAdvice.getTransaccion().getSN_DocIdentidad_Tipo(), despatchAdvice.getTransaccion().getSN_DocIdentidad_Nro(), despatchAdvice.getAdviceType().getUBLExtensions());
 
-            //String barcodeValue = generateBarCodeInfoString(despatchAdvice.getInvoiceType().getID().getValue(), despatchAdvice.getInvoiceType().getInvoiceTypeCode().getValue(), despatchAdvice.getAdviceType().getIssueDate(), despatchAdvice.getTransaccion().getDOCNumero(), null, invoiceType.getInvoiceType().getAccountingSupplierParty(), despatchAdvice.getInvoiceType().getAccountingCustomerParty(), despatchAdvice.getInvoiceType().getUBLExtensions());
-            if (logger.isInfoEnabled()) {
-                //logger.info("generateInvoicePDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
-            }
-            //despatchAdviceObject.setBarcodeValue(barcodeValue);
-
             InputStream inputStream;
-            InputStream inputStreamPDF;
-            //String rutaPath = Directorio.ADJUNTOS + File.separator + "CodigoQR" + File.separator + "09" + File.separator + despatchAdvice.getTransaccion().getDOCNumero() + ".png";
-            //File f = new File(Directorio.ADJUNTOS + File.separator + "CodigoQR" + File.separator + "09");
-            // if (!f.exists()) {
-            //     f.mkdirs();
-            //}
 
-            File f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "09");
-            String rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "09" + File.separator + despatchAdvice.getTransaccion().getDOC_Numero() + ".png";
+            File f = new File(".." + File.separator + "CodigoPDF417" + File.separator + "09");
+            String rutaPath = ".." + File.separator + "CodigoPDF417" + File.separator + "09" + File.separator + despatchAdvice.getTransaccion().getDOC_Numero() + ".png";
             if (!f.exists()) {
                 f.mkdirs();
             }
@@ -2062,19 +1894,17 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             despatchAdviceObject.setCodeQR(inputStream);
 
-            despatchAdviceObject.setSenderLogo(this.senderLogo);
-
-            despatchInBytes = PDFDespatchAdviceCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createDespatchAdvicePDF(despatchAdviceObject, docUUID, configData);
+            despatchInBytes = PDFDespatchAdviceCreator.getInstance(configData.getDocumentReportPath(), configData.getLegendSubReportPath()).createDespatchAdvicePDF(despatchAdviceObject, configData);
         } catch (PDFReportException e) {
-            logger.error("generateDespatchAdvicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+            logger.error("generateDespatchAdvicePDF() [" + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateDespatchAdvicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
+            logger.error("generateDespatchAdvicePDF() [" + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
             throw new PDFReportException(error);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("-generateDespatchAdvicePDF() [" + this.docUUID + "]");
+            logger.debug("-generateDespatchAdvicePDF() [" + "]");
         }
         return despatchInBytes;
     }
@@ -2098,7 +1928,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
     public synchronized byte[] generatePerceptionPDF(UBLDocumentWRP perceptionType, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+generateInvoicePDF() [" + this.docUUID + "]");
+            logger.debug("+generateInvoicePDF() [" + "]");
         }
         byte[] perceptionBytes = null;
 
@@ -2106,51 +1936,51 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             PerceptionObject perceptionObj = new PerceptionObject();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion GENERAL del documento.");
             }
             perceptionObj.setDocumentIdentifier(perceptionType.getPerceptionType().getId().getValue());
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de la fecha." + perceptionType.getPerceptionType().getIssueDate().getValue());
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion de la fecha." + perceptionType.getPerceptionType().getIssueDate().getValue());
             }
             perceptionObj.setIssueDate(formatIssueDate(perceptionType.getPerceptionType().getIssueDate().getValue()));
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion del EMISOR del documento.");
             }
             perceptionObj.setSenderSocialReason(perceptionType.getPerceptionType().getAgentParty().getPartyLegalEntity().get(0).getRegistrationName().getValue().toUpperCase());
             perceptionObj.setSenderRuc(perceptionType.getPerceptionType().getAgentParty().getPartyIdentification().get(0).getID().getValue());
             perceptionObj.setSenderFiscalAddress(perceptionType.getPerceptionType().getAgentParty().getPostalAddress().getStreetName().getValue());
             perceptionObj.setSenderDepProvDist(formatDepProvDist(perceptionType.getPerceptionType().getAgentParty().getPostalAddress()));
-            perceptionObj.setSenderLogo(this.senderLogo);
+            perceptionObj.setSenderLogo(configData.getSenderLogo());
             perceptionObj.setTelValue(perceptionType.getTransaccion().getTelefono());
             //perceptionObj.setTel2Value(perceptionType.getTransaccion().getTelefono1());
             perceptionObj.setWebValue(perceptionType.getTransaccion().getWeb());
             perceptionObj.setSenderMail(perceptionType.getTransaccion().getEMail());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion del RECEPTOR del documento.");
             }
             perceptionObj.setReceiverSocialReason(perceptionType.getPerceptionType().getReceiverParty().getPartyLegalEntity().get(0).getRegistrationName().getValue().toUpperCase());
             perceptionObj.setReceiverRuc(perceptionType.getPerceptionType().getReceiverParty().getPartyIdentification().get(0).getID().getValue());
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion de los ITEMS.");
             }
             perceptionObj.setPerceptionItems(getPerceptionItems(perceptionType.getPerceptionType().getSunatPerceptionDocumentReference(), new BigDecimal(perceptionType.getPerceptionType().getSunatPerceptionPercent().getValue())));
             List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
             for (int i = 0; i < perceptionType.getTransaccion().getTransaccionComprobantePagoList().size(); i++) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Agregando datos al HashMap" + perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().size());
+                    logger.debug("generatePerceptionPDF() [" + "] Agregando datos al HashMap" + perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().size());
                 }
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<String, String>();
                 List<String> newlist = new ArrayList<String>();
                 for (int j = 0; j < perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().size(); j++) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Extrayendo Campos " + perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre());
+                        logger.debug("generatePerceptionPDF() [" + "] Extrayendo Campos " + perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre());
                     }
                     itemObjectHash.put(perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre(), perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());
                     newlist.add(perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
+                        logger.debug("generateInvoicePDF() [" + "] Nuevo Tamanio " + newlist.size());
                     }
                 }
                 itemObject.setLstItemHashMap(itemObjectHash);
@@ -2161,15 +1991,12 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             perceptionObj.setItemListDynamic(listaItem);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
             }
-            // Map<String, LegendObject> legendsMap = new HashMap<String,
-            // LegendObject>();
-
             perceptionObj.setTotalAmountValue(perceptionType.getPerceptionType().getTotalInvoiceAmount().getValue().toString());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
+                logger.debug("generateInvoicePDF() [" + "] Colocando el importe en LETRAS.");
             }
             perceptionType.getTransaccion();
             for (int i = 0; i < perceptionType.getTransaccion().getTransaccionPropiedadesList().size(); i++) {
@@ -2184,47 +2011,30 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 perceptionObj.setValidezPDF("");
             }
 
-            // LegendObject legendLetters =
-            // legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
-            // perceptionObj.setLetterAmountValue(legendLetters.getLegendValue());
-            // legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
+                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion del CODIGO DE BARRAS.");
             }
-            // String barcodeValue =
-            // generateBarcodeInfoV2(perceptionType.getPerceptionType().getId().getValue(),
-            // "40",
-            // perceptionType.getPerceptionType().getIssueDate().toString(),
-            // perceptionType.getPerceptionType().getTotalInvoiceAmount().getValue(),
-            // perceptionType.getPerceptionType().getAgentParty(),
-            // perceptionType.getPerceptionType().getReceiverParty(),
-            // perceptionType.getPerceptionType().getUblExtensions());
-            // if (logger.isInfoEnabled()) {logger.info("generateInvoicePDF() ["
-            // + this.docUUID + "] BARCODE: \n" + barcodeValue);}
-            // perceptionObj.setBarcodeValue(barcodeValue);
+
 
             if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
+                logger.debug("generateInvoicePDF() [" + "] Colocando la lista de LEYENDAS.");
             }
-            // perceptionObj.setLegends(getLegendList(legendsMap));
 
-            perceptionObj.setResolutionCodeValue(this.resolutionCode);
+            perceptionObj.setResolutionCodeValue(configData.getResolutionCode());
             perceptionObj.setImporteTexto(perceptionType.getTransaccion().getTransaccionPropiedadesList().get(0).getValor());
 
-            /*
-             * Generando el PDF de la FACTURA con la informacion recopilada.
-             */
-            perceptionBytes = PDFPerceptionCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createPerceptionPDF(perceptionObj, docUUID);
+            //perceptionBytes = PDFPerceptionCreator.getInstance(configData.getDocumentReportPath(),configData.getLegendSubReportPath() ).createPerceptionPDF(perceptionObj);
+            perceptionBytes = pdfPerceptionCreator.createPerceptionPDF(perceptionObj, configData);
         } catch (PDFReportException e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+            logger.error("generateInvoicePDF() [" + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
+            logger.error("generateInvoicePDF() [" + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
             throw new PDFReportException(error);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("-generateInvoicePDF() [" + this.docUUID + "]");
+            logger.debug("-generateInvoicePDF() [" + "]");
         }
         return perceptionBytes;
     } // generateInvoicePDF
@@ -2232,7 +2042,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
     protected List<PerceptionItemObject> getPerceptionItems(List<SUNATPerceptionDocumentReferenceType> perceptionLines, BigDecimal porcentaje) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+getInvoiceItems() [" + this.docUUID + "] invoiceLines: " + perceptionLines);
+            logger.debug("+getInvoiceItems() [" + "] invoiceLines: " + perceptionLines);
         }
         List<PerceptionItemObject> itemList = null;
 
@@ -2264,16 +2074,16 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                     itemList.add(invoiceItemObj);
                 }
             } catch (PDFReportException e) {
-                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+                logger.error("getInvoiceItems() [" + "] ERROR: "
                         + e.getMessage());
                 throw e;
             } catch (Exception e) {
-                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+                logger.error("getInvoiceItems() [" + "] ERROR: "
                         + IVenturaError.ERROR_415.getMessage());
                 throw new PDFReportException(IVenturaError.ERROR_415);
             }
         } else {
-            logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+            logger.error("getInvoiceItems() [" + "] ERROR: "
                     + IVenturaError.ERROR_411.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_411);
         }

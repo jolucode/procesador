@@ -12,7 +12,6 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
-import service.cloud.request.clientRequest.extras.pdf.DocumentCreator;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
 import service.cloud.request.clientRequest.handler.object.DespatchAdviceObject;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
@@ -25,7 +24,7 @@ import java.util.Map;
 /**
  * @author VS-LT-06
  */
-public class PDFDespatchAdviceCreator extends DocumentCreator {
+public class PDFDespatchAdviceCreator {
 
     private final Logger logger = Logger.getLogger(PDFDespatchAdviceCreator.class);
 
@@ -94,13 +93,12 @@ public class PDFDespatchAdviceCreator extends DocumentCreator {
      *
      * @param despatchAdviceObject Objeto que contiene informacion de la
      *                             factura.
-     * @param docUUID              Identificador unica de la factura.
      * @return Retorna un PDF en bytes.
      * @throws PDFReportException
      */
-    public byte[] createDespatchAdvicePDF(DespatchAdviceObject despatchAdviceObject, String docUUID, ConfigData configuracion) throws PDFReportException {
+    public byte[] createDespatchAdvicePDF(DespatchAdviceObject despatchAdviceObject,ConfigData configuracion) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+createDespatchAdvicePDF() [" + docUUID + "]");
+            logger.debug("+createDespatchAdvicePDF() [" + "]");
         }
         byte[] pdfDocument = null;
 
@@ -161,13 +159,13 @@ public class PDFDespatchAdviceCreator extends DocumentCreator {
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
                 pdfDocument =  outputStream.toByteArray();;
             } catch (Exception e) {
-                logger.error("createDespatchAdvicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
-                logger.error("createDespatchAdvicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
+                logger.error("createDespatchAdvicePDF() [" + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
+                logger.error("createDespatchAdvicePDF() [" + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
                 throw new PDFReportException(IVenturaError.ERROR_441);
             }
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("-createDespatchAdvicePDF() [" + docUUID + "]");
+            logger.debug("-createDespatchAdvicePDF() [" + "]");
         }
         return pdfDocument;
     } //createInvoicePDF

@@ -34,7 +34,9 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
   Logger logger = LoggerFactory.getLogger(DocumentFormatImpl.class);
 
   private final String docUUID = Constants.DOC_UUID;
-  ;
+
+  @Autowired
+  PDFGenerateHandler PDFGenerateHandler;
 
   @Autowired
   ProviderProperties providerProperties;
@@ -51,54 +53,64 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
     }
     byte[] pdfBytes = null;
     List<TransaccionTotales> transaccionTotales = new ArrayList<>(transaction.getTransaccionTotalesList());
-    try {
-      // Crear una nueva instancia de PDFGenerateHandler para cada llamada
-      PDFGenerateHandler pdfHandler = PDFGenerateHandler.newInstance(this.docUUID);
 
+    // Clonar la configuración para garantizar la seguridad en la concurrencia
+    ConfigData configuracionLocal = configuracion.clone();  // Asegúrate que ConfigData implemente un método clone()
+
+
+
+    try {
+      String businessRuc = transaction.getDocIdentidad_Nro();
       String logoSociedad = providerProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + "COMPANY_LOGO.jpg";
-      String rutaPaymentSelected = rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "InvoiceDocumentPaymentDetail.jasper");
+      String rutaPaymentSelected = rutaRecursoPdf(businessRuc, "InvoiceDocumentPaymentDetail.jasper");
+
+      configuracionLocal.setLegendSubReportPath(rutaRecursoPdf(businessRuc, "legendReport.jasper"));
+      configuracionLocal.setPaymentDetailReportPath(rutaPaymentSelected);
+      configuracionLocal.setSenderLogo(logoSociedad);
+      configuracionLocal.setResolutionCode("EmisorElectronico");
 
       String documentName;
       switch (transaction.getDOC_Codigo()) {
         case IUBLConfig.DOC_INVOICE_CODE:
-          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "invoiceDocument_Ing.jrxml" : "invoiceDocument.jrxml";
-          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-          pdfBytes = pdfHandler.generateInvoicePDF(wrp, configuracion);
+          documentName = (configuracionLocal.getPdfIngles() != null && configuracionLocal.getPdfIngles().equals("Si")) ? "invoiceDocument_Ing.jrxml" : "invoiceDocument.jrxml";
+          configuracionLocal.setDocumentReportPath(rutaRecursoPdf(businessRuc, documentName));
+          pdfBytes = PDFGenerateHandler.generateInvoicePDF(wrp, configuracionLocal);
           break;
 
         case IUBLConfig.DOC_BOLETA_CODE:
-          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "boletaDocument_Ing.jrxml" : "boletaDocument.jrxml";
-          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-          pdfBytes = pdfHandler.generateBoletaPDF(wrp, configuracion);
+          documentName = (configuracionLocal.getPdfIngles() != null && configuracionLocal.getPdfIngles().equals("Si")) ? "boletaDocument_Ing.jrxml" : "boletaDocument.jrxml";
+          configuracionLocal.setDocumentReportPath(rutaRecursoPdf(businessRuc, documentName));
+          pdfBytes = PDFGenerateHandler.generateBoletaPDF(wrp, configuracionLocal);
           break;
 
         case IUBLConfig.DOC_CREDIT_NOTE_CODE:
-          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "creditNoteDocument_Ing.jrxml" : "creditNoteDocument.jrxml";
-          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-          pdfBytes = pdfHandler.generateCreditNotePDF(wrp, transaccionTotales, configuracion);
+          documentName = (configuracionLocal.getPdfIngles() != null && configuracionLocal.getPdfIngles().equals("Si")) ? "creditNoteDocument_Ing.jrxml" : "creditNoteDocument.jrxml";
+          configuracionLocal.setDocumentReportPath(rutaRecursoPdf(businessRuc, documentName));
+          pdfBytes = PDFGenerateHandler.generateCreditNotePDF(wrp, transaccionTotales, configuracionLocal);
           break;
 
         case IUBLConfig.DOC_DEBIT_NOTE_CODE:
-          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "debitNoteDocument_Ing.jrxml" : "debitNoteDocument.jrxml";
-          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-          pdfBytes = pdfHandler.generateDebitNotePDF(wrp, transaccionTotales, configuracion);
+          documentName = (configuracionLocal.getPdfIngles() != null && configuracionLocal.getPdfIngles().equals("Si")) ? "debitNoteDocument_Ing.jrxml" : "debitNoteDocument.jrxml";
+          configuracionLocal.setDocumentReportPath(rutaRecursoPdf(businessRuc, documentName));
+          pdfBytes = PDFGenerateHandler.generateDebitNotePDF(wrp, transaccionTotales, configuracionLocal);
           break;
 
         case IUBLConfig.DOC_PERCEPTION_CODE:
-          pdfHandler.setConfiguration(providerProperties.getRutaBaseDoc() + File.separator + "perceptionDocument.jrxml", rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-          pdfBytes = pdfHandler.generatePerceptionPDF(wrp, configuracion); // Comentado porque no estaba implementado
+          documentName = (configuracionLocal.getPdfIngles() != null && configuracionLocal.getPdfIngles().equals("Si")) ? "debitNoteDocument_Ing.jrxml" : "debitNoteDocument.jrxml";
+          configuracionLocal.setDocumentReportPath(rutaRecursoPdf(businessRuc, documentName));
+          pdfBytes = PDFGenerateHandler.generatePerceptionPDF(wrp, configuracionLocal); // Comentado porque no estaba implementado
           break;
 
         case IUBLConfig.DOC_RETENTION_CODE:
-          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "retentionDocument_Ing.jrxml" : "retentionDocument.jrxml";
-          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
-          pdfBytes = pdfHandler.generateRetentionPDF(wrp, configuracion);
+          documentName = (configuracionLocal.getPdfIngles() != null && configuracionLocal.getPdfIngles().equals("Si")) ? "retentionDocument_Ing.jrxml" : "retentionDocument.jrxml";
+          configuracionLocal.setDocumentReportPath(rutaRecursoPdf(businessRuc, documentName));
+          pdfBytes = PDFGenerateHandler.generateRetentionPDF(wrp, configuracionLocal);
           break;
 
         case IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE:
-          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "remissionguideDocument_Ing.jrxml" : "remissionguideDocument.jrxml";
-          pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, providerProperties.getClientProperties(transaction.getDocIdentidad_Nro()).getEmisorElecRs());
-          pdfBytes = pdfHandler.generateDespatchAdvicePDF(wrp, configuracion);
+          documentName = (configuracionLocal.getPdfIngles() != null && configuracionLocal.getPdfIngles().equals("Si")) ? "remissionguideDocument_Ing.jrxml" : "remissionguideDocument.jrxml";
+          configuracionLocal.setDocumentReportPath(rutaRecursoPdf(businessRuc, documentName));
+          pdfBytes = PDFGenerateHandler.generateDespatchAdvicePDF(wrp, configuracionLocal);
           break;
 
         default:
@@ -107,16 +119,10 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
       }
     } catch (PDFReportException e) {
       logger.error("createPDFDocument() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
-      logger.error("createPDFDocument() [" + this.docUUID + "] PDFReportException -->" + ExceptionUtils.getStackTrace(e));
     } catch (ConfigurationException e) {
       logger.error("createPDFDocument() [" + this.docUUID + "] ConfigurationException - ERROR: " + e.getMessage());
-      logger.error("createPDFDocument() [" + this.docUUID + "] ConfigurationException -->" + ExceptionUtils.getStackTrace(e));
     } catch (Exception e) {
       logger.error("createPDFDocument() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
-      logger.error("createPDFDocument() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
-    }
-    if (logger.isDebugEnabled()) {
-      logger.debug("-createPDFDocument() [" + this.docUUID + "]");
     }
     return pdfBytes;
   }

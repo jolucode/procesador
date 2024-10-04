@@ -183,7 +183,7 @@ public class GuiaServiceImpl implements GuiaInterface {
         documentWRP.setTransaccion(transaction);
         documentWRP.setAdviceType((DespatchAdviceType) ublDocument);
 
-        PDFBasicGenerateHandler db = new PDFBasicGenerateHandler(docUUID);
+        PDFBasicGenerateHandler db = new PDFBasicGenerateHandler();
 
         /* Agregar código de Barra */
         Date docFechaVencimiento = transaction.getDOC_FechaVencimiento();

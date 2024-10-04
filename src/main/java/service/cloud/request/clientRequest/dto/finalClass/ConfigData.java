@@ -10,7 +10,7 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-public class ConfigData {
+public class ConfigData implements Cloneable {
 
     private String usuarioSol;
     private String claveSol;
@@ -36,5 +36,20 @@ public class ConfigData {
     private String urlService;
     private String pdfIngles;
 
+
+    private String documentReportPath;
+    private String legendSubReportPath;
+    private String paymentDetailReportPath;
+    private String senderLogo;
+    private String resolutionCode;
+
+    @Override
+    public ConfigData clone() {
+        try {
+            return (ConfigData) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // Esto nunca debería ocurrir porque implementamos Cloneable
+        }
+    }
 
 }

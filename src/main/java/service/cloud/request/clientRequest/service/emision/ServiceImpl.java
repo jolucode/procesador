@@ -413,7 +413,7 @@ public class ServiceImpl implements ServiceInterface {
         UBLDocumentWRP documentWRP = UBLDocumentWRP.getInstance();
         String digestValue = "";
         String barcodeValue = "";
-        PDFBasicGenerateHandler db = new PDFBasicGenerateHandler(docUUID);
+        PDFBasicGenerateHandler db = new PDFBasicGenerateHandler();
 
         Calendar fecha = Calendar.getInstance();
         fecha.setTime(transaction.getDOC_FechaEmision());
@@ -658,11 +658,9 @@ public class ServiceImpl implements ServiceInterface {
         log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
 
-
         if (client.getPdfBorrador().equals("true")){
             transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
         }
-
 
         transactionResponse.setIdentificador(documentName);
         transactionResponse.setDigestValue(digestValue);

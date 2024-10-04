@@ -31,18 +31,11 @@ public class PDFBasicGenerateHandler {
     private final Logger logger = Logger
             .getLogger(PDFBasicGenerateHandler.class);
 
-    /* Identificador del documento */
-    protected String docUUID;
-
-
     /**
      * Constructor de la clase PDFBasicGenerateHandler.
      *
      * @param docUUID UUID identificador de la transaccion.
      */
-    public PDFBasicGenerateHandler(String docUUID) {
-        this.docUUID = docUUID;
-    } // PDFBasicGenerateHandler
 
     /**
      * Este metodo transforma la fecha de emision a String.
@@ -54,7 +47,7 @@ public class PDFBasicGenerateHandler {
     protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
             throws Exception {
         if (logger.isDebugEnabled()) {
-            logger.debug("+formatIssueDate() [" + this.docUUID + "]");
+            logger.debug("+formatIssueDate() ["  + "]");
         }
         Date inputDate = xmlGregorianCal.toGregorianCalendar().getTime();
 
@@ -66,7 +59,7 @@ public class PDFBasicGenerateHandler {
         String issueDate = sdf.format(inputDate);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("-formatIssueDate() [" + this.docUUID + "]");
+            logger.debug("-formatIssueDate() [" + "]");
         }
         return issueDate;
     } // formatIssueDate
@@ -91,7 +84,7 @@ public class PDFBasicGenerateHandler {
             sdf = new SimpleDateFormat(IPDFCreatorConfig.PATTERN_DATE);
             dueDate = sdf.format(inputDueDate);
         } catch (Exception e) {
-            logger.error("formatDueDate() [" + this.docUUID + "] ERROR: "
+            logger.error("formatDueDate() [" + "] ERROR: "
                     + e.getMessage());
         }
         return dueDate;
@@ -200,7 +193,7 @@ public class PDFBasicGenerateHandler {
     protected String formatDepProvDist(AddressType postalAddress)
             throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+-formatDepProvDist() [" + this.docUUID + "]");
+            logger.debug("+-formatDepProvDist() [" + "]");
         }
         String depProvDist = null;
         if (null != postalAddress) {
@@ -220,7 +213,7 @@ public class PDFBasicGenerateHandler {
             List<SUNATRetentionDocumentReferenceType> retentionLines,
             String porcentaje) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+getInvoiceItems() [" + this.docUUID
+            logger.debug("+getInvoiceItems() ["
                     + "] invoiceLines: " + retentionLines);
         }
         List<RetentionItemObject> itemList = null;
@@ -261,16 +254,16 @@ public class PDFBasicGenerateHandler {
                     itemList.add(retencionItemObj);
                 }
             } catch (PDFReportException e) {
-                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+                logger.error("getInvoiceItems() ["+ "] ERROR: "
                         + e.getMessage());
                 throw e;
             } catch (Exception e) {
-                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+                logger.error("getInvoiceItems() ["  + "] ERROR: "
                         + IVenturaError.ERROR_415.getMessage());
                 throw new PDFReportException(IVenturaError.ERROR_415);
             }
         } else {
-            logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+            logger.error("getInvoiceItems() [" + "] ERROR: "
                     + IVenturaError.ERROR_411.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_411);
         }
@@ -284,7 +277,7 @@ public class PDFBasicGenerateHandler {
     protected List<InvoiceItemObject> getInvoiceItems(
             List<InvoiceLineType> invoiceLines) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+getInvoiceItems() [" + this.docUUID
+            logger.debug("+getInvoiceItems() ["
                     + "] invoiceLines: " + invoiceLines);
         }
         List<InvoiceItemObject> itemList = null;
@@ -327,16 +320,16 @@ public class PDFBasicGenerateHandler {
                     itemList.add(invoiceItemObj);
                 }
             } catch (PDFReportException e) {
-                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+                logger.error("getInvoiceItems() [" + "] ERROR: "
                         + e.getMessage());
                 throw e;
             } catch (Exception e) {
-                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+                logger.error("getInvoiceItems() [" + "] ERROR: "
                         + IVenturaError.ERROR_415.getMessage());
                 throw new PDFReportException(IVenturaError.ERROR_415);
             }
         } else {
-            logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
+            logger.error("getInvoiceItems() [" + "] ERROR: "
                     + IVenturaError.ERROR_411.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_411);
         }
@@ -401,7 +394,7 @@ public class PDFBasicGenerateHandler {
     protected BigDecimal getTaxTotalValue2(List<TransaccionImpuestos> taxTotalList,
                                            String taxTotalCode) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+-getTaxTotalValue() [" + this.docUUID
+            logger.debug("+-getTaxTotalValue() ["
                     + "] taxTotalCode: " + taxTotalCode);
         }
         BigDecimal taxValue = BigDecimal.ZERO;
@@ -410,7 +403,7 @@ public class PDFBasicGenerateHandler {
             if (taxTotalList.get(i).getTipoTributo().equalsIgnoreCase(taxTotalCode)) {
                 taxValue = taxValue.add(taxTotalList.get(i).getMonto());
                 if (logger.isDebugEnabled()) {
-                    logger.debug("+-getTaxTotalValue() [" + this.docUUID
+                    logger.debug("+-getTaxTotalValue() ["
                             + "] taxValue: " + taxValue);
                 }
             }
@@ -439,7 +432,7 @@ public class PDFBasicGenerateHandler {
 
     protected BigDecimal getTaxTotalValue(List<TaxTotalType> taxTotalList, String taxTotalCode) {
         if (logger.isDebugEnabled()) {
-            logger.debug("+-getTaxTotalValue() [" + this.docUUID
+            logger.debug("+-getTaxTotalValue() ["
                     + "] taxTotalCode: " + taxTotalCode);
         }
         BigDecimal taxValue = BigDecimal.ZERO;
@@ -448,7 +441,7 @@ public class PDFBasicGenerateHandler {
             if (taxTotalList.get(i).getTaxSubtotal().get(0).getTaxCategory().getTaxScheme().getID().getValue().equalsIgnoreCase(taxTotalCode)) {
                 taxValue = taxTotalList.get(i).getTaxAmount().getValue();
                 if (logger.isDebugEnabled()) {
-                    logger.debug("+-getTaxTotalValue() [" + this.docUUID
+                    logger.debug("+-getTaxTotalValue() ["
                             + "] taxValue: " + taxValue);
                 }
             }
@@ -476,11 +469,11 @@ public class PDFBasicGenerateHandler {
             barcodeValue = MessageFormat.format(IPDFCreatorConfig.BARCODE_PATTERN, RUC_emisor_electronico, documentType, serie, correlativo, Sumatoria_IGV, Importe_total_venta, issueDate, Tipo_documento_adquiriente, Numero_documento_adquiriente, digestValue);
 
         } catch (PDFReportException e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
+            logger.error("generateBarcodeInfo() ["  + "] ERROR: "
                     + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
+            logger.error("generateBarcodeInfo() ["  + "] ERROR: "
                     + IVenturaError.ERROR_418.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_418);
         }
@@ -548,11 +541,11 @@ public class PDFBasicGenerateHandler {
                     receiverDocType, receiverDocNumber, digestValue,
                     signatureValue);
         } catch (PDFReportException e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
+            logger.error("generateBarcodeInfo() ["+ "] ERROR: "
                     + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
+            logger.error("generateBarcodeInfo() ["+ "] ERROR: "
                     + IVenturaError.ERROR_418.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_418);
         }
@@ -578,11 +571,12 @@ public class PDFBasicGenerateHandler {
             /* j.) Valor de la Firma digital <ds:SignatureValue> */
 
         } catch (PDFReportException e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
+            logger.error("generateBarcodeInfo() ["  + "] ERROR: "
                     + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
+            logger.error("generateBarcodeInfo() ["
+                    + "] ERROR: "
                     + IVenturaError.ERROR_418.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_418);
         }
@@ -670,7 +664,7 @@ public class PDFBasicGenerateHandler {
             }
 
         } catch (Exception ex) {
-            logger.error("getAdditionalProperties() [" + this.docUUID
+            logger.error("getAdditionalProperties() ["
                     + "] ERROR: " + IVenturaError.ERROR_420.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_420);
         }
@@ -745,12 +739,12 @@ public class PDFBasicGenerateHandler {
                 }
             }
         } catch (PDFReportException e) {
-            logger.error("getSunatTransactionInfo() [" + this.docUUID
+            logger.error("getSunatTransactionInfo() ["
                     + "] ERROR: " + e.getError().getId() + "-"
                     + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("getSunatTransactionInfo() [" + this.docUUID
+            logger.error("getSunatTransactionInfo() ["
                     + "] Exception -->" + e.getMessage());
         }
         return sunatTransactionInfo;
@@ -759,7 +753,7 @@ public class PDFBasicGenerateHandler {
     protected String getDocumentReferenceValue(
             BillingReferenceType billingReference) throws PDFReportException {
         if (logger.isDebugEnabled()) {
-            logger.debug("+-getDocumentReferenceValue() [" + this.docUUID + "]");
+            logger.debug("+-getDocumentReferenceValue() [" + "]");
         }
         String response = null;
 
@@ -798,7 +792,7 @@ public class PDFBasicGenerateHandler {
                     throw new PDFReportException(IVenturaError.ERROR_430);
             }
         } else {
-            logger.error("getDocumentReferenceValue() [" + this.docUUID
+            logger.error("getDocumentReferenceValue() ["
                     + "] ERROR: " + IVenturaError.ERROR_428.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_428);
         }
@@ -893,10 +887,10 @@ public class PDFBasicGenerateHandler {
              */
             barcodeValue = MessageFormat.format(IPDFCreatorConfig.BARCODE_PATTERN, senderRuc, documentType, serie, correlative, igvTax, payableAmount, issueDate, receiverDocType, receiverDocNumber, digestValue, signatureValue);
         } catch (PDFReportException e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+            logger.error("generateBarcodeInfo() [" + "] ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_418.getMessage());
+            logger.error("generateBarcodeInfo() [" + "] ERROR: " + IVenturaError.ERROR_418.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_418);
         }
         return barcodeValue;
