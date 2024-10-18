@@ -81,7 +81,7 @@ public class ServicePrincipal implements InterfacePrincipal {
             TransaccionRespuesta tr = EnviarTransaccion(transaccion);
             OnPremiseImpl clientHanaService = new OnPremiseImpl();
             request = generateDataRequestHana(transaccion, tr);
-            clientHanaService.anexarDocumentos(request);
+            //clientHanaService.anexarDocumentos(request);
             logger.info("Ruc: " + request.getRuc() + " DocObject: " + request.getDocObject() + " DocEntry: " + request.getDocEntry());
             logger.info("Nombre Documento: " + request.getDocumentName());
 
@@ -91,7 +91,7 @@ public class ServicePrincipal implements InterfacePrincipal {
 
             if(tr.getLogDTO()!=null) {
                 tr.getLogDTO().setRequest(requestOnPremise);
-                logEntryService.saveLogEntryToMongoDB(convertToEntity(tr.getLogDTO())).subscribe();
+                //logEntryService.saveLogEntryToMongoDB(convertToEntity(tr.getLogDTO())).subscribe();
             }
 
             logger.info("Se realizo de manera exitosa la actualizacion del documento :" + transaccion.getFE_Id());

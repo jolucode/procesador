@@ -4,6 +4,7 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecom
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.SignatureType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.*;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonextensioncomponents_2.UBLExtensionsType;
+import service.cloud.request.clientRequest.xmlFormatSunat.xsd.debitnote_2.DebitNoteType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.sunataggregatecomponents_1.SUNATRetentionDocumentReferenceType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.sunataggregatecomponents_1.SUNATRetentionPercentType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.sunataggregatecomponents_1.SUNATRetentionSystemCodeType;
@@ -72,7 +73,7 @@ import java.util.List;
         "sunatRetentionDocumentReference"
 })
 @XmlRootElement(name = "Retention")
-public class RetentionType implements Serializable {
+public class RetentionType implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -228,4 +229,12 @@ public class RetentionType implements Serializable {
         return this.sunatRetentionDocumentReference;
     }
 
+    @Override
+    public RetentionType clone() {
+        try {
+            return (RetentionType) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // No debería ocurrir
+        }
+    }
 }

@@ -21,7 +21,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "TRANSACCION")
-public class Transaccion implements Serializable {
+public class Transaccion implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -384,5 +384,12 @@ public class Transaccion implements Serializable {
         return Objects.hash(FE_Id);
     }
 
-
+    @Override
+    public Transaccion clone() {
+        try {
+            return (Transaccion) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // No debería ocurrir
+        }
+    }
 }

@@ -24,13 +24,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Service
 public class DocumentFormatImpl implements DocumentFormatInterface {
 
-
+  private static final Lock lock = new ReentrantLock();
   Logger logger = LoggerFactory.getLogger(DocumentFormatImpl.class);
 
   private final String docUUID = Constants.DOC_UUID;
@@ -47,17 +49,14 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
   }
 
   @Override
-  public byte[] createPDFDocument(UBLDocumentWRP wrp, Transaccion transaction, ConfigData configuracion) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("+createPDFDocument() [" + this.docUUID + "]");
-    }
+  public byte[] createPDFDocument(UBLDocumentWRP wrp, Transaccion transactions, ConfigData configuracion) {
+
+    Transaccion transaction = transactions.clone();
     byte[] pdfBytes = null;
     List<TransaccionTotales> transaccionTotales = new ArrayList<>(transaction.getTransaccionTotalesList());
 
     // Clonar la configuración para garantizar la seguridad en la concurrencia
     ConfigData configuracionLocal = configuracion.clone();  // Asegúrate que ConfigData implemente un método clone()
-
-
 
     try {
       String businessRuc = transaction.getDocIdentidad_Nro();
@@ -74,7 +73,15 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
         case IUBLConfig.DOC_INVOICE_CODE:
           documentName = (configuracionLocal.getPdfIngles() != null && configuracionLocal.getPdfIngles().equals("Si")) ? "invoiceDocument_Ing.jrxml" : "invoiceDocument.jrxml";
           configuracionLocal.setDocumentReportPath(rutaRecursoPdf(businessRuc, documentName));
-          pdfBytes = PDFGenerateHandler.generateInvoicePDF(wrp, configuracionLocal);
+          lock.lock();
+          try {
+            UBLDocumentWRP wrpLocal = wrp.clone();
+            pdfBytes = PDFGenerateHandler.generateInvoicePDF(wrpLocal, configuracionLocal);
+          } finally {
+            // Libera el lock para permitir que otro hilo acceda
+            lock.unlock();
+          }
+
           break;
 
         case IUBLConfig.DOC_BOLETA_CODE:
@@ -114,15 +121,15 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
           break;
 
         default:
-          logger.error("createPDFDocument() [" + this.docUUID + "] " + IVenturaError.ERROR_460.getMessage());
+          logger.error("createPDFDocument() [" +"] " + IVenturaError.ERROR_460.getMessage());
           throw new ConfigurationException(IVenturaError.ERROR_460.getMessage());
       }
     } catch (PDFReportException e) {
-      logger.error("createPDFDocument() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
+      logger.error("createPDFDocument() [" + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
     } catch (ConfigurationException e) {
-      logger.error("createPDFDocument() [" + this.docUUID + "] ConfigurationException - ERROR: " + e.getMessage());
+      logger.error("createPDFDocument() [" + "] ConfigurationException - ERROR: " + e.getMessage());
     } catch (Exception e) {
-      logger.error("createPDFDocument() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
+      logger.error("createPDFDocument() ["  + "] Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
     }
     return pdfBytes;
   }

@@ -11,6 +11,7 @@ package service.cloud.request.clientRequest.xmlFormatSunat.xsd.debitnote_2;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.*;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.*;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonextensioncomponents_2.UBLExtensionsType;
+import service.cloud.request.clientRequest.xmlFormatSunat.xsd.creditnote_2.CreditNoteType;
 
 import javax.xml.bind.annotation.*;
 import java.io.Serializable;
@@ -125,7 +126,7 @@ import java.util.List;
         "debitNoteLine"
 })
 @XmlRootElement(name = "DebitNote")
-public class DebitNoteType implements Serializable {
+public class DebitNoteType implements Serializable, Cloneable {
 
 
     @XmlElement(name = "UBLExtensions", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2")
@@ -1271,6 +1272,15 @@ public class DebitNoteType implements Serializable {
             debitNoteLine = new ArrayList<DebitNoteLineType>();
         }
         return this.debitNoteLine;
+    }
+
+    @Override
+    public DebitNoteType clone() {
+        try {
+            return (DebitNoteType) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // No debería ocurrir
+        }
     }
 
 }

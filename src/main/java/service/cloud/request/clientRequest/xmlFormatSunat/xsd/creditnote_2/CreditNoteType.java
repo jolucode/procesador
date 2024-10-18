@@ -11,6 +11,7 @@ package service.cloud.request.clientRequest.xmlFormatSunat.xsd.creditnote_2;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.*;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.*;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonextensioncomponents_2.UBLExtensionsType;
+import service.cloud.request.clientRequest.xmlFormatSunat.xsd.invoice_2.InvoiceType;
 
 import javax.xml.bind.annotation.*;
 import java.io.Serializable;
@@ -127,7 +128,7 @@ import java.util.List;
         "creditNoteLine"
 })
 @XmlRootElement(name = "CreditNote")
-public class CreditNoteType implements Serializable {
+public class CreditNoteType implements Serializable, Cloneable {
 
 
     @XmlElement(name = "UBLExtensions", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2")
@@ -1282,4 +1283,12 @@ public class CreditNoteType implements Serializable {
         this.paymentTerms = paymentTerms;
     }
 
+    @Override
+    public CreditNoteType clone() {
+        try {
+            return (CreditNoteType) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // No debería ocurrir
+        }
+    }
 }

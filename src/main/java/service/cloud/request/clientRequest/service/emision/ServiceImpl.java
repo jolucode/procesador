@@ -410,7 +410,8 @@ public class ServiceImpl implements ServiceInterface {
         RetentionType retentionType = null;
         String documentName = "";
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
-        UBLDocumentWRP documentWRP = UBLDocumentWRP.getInstance();
+        //UBLDocumentWRP documentWRP = UBLDocumentWRP.getInstance();
+        UBLDocumentWRP documentWRP = new UBLDocumentWRP();
         String digestValue = "";
         String barcodeValue = "";
         PDFBasicGenerateHandler db = new PDFBasicGenerateHandler();
@@ -571,8 +572,8 @@ public class ServiceImpl implements ServiceInterface {
         log.setThirdPartyRequestXml(new String(signedXmlDocument, StandardCharsets.UTF_8));
 
         /**Guardando el documento xml UBL en DISCO*/
-        String documentPath = fileHandler.storeDocumentInDisk(ublDocument, documentName);
-        logger.info("Documento XML guardado en disco : " + documentPath);
+        //String documentPath = fileHandler.storeDocumentInDisk(ublDocument, documentName);
+        //logger.info("Documento XML guardado en disco : " + documentPath);
 
         String valor = transaction.getTransaccionContractdocrefList().stream()
                 .filter(x -> x.getUsuariocampos().getNombre().equals("pdfadicional"))
@@ -601,6 +602,13 @@ public class ServiceImpl implements ServiceInterface {
 
         // Compress the signedXmlDocument in memory
         DataHandler zipDocument = compressUBLDocumentv2(signedXmlDocument, documentName + ".xml", transaction.getSN_DocIdentidad_Nro(), transaction.getDocIdentidad_Nro());
+        transactionResponse = new TransaccionRespuesta();
+
+        if (client.getPdfBorrador().equals("true")){
+
+            transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
+            saveAllFiles(transactionResponse, documentName, attachmentPath);
+        }
 
         if (null != zipDocument) {
             if (transaction.getFE_Estado().equalsIgnoreCase("N")) {
@@ -628,6 +636,10 @@ public class ServiceImpl implements ServiceInterface {
 
             } else {
                 if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
+                    WSConsumerNew wsConsumers = WSConsumerNew.newInstance(this.docUUID);
+                    wsConsumers.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion, fileHandler, doctype);
+                    StatusResponse response = wsConsumers.getStatus("18ea9d6c-f2cd-47f4-bd34-12b6378b4621", configuracion);
+
                     WSConsumerConsult wsConsumer = WSConsumerConsult.newInstance(this.docUUID);
                     wsConsumer.setConfiguration(configuracion, transaction.getDocIdentidad_Nro());
 
@@ -658,9 +670,7 @@ public class ServiceImpl implements ServiceInterface {
         log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
 
-        if (client.getPdfBorrador().equals("true")){
-            transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
-        }
+
 
         transactionResponse.setIdentificador(documentName);
         transactionResponse.setDigestValue(digestValue);
@@ -676,9 +686,9 @@ public class ServiceImpl implements ServiceInterface {
 
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
         fileHandler.setBaseDirectory(attachmentPath);
-        fileHandler.storeDocumentInDisk(transactionResponse.getXml(), documentName, "xml");
-        fileHandler.storeDocumentInDisk(transactionResponse.getPdf(), documentName, "pdf");
-        fileHandler.storeDocumentInDisk(transactionResponse.getZip(), documentName, "zip");
+        //fileHandler.storeDocumentInDisk(transactionResponse.getXml(), documentName, "xml");
+        fileHandler.storeDocumentInDisk(transactionResponse.getPdfBorrador(), documentName, "pdf");
+        //fileHandler.storeDocumentInDisk(transactionResponse.getZip(), documentName, "zip");
         //fileHandler.storeDocumentInDisk.storeDocumentInDisk(ublDocument, documentName);
     }
 

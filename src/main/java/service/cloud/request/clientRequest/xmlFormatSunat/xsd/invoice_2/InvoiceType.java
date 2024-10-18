@@ -6,6 +6,7 @@
 //
 package service.cloud.request.clientRequest.xmlFormatSunat.xsd.invoice_2;
 
+import service.cloud.request.clientRequest.entity.Transaccion;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.*;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.*;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonextensioncomponents_2.UBLExtensionsType;
@@ -143,7 +144,7 @@ import java.util.List;
         "invoiceLine"
 })
 @XmlRootElement(name = "Invoice")
-public class InvoiceType implements Serializable {
+public class InvoiceType implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -1501,4 +1502,12 @@ public class InvoiceType implements Serializable {
         this.paymentTerms = paymentTerms;
     }
 
+    @Override
+    public InvoiceType clone() {
+        try {
+            return (InvoiceType) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // No debería ocurrir
+        }
+    }
 }

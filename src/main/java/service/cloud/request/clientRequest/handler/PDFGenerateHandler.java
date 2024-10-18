@@ -8,6 +8,10 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.pdf417.encoder.PDF417;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
@@ -655,10 +659,13 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
     } // generateBoletaPDF
 
 
-    public synchronized byte[] generateInvoicePDF(UBLDocumentWRP invoiceType, ConfigData configuracion) throws PDFReportException {
+    public synchronized byte[] generateInvoicePDF(UBLDocumentWRP invoiceTypes, ConfigData configuracions) throws PDFReportException {
         if (logger.isDebugEnabled()) {
             logger.debug("+generateInvoicePDF() [" + "]");
         }
+
+        UBLDocumentWRP invoiceType = invoiceTypes.clone();
+        ConfigData configuracion = configuracions.clone();
         byte[] invoiceInBytes = null;
         try {
             InvoiceObject invoiceObj = new InvoiceObject();
@@ -690,7 +697,6 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
             if (null != invoiceType.getInvoiceType().getNote() && 0 < invoiceType.getInvoiceType().getNote().size()) {
                 invoiceObj.setDueDate(formatDueDate(invoiceType.getTransaccion().getDOC_FechaVencimiento()));
-                //invoiceObj.setDueDate(formatDueDate(invoiceType.getInvoiceType().getNote().get(0).getValue()));
             } else {
                 invoiceObj.setDueDate(formatDueDate(invoiceType.getTransaccion().getDOC_FechaVencimiento()));
             }
@@ -808,11 +814,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             // Cuotas
 
             List<WrapperItemObject> listaItemC = new ArrayList<>();
-
             List<TransaccionCuotas> transaccionCuotas = invoiceType.getTransaccion().getTransaccionCuotas();
-
             DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-
             BigDecimal montoRetencion = (invoiceType.getTransaccion().getMontoRetencion() != null ? invoiceType.getTransaccion().getMontoRetencion() : new BigDecimal("0.0"));
 
             Integer totalCuotas = 0;
@@ -881,12 +884,9 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 baseImponibleRetencion = BigDecimal.ZERO;
             }
             invoiceObj.setBaseImponibleRetencion(baseImponibleRetencion);
-
             // fin Cuotas
 
-
             List<WrapperItemObject> listaItem = new ArrayList<>();
-
             List<TransaccionLineas> transaccionLineas = invoiceType.getTransaccion().getTransaccionLineasList();
             for (TransaccionLineas transaccionLinea : transaccionLineas) {
                 if (logger.isDebugEnabled()) {
@@ -995,19 +995,9 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             invoiceObj.setNuevoCalculo(getCurrency(subtotalValue.add(prepaidAmount.multiply(BigDecimal.ONE.negate()).add(prepaidAmount).subtract(descuento)), currencyCode));
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + "] Extrayendo informacion del CODIGO DE BARRAS.");
-            }
-
             String barcodeValue = generateBarCodeInfoString(invoiceType.getTransaccion().getDocIdentidad_Nro(), invoiceType.getTransaccion().getDOC_Codigo(), invoiceType.getTransaccion().getDOC_Serie(), invoiceType.getTransaccion().getDOC_Numero(), taxTotal, invoiceObj.getIssueDate(), invoiceType.getTransaccion().getDOC_MontoTotal().toString(), invoiceType.getTransaccion().getSN_DocIdentidad_Tipo(), invoiceType.getTransaccion().getSN_DocIdentidad_Nro(), invoiceType.getInvoiceType().getUBLExtensions());
 
-            if (logger.isInfoEnabled()) {
-                logger.info("generateInvoicePDF() [" + "] BARCODE: \n" + barcodeValue);
-            }
-
             // Generar el código QR en memoria
-            InputStream inputStreamPDF;
             String rutaPath = ".." + File.separator + "CodigoQR" + File.separator + "01" + File.separator + invoiceType.getInvoiceType().getID().getValue() + ".png";
             File f = new File(".." + File.separator + "CodigoQR" + File.separator + "01");
             if (!f.exists()) {
@@ -1017,7 +1007,6 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             inputStream = generateQRCode(barcodeValue, rutaPath);
             invoiceObj.setCodeQR(inputStream);
 
-
             ByteArrayOutputStream pdf417OutputStream = new ByteArrayOutputStream();
             generatePDF417Code(barcodeValue, pdf417OutputStream, 200, 200, 1);  // Genera el PDF417 directamente en el OutputStream
             InputStream pdf417InputStream = new ByteArrayInputStream(pdf417OutputStream.toByteArray());  // Convertir OutputStream a InputStream
@@ -1025,34 +1014,125 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             String digestValue = generateDigestValue(invoiceType.getInvoiceType().getUBLExtensions());
 
-            if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + "] VALOR RESUMEN: \n" + digestValue);
-            }
-
             invoiceObj.setDigestValue(digestValue);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
-            }
             Map<String, LegendObject> legendsMap = getaddLeyends(invoiceType.getInvoiceType().getNote());
-
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + "] Colocando el importe en LETRAS.");
-            }
             LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
             invoiceObj.setLetterAmountValue(legendLetters.getLegendValue());
             legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + "] Colocando la lista de LEYENDAS.");
-            }
             invoiceObj.setLegends(getLegendList(legendsMap));
-
             invoiceObj.setResolutionCodeValue(configuracion.getResolutionCode());
 
-            //invoiceInBytes = createInvoicePDF(invoiceObj, configuracion);//PDFInvoiceCreator.getInstance(configuracion.getDocumentReportPath(),configuracion.getLegendSubReportPath() ,configuracion.getPaymentDetailReportPath()).createInvoicePDF(invoiceObj, configuracion);
-            invoiceInBytes = pdfInvoiceCreator.createInvoicePDF(invoiceObj, configuracion);
+            Map<String, Object> cuotasMap = new HashMap<>();
+            cuotasMap.put("M1", invoiceObj.getM1());
+            cuotasMap.put("M2", invoiceObj.getM2());
+            cuotasMap.put("M3", invoiceObj.getM3());
+            cuotasMap.put("C1", invoiceObj.getC1());
+            cuotasMap.put("C2", invoiceObj.getC2());
+            cuotasMap.put("C3", invoiceObj.getC3());
+            cuotasMap.put("F1", invoiceObj.getF1());
+            cuotasMap.put("F2", invoiceObj.getF2());
+            cuotasMap.put("F3", invoiceObj.getF3());
+            cuotasMap.put("totalCuotas", invoiceObj.getTotalCuotas());
+            cuotasMap.put("metodoPago", invoiceObj.getMetodoPago());
+            cuotasMap.put("baseImponibleRetencion", invoiceObj.getBaseImponibleRetencion());
+            cuotasMap.put("porcentajeRetencion", invoiceObj.getPorcentajeRetencion());
+            cuotasMap.put("montoRetencion", invoiceObj.getMontoRetencion());
+            cuotasMap.put("montoPendiente", invoiceObj.getMontoPendiente());
+            //return cuotasMap;
+
+
+            Map<String, Object> parameterMap = new HashMap<>();
+            parameterMap.put(IPDFCreatorConfig.DOCUMENT_IDENTIFIER, invoiceObj.getDocumentIdentifier());
+            parameterMap.put(IPDFCreatorConfig.ISSUE_DATE, invoiceObj.getIssueDate());
+            parameterMap.put(IPDFCreatorConfig.DUE_DATE, invoiceObj.getDueDate());
+            parameterMap.put(IPDFCreatorConfig.CURRENCY_VALUE, invoiceObj.getCurrencyValue());
+            parameterMap.put(IPDFCreatorConfig.OPERATION_TYPE_VALUE, invoiceObj.getFormSap());
+            parameterMap.put(IPDFCreatorConfig.PAYMENT_CONDITION, invoiceObj.getPaymentCondition());
+            parameterMap.put(IPDFCreatorConfig.REMISSION_GUIDE, invoiceObj.getRemissionGuides());
+            parameterMap.put(IPDFCreatorConfig.PORCIGV, invoiceObj.getPorcentajeIGV());
+            parameterMap.put(IPDFCreatorConfig.SENDER_SOCIAL_REASON, invoiceObj.getSenderSocialReason());
+            parameterMap.put(IPDFCreatorConfig.SENDER_RUC, invoiceObj.getSenderRuc());
+            parameterMap.put(IPDFCreatorConfig.SENDER_FISCAL_ADDRESS, invoiceObj.getSenderFiscalAddress());
+            parameterMap.put(IPDFCreatorConfig.SENDER_DEP_PROV_DIST, invoiceObj.getSenderDepProvDist());
+            parameterMap.put(IPDFCreatorConfig.SENDER_CONTACT, invoiceObj.getSenderContact());
+            parameterMap.put(IPDFCreatorConfig.SENDER_MAIL, invoiceObj.getSenderMail());
+            parameterMap.put(IPDFCreatorConfig.SENDER_LOGO_PATH, invoiceObj.getSenderLogo());
+            parameterMap.put(IPDFCreatorConfig.SENDER_TEL, invoiceObj.getTelefono());
+            parameterMap.put(IPDFCreatorConfig.SENDER_TEL_1, invoiceObj.getTelefono_1());
+            parameterMap.put(IPDFCreatorConfig.SENDER_WEB, invoiceObj.getWeb());
+            parameterMap.put(IPDFCreatorConfig.COMMENTS, invoiceObj.getComentarios());
+            parameterMap.put(IPDFCreatorConfig.ANTICIPO_APLICADO, invoiceObj.getAnticipos());
+            parameterMap.put(IPDFCreatorConfig.VALIDEZPDF, invoiceObj.getValidezPDF());
+            parameterMap.put(IPDFCreatorConfig.RECEIVER_SOCIAL_REASON, invoiceObj.getReceiverSocialReason());
+            parameterMap.put(IPDFCreatorConfig.RECEIVER_RUC, invoiceObj.getReceiverRuc());
+            parameterMap.put(IPDFCreatorConfig.RECEIVER_FISCAL_ADDRESS, invoiceObj.getReceiverFiscalAddress());
+            parameterMap.put(IPDFCreatorConfig.PERCENTAGE_PERCEPTION, invoiceObj.getPerceptionPercentage());
+            parameterMap.put(IPDFCreatorConfig.AMOUNT_PERCEPTION, invoiceObj.getPerceptionAmount());
+            parameterMap.put(IPDFCreatorConfig.PORCISC, invoiceObj.getRetentionPercentage());
+            parameterMap.put(IPDFCreatorConfig.PREPAID_AMOUNT_VALUE, invoiceObj.getPrepaidAmountValue());
+            parameterMap.put(IPDFCreatorConfig.SUBTOTAL_VALUE, invoiceObj.getSubtotalValue());
+            parameterMap.put(IPDFCreatorConfig.IGV_VALUE, invoiceObj.getIgvValue());
+            parameterMap.put(IPDFCreatorConfig.ISC_VALUE, invoiceObj.getIscValue());
+            parameterMap.put(IPDFCreatorConfig.AMOUNT_VALUE, invoiceObj.getAmountValue());
+            parameterMap.put(IPDFCreatorConfig.DISCOUNT_VALUE, invoiceObj.getDiscountValue());
+            parameterMap.put(IPDFCreatorConfig.TOTAL_AMOUNT_VALUE, invoiceObj.getTotalAmountValue());
+            parameterMap.put(IPDFCreatorConfig.GRAVADA_AMOUNT_VALUE, invoiceObj.getGravadaAmountValue());
+            parameterMap.put(IPDFCreatorConfig.EXONERADA_AMOUNT_VALUE, invoiceObj.getExoneradaAmountValue());
+            parameterMap.put(IPDFCreatorConfig.INAFECTA_AMOUNT_VALUE, invoiceObj.getInafectaAmountValue());
+            parameterMap.put(IPDFCreatorConfig.NEW_TOTAL_VALUE, invoiceObj.getNuevoCalculo());
+            parameterMap.put(IPDFCreatorConfig.IMPUESTO_BOLSA, invoiceObj.getImpuestoBolsa());
+            parameterMap.put(IPDFCreatorConfig.IMPUESTO_BOLSA_MONEDA, invoiceObj.getImpuestoBolsaMoneda());
+
+            if (StringUtils.isNotBlank(invoiceObj.getGratuitaAmountValue())) {
+                parameterMap.put(IPDFCreatorConfig.GRATUITA_AMOUNT_LABEL, IPDFCreatorConfig.GRATUITA_AMOUNT_LABEL_DSC);
+                parameterMap.put(IPDFCreatorConfig.GRATUITA_AMOUNT_VALUE, invoiceObj.getGratuitaAmountValue());
+            }
+
+            if (configuracion.getImpresionPDF().equalsIgnoreCase("Codigo QR")) {
+                parameterMap.put(IPDFCreatorConfig.CODEQR, invoiceObj.getCodeQR());
+            } else {
+                parameterMap.put(IPDFCreatorConfig.CODEQR, null);
+            }
+
+            if (configuracion.getImpresionPDF().equalsIgnoreCase("PDF 417")) {
+                parameterMap.put(IPDFCreatorConfig.BARCODE_VALUE, invoiceObj.getBarcodeValue());
+            } else {
+                parameterMap.put(IPDFCreatorConfig.BARCODE_VALUE, null);
+            }
+
+            if (configuracion.getImpresionPDF().equalsIgnoreCase("Valor Resumen")) {
+                parameterMap.put(IPDFCreatorConfig.DIGESTVALUE, invoiceObj.getDigestValue());
+            } else {
+                parameterMap.put(IPDFCreatorConfig.DIGESTVALUE, null);
+            }
+
+            parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, invoiceObj.getLetterAmountValue());
+            parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DIR, configuracion.getPaymentDetailReportPath());
+            parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DATASOURCE, new JRBeanCollectionDataSource(invoiceObj.getItemListDynamicC()));
+            parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, configuracion.getLegendSubReportPath());
+            parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(invoiceObj.getLegends()));
+            Map<String, String> legendMap = new HashMap<>();
+            legendMap.put(IPDFCreatorConfig.LEGEND_DOCUMENT_TYPE, IPDFCreatorConfig.LEGEND_INVOICE_DOCUMENT);
+            legendMap.put(IPDFCreatorConfig.RESOLUTION_CODE_VALUE, invoiceObj.getResolutionCodeValue());
+            parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_MAP, legendMap);
+            parameterMap.put(IPDFCreatorConfig.SUBREPORT_CUOTAS_MAP, cuotasMap); // parametros subreporte de cuotas (se pasa como HashMap)
+            parameterMap.put(IPDFCreatorConfig.CAMPOS_USUARIO_CAB, invoiceObj.getInvoicePersonalizacion());
+
+            File invoiceTemplate = new File(configuracion.getDocumentReportPath());
+            if (!invoiceTemplate.isFile()) {
+                throw new FileNotFoundException(IVenturaError.ERROR_401.getMessage());
+            }
+
+            InputStream inputStream2 = new BufferedInputStream(new FileInputStream(invoiceTemplate));
+            JasperDesign iJasperDesign = JRXmlLoader.load(inputStream2);
+            JasperReport iJasperReport = JasperCompileManager.compileReport(iJasperDesign);
+
+            JasperPrint iJasperPrint = JasperFillManager.fillReport(iJasperReport, parameterMap,
+                    new JRBeanCollectionDataSource(invoiceObj.getItemListDynamic()));
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
+            invoiceInBytes = outputStream.toByteArray();
+            
         } catch (PDFReportException e) {
             logger.error("generateInvoicePDF() [" + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
