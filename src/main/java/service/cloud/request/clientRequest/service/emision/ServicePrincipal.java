@@ -36,10 +36,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 
 @RequiredArgsConstructor
@@ -113,6 +110,16 @@ public class ServicePrincipal implements InterfacePrincipal {
             if (tr.getFE_TipoTrans().compareTo("E") == 0) {
                 return "";
             }
+
+            // Determinar prefijo basado en el valor de DOC_Codigo
+            String prefijo;
+            if (Arrays.asList("20", "40").contains(tr.getDOC_Codigo())) {
+                prefijo = "RR-";  // Si DOC_Codigo es 20 o 40, el prefijo es "RR-"
+            } else {
+                prefijo = "RA-";  // Para otros tipos de documentos, el prefijo es "RA-"
+            }
+
+
             TransaccionBaja trb = transaccionBajaRepository.getLastRow();
             LocalDateTime date = LocalDateTime.now();
             Date fecha = Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
@@ -127,7 +134,7 @@ public class ServicePrincipal implements InterfacePrincipal {
                     int numero = Integer.parseInt(fin);
                     numero++;
                     String nuevoId = String.format("%05d", numero);
-                    serie = "RA-" + simpleDateFormat.format(fecha) + "-" + nuevoId;
+                    serie = prefijo + simpleDateFormat.format(fecha) + "-" + nuevoId;
                     tr.setANTICIPO_Id(serie);
 
                     trb.setFecha(Long.valueOf(simpleDateFormat.format(fecha)));
@@ -136,7 +143,7 @@ public class ServicePrincipal implements InterfacePrincipal {
                     transaccionBajaRepository.saveAndFlush(trb);
                 } else {
                     String nuevoId = String.format("%05d", 1);
-                    serie = "RA-" + simpleDateFormat.format(fecha) + "-" + nuevoId;
+                    serie = prefijo + simpleDateFormat.format(fecha) + "-" + nuevoId;
 
                     TransaccionBaja nuevaBaja2 = new TransaccionBaja();
                     nuevaBaja2.setFecha(Long.valueOf(simpleDateFormat.format(fecha)));
@@ -150,7 +157,7 @@ public class ServicePrincipal implements InterfacePrincipal {
                 int numero = 0;
                 numero++;
                 String nuevoId = String.format("%05d", numero);
-                serie = "RA-" + simpleDateFormat.format(fecha) + "-" + nuevoId;
+                serie = prefijo + simpleDateFormat.format(fecha) + "-" + nuevoId;
                 tr.setANTICIPO_Id(serie);
 
                 nuevaBaja.setSerie(serie);

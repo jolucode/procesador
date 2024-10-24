@@ -176,6 +176,7 @@ public class WSConsumerNew {
         try {
             LoggerTrans.getCDThreadLogger().log(Level.INFO, "Verificando conexion a internet...");
 
+
             URL url = new URL("http://www.google.com");
             HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
             urlConn.connect();
@@ -194,8 +195,6 @@ public class WSConsumerNew {
             logger.debug("+sendSummary() [" + this.docUUID + "]");
         }
 
-        validarConnectionInternet();
-
         String ticket = null;
         if (configuracion.getIntegracionWs().equalsIgnoreCase("SUNAT")) {
             ticket = sunatClient.sendSummary(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
@@ -204,9 +203,6 @@ public class WSConsumerNew {
             ticket = oseClient.sendSummary(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("-sendSummary() [" + this.docUUID + "]");
-        }
         return ticket;
     }
 
