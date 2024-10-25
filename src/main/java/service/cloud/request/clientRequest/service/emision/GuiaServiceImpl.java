@@ -179,7 +179,7 @@ public class GuiaServiceImpl implements GuiaInterface {
 
         Object ublDocument = fileHandler.getSignedDocument(signedDocument, transaction.getDOC_Codigo());
 
-        UBLDocumentWRP documentWRP = UBLDocumentWRP.getInstance();
+        UBLDocumentWRP documentWRP = new UBLDocumentWRP();
         documentWRP.setTransaccion(transaction);
         documentWRP.setAdviceType((DespatchAdviceType) ublDocument);
 

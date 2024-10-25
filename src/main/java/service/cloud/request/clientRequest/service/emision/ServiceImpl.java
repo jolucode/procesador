@@ -410,7 +410,7 @@ public class ServiceImpl implements ServiceInterface {
         RetentionType retentionType = null;
         String documentName = "";
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
-        UBLDocumentWRP documentWRP = UBLDocumentWRP.getInstance();
+        UBLDocumentWRP documentWRP = new UBLDocumentWRP();
         String digestValue = "";
         String barcodeValue = "";
         PDFBasicGenerateHandler db = new PDFBasicGenerateHandler(docUUID);
