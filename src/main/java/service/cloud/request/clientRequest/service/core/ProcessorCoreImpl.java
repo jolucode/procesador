@@ -120,7 +120,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
                 /*
                  * Guardar el PDF en DISCO
                  */
-                boolean isPDFOk = fileHandler.storePDFContigenciaDocumentInDisk(pdfBytes, documentName, transaccion.getSN_DocIdentidad_Nro(), transaccion.getDocIdentidad_Nro());
+                boolean isPDFOk = fileHandler.storePDFDocumentInDisk(pdfBytes, documentName, ISunatConnectorConfig.EE_PDF);
                 logger.info("processCDRResponse() [" + this.docUUID + "] El documento PDF fue almacenado en DICO: " + isPDFOk);
             } else {
                 logger.error("processCDRResponse() [" + this.docUUID + "] " + IVenturaError.ERROR_461.getMessage());
