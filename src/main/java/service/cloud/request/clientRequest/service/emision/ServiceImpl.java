@@ -178,11 +178,6 @@ public class ServiceImpl implements ServiceInterface {
             documentPath = fileHandler.storeDocumentInDisk(voidedDocumentType, documentName);
             logger.info("Documento XML guardado en disco : " + documentPath);
         }
-        LoggerTrans.getCDThreadLogger().log(Level.INFO, "[" + this.docUUID + "] Se genero el objeto VoidedDocumentsType de la COMUNICACION DE BAJA.");
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("transactionVoidedDocument() [" + this.docUUID + "] Ruta para los archivos adjuntos: " + attachmentPath);
-        }
 
         SignerHandler signerHandler = SignerHandler.newInstance();
         signerHandler.setConfiguration(certificado, certiPassword, ksType, ksProvider, signerName);
@@ -191,9 +186,6 @@ public class ServiceImpl implements ServiceInterface {
         logger.info("Documento XML firmado correctamente");
 
         DataHandler zipDocument = fileHandler.compressUBLDocument(signedDocument, documentName, transaction.getSN_DocIdentidad_Nro(), transaction.getDocIdentidad_Nro());
-        if (logger.isInfoEnabled()) {
-            logger.info("transactionVoidedDocument() [" + this.docUUID + "] El documento UBL fue convertido a formato ZIP.");
-        }
 
         ConfigData configuracion = ConfigData
                 .builder()
@@ -218,8 +210,6 @@ public class ServiceImpl implements ServiceInterface {
         if (null != zipDocument) {
             WSConsumerNew wsConsumer = WSConsumerNew.newInstance(this.docUUID);
             wsConsumer.setConfiguration(transaction.getDocIdentidad_Nro(), client.getUsuarioSol(), client.getClaveSol(), configuracion, fileHandler, doctype);
-            LoggerTrans.getCDThreadLogger().log(Level.INFO, "[" + this.docUUID + "] Enviando WS sendSummary.");
-
 
             try {
                 /**Generacion ticket en caso no este se genera uno nuevo*/

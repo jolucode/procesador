@@ -194,7 +194,7 @@ public class WSConsumerNew {
             logger.debug("+sendSummary() [" + this.docUUID + "]");
         }
 
-        validarConnectionInternet();
+        //validarConnectionInternet();
 
         String ticket = null;
         if (configuracion.getIntegracionWs().equalsIgnoreCase("SUNAT")) {
@@ -204,9 +204,6 @@ public class WSConsumerNew {
             ticket = oseClient.sendSummary(DocumentNameHandler.getInstance().getZipName(documentName), zipDocument);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("-sendSummary() [" + this.docUUID + "]");
-        }
         return ticket;
     }
 
