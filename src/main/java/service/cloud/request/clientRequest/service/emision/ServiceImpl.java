@@ -106,6 +106,12 @@ public class ServiceImpl implements ServiceInterface {
     @Override
     public TransaccionRespuesta transactionVoidedDocument(Transaccion transaction, String doctype) throws Exception {
 
+        LogDTO log = new LogDTO();
+        log.setRequestDate(DateUtils.formatDateToString(new Date()));
+        log.setRuc(transaction.getDocIdentidad_Nro());
+        log.setBusinessName(transaction.getSN_RazonSocial());
+
+
         if (transaction.getFE_Comentario().isEmpty()) {
             TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
             transactionResponse.setMensaje("Ingresar razón de anulación, y colocar APROBADO y volver a consultar");
@@ -222,6 +228,8 @@ public class ServiceImpl implements ServiceInterface {
                     ticket = transaction.getTicketBaja();
                 }
 
+                log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
+
                 /**Enviamos ticket a Sunat*/
                 if (configuracion.getIntegracionWs().equals("OSE")) {
                     WSConsumer oseConsumer = WSConsumer.newInstance(transaction.getFE_Id());
@@ -258,6 +266,12 @@ public class ServiceImpl implements ServiceInterface {
             }
         }
 
+        log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
+        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
+        log.setSeriesAndCorrelative(documentName);
+        log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
+        log.setResponseDate(DateUtils.formatDateToString(new Date()));
+        log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
         return transactionResponse;
     }
 

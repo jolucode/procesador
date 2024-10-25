@@ -2,6 +2,7 @@ package service.cloud.request.clientRequest.service.emision;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -34,6 +35,7 @@ import service.cloud.request.clientRequest.handler.PDFGenerateHandler;
 import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
+import service.cloud.request.clientRequest.mongo.model.LogDTO;
 import service.cloud.request.clientRequest.prueba.Client;
 import service.cloud.request.clientRequest.prueba.model.ResponseDTO;
 import service.cloud.request.clientRequest.prueba.model.ResponseDTOAuth;
@@ -43,6 +45,7 @@ import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterfac
 import service.cloud.request.clientRequest.utils.CertificateUtils;
 import service.cloud.request.clientRequest.utils.LoggerTrans;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
+import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.TaxTotalType;
@@ -80,12 +83,12 @@ public class GuiaServiceImpl implements GuiaInterface {
     @Override
     public TransaccionRespuesta transactionRemissionGuideDocumentRest(Transaccion transaction, String doctype) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("+transactionRemissionGuideDocument() ["
-                    + this.docUUID + "] DOC_Id: "
-                    + transaction.getDOC_Id() + " DocIdentidad_Nro: "
-                    + transaction.getDocIdentidad_Nro());
-        }
+
+        LogDTO log = new LogDTO();
+        log.setRequestDate(DateUtils.formatDateToString(new Date()));
+        log.setRuc(transaction.getDocIdentidad_Nro());
+        log.setBusinessName(transaction.getSN_RazonSocial());
+
         TransaccionRespuesta transactionResponse = null;
 
         /* Extrayendo la informacion del archivo de configuracion 'config.xml' */
@@ -229,6 +232,7 @@ public class GuiaServiceImpl implements GuiaInterface {
         String barcodeValue = db.generateGuiaBarcodeInfoV2(guia.getID().getValue(), IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE, fecha, BigDecimal.ZERO, BigDecimal.ZERO,
                 guia.getDespatchSupplierParty(), guia.getDeliveryCustomerParty(), guia.getUBLExtensions());
 
+        log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
         if (null != zipDocument) {
             if (transaction.getFE_Estado().equalsIgnoreCase("N")) {
 
@@ -329,6 +333,7 @@ public class GuiaServiceImpl implements GuiaInterface {
             logger.error("transactionRemissionGuideDocument() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_457.getMessage());
             throw new NullPointerException(IVenturaError.ERROR_457.getMessage());
         }
+        log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
         if (logger.isDebugEnabled()) {
             logger.debug("-transactionRemissionGuideDocument() [" + this.docUUID + "]");
         }
@@ -339,6 +344,12 @@ public class GuiaServiceImpl implements GuiaInterface {
         transactionResponse.setDigestValue(digestValue);
         transactionResponse.setBarcodeValue(barcodeValue);
         transactionResponse.setIdentificador(documentName);
+
+        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
+        log.setSeriesAndCorrelative(documentName);
+        log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
+        log.setResponseDate(DateUtils.formatDateToString(new Date()));
+        log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
         return transactionResponse;
     }
 
