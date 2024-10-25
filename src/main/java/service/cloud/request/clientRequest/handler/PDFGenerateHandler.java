@@ -1105,8 +1105,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             InputStream inputStream;
             InputStream inputStreamPDF;
-            String rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "01" + File.separator + invoiceType.getInvoiceType().getID().getValue() + ".png";
-            File f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "01");
+            String rutaPath = ".." + File.separator + "CodigoQR" + File.separator + "01" + File.separator + invoiceType.getInvoiceType().getID().getValue() + ".png";
+            File f = new File(".." + File.separator + "CodigoQR" + File.separator + "01");
             if (!f.exists()) {
                 f.mkdirs();
             }
@@ -1115,8 +1115,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             invoiceObj.setCodeQR(inputStream);
 
-            f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "01");
-            rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "01" + File.separator + invoiceType.getInvoiceType().getID().getValue() + ".png";
+            f = new File(".." + File.separator + "CodigoPDF417" + File.separator + "01");
+            rutaPath = ".." + File.separator + "CodigoPDF417" + File.separator + "01" + File.separator + invoiceType.getInvoiceType().getID().getValue() + ".png";
             if (!f.exists()) {
                 f.mkdirs();
             }
@@ -1429,8 +1429,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             InputStream inputStream;
             InputStream inputStreamPDF;
-            String rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "08" + File.separator + debitNoteType.getDebitNoteType().getID().getValue() + ".png";
-            File f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "08");
+            String rutaPath = ".." + File.separator + "CodigoQR" + File.separator + "08" + File.separator + debitNoteType.getDebitNoteType().getID().getValue() + ".png";
+            File f = new File(".." + File.separator + "CodigoQR" + File.separator + "08");
             if (!f.exists()) {
                 f.mkdirs();
             }
@@ -1443,8 +1443,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             debitNoteObj.setCodeQR(inputStream);
 
-            f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "08");
-            rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + debitNoteType.getDebitNoteType().getID().getValue() + ".png";
+            f = new File(".." + File.separator + "CodigoPDF417" + File.separator + "08");
+            rutaPath = ".." + File.separator + "CodigoPDF417" + File.separator + debitNoteType.getDebitNoteType().getID().getValue() + ".png";
             if (!f.exists()) {
                 f.mkdirs();
             }
@@ -1858,8 +1858,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             InputStream inputStream;
             InputStream inputStreamPDF;
-            String rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "07" + File.separator + creditNoteType.getCreditNoteType().getID().getValue() + ".png";
-            File f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "07");
+            String rutaPath = ".." + File.separator + "CodigoQR" + File.separator + "07" + File.separator + creditNoteType.getCreditNoteType().getID().getValue() + ".png";
+            File f = new File(".." + File.separator + "CodigoQR" + File.separator + "07");
             if (!f.exists()) {
                 f.mkdirs();
             }
@@ -1868,8 +1868,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
             creditNoteObj.setCodeQR(inputStream);
 
-            f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "07");
-            rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "07" + File.separator + creditNoteType.getCreditNoteType().getID().getValue() + ".png";
+            f = new File(".." + File.separator + "CodigoPDF417" + File.separator + "07");
+            rutaPath = ".." + File.separator + "CodigoPDF417" + File.separator + "07" + File.separator + creditNoteType.getCreditNoteType().getID().getValue() + ".png";
             if (!f.exists()) {
                 f.mkdirs();
             }
@@ -2052,8 +2052,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             //     f.mkdirs();
             //}
 
-            File f = new File("Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "09");
-            String rutaPath = "Directorio.ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "09" + File.separator + despatchAdvice.getTransaccion().getDOC_Numero() + ".png";
+            File f = new File(".." + File.separator + "CodigoPDF417" + File.separator + "09");
+            String rutaPath = ".." + File.separator + "CodigoPDF417" + File.separator + "09" + File.separator + despatchAdvice.getTransaccion().getDOC_Numero() + ".png";
             if (!f.exists()) {
                 f.mkdirs();
             }
