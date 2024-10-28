@@ -93,7 +93,7 @@ public class ServiceEmision implements IServiceEmision {
 
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
-        UBLDocumentWRP documentWRP = UBLDocumentWRP.getInstance();
+        UBLDocumentWRP documentWRP = new UBLDocumentWRP();
 
         // Configura la ruta de almacenamiento del archivo
         String attachmentPath = getAttachmentPath(transaction, doctype);

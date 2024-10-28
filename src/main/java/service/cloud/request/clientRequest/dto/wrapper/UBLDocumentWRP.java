@@ -19,7 +19,7 @@ public class UBLDocumentWRP {
      */
     private static UBLDocumentWRP instance = null;
 
-    protected UBLDocumentWRP() {
+    public UBLDocumentWRP() {
 
     }
 
