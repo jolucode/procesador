@@ -212,7 +212,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
         MatrixToImageWriter.writeToFile(matrix, filePath.substring(filePath.lastIndexOf('.') + 1), new File(filePath));
     }
 
-    public byte[] generateRetentionPDF(UBLDocumentWRP retentionType, ConfigData configData) throws PDFReportException {
+    public synchronized byte[] generateRetentionPDF(UBLDocumentWRP retentionType, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
             logger.debug("+generateRetentionPDF() [" + this.docUUID + "]");
         }
@@ -400,7 +400,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
     }
 
-    public byte[] generateBoletaPDF(UBLDocumentWRP boletaType, ConfigData configData) throws PDFReportException {
+    public synchronized byte[] generateBoletaPDF(UBLDocumentWRP boletaType, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
             logger.debug("+generateBoletaPDF() [" + this.docUUID + "]");
         }
@@ -776,7 +776,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
     } // generateBoletaPDF
 
 
-    public byte[] generateInvoicePDF(UBLDocumentWRP invoiceType, ConfigData configuracion) throws PDFReportException {
+    public synchronized byte[] generateInvoicePDF(UBLDocumentWRP invoiceType, ConfigData configuracion) throws PDFReportException {
         if (logger.isDebugEnabled()) {
             logger.debug("+generateInvoicePDF() [" + this.docUUID + "]");
         }
@@ -1271,7 +1271,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
         return invoiceInBytes;
     } // generateInvoicePDF
 
-    public byte[] generateDebitNotePDF(UBLDocumentWRP debitNoteType, List<TransactionTotalesDTO> transactionTotalList, ConfigData configData) throws PDFReportException {
+    public synchronized byte[] generateDebitNotePDF(UBLDocumentWRP debitNoteType, List<TransactionTotalesDTO> transactionTotalList, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
             logger.debug("+generateDebitNotePDF() [" + this.docUUID + "]");
         }
@@ -1609,7 +1609,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
         return debitNoteInBytes;
     } // generateDebitNotePDF
 
-    public byte[] generateCreditNotePDF(UBLDocumentWRP creditNoteType, List<TransactionTotalesDTO> transaccionTotales, ConfigData configData) throws PDFReportException {
+    public synchronized byte[] generateCreditNotePDF(UBLDocumentWRP creditNoteType, List<TransactionTotalesDTO> transaccionTotales, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
             logger.debug("+generateCreditNotePDF() [" + this.docUUID + "]");
         }
@@ -2056,7 +2056,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
         return creditNoteInBytes;
     } // generateCreditNotePDF
 
-    public byte[] generateDespatchAdvicePDF(UBLDocumentWRP despatchAdvice, ConfigData configData) throws PDFReportException {
+    public synchronized byte[] generateDespatchAdvicePDF(UBLDocumentWRP despatchAdvice, ConfigData configData) throws PDFReportException {
 
         if (logger.isDebugEnabled()) {
             logger.debug("+generateDespatchAdvicePDF() [" + this.docUUID + "]");
@@ -2239,7 +2239,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
     }
 
 
-    public byte[] generatePerceptionPDF(UBLDocumentWRP perceptionType, ConfigData configData) throws PDFReportException {
+    public synchronized byte[] generatePerceptionPDF(UBLDocumentWRP perceptionType, ConfigData configData) throws PDFReportException {
         if (logger.isDebugEnabled()) {
             logger.debug("+generateInvoicePDF() [" + this.docUUID + "]");
         }

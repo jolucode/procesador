@@ -245,4 +245,5 @@ public class PDFBoletaCreator extends DocumentCreator {
         return pdfDocument;
     } //createBoletaPDF
 
+
 } //PDFBoletaCreator
