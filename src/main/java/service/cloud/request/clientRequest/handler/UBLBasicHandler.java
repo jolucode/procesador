@@ -1117,35 +1117,6 @@ public abstract class UBLBasicHandler {
                 party.setPhysicalLocation(physicalLocation);
             }
 
-            /* <cac:AccountingCustomerParty><cac:Party><cac:PartyTaxScheme> */
-//            PartyTaxSchemeType partyTaxScheme = new PartyTaxSchemeType();
-//            {
-//                RegistrationNameType registrationName = new RegistrationNameType();
-//                registrationName.setValue(socialReason);
-//                partyTaxScheme.setRegistrationName(registrationName);
-//
-//                CompanyIDType companyID = new CompanyIDType();
-//                companyID.setValue(identifier);
-//                companyID.setSchemeID(identifierType);
-//                companyID.setSchemeAgencyName(IUBLConfig.SCHEME_AGENCY_NAME_PE_SUNAT);
-//                companyID.setSchemeName("Documento de Identidad");
-//                companyID.setSchemeURI(IUBLConfig.URI_CATALOG_06);
-//                partyTaxScheme.setCompanyID(companyID);
-//
-//                AddressType registrationAddress = new AddressType();
-//                AddressTypeCodeType addressTypeCode = new AddressTypeCodeType();
-//                addressTypeCode.setValue(IUBLConfig.ADDRESS_TYPE_CODE_DEFAULT);
-//                registrationAddress.setAddressTypeCode(addressTypeCode);
-//                partyTaxScheme.setRegistrationAddress(registrationAddress);
-//
-//                TaxSchemeType taxScheme = new TaxSchemeType();
-//                IDType id = new IDType();
-//                id.setValue("-");
-//                taxScheme.setID(id);
-//                partyTaxScheme.setTaxScheme(taxScheme);
-//            }
-//            party.getPartyTaxScheme().add(partyTaxScheme);
-
             /* <cac:AccountingCustomerParty><cac:Party><cac:PartyLegalEntity> */
             PartyLegalEntityType partyLegalEntity = new PartyLegalEntityType();
             {
@@ -3186,62 +3157,6 @@ public abstract class UBLBasicHandler {
                 transportHandlingUnit.getMeasurementDimension().add(getMeasurementDimension("02", cEfectivaVehiculoTM));
             }
             consignment.getTransportHandlingUnit().add(transportHandlingUnit);
-
-//            //Punto Origen
-//            PlannedPickupTransportEventType plannedPickupTransportEventType = new PlannedPickupTransportEventType();
-//            LocationType  locationPickup = new LocationType();
-//            IDType iDPickup = new IDType();
-//            iDPickup.setValue("010101");
-//            iDPickup.setSchemeAgencyName("PE:INEI");
-//            iDPickup.setSchemeName("Ubigeos");
-////            AddressType addressType = new AddressType();
-////            
-////            addressType.setID(iDPickup);
-////            locationPickup.setAddress(addressType);
-//            
-//            locationPickup.setID(iDPickup); 
-//            
-//            plannedPickupTransportEventType.setLocation(locationPickup);
-//
-//            //Punto Destino
-//            
-//            PlannedDeliveryTransportEventType plannedDeliveryTransportEventType = new PlannedDeliveryTransportEventType();
-//            LocationType  locationDelivery = new LocationType();
-//            IDType iDDelivery = new IDType();
-//            
-//            iDDelivery.setValue("010103");
-//            iDDelivery.setSchemeAgencyName("PE:INEI");
-//            iDDelivery.setSchemeName("Ubigeos");
-
-
-//            AddressType addressDelivery = new AddressType();
-//            
-//            addressDelivery.setID(iDPickup);
-//            locationDelivery.setAddress(addressDelivery);
-
-//            locationDelivery.setID(iDDelivery);
-//            plannedDeliveryTransportEventType.setLocation(locationDelivery);
-//            
-//           //Descripcion del Tramo
-//            CarrierServiceInstructionsType carrierServiceInstructionsType = new CarrierServiceInstructionsType();
-//            carrierServiceInstructionsType.setValue("Descripcion");
-//            
-//            //Valor Preliminar Referencial virtual
-//            DeliveryTermsType  deliveryTermsVirtual = new DeliveryTermsType();       
-//            AmountType  amountVirtual = new AmountType();
-//            
-//            amountVirtual.setCurrencyID("PEN");
-//            amountVirtual.setValue(BigDecimal.ONE);                  
-//            deliveryTermsVirtual.setAmount(amountVirtual);          
-
-
-            //Insert Consigment
-//            consignmentType.setPlannedPickupTransportEvent(plannedPickupTransportEventType);
-//            consignmentType.setPlannedDeliveryTransportEvent(plannedDeliveryTransportEventType);
-//            consignmentType.setCarrierServiceInstructions(carrierServiceInstructionsType);
-//            consignmentType.setDeliveryTerms(deliveryTermsVirtual);
-
-
             shipment.getConsignment().add(consignment);
         } catch (UBLDocumentException e) {
             logger.error("getShipmentForLine() [" + this.identifier + "] UBLDocumentException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());

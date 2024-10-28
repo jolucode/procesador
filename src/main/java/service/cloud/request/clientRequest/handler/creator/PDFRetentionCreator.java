@@ -82,9 +82,6 @@ public class PDFRetentionCreator extends DocumentCreator {
 
     public static PDFRetentionCreator getInstance(String retentionReportPath,
                                                   String legendSubReportPath) throws PDFReportException {
-        /*if (null == instance) {
-         instance = new PDFRetentionCreator(retentionReportPath,legendSubReportPath);
-         }*/
         instance = new PDFRetentionCreator(retentionReportPath, legendSubReportPath);
         return instance;
     }
@@ -103,13 +100,7 @@ public class PDFRetentionCreator extends DocumentCreator {
         } else {
 
             try {
-                /* Crea instancia del MAP */
                 parameterMap = new HashMap<String, Object>();
-
-                // ================================================================================================
-                // ================================= AGREGANDO INFORMACION AL
-                // MAP =================================
-                // ================================================================================================
                 parameterMap.put(IPDFCreatorConfig.DOCUMENT_IDENTIFIER, retentionObject.getDocumentIdentifier());
                 parameterMap.put(IPDFCreatorConfig.ISSUE_DATE, retentionObject.getIssueDate());
                 if (StringUtils.isNotBlank(retentionObject
@@ -117,7 +108,6 @@ public class PDFRetentionCreator extends DocumentCreator {
                     parameterMap.put(IPDFCreatorConfig.OPERATION_TYPE_LABEL, IPDFCreatorConfig.OPERATION_TYPE_DSC);
                     parameterMap.put(IPDFCreatorConfig.OPERATION_TYPE_VALUE, retentionObject.getSunatTransaction());
                 }
-
                 parameterMap.put(IPDFCreatorConfig.SENDER_SOCIAL_REASON, retentionObject.getSenderSocialReason());
                 parameterMap.put(IPDFCreatorConfig.SENDER_RUC, retentionObject.getSenderRuc());
                 parameterMap.put(IPDFCreatorConfig.SENDER_FISCAL_ADDRESS, retentionObject.getSenderFiscalAddress());
@@ -136,7 +126,6 @@ public class PDFRetentionCreator extends DocumentCreator {
                 parameterMap.put(IPDFCreatorConfig.IMPORTETOTALDOC, retentionObject.getMontoTotalDoc());
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_SOCIAL_REASON, retentionObject.getReceiverSocialReason());
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_RUC, retentionObject.getReceiverRuc());
-
                 parameterMap.put(IPDFCreatorConfig.TOTAL_AMOUNT_VALUE, retentionObject.getTotalAmountValue());
                 parameterMap.put(IPDFCreatorConfig.TOTAL_AMOUNT_VALUE_SOLES, retentionObject.getMontoenSoles());
 
@@ -159,30 +148,6 @@ public class PDFRetentionCreator extends DocumentCreator {
                 }
                 parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, retentionObject.getLetterAmountValue());
 
-                /*
-                 * IMPORTANTE!!
-                 *
-                 * Agregar la ruta del directorio en donde se encuentran los
-                 * sub-reportes en formato (.jasper)
-                 */
-                // parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR,
-                // this.legendSubReportPath);
-                // parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE,
-                // new
-                // JRBeanCollectionDataSource(retentionObject.getLegends()));
-                // Map<String, String> legendMap = new HashMap<String,
-                // String>();
-                // legendMap.put(IPDFCreatorConfig.LEGEND_DOCUMENT_TYPE,
-                // IPDFCreatorConfig.LEGEND_INVOICE_DOCUMENT);
-                // legendMap.put(IPDFCreatorConfig.RESOLUTION_CODE_VALUE,
-                // retentionObject.getResolutionCodeValue());
-                // parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_MAP,
-                // legendMap);
-
-                /*
-                 * Generar el reporte con la informacion de la factura
-                 * electronica
-                 */
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(iJasperReport, parameterMap, new JRBeanCollectionDataSource(retentionObject.getItemListDynamic()));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);

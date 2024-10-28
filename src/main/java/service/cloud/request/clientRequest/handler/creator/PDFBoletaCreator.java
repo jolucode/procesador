@@ -94,9 +94,6 @@ public class PDFBoletaCreator extends DocumentCreator {
      * @throws PDFReportException
      */
     public static PDFBoletaCreator getInstance(String boletaReportPath, String legendSubReportPath) throws PDFReportException {
-        /*if (null == instance) {
-            instance = new PDFBoletaCreator(boletaReportPath, legendSubReportPath);
-        }*/
         instance = new PDFBoletaCreator(boletaReportPath, legendSubReportPath);
         return instance;
     } //getInstance

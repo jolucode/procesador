@@ -94,10 +94,6 @@ public class PDFInvoiceCreator extends DocumentCreator {
      * @throws PDFReportException
      */
     public static PDFInvoiceCreator getInstance(String invoiceReportPath, String legendSubReportPath, String paymentDetailPath) throws PDFReportException {
-        /*if (null == instance) {
-            instance = new PDFInvoiceCreator(invoiceReportPath, legendSubReportPath);
-        }*/
-        //instance = new PDFInvoiceCreator(invoiceReportPath, legendSubReportPath);
         instance = new PDFInvoiceCreator(invoiceReportPath, legendSubReportPath, paymentDetailPath);
         return instance;
     } //getInstance

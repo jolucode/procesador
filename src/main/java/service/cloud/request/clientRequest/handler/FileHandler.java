@@ -36,10 +36,6 @@ public class FileHandler {
     Logger logger = LoggerFactory.getLogger(FileHandler.class);
     private String baseDirectory;
 
-    private final String xmlDirectory = "XML";
-
-    private final String cdrDirectory = "CDR";
-
     private final String pdfDirectory = "PDF";
 
     private final String docUUID;

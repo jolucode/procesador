@@ -85,9 +85,6 @@ public class PDFDespatchAdviceCreator extends DocumentCreator {
      * @throws PDFReportException
      */
     public static PDFDespatchAdviceCreator getInstance(String despatchAdviceReportPath, String legendSubReportPath) throws PDFReportException {
-        /*if (null == instance) {
-         instance = new PDFInvoiceCreator(invoiceReportPath, legendSubReportPath);
-         }*/
         instance = new PDFDespatchAdviceCreator(despatchAdviceReportPath, legendSubReportPath);
         return instance;
     } //getInstance
@@ -112,12 +109,8 @@ public class PDFDespatchAdviceCreator extends DocumentCreator {
             throw new PDFReportException(IVenturaError.ERROR_406);
         } else {
             try {
-                /* Crea instancia del MAP */
-                parameterMap = new HashMap<String, Object>();
 
-                //================================================================================================
-                //================================= AGREGANDO INFORMACION AL MAP =================================
-                //================================================================================================
+                parameterMap = new HashMap<String, Object>();
                 parameterMap.put(IPDFCreatorConfig.CODIGO_EMBARQUE, despatchAdviceObject.getCodigoEmbarque());
                 parameterMap.put(IPDFCreatorConfig.CODIGO_MOTIVO, despatchAdviceObject.getCodigoMotivoTraslado());
                 parameterMap.put(IPDFCreatorConfig.DESCRIPCION_MOTIVO, despatchAdviceObject.getDescripcionMotivoTraslado());
@@ -155,10 +148,7 @@ public class PDFDespatchAdviceCreator extends DocumentCreator {
                 } else {
                     parameterMap.put(IPDFCreatorConfig.CODEQR, null);
                 }
-                /*
-                 * Generar el reporte con la informacion de la factura
-                 * electronica
-                 */
+
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(iJasperReport, parameterMap,
                         new JRBeanCollectionDataSource(despatchAdviceObject.getItemListDynamic()));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
