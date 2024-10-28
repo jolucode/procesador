@@ -1,6 +1,7 @@
 package service.cloud.request.clientRequest.service.emision;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.eclipse.persistence.internal.oxm.ByteArrayDataSource;
 import org.eclipse.persistence.internal.oxm.ByteArraySource;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
 import service.cloud.request.clientRequest.model.Client;
+import service.cloud.request.clientRequest.mongo.model.LogDTO;
 import service.cloud.request.clientRequest.mongo.model.TransaccionBaja;
 import service.cloud.request.clientRequest.mongo.repo.ITransaccionBajaRepository;
 import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
@@ -32,6 +34,7 @@ import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
 import service.cloud.request.clientRequest.utils.*;
 import service.cloud.request.clientRequest.utils.exception.ConfigurationException;
+import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.exception.SignerDocumentException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
@@ -96,6 +99,12 @@ public class ServiceBaja implements IServiceBaja {
     public TransaccionRespuesta transactionVoidedDocument(TransacctionDTO transaction, String doctype) throws Exception {
 
 
+        LogDTO log = new LogDTO();
+        log.setRequestDate(DateUtils.formatDateToString(new Date()));
+        log.setRuc(transaction.getDocIdentidad_Nro());
+        log.setBusinessName(transaction.getSN_RazonSocial());
+
+
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
         String attachmentPath = getAttachmentPath(transaction, doctype);
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
@@ -107,6 +116,7 @@ public class ServiceBaja implements IServiceBaja {
         ConfigData configuracion = createConfigData(client);
         CdrStatusResponse cdrStatusResponse = null;
 
+        String documentName = "";
         try {
 
             if (transaction.getFE_Estado().equals("C")/*!Utils.isNullOrTrimmedEmpty(transaction.getTicket_Baja())*/) {
@@ -118,7 +128,7 @@ public class ServiceBaja implements IServiceBaja {
                     cdrStatusResponse = isunatClientConsult.getStatus(transaction.getDocIdentidad_Nro(), transaction.getTicket_Baja());
                     System.out.println(Arrays.toString(cdrStatusResponse.getContent()));
                 }
-                String documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
+                documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
                 TransaccionRespuesta transaccionRespuesta = processOseResponseBAJA(cdrStatusResponse.getContent(), transaction, fileHandler,documentName, configuracion);
             } else {
                 transaction.setANTICIPO_Id(generarIDyFecha(transaction));
@@ -144,7 +154,7 @@ public class ServiceBaja implements IServiceBaja {
                 byte[] xmlDocument = convertDocumentToBytes(voidedDocumentType);
                 byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
 
-                String documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id());
+                documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id());
                 DataHandler zipDocument = compressUBLDocumentv2(signedXmlDocument, documentName + ".xml");
 
 
@@ -184,6 +194,13 @@ public class ServiceBaja implements IServiceBaja {
             Response.builder().errorCode(e.getMessage()).errorMessage(exceptionProxy.getDescripcion() + " " + exceptionProxy.getDescripcionAdicional().getDescripcion()).build();
             //cdrStatusResponse.setStatusMessage(exceptionProxy.getDescripcion());
         }
+
+        log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
+        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
+        log.setSeriesAndCorrelative(documentName);
+        log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
+        log.setResponseDate(DateUtils.formatDateToString(new Date()));
+        log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
         return transactionResponse;
     }
 

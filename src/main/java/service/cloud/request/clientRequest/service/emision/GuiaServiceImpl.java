@@ -2,6 +2,7 @@ package service.cloud.request.clientRequest.service.emision;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import io.joshworks.restclient.http.HttpResponse;
 import io.joshworks.restclient.http.Unirest;
 import org.apache.commons.codec.binary.Base64;
@@ -25,12 +26,14 @@ import service.cloud.request.clientRequest.handler.document.SignerHandler;
 import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.model.model.ResponseDTO;
 import service.cloud.request.clientRequest.model.model.ResponseDTOAuth;
+import service.cloud.request.clientRequest.mongo.model.LogDTO;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
 import service.cloud.request.clientRequest.utils.CertificateUtils;
 import service.cloud.request.clientRequest.utils.LoggerTrans;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
+import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
 
@@ -63,12 +66,11 @@ public class GuiaServiceImpl implements GuiaInterface {
     @Override
     public TransaccionRespuesta transactionRemissionGuideDocumentRest(TransacctionDTO transaction, String doctype) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("+transactionRemissionGuideDocument() ["
-                    + this.docUUID + "] DOC_Id: "
-                    + transaction.getDOC_Id() + " DocIdentidad_Nro: "
-                    + transaction.getDocIdentidad_Nro());
-        }
+        LogDTO log = new LogDTO();
+        log.setRequestDate(DateUtils.formatDateToString(new Date()));
+        log.setRuc(transaction.getDocIdentidad_Nro());
+        log.setBusinessName(transaction.getSN_RazonSocial());
+
         TransaccionRespuesta transactionResponse = null;
 
         String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
@@ -177,8 +179,8 @@ public class GuiaServiceImpl implements GuiaInterface {
                 .build();
 
         logger.info("Se esta apuntando al ambiente : " + configuracion.getAmbiente() + " - " + configuracion.getIntegracionWs());
-        //if(configuracion.getIntegracionWs().equals("OSE")) logger.info("Url Service: "+ applicationProperties.getUrlOse());
-        //else if(configuracion.getIntegracionWs().equals("SUNAT")) logger.info("Url Service: "+ applicationProperties.getUrlSunat());
+        if(configuracion.getIntegracionWs().equals("OSE")) logger.info("Url Service: "+ applicationProperties.getUrlOse());
+        else if(configuracion.getIntegracionWs().equals("SUNAT")) logger.info("Url Service: "+ applicationProperties.getUrlSunatEmision());
         logger.info("Usuario Sol: " + configuracion.getUserNameSunatSunat());
         logger.info("Clave Sol: " + configuracion.getPasswordSunatSunat());
         logger.info("Client id: " + configuracion.getClientId());
@@ -189,6 +191,7 @@ public class GuiaServiceImpl implements GuiaInterface {
         String barcodeValue = db.generateGuiaBarcodeInfoV2(guia.getID().getValue(), IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE, fecha, BigDecimal.ZERO, BigDecimal.ZERO,
                 guia.getDespatchSupplierParty(), guia.getDeliveryCustomerParty(), guia.getUBLExtensions());
 
+        log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
         if (null != zipDocument) {
             if (transaction.getFE_Estado().equalsIgnoreCase("N")) {
 
@@ -288,6 +291,8 @@ public class GuiaServiceImpl implements GuiaInterface {
             logger.error("transactionRemissionGuideDocument() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_457.getMessage());
             throw new NullPointerException(IVenturaError.ERROR_457.getMessage());
         }
+
+        log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
         if (logger.isDebugEnabled()) {
             logger.debug("-transactionRemissionGuideDocument() [" + this.docUUID + "]");
         }
@@ -299,6 +304,12 @@ public class GuiaServiceImpl implements GuiaInterface {
         transactionResponse.setDigestValue(digestValue);
         transactionResponse.setBarcodeValue(barcodeValue);
         transactionResponse.setIdentificador(documentName);
+
+        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
+        log.setSeriesAndCorrelative(documentName);
+        log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
+        log.setResponseDate(DateUtils.formatDateToString(new Date()));
+        log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
         return transactionResponse;
     }
 
