@@ -20,6 +20,7 @@ import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.mongo.model.TransaccionBaja;
 import service.cloud.request.clientRequest.mongo.repo.ITransaccionBajaRepository;
+import service.cloud.request.clientRequest.mongo.service.ILogService;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
@@ -63,6 +64,9 @@ public class CloudService implements CloudInterface {
     @Autowired
     ITransaccionBajaRepository iTransaccionBajaRepository;
 
+    @Autowired
+    private ILogService logEntryService;
+
     @Override
     public ResponseEntity<RequestPost> proccessDocument(String stringRequestOnpremise) {
         TransacctionDTO[] transacctionDTO = null;
@@ -73,7 +77,7 @@ public class CloudService implements CloudInterface {
         try {
             Gson gson = new Gson();
             transacctionDTO = gson.fromJson(updatedJson, TransacctionDTO[].class);
-            responseProcesor = procesarTransaccion(insertarImpuestoBolsa(transacctionDTO[0]));
+            responseProcesor = procesarTransaccion(insertarImpuestoBolsa(transacctionDTO[0]), stringRequestOnpremise);
 
             System.out.println("*******************************************************************************************************************************************************************************");
         } catch (Exception e) {
@@ -133,40 +137,6 @@ public class CloudService implements CloudInterface {
         return transaccion;
     }
 
-
-    /**
-     * @return la lista de trnsacciones pendientes de envio. Es decir las que
-     * tengan el estado [N]uevo,[C]orregido,[E]nviado
-     */
-
-    /*public RequestPost procesarTransaccion(TransacctionDTO transaccion, String stringRequestOnpremise) throws Exception {
-        RequestPost request = new RequestPost();
-
-        //request.getLogMdb().setRequest(new Gson().toJson(transaccion));
-        logger.info("Documento extraido de la intermedia es : " + transaccion.getDocIdentidad_Nro() + " - " + transaccion.getDOC_Id());
-        try {
-
-            TransaccionRespuesta tr = EnviarTransaccion(transaccion);
-            OnPremiseImpl clientHanaService = new OnPremiseImpl();
-            request = generateDataRequestHana(transaccion, tr);
-            //anexarDocumentos(request);
-            logger.info("Ruc: " + request.getRuc() + " DocObject: " + request.getDocObject() + " DocEntry: " + request.getDocEntry());
-            logger.info("Nombre Documento: " + request.getDocumentName());
-
-            if (request.getResponseRequest() != null && request.getResponseRequest().getServiceResponse() != null) {
-                logger.info("Mensaje Documento: " + request.getResponseRequest().getServiceResponse());
-            }
-
-            //logEntryService.saveLogEntryToMongoDB(convertToEntity(tr.getLogDTO())).subscribe();
-
-            logger.info("Se realizo de manera exitosa la actualizacion del documento :" + transaccion.getFE_Id());
-            logger.info("Se anexo de manera correcta los documentos en SAP");
-            logger.info("===============================================================================");
-        } catch (VenturaExcepcion e) {
-            throw new RuntimeException(e);
-        }
-        return request;
-    }*/
     public int anexarDocumentos(RequestPost request) {
         HttpResponse<String> response = null;
         try {
@@ -184,13 +154,31 @@ public class CloudService implements CloudInterface {
         return response.getStatus();
     }
 
-    public RequestPost procesarTransaccion(TransacctionDTO transaccion) throws Exception {
+    public RequestPost procesarTransaccion(TransacctionDTO transaccion, String requestOnPremise) throws Exception {
         System.out.println("*******************************************************************************************************************************************************************************");
         logger.info("Ruc: " + transaccion.getDocIdentidad_Nro() + " DocObject: " + transaccion.getFE_ObjectType() + " DocEntry: " + transaccion.getFE_DocEntry());
 
         TransaccionRespuesta tr = enviarTransaccion(transaccion);
         RequestPost request = new RequestPost();
         request = generateDataRequestHana(transaccion, tr);
+        anexarDocumentos(request);
+
+        logger.info("Ruc: " + request.getRuc() + " DocObject: " + request.getDocObject() + " DocEntry: " + request.getDocEntry());
+        logger.info("Nombre Documento: " + request.getDocumentName());
+
+        if (request.getResponseRequest() != null && request.getResponseRequest().getServiceResponse() != null) {
+            logger.info("Mensaje Documento: " + request.getResponseRequest().getServiceResponse());
+        }
+
+        if(tr.getLogDTO()!=null) {
+            tr.getLogDTO().setRequest(requestOnPremise);
+            //logEntryService.saveLogEntryToMongoDB(convertToEntity(tr.getLogDTO())).subscribe();
+        }
+
+        logger.info("Se realizo de manera exitosa la actualizacion del documento :" + transaccion.getFE_Id());
+        logger.info("Se anexo de manera correcta los documentos en SAP");
+        logger.info("===============================================================================");
+
         return request;
     }
 
@@ -231,10 +219,11 @@ public class CloudService implements CloudInterface {
             request.setTicketBaja(tr.getTicketRest());
 
 
-            request.setDbName(tc.getDbName());
             request.setUrlOnpremise(providerProperties.getUrlOnpremise(tc.getDocIdentidad_Nro()));
 
             if (tr.getMensaje().contains("ha sido aceptad") || tr.getMensaje().contains("aprobado")) {
+
+                tr.setPdf(tr.getPdfBorrador());
 
                 Map<String, Data.ResponseDocument> listMapDocuments = new HashMap<>();
                 if (tr.getMensaje().contains("Baja")) {

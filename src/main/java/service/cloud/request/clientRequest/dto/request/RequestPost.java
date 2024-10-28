@@ -3,6 +3,7 @@ package service.cloud.request.clientRequest.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import service.cloud.request.clientRequest.dto.response.Data;
+import service.cloud.request.clientRequest.mongo.model.Log;
 
 @lombok.Data
 public class RequestPost {
@@ -22,5 +23,7 @@ public class RequestPost {
     @JsonIgnore
     private String urlOnpremise;
     private String dbName;
+    @JsonIgnore
+    private Log logMdb;
 
 }
