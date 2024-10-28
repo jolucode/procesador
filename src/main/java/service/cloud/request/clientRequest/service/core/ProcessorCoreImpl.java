@@ -10,6 +10,7 @@ import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
+import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.utils.Constants;
@@ -123,7 +124,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
                 /*
                  * Guardar el PDF en DISCO
                  */
-                boolean isPDFOk = fileHandler.storePDFContigenciaDocumentInDisk(pdfBytes, documentName, transaccion.getSN_DocIdentidad_Nro(), transaccion.getDocIdentidad_Nro());
+                boolean isPDFOk = fileHandler.storePDFDocumentInDisk(pdfBytes, documentName, ISunatConnectorConfig.EE_PDF);
                 logger.info("processCDRResponse() [" + this.docUUID + "] El documento PDF fue almacenado en DICO: " + isPDFOk);
             } else {
                 logger.error("processCDRResponse() [" + this.docUUID + "] " + IVenturaError.ERROR_461.getMessage());

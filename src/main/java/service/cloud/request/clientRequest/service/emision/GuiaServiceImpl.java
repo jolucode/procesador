@@ -131,7 +131,7 @@ public class GuiaServiceImpl implements GuiaInterface {
         int dia = fecha2.get(Calendar.DAY_OF_MONTH);
 
         String attachmentPath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() +
-                File.separator + "anexo" + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
+                File.separator + "anexo"  + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
         fileHandler.setBaseDirectory(attachmentPath);
 
         fileHandler.setBaseDirectory(attachmentPath);
