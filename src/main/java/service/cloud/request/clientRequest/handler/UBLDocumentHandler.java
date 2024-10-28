@@ -2296,7 +2296,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             if (logger.isDebugEnabled()) {
                 logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando sumatoria de OTROS CARGOS.");
             }
-            if ((new BigDecimal(transaccion.getDOC_OtrosCargos())).compareTo(BigDecimal.ZERO) > 0) {
+            if (transaccion.getDOC_OtrosCargos() != null &&(new BigDecimal(transaccion.getDOC_OtrosCargos())).compareTo(BigDecimal.ZERO) > 0) {
                 summaryDocumentLine.getAllowanceCharge().add(getAllowanceCharge2(new BigDecimal(transaccion.getDOC_OtrosCargos()), transaccion.getDOC_MON_Codigo(), true));
             }
 
