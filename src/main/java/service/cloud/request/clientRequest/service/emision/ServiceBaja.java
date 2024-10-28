@@ -373,6 +373,14 @@ public class ServiceBaja implements IServiceBaja {
         String serie = "";
         try {
 
+            // Determinar prefijo basado en el valor de DOC_Codigo
+            String prefijo;
+            if (Arrays.asList("20", "40").contains(tr.getDOC_Codigo())) {
+                prefijo = "RR-";  // Si DOC_Codigo es 20 o 40, el prefijo es "RR-"
+            } else {
+                prefijo = "RA-";  // Para otros tipos de documentos, el prefijo es "RA-"
+            }
+
             // Obtener el último registro para la empresa especificada
             TransaccionBaja trb = iTransaccionBajaRepository.findFirstByRucEmpresaOrderByFechaDescIddDesc(tr.getDocIdentidad_Nro()).block();
             LocalDateTime date = LocalDateTime.now();
@@ -383,20 +391,20 @@ public class ServiceBaja implements IServiceBaja {
                 if (fechaActual.equals(fechaUltimoRegistro)) {
                     // Actualizar el último registro
                     String nuevoId = generarNuevoId(trb.getSerie());
-                    serie = Utils.construirSerie(fechaActual, nuevoId);
+                    serie = Utils.construirSerie(prefijo, fechaActual, nuevoId);
 
                     //actualizarRegistro(trb, fechaActual, nuevoId);
                     trb = crearNuevoRegistro(tr.getDocIdentidad_Nro(), trb.getIdd(), fechaActual, serie);
                 } else {
                     // Crear un nuevo registro
-                    serie = Utils.construirSerie(fechaActual, "00001");
+                    serie = Utils.construirSerie(prefijo, fechaActual, "00001");
                     trb.setIdd(0);
                     trb = crearNuevoRegistro(tr.getDocIdentidad_Nro(), trb.getIdd(), fechaActual, serie);
                 }
                 trb.setTicketBaja(tr.getTicket_Baja());
             } else {
                 // Crear el primer registro para la empresa
-                serie = Utils.construirSerie(fechaActual, "00001");
+                serie = Utils.construirSerie(prefijo, fechaActual, "00001");
                 trb = crearNuevoRegistro(tr.getDocIdentidad_Nro(), 0, fechaActual, serie);
             }
 

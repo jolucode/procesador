@@ -84,8 +84,8 @@ public class Utils {
     }
 
 
-    public static String construirSerie(String fecha, String nuevoId) {
-        return "RA-" + fecha + "-" + nuevoId;
+    public static String construirSerie(String prefijo, String fecha, String nuevoId) {
+        return prefijo+"-" + fecha + "-" + nuevoId;
     }
 
 
