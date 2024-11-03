@@ -19,7 +19,7 @@ public class SecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> {
 
     private final Logger logger = Logger.getLogger(SecuritySOAPHandler.class);
 
-    private Consumer consumer;
+    private final Consumer consumer;
 
     private boolean printOption;
 

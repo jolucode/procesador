@@ -9,8 +9,8 @@ import java.util.Optional;
 
 public interface DocumentFormatInterface {
 
-    public byte[] createPDFDocument(UBLDocumentWRP wrp, TransacctionDTO transaction, ConfigData configuracion);
+    byte[] createPDFDocument(UBLDocumentWRP wrp, TransacctionDTO transaction, ConfigData configuracion);
 
-    public Optional<byte[]> unzipResponse(byte[] cdr) throws IOException;
+    Optional<byte[]> unzipResponse(byte[] cdr) throws IOException;
 
 }

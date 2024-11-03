@@ -34,9 +34,8 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
   Logger logger = LoggerFactory.getLogger(DocumentFormatImpl.class);
 
   private final String docUUID = Constants.DOC_UUID;
-  ;
 
-  @Autowired
+    @Autowired
   ProviderProperties providerProperties;
 
   public String rutaRecursoPdf(String ruc, String typeDocument) {

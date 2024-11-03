@@ -155,7 +155,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             }
 
 
-            for (Map<String, String> docRef : transaccion.getTransactionContractDocRefListDTOS()) {
+            /*for (Map<String, String> docRef : transaccion.getTransactionContractDocRefListDTOS()) {
                 if ("texto_amplio".equals(docRef.get("Nombre"))) {
                     String valor = docRef.get("Valor");
                     if (valor != null && !valor.isEmpty()) {
@@ -165,7 +165,25 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                         break;
                     }
                 }
+            }*/
+
+
+            Optional<Map<String, String>> optional = transaccion.getTransactionContractDocRefListDTOS().parallelStream()
+                    .filter(docRef -> docRef.containsKey("texto_amplio")) //
+                    .findAny();
+
+            if (optional.isPresent()) {
+                String value = optional.get().get("texto_amplio"); //
+                if (value != null && !value.isEmpty()) {
+                    NoteType noteType = new NoteType();
+                    noteType.setValue(value);
+                    ublExtension.setNote(noteType);
+                }
             }
+
+
+
+
 
             /* Colocar la informacion en el TAG UBLExtension */
             ExtensionContentType extensionContent = new ExtensionContentType();
@@ -282,25 +300,17 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             /* Agregar <Invoice><cbc:ProfileID> */
             invoiceType.setProfileID(getProfileID(transaction.getTipoOperacionSunat()));
             List<Map<String, String>> transactionContractDocRefListDTOS = transaction.getTransactionContractDocRefListDTOS();
+
             Optional<Map<String, String>> optional = transactionContractDocRefListDTOS.parallelStream()
-                    .filter(docRef -> IUBLConfig.CONTRACT_DOC_REF_SELL_ORDER_CODE.equalsIgnoreCase(docRef.get("Nombre")))
+                    .filter(docRef -> docRef.containsKey("cu01")) // Verifica si el mapa tiene la clave "cu01"
                     .findAny();
 
             if (optional.isPresent()) {
-                Map<String, String> docRef = optional.get();
-                String valor = docRef.get("Valor");
-                if (valor != null) {
-                    invoiceType.getContractDocumentReference().add(getContractDocumentReference(valor, "OC"));
+                String value = optional.get().get("cu01"); // Obtiene el valor de "cu01"
+                if (value != null) {
+                    invoiceType.getContractDocumentReference().add(getContractDocumentReference(value, "OC"));
                 }
             }
-//            if (!transaccionContractdocrefList.isEmpty()) {
-//                for (TransaccionContractdocref transContractdocref : transaccionContractdocrefList) {
-//                    if (logger.isDebugEnabled()) {
-//                        logger.debug("generateInvoiceType() [" + this.identifier + "] CAMPOS PERSONALIZADOS" + transContractdocref.getUsuariocampos().getNombre() + " :" + transContractdocref.getValor());
-//                    }
-//                    invoiceType.getContractDocumentReference().add(getContractDocumentReference(transContractdocref.getValor(), transContractdocref.getUsuariocampos().getNombre()));
-//                }
-//            }
 
             /* Agregar <Invoice><cbc:ID> */
             if (logger.isInfoEnabled()) {
@@ -554,15 +564,17 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             BigDecimal payableAmount = transaction.getDOC_MontoTotal();
             BigDecimal lineExtensionAmount = transaction.getDOC_ImporteTotal();
             String socioDocIdentidad = transaction.getSN_DocIdentidad_Tipo();
-            BigDecimal otrosCargosValue = new BigDecimal(transaction.getDOC_OtrosCargos());
-            String formSap = transaction.getFE_FormSAP();
 
+            BigDecimal otrosCargosValue = transaction.getDOC_OtrosCargos();
+            String formSap = transaction.getFE_FormSAP();
+            System.out.println("*******************************************************************************************************************************************************************************");
             if (socioDocIdentidad.equalsIgnoreCase("0") && formSap.contains("exportacion")) {
                 logger.info("Entro a esta parte de la validacion");
                 lineExtensionAmount = transaction.getDOC_MontoTotal();
                 taxInclusiveAmount = lineExtensionAmount;
-                if (Objects.nonNull(otrosCargosValue)) payableAmount = taxInclusiveAmount.add(otrosCargosValue);
+                if(Objects.nonNull(otrosCargosValue)) payableAmount = taxInclusiveAmount.add(otrosCargosValue);
             }
+
             BigDecimal docDescuentoTotal = transaction.getDOC_DescuentoTotal();
             invoiceType.setLegalMonetaryTotal(getMonetaryTotal(transaction, lineExtensionAmount, taxInclusiveAmount, noContainsFreeItem, otrosCargosValue, transaction.getANTICIPO_Monto(), payableAmount, docDescuentoTotal, transaction.getDOC_MON_Codigo(), true));
             if (logger.isInfoEnabled()) {
@@ -728,7 +740,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             }
             BigDecimal docDescuentoTotal = transaction.getDOC_DescuentoTotal();
             /* Agregar <CreditNote><cac:LegalMonetaryTotal> */
-            creditNoteType.setLegalMonetaryTotal(getMonetaryTotal(transaction, transaction.getDOC_Importe(), transaction.getDOC_SinPercepcion(), false, new BigDecimal(transaction.getDOC_OtrosCargos()), null, transaction.getDOC_MontoTotal(), docDescuentoTotal, transaction.getDOC_MON_Codigo(), false));
+            creditNoteType.setLegalMonetaryTotal(getMonetaryTotal(transaction, transaction.getDOC_Importe(), transaction.getDOC_SinPercepcion(), false, transaction.getDOC_OtrosCargos(), null, transaction.getDOC_MontoTotal(), docDescuentoTotal, transaction.getDOC_MON_Codigo(), false));
             if (logger.isInfoEnabled()) {
                 logger.info("generateCreditNoteType() [" + this.identifier + "] xxxxxxxxxxxxxxxxxxx LegalMonetaryTotal - IMPORTES TOTALES xxxxxxxxxxxxxxxxxxx");
             }
@@ -845,7 +857,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             }
             BigDecimal docDescuentoTotal = transaction.getDOC_DescuentoTotal();
             /* Agregar <DebitNote><cac:RequestedMonetaryTotal> */
-            debitNoteType.setRequestedMonetaryTotal(getMonetaryTotal(transaction, transaction.getDOC_Importe(), transaction.getDOC_SinPercepcion(), false, new BigDecimal(transaction.getDOC_OtrosCargos()), null, transaction.getDOC_MontoTotal(), docDescuentoTotal, transaction.getDOC_MON_Codigo(), false));
+            debitNoteType.setRequestedMonetaryTotal(getMonetaryTotal(transaction, transaction.getDOC_Importe(), transaction.getDOC_SinPercepcion(), false,transaction.getDOC_OtrosCargos(), null, transaction.getDOC_MontoTotal(), docDescuentoTotal, transaction.getDOC_MON_Codigo(), false));
             if (logger.isInfoEnabled()) {
                 logger.info("generateDebitNoteType() [" + this.identifier + "] xxxxxxxxxxxxxxxxxxx RequestedMonetaryTotal - IMPORTES TOTALES xxxxxxxxxxxxxxxxxxx");
             }
@@ -964,7 +976,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 logger.info("generatePerceptionType() [" + this.identifier + "] xxxxxxxxxxxxxxxxxxx SUNATTotalCashed - IMPORTE TOTAL COBRADO xxxxxxxxxxxxxxxxxxx");
             }
             SUNATTotalCashedType sunatTotalCashed = new SUNATTotalCashedType();
-            sunatTotalCashed.setValue(transaction.getImportePagado().setScale(2, BigDecimal.ROUND_HALF_UP));
+            sunatTotalCashed.setValue(transaction.getImportePagado().setScale(2, RoundingMode.HALF_UP));
             sunatTotalCashed.setCurrencyID(CurrencyCodeContentType.valueOf(transaction.getMonedaPagado()).value());
             perceptionType.setSunatTotalCashed(sunatTotalCashed);
 
@@ -1061,7 +1073,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 logger.info("generateRetentionType() [" + this.identifier + "] xxxxxxxxxxxxxxxxxxx SUNATTotalPaid - IMPORTE TOTAL PAGADO xxxxxxxxxxxxxxxxxxx");
             }
             SUNATTotalPaid sunatTotalPaid = new SUNATTotalPaid();
-            sunatTotalPaid.setValue(transaction.getImportePagado().setScale(2, BigDecimal.ROUND_HALF_UP));
+            sunatTotalPaid.setValue(transaction.getImportePagado().setScale(2, RoundingMode.HALF_UP));
             sunatTotalPaid.setCurrencyID(CurrencyCodeContentType.valueOf(transaction.getMonedaPagado()).value());
             retentionType.setTotalPaid(sunatTotalPaid);
 
@@ -1223,9 +1235,9 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         NoteType noteType = new NoteType();
         boolean texto = false;
 
-        List<Map<String, String>> contractdocrefs = transaccion.getTransactionContractDocRefListDTOS();
+        //List<Map<String, String>> contractdocrefs = transaccion.getTransactionContractDocRefListDTOS();
 
-        for (Map<String, String> contractdocref : contractdocrefs) {
+        /*for (Map<String, String> contractdocref : contractdocrefs) {
             if ("guia_comentarios".equalsIgnoreCase(contractdocref.get("nombre"))) {
                 String valor = contractdocref.get("valor");
                 if (valor != null && !valor.isEmpty()) {
@@ -1235,7 +1247,24 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                     break;
                 }
             }
+        }*/
+
+
+        Optional<Map<String, String>> optional = transaccion.getTransactionContractDocRefListDTOS().parallelStream()
+                .filter(docRef -> docRef.containsKey("guia_comentarios")) // Verifica si el mapa tiene la clave "cu01"
+                .findAny();
+
+        if (optional.isPresent()) {
+            String value = optional.get().get("guia_comentarios"); // Obtiene el valor de "cu01"
+            if (value != null && !value.isEmpty()) {
+                noteType.setValue(value);
+                noteTypeList.add(noteType);
+                texto = true;
+            }
         }
+
+
+
 
         return noteTypeList;
     }
@@ -2296,8 +2325,8 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             if (logger.isDebugEnabled()) {
                 logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando sumatoria de OTROS CARGOS.");
             }
-            if (transaccion.getDOC_OtrosCargos() != null &&(new BigDecimal(transaccion.getDOC_OtrosCargos())).compareTo(BigDecimal.ZERO) > 0) {
-                summaryDocumentLine.getAllowanceCharge().add(getAllowanceCharge2(new BigDecimal(transaccion.getDOC_OtrosCargos()), transaccion.getDOC_MON_Codigo(), true));
+            if (transaccion.getDOC_OtrosCargos() != null &&(transaccion.getDOC_OtrosCargos()).compareTo(BigDecimal.ZERO) > 0) {
+                summaryDocumentLine.getAllowanceCharge().add(getAllowanceCharge2(transaccion.getDOC_OtrosCargos(), transaccion.getDOC_MON_Codigo(), true));
             }
 
             summaryDocumentLine.getTaxTotal().add(getTaxTotalForSummary(transaccion.getDOC_ImpuestoTotal(), transaccion.getDOC_MON_Codigo(), IUBLConfig.TAX_TOTAL_IGV_ID, IUBLConfig.TAX_TOTAL_IGV_NAME, IUBLConfig.TAX_TOTAL_IGV_CODE));

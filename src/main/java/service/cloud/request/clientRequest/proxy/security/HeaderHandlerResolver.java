@@ -11,7 +11,7 @@ import java.util.List;
 
 public class HeaderHandlerResolver implements HandlerResolver {
 
-    private Consumer consumer;
+    private final Consumer consumer;
 
     public HeaderHandlerResolver(Consumer consumer) {
         this.consumer = consumer;

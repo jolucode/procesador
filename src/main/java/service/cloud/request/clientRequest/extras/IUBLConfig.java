@@ -28,12 +28,12 @@ public interface IUBLConfig {
         }});
     }};
     ArrayList<BigDecimal> lstImporteIGV = new ArrayList<>();
-    public static final String INSTRUCTION_ID_GRAVADO = "01";
-    public static final String INSTRUCTION_ID_EXONERADO = "02";
-    public static final String INSTRUCTION_ID_INAFECTO = "03";
-    public static final String INSTRUCTION_ID_EXPORTACION = "04";
-    public static final String INSTRUCTION_ID_GRATUITAS = "05";
-    public static final String CUSTOMIZATION_ID1 = "1.1";
+    String INSTRUCTION_ID_GRAVADO = "01";
+    String INSTRUCTION_ID_EXONERADO = "02";
+    String INSTRUCTION_ID_INAFECTO = "03";
+    String INSTRUCTION_ID_EXPORTACION = "04";
+    String INSTRUCTION_ID_GRATUITAS = "05";
+    String CUSTOMIZATION_ID1 = "1.1";
 
 
     /**

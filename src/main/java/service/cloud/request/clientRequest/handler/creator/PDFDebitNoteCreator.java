@@ -31,13 +31,13 @@ public class PDFDebitNoteCreator extends DocumentCreator {
     /* Patron SINGLETON */
     private static PDFDebitNoteCreator instance = null;
 
-    private JasperDesign dnJasperDesign;
+    private final JasperDesign dnJasperDesign;
 
-    private JasperReport dnJasperReport;
+    private final JasperReport dnJasperReport;
 
     private Map<String, Object> parameterMap;
 
-    private String legendSubReportPath;
+    private final String legendSubReportPath;
 
     /**
      * Constructor privado para evitar instancias.
@@ -202,7 +202,7 @@ public class PDFDebitNoteCreator extends DocumentCreator {
                         new JRBeanCollectionDataSource(debitNoteObj.getItemsListDynamic()));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
-                pdfDocument =  outputStream.toByteArray();;
+                pdfDocument =  outputStream.toByteArray();
             } catch (Exception e) {
                 logger.error("createDebitNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
                 logger.error("createDebitNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));

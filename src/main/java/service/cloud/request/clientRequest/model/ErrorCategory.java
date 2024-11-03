@@ -16,10 +16,10 @@ public enum ErrorCategory {
     EXTERNAL_TIMEOUT("external-timeout", 503);
 
     private static final String PROPERTY_PREFIX = "application.atlas.error-code.";
-    private String property;
-    private int httpStatus;
+    private final String property;
+    private final int httpStatus;
 
-    private ErrorCategory(String property, int httpStatus) {
+    ErrorCategory(String property, int httpStatus) {
         this.property = "application.atlas.error-code.".concat(property);
         this.httpStatus = httpStatus;
     }

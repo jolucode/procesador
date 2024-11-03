@@ -9,7 +9,7 @@ public interface IServiceEmision {
 
 
     /**emision*/
-    public TransaccionRespuesta transactionDocument(TransacctionDTO transaction, String doctype) throws Exception;
+    TransaccionRespuesta transactionDocument(TransacctionDTO transaction, String doctype) throws Exception;
 
 
 }

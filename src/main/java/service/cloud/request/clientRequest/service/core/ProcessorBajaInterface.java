@@ -7,7 +7,7 @@ import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 @Component
 public interface ProcessorBajaInterface {
 
-    public TransaccionRespuesta consultVoidedDocument(TransacctionDTO transaction, String doctype) throws Exception ;
+    TransaccionRespuesta consultVoidedDocument(TransacctionDTO transaction, String doctype) throws Exception ;
 
 
 }

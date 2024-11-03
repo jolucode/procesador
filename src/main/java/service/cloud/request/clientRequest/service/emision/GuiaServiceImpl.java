@@ -83,13 +83,28 @@ public class GuiaServiceImpl implements GuiaInterface {
                 break;
             }
         }*/
-        List<Map<String, String>> contractdocrefs = transaction.getTransactionContractDocRefListDTOS();
+        /*List<Map<String, String>> contractdocrefs = transaction.getTransactionContractDocRefListDTOS();
         for (Map<String, String> contractdocref : contractdocrefs) {
             if ("cu31".equalsIgnoreCase(contractdocref.get("nombre"))) {
                 isContingencia = "Si".equalsIgnoreCase(contractdocref.get("valor"));
                 break;
             }
+        }*/
+
+
+        Optional<Map<String, String>> optional = transaction.getTransactionContractDocRefListDTOS().parallelStream()
+                .filter(docRef -> docRef.containsKey("cu31")) //
+                .findAny();
+
+        if (optional.isPresent()) {
+            String value = optional.get().get("cu31"); //
+            if (value != null) {
+                isContingencia = "Si".equalsIgnoreCase(value);
+            }
         }
+
+
+
 
         ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
         validationHandler.checkBasicInformation(

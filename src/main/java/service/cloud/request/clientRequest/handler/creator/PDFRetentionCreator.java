@@ -25,13 +25,13 @@ public class PDFRetentionCreator extends DocumentCreator {
 
     private static PDFRetentionCreator instance = null;
 
-    private JasperDesign iJasperDesign;
+    private final JasperDesign iJasperDesign;
 
-    private JasperReport iJasperReport;
+    private final JasperReport iJasperReport;
 
     private Map<String, Object> parameterMap;
 
-    private String legendSubReportPath;
+    private final String legendSubReportPath;
 
     private PDFRetentionCreator(String retentionReportPath,
                                 String legendSubReportPath) throws PDFReportException {
@@ -151,7 +151,7 @@ public class PDFRetentionCreator extends DocumentCreator {
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(iJasperReport, parameterMap, new JRBeanCollectionDataSource(retentionObject.getItemListDynamic()));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
-                pdfDocument =  outputStream.toByteArray();;
+                pdfDocument =  outputStream.toByteArray();
             } catch (Exception e) {
                 logger.error("createInvoicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
                 logger.error("createInvoicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));

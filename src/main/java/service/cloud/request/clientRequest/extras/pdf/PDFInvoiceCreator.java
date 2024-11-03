@@ -253,7 +253,7 @@ public class PDFInvoiceCreator extends DocumentCreator {
                         new JRBeanCollectionDataSource(invoiceObj.getItemListDynamic()));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
-                pdfDocument =  outputStream.toByteArray();;
+                pdfDocument =  outputStream.toByteArray();
             } catch (Exception e) {
                 logger.error("createInvoicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
                 logger.error("createInvoicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));

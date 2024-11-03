@@ -31,17 +31,17 @@ public class PDFCreditNoteCreator extends DocumentCreator {
     /* Patron SINGLETON */
     private static PDFCreditNoteCreator instance = null;
 
-    private JasperDesign cnJasperDesign;
+    private final JasperDesign cnJasperDesign;
 
-    private JasperReport cnJasperReport;
+    private final JasperReport cnJasperReport;
 
     private Map<String, Object> parameterMap;
 
     private Map<String, Object> cuotasMap;
 
-    private String legendSubReportPath;
+    private final String legendSubReportPath;
 
-    private String paymentDetailReportPath;
+    private final String paymentDetailReportPath;
 
     /**
      * Constructor privado para evitar instancias.
@@ -227,7 +227,7 @@ public class PDFCreditNoteCreator extends DocumentCreator {
                         new JRBeanCollectionDataSource(creditNoteObj.getItemsListDynamic()));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
-                pdfDocument =  outputStream.toByteArray();;
+                pdfDocument =  outputStream.toByteArray();
             } catch (Exception e) {
                 logger.error("createCreditNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
                 logger.error("createCreditNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));

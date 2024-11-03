@@ -6,6 +6,6 @@ import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 public interface GuiaInterface {
 
 
-    public TransaccionRespuesta transactionRemissionGuideDocumentRest(TransacctionDTO transaction, String docType) throws Exception;
+    TransaccionRespuesta transactionRemissionGuideDocumentRest(TransacctionDTO transaction, String docType) throws Exception;
 
 }

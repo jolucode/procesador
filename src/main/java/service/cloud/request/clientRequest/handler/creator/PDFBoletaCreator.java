@@ -33,13 +33,13 @@ public class PDFBoletaCreator extends DocumentCreator {
     /* Patron SINGLETON */
     private static PDFBoletaCreator instance = null;
 
-    private JasperDesign bJasperDesign;
+    private final JasperDesign bJasperDesign;
 
-    private JasperReport bJasperReport;
+    private final JasperReport bJasperReport;
 
     private Map<String, Object> parameterMap;
 
-    private String legendSubReportPath;
+    private final String legendSubReportPath;
 
     /**
      * Constructor privado para evitar instancias.
@@ -229,7 +229,7 @@ public class PDFBoletaCreator extends DocumentCreator {
 
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
-                pdfDocument =  outputStream.toByteArray();;
+                pdfDocument =  outputStream.toByteArray();
             } catch (Exception e) {
                 logger.error("createBoletaPDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
                 logger.error("createBoletaPDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));

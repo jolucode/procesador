@@ -61,7 +61,7 @@ public class TransacctionDTO {
     private String Telefono;
     private String Telefono_1;
     private String ANTICIPO_Nro_Doc_ID;
-    private BigDecimal ANTICIPO_Monto = new BigDecimal("0.0");;
+    private BigDecimal ANTICIPO_Monto = new BigDecimal("0.0");
     private String REFDOC_Tipo;
     private String Web;
     private String SN_DIR_Ubigeo;
@@ -71,7 +71,7 @@ public class TransacctionDTO {
     private String Observacione;
     private String FechaDOCRe;
     private String FechaVenDOCRef;
-    private String DOC_OtrosCargos;
+    private BigDecimal DOC_OtrosCargos;
     private BigDecimal ImporteDOCRef;
     private BigDecimal DOC_Descuento;
     private String DOC_Codigo;

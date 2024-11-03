@@ -87,8 +87,15 @@ public class CloudService implements CloudInterface {
     }
 
     private TransacctionDTO insertarImpuestoBolsa(TransacctionDTO transaccion) {
+
+        transaccion.getTransactionLineasDTOList().forEach(linea -> {
+            if (linea.getItmBolsa() == null || linea.getItmBolsa().isEmpty()) {
+                linea.setItmBolsa("N"); // Asignar 'N' si itmBolsa es null o vacío
+            }
+        });
+
         String impuestoBolsa = "I", itemBolsa = "A";
-        Optional<TransactionLineasDTO> lineasOptional =transaccion.getTransactionLineasDTOList().stream().filter(linea -> linea.getItmBolsa().equals(itemBolsa)).findAny();
+        Optional<TransactionLineasDTO> lineasOptional = transaccion.getTransactionLineasDTOList().stream().filter(linea -> linea.getItmBolsa().equals(itemBolsa)).findAny();
 
         lineasOptional.ifPresent(lineaBolsa -> {
             Optional<TransactionLineasDTO> impuestoBolsaOptional = transaccion.getTransactionLineasDTOList().stream().filter(linea -> linea.getItmBolsa().equals(impuestoBolsa)).findAny();
@@ -161,7 +168,7 @@ public class CloudService implements CloudInterface {
         TransaccionRespuesta tr = enviarTransaccion(transaccion);
         RequestPost request = new RequestPost();
         request = generateDataRequestHana(transaccion, tr);
-        anexarDocumentos(request);
+        //anexarDocumentos(request);
 
         logger.info("Ruc: " + request.getRuc() + " DocObject: " + request.getDocObject() + " DocEntry: " + request.getDocEntry());
         logger.info("Nombre Documento: " + request.getDocumentName());

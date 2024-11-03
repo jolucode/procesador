@@ -9,6 +9,6 @@ public interface IServiceBaja {
 
 
     /**dar de baja*/
-    public TransaccionRespuesta transactionVoidedDocument(TransacctionDTO transaction, String doctype) throws Exception ;
+    TransaccionRespuesta transactionVoidedDocument(TransacctionDTO transaction, String doctype) throws Exception ;
 
 }

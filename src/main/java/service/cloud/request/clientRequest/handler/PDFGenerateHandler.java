@@ -564,7 +564,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             for (int i = 0; i < boletaType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
                 for (int j = 0; j < boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().size(); j++) {
                     if (boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
-                        boletaObj.setPorcentajeISC(boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje().setScale(1, BigDecimal.ROUND_HALF_UP).toString());
+                        boletaObj.setPorcentajeISC(boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje().setScale(1, RoundingMode.HALF_UP).toString());
                         retentionpercentage = boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje();
                         break;
                     }
@@ -572,14 +572,14 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (retentionpercentage == null) {
-                boletaObj.setPorcentajeISC(retentionpercentage.ZERO.toString());
+                boletaObj.setPorcentajeISC(BigDecimal.ZERO.toString());
             }
 
             if (percepctionAmount == null) {
                 boletaObj.setPerceptionAmount(boletaType.getInvoiceType().getDocumentCurrencyCode().getValue() + " 0.00");
             }
             if (perceptionPercentage == null) {
-                boletaObj.setPerceptionPercentage(perceptionPercentage.ZERO.toString());
+                boletaObj.setPerceptionPercentage(BigDecimal.ZERO.toString());
             }
 
             BigDecimal prepaidAmount = null;
@@ -1479,7 +1479,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             for (int i = 0; i < debitNoteType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
                 for (int j = 0; j < debitNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().size(); j++) {
                     if (debitNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
-                        debitNoteObj.setISCPercetange(debitNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje().setScale(1, BigDecimal.ROUND_HALF_UP).toString());
+                        debitNoteObj.setISCPercetange(debitNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje().setScale(1, RoundingMode.HALF_UP).toString());
                         retentionpercentage = debitNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje();
                         break;
                     }
@@ -1487,14 +1487,14 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (retentionpercentage == null) {
-                debitNoteObj.setISCPercetange(retentionpercentage.ZERO.toString());
+                debitNoteObj.setISCPercetange(BigDecimal.ZERO.toString());
             }
 
             if (percepctionAmount == null) {
                 debitNoteObj.setPerceptionAmount(debitNoteType.getDebitNoteType().getDocumentCurrencyCode().getValue() + " 0.00");
             }
             if (perceptionPercentage == null) {
-                debitNoteObj.setPerceptionPercentage(perceptionPercentage.ZERO.toString());
+                debitNoteObj.setPerceptionPercentage(BigDecimal.ZERO.toString());
             }
 
             if (null != debitNoteType.getDebitNoteType().getRequestedMonetaryTotal().getAllowanceTotalAmount() && null != debitNoteType.getDebitNoteType().getRequestedMonetaryTotal().getAllowanceTotalAmount().getValue()) {
@@ -1704,8 +1704,8 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
 
                 itemObjectHash.put("Cuota", transaccionCuota.getCuota().replaceAll("[^0-9]", ""));
                 newlist.add(transaccionCuota.getCuota().replaceAll("[^0-9]", ""));
-                itemObjectHash.put("FechaCuota", df.format(transaccionCuota.getFechaCuota()));
-                newlist.add(df.format(transaccionCuota.getFechaCuota()));
+                itemObjectHash.put("FechaCuota", df.format(DateUtil.parseDate(transaccionCuota.getFechaCuota())));
+                newlist.add(df.format(DateUtil.parseDate(transaccionCuota.getFechaCuota())));
                 itemObjectHash.put("MontoCuota", transaccionCuota.getMontoCuota().toString());
                 newlist.add(transaccionCuota.getMontoCuota().toString());
                 itemObjectHash.put("FormaPago", transaccionCuota.getFormaPago());
@@ -1719,17 +1719,17 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 if (totalCuotas == 1) {
                     metodoPago = transaccionCuota.getFormaPago();
                     m1 = transaccionCuota.getMontoCuota();
-                    f1 = df.format(transaccionCuota.getFechaCuota());
+                    f1 = df.format(DateUtil.parseDate(transaccionCuota.getFechaCuota()));
                     c1 = transaccionCuota.getCuota().replaceAll("[^0-9]", "");
                 }
                 if (totalCuotas == 2) {
                     m2 = transaccionCuota.getMontoCuota();
-                    f2 = df.format(transaccionCuota.getFechaCuota());
+                    f2 = df.format(DateUtil.parseDate(transaccionCuota.getFechaCuota()));
                     c2 = transaccionCuota.getCuota().replaceAll("[^0-9]", "");
                 }
                 if (totalCuotas == 3) {
                     m3 = transaccionCuota.getMontoCuota();
-                    f3 = df.format(transaccionCuota.getFechaCuota());
+                    f3 = df.format(DateUtil.parseDate(transaccionCuota.getFechaCuota()));
                     c3 = transaccionCuota.getCuota().replaceAll("[^0-9]", "");
                 }
             }
@@ -1883,7 +1883,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             for (int i = 0; i < creditNoteType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
                 for (int j = 0; j < creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().size(); j++) {
                     if (creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
-                        creditNoteObj.setISCPercetange(creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje().setScale(1, BigDecimal.ROUND_HALF_UP).toString());
+                        creditNoteObj.setISCPercetange(creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje().setScale(1, RoundingMode.HALF_UP).toString());
                         retentionpercentage = creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getPorcentaje();
                         break;
                     }
@@ -1891,14 +1891,14 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             }
 
             if (retentionpercentage == null) {
-                creditNoteObj.setISCPercetange(retentionpercentage.ZERO.toString());
+                creditNoteObj.setISCPercetange(BigDecimal.ZERO.toString());
             }
 
             if (percepctionAmount == null) {
                 creditNoteObj.setPerceptionAmount(creditNoteType.getCreditNoteType().getDocumentCurrencyCode().getValue() + " 0.00");
             }
             if (perceptionPercentage == null) {
-                creditNoteObj.setPerceptionPercentage(perceptionPercentage.ZERO.toString());
+                creditNoteObj.setPerceptionPercentage(BigDecimal.ZERO.toString());
             }
 
             if (creditNoteType.getCreditNoteType().getID().getValue().startsWith(IUBLConfig.INVOICE_SERIE_PREFIX)) {

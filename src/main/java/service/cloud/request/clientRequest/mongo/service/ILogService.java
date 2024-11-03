@@ -7,7 +7,7 @@ import service.cloud.request.clientRequest.mongo.model.Log;
 public interface ILogService  {
 
 
-  public Mono<Log> saveLogEntryToMongoDB(Log logEntry);
+  Mono<Log> saveLogEntryToMongoDB(Log logEntry);
   Mono<Log> save(Log Log);
 
   Mono<Log> udpate(Log Log, String id);

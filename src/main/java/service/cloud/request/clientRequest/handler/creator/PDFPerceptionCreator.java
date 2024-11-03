@@ -23,13 +23,13 @@ public class PDFPerceptionCreator extends DocumentCreator {
 
     private static PDFPerceptionCreator instance = null;
 
-    private JasperDesign iJasperDesign;
+    private final JasperDesign iJasperDesign;
 
-    private JasperReport iJasperReport;
+    private final JasperReport iJasperReport;
 
     private Map<String, Object> parameterMap;
 
-    private String legendSubReportPath;
+    private final String legendSubReportPath;
 
     private PDFPerceptionCreator(String perceptionReportPath,
                                  String legendSubReportPath) throws PDFReportException {

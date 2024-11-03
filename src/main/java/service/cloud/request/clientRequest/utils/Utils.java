@@ -65,10 +65,8 @@ public class Utils {
 
     public static boolean isRegularDocument(String documentType) {
 
-        if (documentType.equals(IUBLConfig.DOC_RETENTION_CODE)
-                || documentType.equals(IUBLConfig.DOC_PERCEPTION_CODE))
-            return false;
-        else return true;
+        return !documentType.equals(IUBLConfig.DOC_RETENTION_CODE)
+                && !documentType.equals(IUBLConfig.DOC_PERCEPTION_CODE);
     }
 
 
