@@ -9,5 +9,4 @@ public class TransactionTotalesDTO {
     private BigDecimal Monto;
     private String Id;
     private BigDecimal Prcnt;
-
 }

@@ -6,8 +6,6 @@ import java.util.Date;
 
 @Data
 public class PublicardocWs {
-
-
     private String fEId;
     private String rSRuc;
     private String rSDescripcion;
@@ -29,9 +27,6 @@ public class PublicardocWs {
     private String eMailEmisor;
     private Character estadoPublicacion;
     private Date fechaPublicacionPortal;
-
-
-
 }
 
 

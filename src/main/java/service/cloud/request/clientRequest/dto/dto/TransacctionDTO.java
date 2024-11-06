@@ -8,7 +8,6 @@ import java.util.Map;
 
 @Data
 public class TransacctionDTO {
-
     private String dbName;
     private String SN_NombreComercial;
     private String ANTCIPO_Tipo_Doc_ID;
@@ -110,27 +109,15 @@ public class TransacctionDTO {
 
     //private List<TransactionContractDocRefDTO> transactionContractDocRefListDTOS;
     private List<Map<String, String>> transactionContractDocRefListDTOS;
-
     private List<TransactionPropertiesDTO> transactionPropertiesDTOList;
-
     private List<TransactionImpuestosDTO> transactionImpuestosDTOList;
-
     private List<TransactionLineasDTO> transactionLineasDTOList;
-
     private TransactionGuiasDTO transactionGuias;
-
     private List<TransactionCuotasDTO> transactionCuotasDTOList;
-
     private List<TransactionDocReferDTO> transactionDocReferDTOList;
-
     private List<TransactionTotalesDTO> transactionTotalesDTOList;
-
     private List<TransactionComprobantesDTO> transactionComprobantesDTOList;
-
     private List<TransactionActicipoDTO> transactionActicipoDTOList;
-
-
-
 }
 
 

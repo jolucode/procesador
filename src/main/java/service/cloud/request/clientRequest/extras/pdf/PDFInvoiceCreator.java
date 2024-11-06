@@ -23,7 +23,7 @@ import java.util.Map;
  *
  * @author Jose Manuel Lucas Barrera (josemlucasb@gmail.com)
  */
-public class PDFInvoiceCreator extends DocumentCreator {
+public class PDFInvoiceCreator {
 
     private final Logger logger = Logger.getLogger(PDFInvoiceCreator.class);
 
@@ -57,18 +57,9 @@ public class PDFInvoiceCreator extends DocumentCreator {
             if (!invoiceTemplate.isFile()) {
                 throw new FileNotFoundException(IVenturaError.ERROR_401.getMessage());
             }
-
             InputStream inputStream = new BufferedInputStream(new FileInputStream(invoiceTemplate));
-            /* Carga el template .jrxml */
             iJasperDesign = JRXmlLoader.load(inputStream);
-
-            /* Compila el reporte */
             iJasperReport = JasperCompileManager.compileReport(iJasperDesign);
-
-            /*
-             * Guardando en la instancia la ruta del subreporte de
-             * leyendas
-             */
             this.legendSubReportPath = legendSubReportPath;
             this.paymentDetailReportPath = paymentDetailReportPath;
         } catch (FileNotFoundException e) {

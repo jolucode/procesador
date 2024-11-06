@@ -567,7 +567,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
             BigDecimal otrosCargosValue = transaction.getDOC_OtrosCargos();
             String formSap = transaction.getFE_FormSAP();
-            System.out.println("*******************************************************************************************************************************************************************************");
             if (socioDocIdentidad.equalsIgnoreCase("0") && formSap.contains("exportacion")) {
                 logger.info("Entro a esta parte de la validacion");
                 lineExtensionAmount = transaction.getDOC_MontoTotal();

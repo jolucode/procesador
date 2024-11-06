@@ -7,7 +7,6 @@ import service.cloud.request.clientRequest.mongo.model.Log;
 
 @lombok.Data
 public class RequestPost {
-
     private int status;
     private String ruc;
     private String docObject;
@@ -16,7 +15,6 @@ public class RequestPost {
     private String ticketBaja;
     private String digestValue;
     private String barcodeValue;
-
     private String documentName;
     private Data.ResponseRequest responseRequest;
     private Data.Error responseError;

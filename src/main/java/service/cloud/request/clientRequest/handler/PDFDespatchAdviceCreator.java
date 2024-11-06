@@ -13,7 +13,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
-import service.cloud.request.clientRequest.extras.pdf.DocumentCreator;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
 import service.cloud.request.clientRequest.handler.object.DespatchAdviceObject;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
@@ -26,7 +25,7 @@ import java.util.Map;
 /**
  * @author VS-LT-06
  */
-public class PDFDespatchAdviceCreator extends DocumentCreator {
+public class PDFDespatchAdviceCreator {
 
     Logger logger = LoggerFactory.getLogger(PDFDespatchAdviceCreator.class);
 
@@ -49,19 +48,9 @@ public class PDFDespatchAdviceCreator extends DocumentCreator {
             if (!despatchAdviceTemplate.isFile()) {
                 throw new FileNotFoundException(IVenturaError.ERROR_401.getMessage());
             }
-
             InputStream inputStream = new BufferedInputStream(new FileInputStream(despatchAdviceTemplate));
-
-            /* Carga el template .jrxml */
             iJasperDesign = JRXmlLoader.load(inputStream);
-
-            /* Compila el reporte */
             iJasperReport = JasperCompileManager.compileReport(iJasperDesign);
-
-            /*
-             * Guardando en la instancia la ruta del subreporte de
-             * leyendas
-             */
             this.legendSubReportPath = legendSubReportPath;
         } catch (FileNotFoundException e) {
             logger.error("PDFDespatchAdviceCreator() FileNotFoundException - ERROR: " + e.getMessage());

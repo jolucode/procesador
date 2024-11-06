@@ -9,13 +9,8 @@ package service.cloud.request.clientRequest.dto;
  * @author VSUSER
  */
 public class TipoVersionUBL {
-
     public static String factura = null; //
-
     public static String boleta = null; //
-
     public static String notacredito = null; //
-
     public static String notadebito = null; //
-
 }

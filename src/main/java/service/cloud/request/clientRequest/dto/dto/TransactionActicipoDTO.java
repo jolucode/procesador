@@ -9,9 +9,7 @@ public class TransactionActicipoDTO {
     private String DOC_Moneda;
     private BigDecimal Anticipo_Monto;
     private String AntiDOC_Tipo;
-
     private String AntiDOC_Serie_Correlativo;
     private String DOC_Numero;
     private String DOC_Tipo;
-
 }

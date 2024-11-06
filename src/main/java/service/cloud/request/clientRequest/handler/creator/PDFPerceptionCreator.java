@@ -7,7 +7,6 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-import service.cloud.request.clientRequest.extras.pdf.DocumentCreator;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
 import service.cloud.request.clientRequest.handler.object.PerceptionObject;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
@@ -17,7 +16,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PDFPerceptionCreator extends DocumentCreator {
+public class PDFPerceptionCreator {
 
     private final Logger logger = Logger.getLogger(PDFPerceptionCreator.class);
 
@@ -44,19 +43,10 @@ public class PDFPerceptionCreator extends DocumentCreator {
                 throw new FileNotFoundException(
                         IVenturaError.ERROR_401.getMessage());
             }
-
             InputStream inputStream = new BufferedInputStream(
                     new FileInputStream(perceptionTemplate));
-
-            /* Carga el template .jrxml */
             iJasperDesign = JRXmlLoader.load(inputStream);
-
-            /* Compila el reporte */
             iJasperReport = JasperCompileManager.compileReport(iJasperDesign);
-
-            /*
-             * Guardando en la instancia la ruta del subreporte de leyendas
-             */
             this.legendSubReportPath = legendSubReportPath;
         } catch (FileNotFoundException e) {
             logger.error("PDFPerceptionCreator() FileNotFoundException - ERROR: "

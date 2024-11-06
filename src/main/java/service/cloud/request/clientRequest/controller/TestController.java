@@ -36,20 +36,4 @@ public class TestController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-
-    /*@GetMapping
-    public Mono<ResponseEntity<CdrStatusResponse>> emisionDoc() throws Exception {
-
-        String documentRUC = "20552572565";
-        String documentType = "03";
-        String documentSerie = "B001";
-        Integer documentNumber = 932;
-
-        CdrStatusResponse statusResponseOSE = oseClient.getStatusCDR(documentRUC, documentType, documentSerie, documentNumber);
-
-        return Mono.just(ResponseEntity.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(statusResponseOSE))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }*/
 }

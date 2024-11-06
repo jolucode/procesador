@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
-import service.cloud.request.clientRequest.extras.pdf.DocumentCreator;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.handler.object.DebitNoteObject;
@@ -24,7 +23,7 @@ import java.util.Map;
  *
  * @author Jose Manuel Lucas Barrera (josemlucasb@gmail.com)
  */
-public class PDFDebitNoteCreator extends DocumentCreator {
+public class PDFDebitNoteCreator {
 
     private final Logger logger = Logger.getLogger(PDFDebitNoteCreator.class);
 
@@ -55,19 +54,9 @@ public class PDFDebitNoteCreator extends DocumentCreator {
             if (!debitNoteTemplate.isFile()) {
                 throw new FileNotFoundException(IVenturaError.ERROR_404.getMessage());
             }
-
             InputStream inputStream = new BufferedInputStream(new FileInputStream(debitNoteTemplate));
-
-            /* Carga el template .jrxml */
             dnJasperDesign = JRXmlLoader.load(inputStream);
-
-            /* Compila el reporte */
             dnJasperReport = JasperCompileManager.compileReport(dnJasperDesign);
-
-            /*
-             * Guardando en la instancia la ruta del subreporte de
-             * leyendas
-             */
             this.legendSubReportPath = legendSubReportPath;
         } catch (FileNotFoundException e) {
             logger.error("PDFDebitNoteCreator() FileNotFoundException - ERROR: " + e.getMessage());

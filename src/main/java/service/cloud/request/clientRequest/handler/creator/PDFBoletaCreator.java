@@ -9,9 +9,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
-import service.cloud.request.clientRequest.extras.pdf.DocumentCreator;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
-import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.object.legend.BoletaObject;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
@@ -26,7 +24,7 @@ import java.util.Map;
  *
  * @author Jose Manuel Lucas Barrera (josemlucasb@gmail.com)
  */
-public class PDFBoletaCreator extends DocumentCreator {
+public class PDFBoletaCreator {
 
     Logger logger = LoggerFactory.getLogger(PDFBoletaCreator.class);
 
@@ -57,19 +55,9 @@ public class PDFBoletaCreator extends DocumentCreator {
             if (!boletaTemplate.isFile()) {
                 throw new FileNotFoundException(IVenturaError.ERROR_402.getMessage());
             }
-
             InputStream inputStream = new BufferedInputStream(new FileInputStream(boletaTemplate));
-
-            /* Carga el template .jrxml */
             bJasperDesign = JRXmlLoader.load(inputStream);
-
-            /* Compila el reporte */
             bJasperReport = JasperCompileManager.compileReport(bJasperDesign);
-
-            /*
-             * Guardando en la instancia la ruta del subreporte de
-             * leyendas
-             */
             this.legendSubReportPath = legendSubReportPath;
         } catch (FileNotFoundException e) {
             logger.error("PDFBoletaCreator() FileNotFoundException - ERROR: " + e.getMessage());

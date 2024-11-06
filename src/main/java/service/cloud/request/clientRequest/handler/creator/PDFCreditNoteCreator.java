@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
-import service.cloud.request.clientRequest.extras.pdf.DocumentCreator;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.handler.object.CreditNoteObject;
@@ -24,7 +23,7 @@ import java.util.Map;
  *
  * @author Jose Manuel Lucas Barrera (josemlucasb@gmail.com)
  */
-public class PDFCreditNoteCreator extends DocumentCreator {
+public class PDFCreditNoteCreator {
 
     private final Logger logger = Logger.getLogger(PDFCreditNoteCreator.class);
 
@@ -59,19 +58,9 @@ public class PDFCreditNoteCreator extends DocumentCreator {
             if (!creditNoteTemplate.isFile()) {
                 throw new FileNotFoundException(IVenturaError.ERROR_403.getMessage());
             }
-
             InputStream inputStream = new BufferedInputStream(new FileInputStream(creditNoteTemplate));
-
-            /* Carga el template .jrxml */
             cnJasperDesign = JRXmlLoader.load(inputStream);
-
-            /* Compila el reporte */
             cnJasperReport = JasperCompileManager.compileReport(cnJasperDesign);
-
-            /*
-             * Guardando en la instancia la ruta del subreporte de
-             * leyendas
-             */
             this.legendSubReportPath = legendSubReportPath;
             this.paymentDetailReportPath = paymentDetailReportPath;
         } catch (FileNotFoundException e) {

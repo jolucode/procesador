@@ -16,7 +16,6 @@ public class TransactionComprobantesDTO {
     private BigDecimal U_PagoImporteSR;
     private BigDecimal CP_Importe;
     private BigDecimal U_Importe_Pago_Soles;
-
     private String U_DOC_Tipo;
     private String DOC_Numero;
     private String DOC_FechaEmision;
@@ -29,5 +28,4 @@ public class TransactionComprobantesDTO {
     private String TC_MonedaRef;
     private String TC_Fecha;
     private String U_TipoComprobante;
-
 }

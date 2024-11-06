@@ -9,7 +9,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
-import service.cloud.request.clientRequest.extras.pdf.DocumentCreator;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
 import service.cloud.request.clientRequest.handler.object.RetentionObject;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
@@ -19,7 +18,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PDFRetentionCreator extends DocumentCreator {
+public class PDFRetentionCreator {
 
     Logger logger = LoggerFactory.getLogger(PDFRetentionCreator.class);
 
@@ -46,19 +45,10 @@ public class PDFRetentionCreator extends DocumentCreator {
                 throw new FileNotFoundException(
                         IVenturaError.ERROR_401.getMessage());
             }
-
             InputStream inputStream = new BufferedInputStream(
                     new FileInputStream(retentionTemplate));
-
-            /* Carga el template .jrxml */
             iJasperDesign = JRXmlLoader.load(inputStream);
-
-            /* Compila el reporte */
             iJasperReport = JasperCompileManager.compileReport(iJasperDesign);
-
-            /*
-             * Guardando en la instancia la ruta del subreporte de leyendas
-             */
             this.legendSubReportPath = legendSubReportPath;
         } catch (FileNotFoundException e) {
             logger.error("PDFRetentionCreator() FileNotFoundException - ERROR: "

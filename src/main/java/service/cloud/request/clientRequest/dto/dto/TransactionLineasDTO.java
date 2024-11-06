@@ -16,21 +16,16 @@ public class TransactionLineasDTO {
     private String CodUbigeoDestino;
     private String CodProdGS1;
     private String NombreEmbarcacion;
-
     private String NumeroSerie;
-
     private BigDecimal LineaImpuesto;
     private BigDecimal CantidadEspecieVendida;
-
     private String Numeracion;
     private String Descripcion;
     private String CodArticulo;
     private BigDecimal TotalLineaSinIGV;
-
     private String ConfVehicular;
     private BigDecimal CEfectivaVehiculo;
     private BigDecimal ValorPreRef;
-
     private BigDecimal PrecioRef_Monto;
     private BigDecimal ValorRefTM;
     private String LugarDescarga;
@@ -68,9 +63,7 @@ public class TransactionLineasDTO {
     private String U_TipoAfectacion;
     private String U_DSCTO_Monto;
     private Date FechaDescarga;
-
     List<TransactionLineasImpuestoDTO> transactionLineasImpuestoListDTO;
     List<TransactionLineasBillRefDTO> transaccionLineasBillrefListDTO;
     private Map<String, String> transaccionLineasCamposUsuario;
-
 }

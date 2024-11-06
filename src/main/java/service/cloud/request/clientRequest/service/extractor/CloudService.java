@@ -79,7 +79,7 @@ public class CloudService implements CloudInterface {
             transacctionDTO = gson.fromJson(updatedJson, TransacctionDTO[].class);
             responseProcesor = procesarTransaccion(insertarImpuestoBolsa(transacctionDTO[0]), stringRequestOnpremise);
 
-            System.out.println("*******************************************************************************************************************************************************************************");
+            System.out.println("***********************************************************************************************************************************************************************************************************");
         } catch (Exception e) {
             logger.info("SE GENERO UN ERROR : " + e.getMessage());
         }
@@ -162,7 +162,7 @@ public class CloudService implements CloudInterface {
     }
 
     public RequestPost procesarTransaccion(TransacctionDTO transaccion, String requestOnPremise) throws Exception {
-        System.out.println("*******************************************************************************************************************************************************************************");
+        System.out.println("***********************************************************************************************************************************************************************************************************");
         logger.info("Ruc: " + transaccion.getDocIdentidad_Nro() + " DocObject: " + transaccion.getFE_ObjectType() + " DocEntry: " + transaccion.getFE_DocEntry());
 
         TransaccionRespuesta tr = enviarTransaccion(transaccion);
@@ -184,8 +184,6 @@ public class CloudService implements CloudInterface {
 
         logger.info("Se realizo de manera exitosa la actualizacion del documento :" + transaccion.getFE_Id());
         logger.info("Se anexo de manera correcta los documentos en SAP");
-        logger.info("===============================================================================");
-
         return request;
     }
 

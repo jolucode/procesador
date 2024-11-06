@@ -8,7 +8,6 @@ import service.cloud.request.clientRequest.dto.dto.TransactionImpuestosDTO;
 import service.cloud.request.clientRequest.dto.dto.TransactionTotalesDTO;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
-import service.cloud.request.clientRequest.extras.pdf.PDFInvoiceCreator;
 import service.cloud.request.clientRequest.handler.object.item.InvoiceItemObject;
 import service.cloud.request.clientRequest.handler.object.item.RetentionItemObject;
 import service.cloud.request.clientRequest.handler.object.legend.LegendObject;
@@ -35,23 +34,10 @@ public class PDFBasicGenerateHandler {
     /* Identificador del documento */
     protected String docUUID;
 
-
-    /**
-     * Constructor de la clase PDFBasicGenerateHandler.
-     *
-     * @param docUUID UUID identificador de la transaccion.
-     */
     public PDFBasicGenerateHandler(String docUUID) {
         this.docUUID = docUUID;
     } // PDFBasicGenerateHandler
 
-    /**
-     * Este metodo transforma la fecha de emision a String.
-     *
-     * @param xmlGregorianCal La fecha de emision de entrada.
-     * @return Retorna la fecha de emision formateada.
-     * @throws Exception
-     */
     protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
             throws Exception {
         if (logger.isDebugEnabled()) {

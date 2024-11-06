@@ -2265,7 +2265,6 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             perceptionObj.setSenderDepProvDist(formatDepProvDist(perceptionType.getPerceptionType().getAgentParty().getPostalAddress()));
             perceptionObj.setSenderLogo(this.senderLogo);
             perceptionObj.setTelValue(perceptionType.getTransaccion().getTelefono());
-            //perceptionObj.setTel2Value(perceptionType.getTransaccion().getTelefono1());
             perceptionObj.setWebValue(perceptionType.getTransaccion().getWeb());
             perceptionObj.setSenderMail(perceptionType.getTransaccion().getEMail());
 

@@ -1,6 +1,5 @@
 package service.cloud.request.clientRequest.handler;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
@@ -36,36 +35,16 @@ public class FileHandler {
     Logger logger = LoggerFactory.getLogger(FileHandler.class);
     private String baseDirectory;
 
-    private final String pdfDirectory = "PDF";
-
     private final String docUUID;
 
-    /**
-     * Constructor privado para evitar instancias.
-     *
-     * @param docUUID UUID que identifica al documento de la transaccion.
-     */
     private FileHandler(String docUUID) {
         this.docUUID = docUUID;
     } //FileHandler
 
-    /**
-     * Este metodo crea una nueva instancia de la clase FileHandler.
-     *
-     * @param docUUID UUID que identifica al documento de la transaccion.
-     * @return
-     */
     public static synchronized FileHandler newInstance(String docUUID) {
         return new FileHandler(docUUID);
     } //newInstance
 
-    /**
-     * Este metodo guarda el directorio base en el cual se almacenan los
-     * documentos.
-     *
-     * @param directoryPath El directorio base en donde se almacenan los
-     *                      documentos.
-     */
     public void setBaseDirectory(String directoryPath) {
         this.baseDirectory = directoryPath;
         if (logger.isDebugEnabled()) {
@@ -105,14 +84,6 @@ public class FileHandler {
         return documentPath;
     }
 
-    /**
-     * Este metodo guarda el documento UBL en DISCO segun la ruta configurada.
-     *
-     * @param ublDocument  El documento UBL que se almacena.
-     * @param documentName El nombre del documento UBL.
-     * @return Retorna la ubicacion en donde fue guardado el documento.
-     * @throws Exception
-     */
     public String storeDocumentInDisk(Object ublDocument, String documentName) throws Exception {
 
 
@@ -151,16 +122,6 @@ public class FileHandler {
         return documentPath;
     } //storeDocumentInDisk
 
-
-    /**
-     * Este metodo comprime el documento UBL en formato ZIP.
-     *
-     * @param document     El objeto File que contiene la ruta del documento UBL.
-     * @param documentName El nombre del documento UBL.
-     * @return Retorna un objeto MAP que contiene el DataHandler y la ruta del
-     * documento UBL en formato ZIP.
-     * @throws IOException
-     */
     public DataHandler compressUBLDocument(File document, String documentName, String rucCliente, String rucEmpresa) throws IOException {
         if (logger.isDebugEnabled()) {
             logger.debug("+compressUBLDocument() [" + this.docUUID + "]");
@@ -224,14 +185,6 @@ public class FileHandler {
         }
     } //convertFileToBytes
 
-    /**
-     * Este metodo almacena un documento PDF en el DISCO DURO.
-     *
-     * @param pdfBytes     El document PDF en formato bytes.
-     * @param documentName El nombre del documento PDF.
-     * @return Retorna un valor booleano que indica si el documento fue
-     * almacenado o no.
-     */
     public boolean storePDFDocumentInDisk(byte[] pdfBytes, String documentName, String extension) {
         if (logger.isDebugEnabled()) {
             logger.debug("+storePDFDocumentInDisk() [" + this.docUUID + "]");
@@ -239,11 +192,11 @@ public class FileHandler {
         boolean flag = false;
         try {
             String separator = File.separator;
-            File file = new File(this.baseDirectory /*+ separator + this.pdfDirectory + separator + rucEmpresa + separator + rucCliente*/);
+            File file = new File(this.baseDirectory);
             if (!file.exists()) {
                 file.mkdirs();
             }
-            String filePath = this.baseDirectory +/*+ separator + this.pdfDirectory + separator + rucEmpresa + separator + rucCliente + */separator + documentName + extension;
+            String filePath = this.baseDirectory + separator + documentName + extension;
             File newFile = new File(filePath);
             if (!newFile.exists()) {
                 newFile.createNewFile();
@@ -258,48 +211,6 @@ public class FileHandler {
             flag = true;
         } catch (IOException | VenturaExcepcion e) {
             logger.error("storePDFDocumentInDisk() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("+storePDFDocumentInDisk() [" + this.docUUID + "]");
-        }
-        return flag;
-    } //storePDFDocumentInDisk
-
-    /**
-     * Este metodo almacena un documento PDF en el DISCO DURO.
-     *
-     * @param pdfBytes     El document PDF en formato bytes.
-     * @param documentName El nombre del documento PDF.
-     * @return Retorna un valor booleano que indica si el documento fue
-     * almacenado o no.
-     */
-    public boolean storePDFContigenciaDocumentInDisk(byte[] pdfBytes, String documentName, String rucCliente, String rucEmpresa) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+storePDFDocumentInDisk() [" + this.docUUID + "]");
-        }
-        boolean flag = false;
-        try {
-            String separator = File.separator;
-            File file = new File(this.baseDirectory + separator + this.pdfDirectory + separator + rucEmpresa + separator + rucCliente);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            String filePath = file.getAbsolutePath() + separator + documentName + "_Borrador" + ISunatConnectorConfig.EE_PDF;
-            File newFile = new File(filePath);
-            if (!newFile.exists()) {
-                newFile.createNewFile();
-            } else {
-                boolean canWrite = newFile.canWrite();
-                if (!canWrite) {
-                    throw new VenturaExcepcion("No se puede guardar el documento PDF porque est\u00fa siendo usado por otro proceso. Cierre el documento y realice nuevamente el env\u00d3o");
-                }
-            }
-            Path path = Paths.get(filePath);
-            Files.write(path, pdfBytes);
-            flag = true;
-        } catch (Exception e) {
-            logger.error("storePDFDocumentInDisk() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
-            logger.error("storePDFDocumentInDisk() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
         }
         if (logger.isDebugEnabled()) {
             logger.debug("+storePDFDocumentInDisk() [" + this.docUUID + "]");
