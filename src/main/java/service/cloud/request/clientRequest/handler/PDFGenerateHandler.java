@@ -1149,9 +1149,12 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             if (logger.isDebugEnabled()) {
                 logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
             }
-            LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
-            invoiceObj.setLetterAmountValue(legendLetters.getLegendValue());
-            legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
+
+            if(!legendsMap.isEmpty()) {
+                LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
+                invoiceObj.setLetterAmountValue(legendLetters.getLegendValue());
+                legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
+            }
 
             if (logger.isDebugEnabled()) {
                 logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
