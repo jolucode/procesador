@@ -35,7 +35,9 @@ import service.cloud.request.clientRequest.handler.PDFGenerateHandler;
 import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
+import service.cloud.request.clientRequest.mongo.model.GuiaTicket;
 import service.cloud.request.clientRequest.mongo.model.LogDTO;
+import service.cloud.request.clientRequest.mongo.repo.IGuiaTicketRepo;
 import service.cloud.request.clientRequest.prueba.Client;
 import service.cloud.request.clientRequest.prueba.model.ResponseDTO;
 import service.cloud.request.clientRequest.prueba.model.ResponseDTOAuth;
@@ -79,6 +81,9 @@ public class GuiaServiceImpl implements GuiaInterface {
 
     @Autowired
     DocumentFormatInterface documentFormatInterface;
+
+    @Autowired
+    private IGuiaTicketRepo guiaTicketRepo;
 
     @Override
     public TransaccionRespuesta transactionRemissionGuideDocumentRest(Transaccion transaction, String doctype) throws Exception {
@@ -151,7 +156,7 @@ public class GuiaServiceImpl implements GuiaInterface {
         int dia = fecha2.get(Calendar.DAY_OF_MONTH);
 
         String attachmentPath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() +
-                File.separator + "anexo"  + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
+                File.separator + "anexo" + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
         fileHandler.setBaseDirectory(attachmentPath);
         if (logger.isDebugEnabled()) {
             logger.debug("transactionCreditNoteDocument() [" + this.docUUID + "] Ruta para los archivos adjuntos: " + attachmentPath);
@@ -220,8 +225,10 @@ public class GuiaServiceImpl implements GuiaInterface {
                 .build();
 
         logger.info("Se esta apuntando al ambiente : " + configuracion.getAmbiente() + " - " + configuracion.getIntegracionWs());
-        if(configuracion.getIntegracionWs().equals("OSE")) logger.info("Url Service: "+ applicationProperties.getUrlOse());
-        else if(configuracion.getIntegracionWs().equals("SUNAT")) logger.info("Url Service: "+ applicationProperties.getUrlSunat());
+        if (configuracion.getIntegracionWs().equals("OSE"))
+            logger.info("Url Service: " + applicationProperties.getUrlOse());
+        else if (configuracion.getIntegracionWs().equals("SUNAT"))
+            logger.info("Url Service: " + applicationProperties.getUrlSunat());
         logger.info("Usuario Sol: " + configuracion.getUserNameSunatSunat());
         logger.info("Clave Sol: " + configuracion.getPasswordSunatSunat());
         logger.info("Client id: " + configuracion.getClientId());
@@ -236,97 +243,102 @@ public class GuiaServiceImpl implements GuiaInterface {
         if (null != zipDocument) {
             if (transaction.getFE_Estado().equalsIgnoreCase("N")) {
 
-                ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
+                GuiaTicket ticketMongoSave = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
+                        transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
+                ).block();
 
-                if (responseDTOJWT.getStatusCode() == 400 || responseDTOJWT.getStatusCode() == 401) {
-                    return generateResponseRest(documentWRP, responseDTOJWT);
-                }
+                if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty()) {
+                    String ticketToUse = ticketMongoSave.getTicketSunat();
 
-                //DECLARE
-                ResponseDTO responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
 
-                //DECLARE
-                if (responseDTO.getStatusCode() == 401) {
-                    responseDTOJWT = getJwtSunat(configuracion);
-                    responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
-                }
+                    if (ticketToUse != null && !ticketToUse.isEmpty()) {
+                        // Consultar ticket en SUNAT
+                        ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
 
-                //sendQR(transaction.getDOCCodigo(), documentWRP);
-                Thread.sleep(5000);
+                        // Manejar respuestas de SUNAT
+                        transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, signedDocument, fileHandler,
+                                documentName, transaction, configuracion);
 
-                //CONSULT
-                responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-                if (responseDTO.getStatusCode() == 401) {
-                    responseDTOJWT = getJwtSunat(configuracion);
-                    responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-                }
+                        if (transactionResponse != null) {
+                            byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
+                            transactionResponse.setXml(documentBytes);
+                        }
+                    }
 
-                int contador = 0;
-                while (responseDTO.getCodRespuesta().equals("98")) {
-                    Thread.sleep(5000);
-                    if (contador == 5) break;
-                    responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-                    contador++;
-                }
 
-                //EXTRAER ZIP
-                if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("0")) {
-                    transactionResponse = generateResponseRest(documentWRP, responseDTO);
-
-                    byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null, signedDocument, fileHandler, documentName,
-                            transaction.getDOC_Codigo(), documentWRP, transaction, configuracion);
-                    transactionResponse.setPdf(pdf);
-
-                    //AGREGAR A SAP CAMPO
-                    logger.info("CODIGO TIKCET GUIAS SUNAT - [0]" + responseDTO.getNumTicket());
-                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
-
-                } else if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("98")) {
-                    logger.info("CODIGO TIKCET GUIAS SUNAT - [98]" + responseDTO.getNumTicket());
-                    transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
-                } else if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("99")) {
-                    transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
-                }
-                byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
-                transactionResponse.setXml(documentBytes);
-
-            } else if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
-
-                if (transaction.getTransaccionGuiaRemision().getTicketRest() != null && !transaction.getTransaccionGuiaRemision().getTicketRest().isEmpty()) {
-
-                    //CONSULT
+                } else {
                     ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
 
-                    ResponseDTO responseDTO = consult(transaction.getTransaccionGuiaRemision().getTicketRest(), responseDTOJWT.getAccess_token());
+
+
+
+                    if (responseDTOJWT.getStatusCode() == 400 || responseDTOJWT.getStatusCode() == 401) {
+                        return generateResponseRest(documentWRP, responseDTOJWT);
+                    }
+
+                    //DECLARE
+                    ResponseDTO responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
+                    //GUARDAR EN BASE DATOS
+                    saveTicketRest(transaction, responseDTO);
+
+
+                    //DECLARE
+                    if (responseDTO.getStatusCode() == 401) {
+                        responseDTOJWT = getJwtSunat(configuracion);
+                        responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
+                    }
+
+                    //sendQR(transaction.getDOCCodigo(), documentWRP);
+                    Thread.sleep(5000);
+
+                    //CONSULT
+                    responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
                     if (responseDTO.getStatusCode() == 401) {
                         responseDTOJWT = getJwtSunat(configuracion);
                         responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
                     }
 
-                    if (responseDTO.getStatusCode() == 400 || responseDTO.getStatusCode() == 404) {
-                        return generateResponseRest(documentWRP, responseDTO);
+                    int contador = 0;
+                    while (responseDTO.getCodRespuesta().equals("98")) {
+                        Thread.sleep(5000);
+                        if (contador == 5) break;
+                        responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
+                        contador++;
                     }
 
+                    //EXTRAER ZIP
+                    // Manejar respuestas de SUNAT
+                    transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, signedDocument, fileHandler,
+                            documentName, transaction, configuracion);
 
-                    //responseDTO.setCodRespuesta("0");
-                    if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("0")) {
-                        transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                        byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null, signedDocument, fileHandler, documentName,
-                                transaction.getDOC_Codigo(), documentWRP, transaction, configuracion);
-                        transactionResponse.setPdf(pdf);
-
-                        //AGREGAR A SAP CAMPO
-                        transactionResponse.setTicketRest(responseDTO.getNumTicket());
-                    } else if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("98")) {
-                        transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                    } else if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("99")) {
-                        transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                    }
                     byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
+                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
                     transactionResponse.setXml(documentBytes);
 
+                }
+
+            } else if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
+
+                GuiaTicket ticketMongoSave = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
+                        transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
+                ).block(); // Bloquea y espera el resultado sincrónicamente
+
+                String ticketToUse = (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty())
+                        ? ticketMongoSave.getTicketSunat()
+                        : transaction.getTransaccionGuiaRemision().getTicketRest();
+
+                if (ticketToUse != null && !ticketToUse.isEmpty()) {
+                    // Consultar ticket en SUNAT
+                    ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
+
+                    // Manejar respuestas de SUNAT
+                    transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, signedDocument, fileHandler,
+                            documentName, transaction, configuracion);
+
+                    if (transactionResponse != null) {
+                        byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
+                        transactionResponse.setXml(documentBytes);
+                    }
                 }
             }
         } else {
@@ -338,7 +350,7 @@ public class GuiaServiceImpl implements GuiaInterface {
             logger.debug("-transactionRemissionGuideDocument() [" + this.docUUID + "]");
         }
 
-        if (client.getPdfBorrador().equals("true")){
+        if (client.getPdfBorrador().equals("true")) {
             transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
         }
         transactionResponse.setDigestValue(digestValue);
@@ -492,103 +504,55 @@ public class GuiaServiceImpl implements GuiaInterface {
         return transactionResponse;
     }
 
-
-    public String generateBarCodeInfoString(String RUC_emisor_electronico,
-                                            String documentType, String serie,
-                                            String correlativo, List<TaxTotalType> taxTotalList,
-                                            String issueDate, String Importe_total_venta,
-                                            String Tipo_documento_adquiriente, String Numero_documento_adquiriente,
-                                            UBLExtensionsType ublExtensions) throws PDFReportException {
-        String barcodeValue = "";
-        try {
-
-            String digestValue = getDigestValue(ublExtensions);
-            String Sumatoria_IGV = getTaxTotalValueV21(taxTotalList).toString();
-            barcodeValue = MessageFormat.format(IPDFCreatorConfig.BARCODE_PATTERN, RUC_emisor_electronico,
-                    documentType, serie, correlativo, Sumatoria_IGV, Importe_total_venta, issueDate,
-                    Tipo_documento_adquiriente, Numero_documento_adquiriente, digestValue);
-
-        } catch (PDFReportException e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
-                    + e.getError().getId() + "-" + e.getError().getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
-                    + IVenturaError.ERROR_418.getMessage());
-            throw new PDFReportException(IVenturaError.ERROR_418);
-        }
-
-        return barcodeValue;
+    public void saveTicketRest(Transaccion transaccion, ResponseDTO responseDTO) {
+        GuiaTicket guiaTicket = new GuiaTicket();
+        guiaTicket.setRucEmisor(transaccion.getDocIdentidad_Nro());
+        guiaTicket.setFeId(transaccion.getFE_Id());
+        guiaTicket.setTicketSunat(responseDTO.getNumTicket());
+        guiaTicketRepo.save(guiaTicket).subscribe();
     }
 
-    private String getDigestValue(UBLExtensionsType ublExtensions)
-            throws PDFReportException, Exception {
-        String digestValue = null;
-        try {
-            int lastIndex = ublExtensions.getUBLExtension().size() - 1;
-            UBLExtensionType ublExtension = ublExtensions.getUBLExtension()
-                    .get(lastIndex);
+    private ResponseDTO consultarTicketEnSunat(String ticket, ConfigData configuracion) throws IOException {
+        ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
+        ResponseDTO responseDTO = consult(ticket, responseDTOJWT.getAccess_token());
 
-            NodeList nodeList = ublExtension.getExtensionContent().getAny()
-                    .getElementsByTagName(IUBLConfig.UBL_DIGESTVALUE_TAG);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i).getNodeName()
-                        .equalsIgnoreCase(IUBLConfig.UBL_DIGESTVALUE_TAG)) {
-                    digestValue = nodeList.item(i).getTextContent();
-                    break;
-                }
-            }
-
-            if (StringUtils.isBlank(digestValue)) {
-                throw new PDFReportException(IVenturaError.ERROR_423);
-            }
-        } catch (PDFReportException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("getDigestValue() Exception -->" + e.getMessage());
-            throw e;
-        }
-        return digestValue;
-    } // getDigestValue
-
-    protected BigDecimal getTaxTotalValueV21(List<TaxTotalType> taxTotalList) {
-
-        if (taxTotalList != null) {
-            for (int i = 0; i < taxTotalList.size(); i++) {
-                for (int j = 0; j < taxTotalList.get(i).getTaxSubtotal().size(); j++) {
-                    if (taxTotalList.get(i).getTaxSubtotal().get(j).getTaxCategory().getTaxScheme().getID().getValue().equalsIgnoreCase("1000")) {
-                        return taxTotalList.get(i).getTaxAmount().getValue();
-                    }
-                }
-
-            }
+        if (responseDTO.getStatusCode() == 401) {
+            // Renovar token y volver a intentar
+            responseDTOJWT = getJwtSunat(configuracion);
+            responseDTO = consult(ticket, responseDTOJWT.getAccess_token());
         }
 
-        return BigDecimal.ZERO;
+        return responseDTO;
     }
 
-    public static InputStream generateQRCode(String qrCodeData, String filePath) {
-
-        try {
-
-            String charset = "utf-8"; // or "ISO-8859-1"
-            Map hintMap = new HashMap();
-
-            hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.Q);
-            createQRCode(qrCodeData, filePath, charset, hintMap, 200, 200);
-
-            FileInputStream fis = new FileInputStream(filePath);
-            InputStream is = fis;
-            return is;
-
-        } catch (WriterException | IOException ex) {
-            java.util.logging.Logger.getLogger(PDFGenerateHandler.class.getName()).log(Level.SEVERE, null, ex);
+    private TransaccionRespuesta manejarRespuestaSunat(ResponseDTO responseDTO, UBLDocumentWRP documentWRP,
+                                                       File signedDocument, FileHandler fileHandler,
+                                                       String documentName, Transaccion transaction,
+                                                       ConfigData configuracion) {
+        if (responseDTO.getStatusCode() == 400 || responseDTO.getStatusCode() == 404) {
+            return generateResponseRest(documentWRP, responseDTO);
         }
+
+        if (responseDTO.getCodRespuesta() != null) {
+            switch (responseDTO.getCodRespuesta()) {
+                case "0":
+                    TransaccionRespuesta transactionResponse = generateResponseRest(documentWRP, responseDTO);
+                    byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null, signedDocument, fileHandler,
+                            documentName, transaction.getDOC_Codigo(), documentWRP, transaction, configuracion);
+                    transactionResponse.setPdf(pdf);
+                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
+                    return transactionResponse;
+
+                case "98":
+                case "99":
+                    return generateResponseRest(documentWRP, responseDTO);
+
+                default:
+                    return null;
+            }
+        }
+
         return null;
     }
 
-    public static void createQRCode(String qrCodeData, String filePath, String charset, Map hintMap, int qrCodeheight, int qrCodewidth) throws WriterException, IOException {
-        BitMatrix matrix = new MultiFormatWriter().encode(new String(qrCodeData.getBytes(charset), charset), BarcodeFormat.QR_CODE, qrCodewidth, qrCodeheight, hintMap);
-        MatrixToImageWriter.writeToFile(matrix, filePath.substring(filePath.lastIndexOf('.') + 1), new File(filePath));
-    }
 }
