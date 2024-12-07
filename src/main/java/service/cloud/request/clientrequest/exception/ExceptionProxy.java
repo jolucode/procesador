@@ -1,0 +1,24 @@
+package service.cloud.request.clientrequest.exception;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ExceptionProxy {
+    private String traza;
+    private String descripcion;
+
+    @JsonProperty("descripcion-adicional")
+    private DescripcionAdicional descripcionAdicional;
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class DescripcionAdicional {
+        private String descripcion;
+    }
+
+}
+
+
