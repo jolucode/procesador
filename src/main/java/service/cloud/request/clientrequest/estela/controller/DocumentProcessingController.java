@@ -9,29 +9,32 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import service.cloud.request.clientrequest.estela.dto.FileRequestDTO;
 import service.cloud.request.clientrequest.estela.dto.FileResponseDTO;
-import service.cloud.request.clientrequest.estela.service.ConsultaFileService;
-import service.cloud.request.clientrequest.estela.service.EmisionService;
+import service.cloud.request.clientrequest.estela.service.DocumentQueryService;
+import service.cloud.request.clientrequest.estela.service.DocumentEmissionService;
 
 @RestController
-@RequestMapping("/api/files")
-public class FileController {
+@RequestMapping("/api/documents")
+public class DocumentProcessingController {
 
-    private final EmisionService emisionService;
-    private final ConsultaFileService consultaFileService;
+    private final DocumentEmissionService documentEmissionService;
+    private final DocumentQueryService documentQueryService;
 
-    public FileController(EmisionService emisionService, ConsultaFileService consultaFileService) {
-        this.emisionService = emisionService;
-        this.consultaFileService = consultaFileService;
+    public DocumentProcessingController(DocumentEmissionService documentEmissionService, DocumentQueryService documentQueryService) {
+        this.documentEmissionService = documentEmissionService;
+        this.documentQueryService = documentQueryService;
     }
 
     @PostMapping("/upload")
-    public Mono<ResponseEntity<FileResponseDTO>> emisionDoc(@RequestBody FileRequestDTO requestDTO) {
+    public Mono<ResponseEntity<FileResponseDTO>> processDocumentEmission(@RequestBody FileRequestDTO requestDTO) {
         String url;
 
         // Determinar la URL según el valor del campo 'service' en requestDTO
         switch (requestDTO.getService()) {
             case "SUNAT":
-                url = "https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService";
+                if (requestDTO.getFilename().contains("-20-") || requestDTO.getFilename().contains("-40-"))
+                    url = "https://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService";
+                else
+                    url = "https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService";
                 break;
             case "OSE":
                 url = "https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl";
@@ -45,15 +48,15 @@ public class FileController {
         }
 
         // Llamar al servicio con la URL determinada
-        return emisionService.processAndSaveFile(url, requestDTO)
+        return documentEmissionService.processDocumentEmission(url, requestDTO)
                 .map(response -> ResponseEntity.ok(response))
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
 
     @PostMapping("/consulta")
-    public Mono<ResponseEntity<FileResponseDTO>> consultaDoc(@RequestBody FileRequestDTO requestDTO) {
-        return consultaFileService.processAndSaveFile("https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl", requestDTO)
+    public Mono<ResponseEntity<FileResponseDTO>> processDocumentQuery(@RequestBody FileRequestDTO requestDTO) {
+        return documentQueryService.processAndSaveFile("https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl", requestDTO)
                 .map(response -> ResponseEntity.ok(response)).defaultIfEmpty(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 }

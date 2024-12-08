@@ -6,23 +6,23 @@ import reactor.core.publisher.Mono;
 import service.cloud.request.clientrequest.estela.builder.DocumentBuilder;
 import service.cloud.request.clientrequest.estela.dto.FileRequestDTO;
 import service.cloud.request.clientrequest.estela.dto.FileResponseDTO;
-import service.cloud.request.clientrequest.estela.proxy.EmisionProxy;
+import service.cloud.request.clientrequest.estela.proxy.ServiceProxy;
 
 @Service
-public class ConsultaFileService {
+public class DocumentQueryService {
 
-    private final EmisionProxy fileProxy;
+    private final ServiceProxy serviceClient;
 
-    private final DocumentBuilder fileBuilder;
+    private final DocumentBuilder soapRequestBuilder;
 
     @Autowired
-    public ConsultaFileService(EmisionProxy fileProxy, DocumentBuilder fileBuilder) {
-        this.fileProxy = fileProxy;
-        this.fileBuilder = fileBuilder;
+    public DocumentQueryService(ServiceProxy serviceClient, DocumentBuilder soapRequestBuilder) {
+        this.serviceClient = serviceClient;
+        this.soapRequestBuilder = soapRequestBuilder;
     }
 
     public Mono<FileResponseDTO> processAndSaveFile(String url, FileRequestDTO soapRequest) {
-        return fileProxy.sendFileToExternalService(url, fileBuilder.consultaBuildSoapRequest(soapRequest))
+        return serviceClient.sendSoapRequest(url, soapRequestBuilder.buildConsultaSoapRequest(soapRequest))
                 .map(response -> new FileResponseDTO("Success", "File processed successfully"))
                 .onErrorResume(error -> {
                     String errorMessage = error.getMessage() != null ? error.getMessage() : "Unknown error";
