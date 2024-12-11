@@ -44,7 +44,7 @@ public class DocumentProcessingController {
                 break;
             default:
                 // En caso de que el servicio no sea uno de los conocidos, puedes asignar una URL por defecto o lanzar un error.
-                return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FileResponseDTO("Error", "Invalid service")));
+                return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FileResponseDTO("Error", "Invalid service", null)));
         }
 
         // Llamar al servicio con la URL determinada
