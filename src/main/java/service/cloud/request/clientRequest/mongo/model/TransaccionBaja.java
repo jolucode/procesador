@@ -14,14 +14,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "transaccion_baja")
 public class TransaccionBaja {
 
-  @Id
-  @EqualsAndHashCode.Include
-  private String id; // Identificador único del documento en MongoDB
-  private String rucEmpresa;
-  private String fecha; // Fecha en formato yyyyMMdd
-  private Integer idd; // Último número usado
-  private String serie;
-  private String ticketBaja;
-  private String docId;
+    @Id
+    @EqualsAndHashCode.Include
+    private String id; // Identificador único del documento en MongoDB
+    private String rucEmpresa;
+    private String fecha; // Fecha en formato yyyyMMdd
+    private Integer idd; // Último número usado
+    private String serie;
+    private String ticketBaja;
+    private String docId;
 
 }

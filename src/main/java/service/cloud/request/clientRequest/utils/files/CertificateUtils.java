@@ -1,4 +1,4 @@
-package service.cloud.request.clientRequest.utils;
+package service.cloud.request.clientRequest.utils.files;
 
 import org.apache.log4j.Logger;
 import service.cloud.request.clientRequest.utils.exception.ConfigurationException;
@@ -13,24 +13,23 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
-/**
- * Esta clase contiene metodos para manipular los certificados
- * digitales.
- *
- * @author Jose Manuel Lucas Barrera (josemlucasb@gmail.com)
- */
+
 public class CertificateUtils {
 
     private final static Logger logger = Logger.getLogger(CertificateUtils.class);
 
 
-    /**
-     * Este metodo tranforma un certificado digital en base a su ubicacion en disco, convirtiendola
-     * en bytes.
-     *
-     * @param certificatePath La ruta en disco del certificado digital.
-     * @return Retorna el certificado digital en bytes.
-     */
+
+    // Método para cargar un certificado en bytes desde una ruta
+    public static byte[] loadCertificate(String certificatePath) throws FileNotFoundException, ConfigurationException {
+        return getCertificateInBytes(certificatePath);
+    }
+
+    // Método para validar un certificado digital
+    public static void validateCertificate(byte[] certificate, String password, String provider, String keystoreType) throws SignerDocumentException {
+        checkDigitalCertificateV2(certificate, password, provider, keystoreType);
+    }
+
     public static synchronized byte[] getCertificateInBytes(String certificatePath) throws ConfigurationException, FileNotFoundException {
         if (logger.isDebugEnabled()) {
             logger.debug("+getCertificateInBytes() certificatePath: " + certificatePath);

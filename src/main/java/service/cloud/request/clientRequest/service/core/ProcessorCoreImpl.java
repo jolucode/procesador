@@ -1,7 +1,5 @@
 package service.cloud.request.clientRequest.service.core;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.eclipse.persistence.internal.oxm.ByteArraySource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,31 +8,11 @@ import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
-import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
+import service.cloud.request.clientRequest.estela.dto.FileResponseDTO;
 import service.cloud.request.clientRequest.handler.FileHandler;
-import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.SunatResponseUtils;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
-import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.applicationresponse_2.ApplicationResponseType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.DocumentResponseType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.ResponseType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.StatusType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.DescriptionType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.ResponseCodeType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.StatusReasonCodeType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.StatusReasonType;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 
 @Service
 public class ProcessorCoreImpl implements ProcessorCoreInterface {
@@ -89,23 +67,11 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
 
     @Override
     //interface nueva:
-    public TransaccionRespuesta processResponseSinCDR(TransacctionDTO transaction, CdrStatusResponse cdrStatusResponse) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+processResponseSinResponse() [" + this.docUUID + "]");
-        }
-        TransaccionRespuesta transactionResponse = null;
-        transactionResponse = new TransaccionRespuesta();
-        transactionResponse.setCodigo(TransaccionRespuesta.RQT_EMITIDO_EXCEPTION);
-        transactionResponse.setMensaje(cdrStatusResponse.getStatusMessage());
-
-        logger.warn("Respuesta del servicio invocado: " + cdrStatusResponse.getStatusMessage());
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("-processCDRResponse() [" + this.docUUID + "]");
-        }
+    public TransaccionRespuesta processResponseSinCDR(TransacctionDTO transaction, FileResponseDTO responseDTO) {
+        TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
+        transactionResponse.setMensaje(responseDTO.getMessage());
         return transactionResponse;
     }
-
 
 
 }

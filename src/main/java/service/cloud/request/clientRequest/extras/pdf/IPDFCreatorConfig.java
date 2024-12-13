@@ -4,42 +4,22 @@ public interface IPDFCreatorConfig {
 
     String CAMPOS_USUARIO_CAB = "CamposUsuarioCab";
 
-    /**
-     * Valor por defecto para los TAG's vacios
-     */
+
     String EMPTY_VALUE = "-";
-
-
-    String UBL_ADDITIONAL_MONETARY_TOTAL = "AdditionalMonetaryTotal";
-    String UBL_ID = "ID";
-    String UBL_PAYABLE_AMOUNT = "PayableAmount";
 
     String LOCALE_ES = "es";
     String LOCALE_PE = "PE";
     String PATTERN_DATE = "dd/MM/yyyy";
     String LANG_PATTERN = "llll";
 
-    /**
-     * Regex and format patterns
-     */
     String PATTERN_FLOAT_DEC = "###,###.00";
 
     String ALTERNATIVE_COND_UNIT_PRICE = "01";
 
-    /**
-     * Formato de CODIGO DE BARRAS
-     */
     String BARCODE_PATTERN = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}";
 
-
-    /**
-     * Valor cuando no hay LEYENDAS
-     */
     String LEGEND_DEFAULT_EMPTY = "NINGUNA";
 
-    /**
-     * SUNATTransaction values
-     */
     String SUNAT_TRANS_VENTA_INTERNA_ID = "01";
     String SUNAT_TRANS_VENTA_INTERNA_DSC = "Venta Interna";
     String SUNAT_TRANS_EXPORTACION_ID = "02";
@@ -165,7 +145,6 @@ public interface IPDFCreatorConfig {
     String NEW_TOTAL_VALUE = "NEW_TOTAL";
     String IMPUESTO_BOLSA = "IMPUESTO_BOLSA";
     String IMPUESTO_BOLSA_MONEDA = "IMPUESTO_BOLSA_MONEDA";
-    String IMPORTE_TEXTO = "IMPORTE_TEXTO";
 
     String BARCODE_VALUE = "BARCODE_VALUE";
     String LETTER_AMOUNT_VALUE = "LETTER_AMOUNT_VALUE";
@@ -182,9 +161,9 @@ public interface IPDFCreatorConfig {
     String LEGEND_DOCUMENT_TYPE = "LEGEND_DOCUMENT_TYPE";
     String RESOLUTION_CODE_VALUE = "RESOLUTION_CODE_VALUE";
 
-    /* Valores agregados a la leyenda del TEMPLATE */ String LEGEND_INVOICE_DOCUMENT = "factura electr\u00F3nica";
+    String LEGEND_INVOICE_DOCUMENT = "factura electr\u00F3nica";
     String LEGEND_BOLETA_DOCUMENT = "boleta de venta electr\u00F3nica";
     String LEGEND_CREDIT_NOTE_DOCUMENT = "nota de cr\u00E9dito electr\u00F3nica";
     String LEGEND_DEBIT_NOTE_DOCUMENT = "nota de d\u00E9bito electr\u00F3nica";
     String LEGEND_PERCEPTION_DOCUMENT = "comprobante de percepcion";
-} // IPDFCreatorConfig
+}

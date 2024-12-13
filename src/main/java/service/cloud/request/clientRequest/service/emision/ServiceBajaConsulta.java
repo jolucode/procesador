@@ -1,6 +1,5 @@
 package service.cloud.request.clientRequest.service.emision;
 
-import org.eclipse.persistence.internal.oxm.ByteArraySource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,31 +14,13 @@ import service.cloud.request.clientRequest.estela.dto.FileRequestDTO;
 import service.cloud.request.clientRequest.estela.dto.FileResponseDTO;
 import service.cloud.request.clientRequest.estela.service.DocumentBajaQueryService;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
-import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
-import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.SunatResponseUtils;
-import service.cloud.request.clientRequest.utils.UtilsFile;
+import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
-import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.applicationresponse_2.ApplicationResponseType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.DocumentResponseType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.ResponseType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.StatusType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.DescriptionType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.ResponseCodeType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.StatusReasonCodeType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.StatusReasonType;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ServiceBajaConsulta implements IServiceBaja {
@@ -51,11 +32,6 @@ public class ServiceBajaConsulta implements IServiceBaja {
 
     @Autowired
     ApplicationProperties applicationProperties;
-
-    private final String docUUID = "123123";
-
-    @Autowired
-    DocumentFormatInterface documentFormatInterface;
 
     @Autowired
     DocumentBajaQueryService documentBajaQueryService;

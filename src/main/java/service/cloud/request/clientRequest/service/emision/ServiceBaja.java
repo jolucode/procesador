@@ -1,6 +1,5 @@
 package service.cloud.request.clientRequest.service.emision;
 
-import org.eclipse.persistence.internal.oxm.ByteArrayDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +27,14 @@ import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
 import service.cloud.request.clientRequest.utils.*;
-import service.cloud.request.clientRequest.utils.exception.ConfigurationException;
-import service.cloud.request.clientRequest.utils.exception.SignerDocumentException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
+import service.cloud.request.clientRequest.utils.files.CertificateUtils;
+import service.cloud.request.clientRequest.utils.files.DocumentConverterUtils;
+import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.voideddocuments_1.VoidedDocumentsType;
 
 import javax.activation.DataHandler;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -56,9 +53,6 @@ public class ServiceBaja implements IServiceBaja {
     ApplicationProperties applicationProperties;
 
     private final String docUUID = "123123";
-
-    @Autowired
-    DocumentFormatInterface documentFormatInterface;
 
     @Autowired
     ITransaccionBajaRepository iTransaccionBajaRepository;
@@ -94,8 +88,11 @@ public class ServiceBaja implements IServiceBaja {
                 return transactionResponse;
             }
 
-            byte[] certificado = loadCertificate(client, transaction.getDocIdentidad_Nro());
-            validateCertificate(certificado, client);
+            String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
+
+            byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
+            CertificateUtils .validateCertificate(certificado,client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
+
             String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
             SignerHandler signerHandler = SignerHandler.newInstance();
             signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), client.getCertificadoTipoKeystore(), client.getCertificadoProveedor(), signerName);
@@ -103,7 +100,7 @@ public class ServiceBaja implements IServiceBaja {
             UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
             VoidedDocumentsType voidedDocumentType = ublHandler.generateVoidedDocumentType(transaction, signerName);
 
-            byte[] xmlDocument = convertDocumentToBytes(voidedDocumentType);
+            byte[] xmlDocument = DocumentConverterUtils.convertDocumentToBytes(voidedDocumentType);
             byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
             String documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id());
             byte[] zipBytes = compressUBLDocumentv2(signedXmlDocument, documentName + ".xml");
@@ -131,7 +128,7 @@ public class ServiceBaja implements IServiceBaja {
                 cdrStatusResponse.setStatusMessage(fileResponseDTO.getMessage());
 
                 documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
-                transactionResponse = processOseResponseBAJA(cdrStatusResponse.getContent(), transaction, fileHandler, documentName, configuracion);
+                transactionResponse = processOseResponseBAJA(cdrStatusResponse.getContent(), transaction, documentName, configuracion);
                 transactionResponse.setTicketRest(ticket);
             }
         } catch (Exception e) {
@@ -166,38 +163,6 @@ public class ServiceBaja implements IServiceBaja {
                     return iTransaccionBajaRepository.save(transaccionBaja); // Guarda el documento actualizado
                 });
     }
-
-    /*private DataHandler compressUBLDocumentv2(byte[] document, String documentName) throws IOException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+compressUBLDocument() [" + this.docUUID + "]");
-        }
-        DataHandler zipDocument = null;
-        try {
-            try (ByteArrayInputStream bis = new ByteArrayInputStream(document)) {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                try (ZipOutputStream zos = new ZipOutputStream(bos)) {
-                    byte[] array = new byte[10000];
-                    int read = 0;
-                    zos.putNextEntry(new ZipEntry(documentName));
-                    while ((read = bis.read(array, 0, array.length)) != -1) {
-                        zos.write(array, 0, read);
-                    }
-                    zos.closeEntry();
-                }
-                zipDocument = new DataHandler(new ByteArrayDataSource(bos.toByteArray(), "application/zip"));
-                if (logger.isDebugEnabled()) {
-                    logger.debug("compressUBLDocument() [" + this.docUUID + "] El documento UBL fue convertido a formato ZIP correctamente.");
-                }
-            }
-        } catch (Exception e) {
-            logger.error("compressUBLDocument() [" + this.docUUID + "] " + e.getMessage());
-            throw new IOException(IVenturaError.ERROR_455.getMessage());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-compressUBLDocument() [" + this.docUUID + "]");
-        }
-        return zipDocument;
-    }*/
 
     private byte[] compressUBLDocumentv2(byte[] document, String documentName) throws IOException {
         if (logger.isDebugEnabled()) {
@@ -236,7 +201,7 @@ public class ServiceBaja implements IServiceBaja {
     }
 
 
-    private TransaccionRespuesta processOseResponseBAJA(byte[] statusResponse, TransacctionDTO transaction, FileHandler fileHandler, String documentName, ConfigData configuracion) {
+    private TransaccionRespuesta processOseResponseBAJA(byte[] statusResponse, TransacctionDTO transaction, String documentName, ConfigData configuracion) {
         TransaccionRespuesta.Sunat sunatResponse = SunatResponseUtils.proccessResponse(statusResponse, transaction, configuracion.getIntegracionWs());//proccessResponse(statusResponse, transaction, configuracion.getIntegracionWs());
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
         if ((IVenturaError.ERROR_0.getId() == sunatResponse.getCodigo()) || (4000 <= sunatResponse.getCodigo())) {
@@ -245,7 +210,6 @@ public class ServiceBaja implements IServiceBaja {
             if (null != statusResponse && 0 < statusResponse.length) {
                 UtilsFile.storePDFDocumentInDisk(statusResponse, applicationProperties.getRutaBaseDoc(), documentName + "_SUNAT_CDR_BAJA", ISunatConnectorConfig.EE_ZIP);//fileHandler.storePDFDocumentInDisk(statusResponse, documentName + "_SUNAT_CDR_BAJA", ISunatConnectorConfig.EE_ZIP);
             }
-
             transactionResponse.setMensaje(sunatResponse.getMensaje());
             transactionResponse.setZip(statusResponse);
 
@@ -255,35 +219,6 @@ public class ServiceBaja implements IServiceBaja {
         }
 
         return transactionResponse;
-    }
-
-    private byte[] loadCertificate(Client client, String docIdentidadNuumero) throws ConfigurationException, FileNotFoundException {
-        String certificatePath = applicationProperties.getRutaBaseDoc() + docIdentidadNuumero + File.separator + client.getCertificadoName();
-        return CertificateUtils.getCertificateInBytes(certificatePath);
-    }
-
-    private void validateCertificate(byte[] certificate, Client client) throws SignerDocumentException {
-        CertificateUtils.checkDigitalCertificateV2(certificate, client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
-    }
-
-    // Método genérico para convertir cualquier tipo de documento a bytes
-    private <T> byte[] convertDocumentToBytes(T document) {
-        return convertToBytes(document, (Class<T>) document.getClass());
-    }
-
-    // Método privado para realizar la conversión a bytes
-    private <T> byte[] convertToBytes(T document, Class<T> documentClass) {
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(documentClass);
-            Marshaller marshaller = jaxbContext.createMarshaller();
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            marshaller.marshal(document, baos);
-
-            return baos.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException("Error al convertir " + documentClass.getSimpleName() + " a byte[]", e);
-        }
     }
 
     private ConfigData createConfigData(Client client) {
@@ -366,16 +301,13 @@ public class ServiceBaja implements IServiceBaja {
         return String.format("%05d", numero);
     }
 
-
     private TransaccionBaja crearNuevoRegistro(String rucEmpresa, Integer idd, String fecha, String serie) {
         TransaccionBaja nuevaBaja = new TransaccionBaja();
         nuevaBaja.setRucEmpresa(rucEmpresa);
         nuevaBaja.setFecha(fecha);
         nuevaBaja.setIdd(++idd);
         nuevaBaja.setSerie(serie);
-        return nuevaBaja;//iTransaccionBajaRepository.save(nuevaBaja).block();
+        return nuevaBaja;
     }
-
-
 
 }

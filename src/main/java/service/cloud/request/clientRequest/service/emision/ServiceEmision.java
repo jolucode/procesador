@@ -1,7 +1,6 @@
 package service.cloud.request.clientRequest.service.emision;
 
 import com.google.gson.Gson;
-import org.eclipse.persistence.internal.oxm.ByteArrayDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +28,12 @@ import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
-import service.cloud.request.clientRequest.utils.CertificateUtils;
-import service.cloud.request.clientRequest.utils.DocumentNameUtils;
-import service.cloud.request.clientRequest.utils.UtilsFile;
-import service.cloud.request.clientRequest.utils.ValidationHandler;
-import service.cloud.request.clientRequest.utils.exception.ConfigurationException;
+import service.cloud.request.clientRequest.utils.*;
 import service.cloud.request.clientRequest.utils.exception.DateUtils;
-import service.cloud.request.clientRequest.utils.exception.SignerDocumentException;
-import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
+import service.cloud.request.clientRequest.utils.files.CertificateUtils;
+import service.cloud.request.clientRequest.utils.files.DocumentConverterUtils;
+import service.cloud.request.clientRequest.utils.files.DocumentNameUtils;
+import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.creditnote_2.CreditNoteType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.debitnote_2.DebitNoteType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
@@ -44,15 +41,11 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.invoice_2.InvoiceT
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.perception_1.PerceptionType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.retention_1.RetentionType;
 
-import javax.activation.DataHandler;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @Service
 public class ServiceEmision implements IServiceEmision {
@@ -93,8 +86,10 @@ public class ServiceEmision implements IServiceEmision {
 
         // Obtiene datos del cliente y valida certificado
         Client client = getClientData(transaction);
-        byte[] certificado = loadCertificate(client, transaction.getDocIdentidad_Nro());
-        validateCertificate(certificado, client);
+
+        String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
+        byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
+        CertificateUtils .validateCertificate(certificado,client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
 
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
@@ -110,21 +105,21 @@ public class ServiceEmision implements IServiceEmision {
 
         if (doctype.equals("07")) {
             CreditNoteType creditNoteType = ublHandler.generateCreditNoteType(transaction, signerName);
-            xmlDocument = convertDocumentToBytes(creditNoteType); //generico
+            xmlDocument = DocumentConverterUtils.convertDocumentToBytes(creditNoteType); //generico
         } else if (doctype.equals("08")) {
             DebitNoteType debitNoteType = ublHandler.generateDebitNoteType(transaction, signerName);
-            xmlDocument = convertDocumentToBytes(debitNoteType);
+            xmlDocument = DocumentConverterUtils.convertDocumentToBytes(debitNoteType);
         } else if (doctype.equals("01") || (doctype.equals("03"))) {
             InvoiceType invoiceType = ublHandler.generateInvoiceType(transaction, signerName);
-            xmlDocument = convertDocumentToBytes(invoiceType);
+            xmlDocument = DocumentConverterUtils.convertDocumentToBytes(invoiceType);
         } else if (doctype.equals("40")) {
             PerceptionType perceptionType = ublHandler.generatePerceptionType(transaction, signerName);
             validationHandler.checkPerceptionDocument(perceptionType);
-            xmlDocument = convertDocumentToBytes(perceptionType);
+            xmlDocument = DocumentConverterUtils.convertDocumentToBytes(perceptionType);
         } else if (doctype.equals("20")) {
             RetentionType retentionType = ublHandler.generateRetentionType(transaction, signerName);
             validationHandler.checkRetentionDocument(retentionType);
-            xmlDocument = convertDocumentToBytes(retentionType);
+            xmlDocument = DocumentConverterUtils.convertDocumentToBytes(retentionType);
         }
 
 
@@ -138,19 +133,14 @@ public class ServiceEmision implements IServiceEmision {
         String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
         documentWRP = configureDocumentWRP(documentWRP, signedXmlDocument, transaction.getDOC_Codigo(), doctype);
         documentWRP.setTransaccion(transaction);
-        Object ublDocument = getSignedDocumentV(signedXmlDocument, transaction.getDOC_Codigo());
-
-        String documentPath = fileHandler.storeDocumentInDisk(ublDocument, documentName);
 
         ConfigData configuracion = createConfigData(client);
 
-        DataHandler zipDocument = UtilsFile.compressUBLDocument(signedXmlDocument, documentName + ".xml");
-
-        byte[] zipBytes = extractBytesFromDataHandler(zipDocument); // Método para extraer bytes de DataHandler
+        byte[] zipBytes = DocumentConverterUtils.compressUBLDocument(signedXmlDocument, documentName + ".xml");
         String base64Content = convertToBase64(zipBytes);
 
         log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
-        TransaccionRespuesta transactionResponse = handleTransactionStatus(base64Content, transaction, zipDocument, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
+        TransaccionRespuesta transactionResponse = handleTransactionStatus(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
         log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
 
         if (client.getPdfBorrador().equals("true")) {
@@ -174,36 +164,21 @@ public class ServiceEmision implements IServiceEmision {
         return transactionResponse;
     }
 
-    // Método para extraer los bytes de DataHandler
-    private byte[] extractBytesFromDataHandler(DataHandler dataHandler) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        InputStream inputStream = dataHandler.getInputStream();
-        byte[] buffer = new byte[1024];
-        int bytesRead;
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, bytesRead);
-        }
-        return outputStream.toByteArray();
-    }
-
     // Método para convertir los bytes a base64
     private String convertToBase64(byte[] content) {
         return Base64.getEncoder().encodeToString(content);
     }
 
-    private TransaccionRespuesta handleTransactionStatus(String base64Content, TransacctionDTO transaction, DataHandler zipDocument,
+    private TransaccionRespuesta handleTransactionStatus(String base64Content, TransacctionDTO transaction,
                                                          byte[] signedXmlDocument, UBLDocumentWRP documentWRP,
                                                          ConfigData configuracion, String documentName,
                                                          String attachmentPath) throws Exception {
-        if (zipDocument == null) {
-            logger.error("Error: Zip document is null");
-            return null;
-        }
+
 
         String estado = transaction.getFE_Estado().toUpperCase();
         switch (estado) {
             case "N":
-                return processNewTransaction(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath, zipDocument);
+                return processNewTransaction(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
             case "C":
                 return processCancelledTransaction(transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
             default:
@@ -212,30 +187,22 @@ public class ServiceEmision implements IServiceEmision {
         }
     }
 
-    private TransaccionRespuesta processNewTransaction(String base64Content, TransacctionDTO transaction, byte[] signedXmlDocument, UBLDocumentWRP documentWRP, ConfigData configuracion, String documentName, String attachmentPath, DataHandler zipDocument) throws Exception {
+    private TransaccionRespuesta processNewTransaction(String base64Content, TransacctionDTO transaction, byte[] signedXmlDocument, UBLDocumentWRP documentWRP, ConfigData configuracion, String documentName, String attachmentPath) throws Exception {
         Thread.sleep(50);
 
-        CdrStatusResponse cdrStatusResponse = null;
         FileRequestDTO soapRequest = new FileRequestDTO();
         soapRequest.setService("https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl");
         soapRequest.setUsername(configuracion.getUsuarioSol());
         soapRequest.setPassword(configuracion.getClaveSol());
         soapRequest.setFileName(DocumentNameHandler.getInstance().getZipName(documentName));
         soapRequest.setContentFile(base64Content);
-        Mono<FileResponseDTO> monoResponse = documentEmissionService.processDocumentEmission(soapRequest.getService(), soapRequest);//ioseClient.getStatusCDR(transaction.getDocIdentidad_Nro(), transaction.getDOC_Codigo(), transaction.getDOC_Serie(), Integer.valueOf(transaction.getDOC_Numero()));
+        Mono<FileResponseDTO> monoResponse = documentEmissionService.processDocumentEmission(soapRequest.getService(), soapRequest);
+
         FileResponseDTO responseDTO = monoResponse.block();
-        cdrStatusResponse = new CdrStatusResponse();
-
         if (responseDTO.getContent() != null) {
-            cdrStatusResponse.setContent(responseDTO.getContent());
+            return processorCoreInterface.processCDRResponseV2(responseDTO.getContent(), signedXmlDocument, documentWRP, transaction, configuracion, documentName, attachmentPath);
         } else {
-            cdrStatusResponse.setStatusMessage(responseDTO.getMessage());
-        }
-
-        if (cdrStatusResponse.getContent() != null) {
-            return processorCoreInterface.processCDRResponseV2(cdrStatusResponse.getContent(), signedXmlDocument, documentWRP, transaction, configuracion, documentName, attachmentPath);
-        } else {
-            return processorCoreInterface.processResponseSinCDR(transaction, cdrStatusResponse);
+            return processorCoreInterface.processResponseSinCDR(transaction, responseDTO);
         }
     }
 
@@ -252,18 +219,11 @@ public class ServiceEmision implements IServiceEmision {
 
         Mono<FileResponseDTO> monoResponse = documentQueryService.processAndSaveFile(soapRequest.getService(), soapRequest);//ioseClient.getStatusCDR(transaction.getDocIdentidad_Nro(), transaction.getDOC_Codigo(), transaction.getDOC_Serie(), Integer.valueOf(transaction.getDOC_Numero()));
         FileResponseDTO responseDTO = monoResponse.block();
-        CdrStatusResponse cdrStatusResponse = new CdrStatusResponse();
-
-        if (responseDTO.getContent() != null) {
-            cdrStatusResponse.setContent(responseDTO.getContent());
-        } else {
-            cdrStatusResponse.setStatusMessage(responseDTO.getMessage());
-        }
 
         if (responseDTO.getContent() != null) {
             return processorCoreInterface.processCDRResponseV2(responseDTO.getContent(), signedXmlDocument, documentWRP, transaction, configuracion, documentName, attachmentPath);
         } else {
-            return processorCoreInterface.processResponseSinCDR(transaction, cdrStatusResponse);
+            return processorCoreInterface.processResponseSinCDR(transaction, responseDTO);
         }
     }
 
@@ -299,15 +259,6 @@ public class ServiceEmision implements IServiceEmision {
         return clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
     }
 
-    private byte[] loadCertificate(Client client, String docIdentidadNuumero) throws ConfigurationException, FileNotFoundException {
-        String certificatePath = applicationProperties.getRutaBaseDoc() + docIdentidadNuumero + File.separator + client.getCertificadoName();
-        return CertificateUtils.getCertificateInBytes(certificatePath);
-    }
-
-    private void validateCertificate(byte[] certificate, Client client) throws SignerDocumentException {
-        CertificateUtils.checkDigitalCertificateV2(certificate, client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
-    }
-
     private UBLDocumentWRP configureDocumentWRP(UBLDocumentWRP documentWRP, byte[] signedXmlDocument, String docCodigo, String doctype) throws Exception {
         Object ublDocument = getSignedDocumentV(signedXmlDocument, docCodigo);
 
@@ -332,29 +283,6 @@ public class ServiceEmision implements IServiceEmision {
                 throw new IllegalArgumentException("Invalid document type: " + doctype);
         }
         return documentWRP;
-    }
-
-
-
-
-    // Método genérico para convertir cualquier tipo de documento a bytes
-    private <T> byte[] convertDocumentToBytes(T document) {
-        return convertToBytes(document, (Class<T>) document.getClass());
-    }
-
-    // Método privado para realizar la conversión a bytes
-    private <T> byte[] convertToBytes(T document, Class<T> documentClass) {
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(documentClass);
-            Marshaller marshaller = jaxbContext.createMarshaller();
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            marshaller.marshal(document, baos);
-
-            return baos.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException("Error al convertir " + documentClass.getSimpleName() + " a byte[]", e);
-        }
     }
 
     // Método para deserializar un documento XML firmado basado en su tipo de documento.

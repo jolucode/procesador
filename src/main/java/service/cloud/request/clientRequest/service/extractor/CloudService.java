@@ -66,7 +66,6 @@ public class CloudService implements CloudInterface {
         String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
 
         try {
-            // Convertir JSON a una lista de objetos TransacctionDTO
             Gson gson = new Gson();
             TransacctionDTO[] transacctionDTOs = gson.fromJson(updatedJson, TransacctionDTO[].class);
 
@@ -86,62 +85,6 @@ public class CloudService implements CloudInterface {
             logger.error("Error al procesar documentos: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    private TransacctionDTO insertarImpuestoBolsa(TransacctionDTO transaccion) {
-
-        transaccion.getTransactionLineasDTOList().forEach(linea -> {
-            if (linea.getItmBolsa() == null || linea.getItmBolsa().isEmpty()) {
-                linea.setItmBolsa("N"); // Asignar 'N' si itmBolsa es null o vacío
-            }
-        });
-
-        String impuestoBolsa = "I", itemBolsa = "A";
-        Optional<TransactionLineasDTO> lineasOptional = transaccion.getTransactionLineasDTOList().stream().filter(linea -> linea.getItmBolsa().equals(itemBolsa)).findAny();
-
-        lineasOptional.ifPresent(lineaBolsa -> {
-            Optional<TransactionLineasDTO> impuestoBolsaOptional = transaccion.getTransactionLineasDTOList().stream().filter(linea -> linea.getItmBolsa().equals(impuestoBolsa)).findAny();
-
-            TransactionImpuestosDTO transaccionImpuesto = new TransactionImpuestosDTO();
-            transaccionImpuesto.setAbreviatura(Constants.TAX_TOTAL_OTH_CODE);
-            transaccionImpuesto.setMoneda(transaccion.getDOC_MON_Codigo());
-            BigDecimal precioRefMonto = impuestoBolsaOptional.map(TransactionLineasDTO::getPrecioRef_Monto).orElseGet(lineaBolsa::getPrecioRef_Monto);
-            BigDecimal totalBruto = impuestoBolsaOptional.map(TransactionLineasDTO::getTotalBruto).orElseGet(lineaBolsa::getTotalBruto);
-            transaccionImpuesto.setMonto(precioRefMonto);
-            transaccionImpuesto.setValorVenta(totalBruto);
-            transaccionImpuesto.setPorcentaje(BigDecimal.valueOf(100));
-            transaccionImpuesto.setTipoTributo(Constants.TAX_TOTAL_BPT_ID);
-            transaccionImpuesto.setCodigo("C");
-            transaccionImpuesto.setNombre(Constants.TAX_TOTAL_BPT_NAME);
-
-
-            transaccion.getTransactionImpuestosDTOList().add(transaccionImpuesto);
-
-            Optional<TransactionImpuestosDTO> impuestosOptional = transaccion.getTransactionImpuestosDTOList().stream().filter(impuestoTotal -> impuestoTotal.getNombre().isEmpty()).findAny();
-            impuestosOptional.ifPresent(transaccion.getTransactionImpuestosDTOList()::remove);
-
-            TransactionLineasImpuestoDTO transaccionLineaImpuesto = new TransactionLineasImpuestoDTO();
-            transaccionLineaImpuesto.setAbreviatura(Constants.TAX_TOTAL_OTH_CODE);
-            transaccionLineaImpuesto.setMoneda(transaccion.getDOC_MON_Codigo());
-            transaccionLineaImpuesto.setMonto(precioRefMonto);
-            transaccionLineaImpuesto.setValorVenta(totalBruto);
-            transaccionLineaImpuesto.setPorcentaje(BigDecimal.valueOf(100));
-            transaccionLineaImpuesto.setTipoTributo(Constants.TAX_TOTAL_BPT_ID);
-            transaccionLineaImpuesto.setCodigo("C");
-            transaccionLineaImpuesto.setNombre(Constants.TAX_TOTAL_BPT_NAME);
-
-            // *** Aquí se añade la cantidad de la línea ***
-            transaccionLineaImpuesto.setCantidad(lineaBolsa.getCantidad());
-            transaccionLineaImpuesto.setUnidadSunat(lineaBolsa.getUnidadSunat());
-
-            lineaBolsa.getTransactionLineasImpuestoListDTO().add(transaccionLineaImpuesto);
-            impuestoBolsaOptional.ifPresent(transaccion.getTransactionLineasDTOList()::remove);
-            Predicate<TransactionImpuestosDTO> predicate = impuesto -> impuesto.getPorcentaje().compareTo(valueOf(100)) == 0 && impuesto.getValorVenta().compareTo(totalBruto) == 0 && !Constants.TAX_TOTAL_BPT_NAME.equalsIgnoreCase(impuesto.getNombre());
-            ArrayList<TransactionImpuestosDTO> transaccionImpuestos = new ArrayList<>(transaccion.getTransactionImpuestosDTOList());
-            Optional<TransactionImpuestosDTO> optional = transaccionImpuestos.stream().filter(predicate).findAny();
-            optional.ifPresent(transaccion.getTransactionImpuestosDTOList()::remove);
-        });
-        return transaccion;
     }
 
     public int anexarDocumentos(RequestPost request) {

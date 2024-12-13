@@ -14,20 +14,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "logs")
 public class Log {
 
-  @Id
-  @EqualsAndHashCode.Include
-  private String id;
-  private String ruc;
-  private String businessName;
-  private String request;
-  private String response;
-  private String thirdPartyRequestXml;
-  private String thirdPartyResponseXml;
-  private String requestDate;
-  private String responseDate;
-  private String thirdPartyServiceInvocationDate;
-  private String thirdPartyServiceResponseDate;
-  private String objectTypeAndDocEntry;
-  private String seriesAndCorrelative;
+    @Id
+    @EqualsAndHashCode.Include
+    private String id;
+    private String ruc;
+    private String businessName;
+    private String request;
+    private String response;
+    private String thirdPartyRequestXml;
+    private String thirdPartyResponseXml;
+    private String requestDate;
+    private String responseDate;
+    private String thirdPartyServiceInvocationDate;
+    private String thirdPartyServiceResponseDate;
+    private String objectTypeAndDocEntry;
+    private String seriesAndCorrelative;
 
 }

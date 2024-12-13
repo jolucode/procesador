@@ -12,20 +12,16 @@ public class DateConverter {
     public static String convertToDate(String dateStr) throws Exception {
         Date date = null;
         try {
-            // Intentar parsear la fecha en formato "Thu May 09 00:00:00 PET 2024"
             SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
             date = formatter.parse(dateStr);
         } catch (ParseException e1) {
             try {
-                // Intentar parsear la fecha en formato ISO-8601
                 XMLGregorianCalendar xmlGregorianCal = DatatypeFactory.newInstance().newXMLGregorianCalendar(dateStr);
                 date = xmlGregorianCal.toGregorianCalendar().getTime();
             } catch (Exception e2) {
-                // Si ambos formatos fallan, lanzar una excepción
                 throw new IllegalArgumentException("Unsupported date format: " + dateStr);
             }
         }
-        // Formatear la fecha al formato "dd/MM/yyyy"
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         return sdf.format(date);
     }

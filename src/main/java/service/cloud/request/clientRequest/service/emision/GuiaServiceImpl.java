@@ -30,16 +30,15 @@ import service.cloud.request.clientRequest.mongo.model.LogDTO;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
-import service.cloud.request.clientRequest.utils.CertificateUtils;
-import service.cloud.request.clientRequest.utils.UtilsFile;
+import service.cloud.request.clientRequest.utils.files.CertificateUtils;
+import service.cloud.request.clientRequest.utils.files.DocumentConverterUtils;
+import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
 import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
 
 import javax.activation.DataHandler;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -164,7 +163,7 @@ public class GuiaServiceImpl implements GuiaInterface {
         String fecha = simpleDateFormat.format(transaction.getDOC_FechaVencimiento());
         DespatchAdviceType guia = documentWRP.getAdviceType();
 
-        byte[] xmlDocument = convertDocumentToBytes(despatchAdviceType);
+        byte[] xmlDocument = DocumentConverterUtils.convertDocumentToBytes(despatchAdviceType);
         byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
         DataHandler zipDocument = UtilsFile.compressUBLDocument(signedXmlDocument, documentName + ".xml");
 
@@ -241,10 +240,8 @@ public class GuiaServiceImpl implements GuiaInterface {
                     transactionResponse = generateResponseRest(documentWRP, responseDTO);
 
                     byte[] pdfBytes = documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion);
-                    //transaction.getDOC_Codigo(), documentWRP, transaction, configuracion);
                     transactionResponse.setPdf(pdfBytes);
 
-                    //AGREGAR A SAP CAMPO
                     logger.info("CODIGO TIKCET GUIAS SUNAT - [0]" + responseDTO.getNumTicket());
                     transactionResponse.setTicketRest(responseDTO.getNumTicket());
 
@@ -319,26 +316,6 @@ public class GuiaServiceImpl implements GuiaInterface {
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
         log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
         return transactionResponse;
-    }
-
-    // Método genérico para convertir cualquier tipo de documento a bytes
-    private <T> byte[] convertDocumentToBytes(T document) {
-        return convertToBytes(document, (Class<T>) document.getClass());
-    }
-
-    // Método privado para realizar la conversión a bytes
-    private <T> byte[] convertToBytes(T document, Class<T> documentClass) {
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(documentClass);
-            Marshaller marshaller = jaxbContext.createMarshaller();
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            marshaller.marshal(document, baos);
-
-            return baos.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException("Error al convertir " + documentClass.getSimpleName() + " a byte[]", e);
-        }
     }
 
     public ResponseDTO consult(String numTicket, String token) throws IOException {

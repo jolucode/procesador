@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.persistence.internal.oxm.ByteArraySource;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
-import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
+import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.applicationresponse_2.ApplicationResponseType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.DocumentResponseType;

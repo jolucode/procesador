@@ -26,8 +26,6 @@ import java.util.Optional;
  */
 public class ValidationHandler {
 
-    //private final Logger logger = Logger.getLogger(ValidationHandler.class);
-    //private final Logger logger = Logger.getLogger(ValidationHandler.class);}
     private final Logger logger = LoggerFactory.getLogger(ValidationHandler.class);
 
     private List<String> totalIDList = null;

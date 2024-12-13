@@ -10,46 +10,46 @@ import service.cloud.request.clientRequest.mongo.service.ILogService;
 
 @Service
 @RequiredArgsConstructor
-public class LogServiceImpl  implements ILogService {
+public class LogServiceImpl implements ILogService {
 
-  private final ILogRepo repo;
+    private final ILogRepo repo;
 
-  public Mono<Log> saveLogEntryToMongoDB(Log logEntry) {
-    // Puedes realizar operaciones adicionales antes de guardar, si es necesario
-    return repo.save(logEntry);
-  }
+    public Mono<Log> saveLogEntryToMongoDB(Log logEntry) {
+        // Puedes realizar operaciones adicionales antes de guardar, si es necesario
+        return repo.save(logEntry);
+    }
 
-  @Override
-  public Mono<Log> save(Log log) {
-    return repo.save(log);
-  }
+    @Override
+    public Mono<Log> save(Log log) {
+        return repo.save(log);
+    }
 
-  @Override
-  public Mono<Log> udpate(Log client, String id) {
-    return repo.findById(id).flatMap(v -> repo.save(client));
-  }
+    @Override
+    public Mono<Log> udpate(Log client, String id) {
+        return repo.findById(id).flatMap(v -> repo.save(client));
+    }
 
-  @Override
-  public Flux<Log> findAll() {
-    return repo.findAll();
-  }
+    @Override
+    public Flux<Log> findAll() {
+        return repo.findAll();
+    }
 
-  @Override
-  public Mono<Log> findById(String id) {
-    return repo.findById(id);
-  }
+    @Override
+    public Mono<Log> findById(String id) {
+        return repo.findById(id);
+    }
 
-  @Override
-  public Mono<Boolean> delete(String id) {
-    return repo.findById(id)
-        .hasElement()
-        .flatMap(valor -> {
-          if (valor) {
-            return repo.deleteById(id).thenReturn(valor);
-            //return Mono.just(valor);
-          } else {
-            return Mono.just(!valor);
-          }
-        });
-  }
+    @Override
+    public Mono<Boolean> delete(String id) {
+        return repo.findById(id)
+                .hasElement()
+                .flatMap(valor -> {
+                    if (valor) {
+                        return repo.deleteById(id).thenReturn(valor);
+                        //return Mono.just(valor);
+                    } else {
+                        return Mono.just(!valor);
+                    }
+                });
+    }
 }

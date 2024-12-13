@@ -3,7 +3,6 @@ package service.cloud.request.clientRequest.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -12,7 +11,6 @@ import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class Utils {
 
@@ -28,23 +26,6 @@ public class Utils {
             logger.error("Este es error en XMLGregorian -> " + e.getMessage());
         }
         return xmlDate;
-    }
-
-
-    public static final String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
-            throws Exception {
-
-        Date inputDate = xmlGregorianCal.toGregorianCalendar().getTime();
-
-        Locale locale = new Locale(IPDFCreatorConfig.LOCALE_ES,
-                IPDFCreatorConfig.LOCALE_PE);
-
-        SimpleDateFormat sdf = new SimpleDateFormat(
-                IPDFCreatorConfig.PATTERN_DATE, locale);
-        String issueDate = sdf.format(inputDate);
-
-
-        return issueDate;
     }
 
     public static BigDecimal round(BigDecimal value, int places) {
