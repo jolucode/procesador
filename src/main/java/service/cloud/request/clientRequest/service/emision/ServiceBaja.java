@@ -147,7 +147,7 @@ public class ServiceBaja implements IServiceBaja {
 
                 documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
                 transactionResponse = processOseResponseBAJA(cdrStatusResponse.getContent(), transaction, fileHandler, documentName, configuracion);
-
+                transactionResponse.setTicketRest(ticket);
             }
         } catch (Exception e) {
             logger.error("El error capturado es : " + e.getMessage());

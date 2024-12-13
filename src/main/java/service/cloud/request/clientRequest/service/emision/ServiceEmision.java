@@ -216,7 +216,7 @@ public class ServiceEmision implements IServiceEmision {
 
         CdrStatusResponse cdrStatusResponse = null;
         FileRequestDTO soapRequest = new FileRequestDTO();
-        soapRequest.setService("https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService");
+        soapRequest.setService("https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl");
         soapRequest.setUsername(configuracion.getUsuarioSol());
         soapRequest.setPassword(configuracion.getClaveSol());
         soapRequest.setFileName(DocumentNameHandler.getInstance().getZipName(documentName));
