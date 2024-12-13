@@ -173,54 +173,6 @@ public class ValidationHandler {
         }
     } //checkBasicInformation
 
-    /**
-     * Este metodo verifica la informacion del identificador del documento de
-     * COMUNICACION DE BAJA y RESUMEN DIARIO, el numero RUC del emisor y la
-     * fecha de emision.
-     *
-     * @param docIdentifier    El identificador del documento.
-     * @param senderIdentifier El numero RUC del emisor.
-     * @param issueDate        La fecha de emision.
-     * @throws ValidationException
-     */
-    public void checkBasicInformation2(String docIdentifier, String senderIdentifier, Date issueDate) throws ValidationException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+checkBasicInformation2() [" + this.docUUID + "]");
-        }
-        /*
-         * Validando identificador del documento
-         */
-        if (StringUtils.isBlank(docIdentifier)) {
-            throw new ValidationException(IVenturaError.ERROR_529);
-        }
-        if (!docIdentifier.startsWith(IUBLConfig.VOIDED_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.SUMMARY_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.VOIDED_SERIE_PREFIX_CPE)) {
-            throw new ValidationException(IVenturaError.ERROR_530);
-        }
-
-        /*
-         * Validando RUC del emisor electronico
-         */
-        if (IUBLConfig.DOC_RUC_LENGTH != senderIdentifier.length()) {
-            throw new ValidationException(IVenturaError.ERROR_519);
-        }
-        try {
-            Long.valueOf(senderIdentifier);
-        } catch (Exception e) {
-            throw new ValidationException(IVenturaError.ERROR_520);
-        }
-
-        /*
-         * Validando la fecha de emision
-         */
-        if (null == issueDate) {
-            throw new ValidationException(IVenturaError.ERROR_521);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-checkBasicInformation2() [" + this.docUUID + "]");
-        }
-    } //checkBasicInformation2
-
-
     public void checkRetentionDocument(RetentionType retentionType) throws ValidationException {
         long startTime = System.currentTimeMillis();
         if (logger.isDebugEnabled()) {

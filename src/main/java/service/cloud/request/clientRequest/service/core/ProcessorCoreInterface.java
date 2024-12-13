@@ -11,14 +11,9 @@ import java.io.File;
 
 public interface ProcessorCoreInterface {
 
-    byte[] processCDRResponseContigencia(byte[] cdrConstancy, File signedDocument, FileHandler fileHandler, String documentName, String documentCode, UBLDocumentWRP documentWRP, TransacctionDTO transaccion, ConfigData configuracion);
+    //byte[] processCDRResponseContigencia(byte[] cdrConstancy, File signedDocument, FileHandler fileHandler, String documentName, String documentCode, UBLDocumentWRP documentWRP, TransacctionDTO transaccion, ConfigData configuracion);
 
     TransaccionRespuesta processCDRResponseV2(byte[] cdrConstancy, byte[] signedDocument, UBLDocumentWRP documentWRP, TransacctionDTO transaction, ConfigData configuracion, String documentName, String attachmentPath) throws Exception;
 
     TransaccionRespuesta processResponseSinCDR(TransacctionDTO transaction, CdrStatusResponse cdrStatusResponse);
-
-
-    TransaccionRespuesta.Sunat proccessResponse(byte[] cdrConstancy, TransacctionDTO transaction, String sunatType);
-
-
 }

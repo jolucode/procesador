@@ -21,6 +21,8 @@ import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
 import service.cloud.request.clientRequest.utils.Constants;
+import service.cloud.request.clientRequest.utils.SunatResponseUtils;
+import service.cloud.request.clientRequest.utils.UtilsFile;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.applicationresponse_2.ApplicationResponseType;
@@ -61,15 +63,13 @@ public class ServiceBajaConsulta implements IServiceBaja {
     @Override
     public TransaccionRespuesta transactionVoidedDocument(TransacctionDTO transaction, String doctype) {
 
-        String attachmentPath = getAttachmentPath(transaction, doctype);
-        FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
-        fileHandler.setBaseDirectory(attachmentPath);
-
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
+
+        String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDoc());
+
         Client client = clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
         ConfigData configuracion = createConfigData(client);
 
-        String documentName = "";
         try {
 
             FileRequestDTO soapRequest = new FileRequestDTO();
@@ -78,10 +78,10 @@ public class ServiceBajaConsulta implements IServiceBaja {
             soapRequest.setPassword(configuracion.getClaveSol());
             soapRequest.setTicket(transaction.getTicket_Baja());
 
-            Mono<FileResponseDTO> fileResponseDTOMono = documentBajaQueryService.processAndSaveFile(soapRequest.getService(), soapRequest);//ioseClient.getStatus(transaction.getDocIdentidad_Nro(), transaction.getTicket_Baja());
+            Mono<FileResponseDTO> fileResponseDTOMono = documentBajaQueryService.processAndSaveFile(soapRequest.getService(), soapRequest);
             FileResponseDTO fileRequestDTO = fileResponseDTOMono.block();
-            documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
-            transactionResponse = processOseResponseBAJA(fileRequestDTO.getContent(), transaction, fileHandler, documentName, configuracion);
+            String documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
+            transactionResponse = processOseResponseBAJA(fileRequestDTO.getContent(), transaction, attachmentPath, documentName, configuracion);
 
         } catch (Exception e) {
             logger.error("El error capturado es : " + e.getMessage());
@@ -90,14 +90,14 @@ public class ServiceBajaConsulta implements IServiceBaja {
         return transactionResponse;
     }
 
-    private TransaccionRespuesta processOseResponseBAJA(byte[] statusResponse, TransacctionDTO transaction, FileHandler fileHandler, String documentName, ConfigData configuracion) {
-        TransaccionRespuesta.Sunat sunatResponse = proccessResponse(statusResponse, transaction, configuracion.getIntegracionWs());
+    private TransaccionRespuesta processOseResponseBAJA(byte[] statusResponse, TransacctionDTO transaction, String baseDirectory, String documentName, ConfigData configuracion) {
+        TransaccionRespuesta.Sunat sunatResponse = SunatResponseUtils.proccessResponse(statusResponse, transaction, configuracion.getIntegracionWs());//proccessResponse(statusResponse, transaction, configuracion.getIntegracionWs());
+
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
         if ((IVenturaError.ERROR_0.getId() == sunatResponse.getCodigo()) || (4000 <= sunatResponse.getCodigo())) {
 
-            /**se realiza el anexo del documento de baja*/
             if (null != statusResponse && 0 < statusResponse.length) {
-                fileHandler.storePDFDocumentInDisk(statusResponse, documentName + "_SUNAT_CDR_BAJA", ISunatConnectorConfig.EE_ZIP);
+                UtilsFile.storePDFDocumentInDisk(statusResponse, baseDirectory, documentName + "_SUNAT_CDR_BAJA", ISunatConnectorConfig.EE_ZIP);
             }
             transactionResponse.setMensaje(sunatResponse.getMensaje());
             transactionResponse.setZip(statusResponse);
@@ -107,73 +107,6 @@ public class ServiceBajaConsulta implements IServiceBaja {
             transactionResponse.setZip(statusResponse);
         }
         return transactionResponse;
-    }
-
-    public TransaccionRespuesta.Sunat proccessResponse(byte[] cdrConstancy, TransacctionDTO transaction, String
-            sunatType) {
-        try {
-            String descripcionRespuesta = "";
-            Optional<byte[]> unzipedResponse = documentFormatInterface.unzipResponse(cdrConstancy);
-            int codigoObservacion = 0;
-            int codigoRespuesta = 0;
-            String identificador = Constants.IDENTIFICATORID_OSE;
-            if (unzipedResponse.isPresent()) {
-                StringBuilder descripcion = new StringBuilder();
-                JAXBContext jaxbContext = JAXBContext.newInstance(ApplicationResponseType.class);
-                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-                JAXBElement<ApplicationResponseType> jaxbElement = unmarshaller.unmarshal(new ByteArraySource(unzipedResponse.get()), ApplicationResponseType.class);
-                ApplicationResponseType applicationResponse = jaxbElement.getValue();
-                List<DocumentResponseType> documentResponse = applicationResponse.getDocumentResponse();
-                List<TransaccionRespuesta.Observacion> observaciones = new ArrayList<>();
-                for (DocumentResponseType documentResponseType : documentResponse) {
-                    ResponseType response = documentResponseType.getResponse();
-                    ResponseCodeType responseCode = response.getResponseCode();
-                    codigoRespuesta = Optional.ofNullable(responseCode.getValue()).map(s -> s.isEmpty() ? null : s).map(Integer::parseInt).orElse(0);
-                    List<DescriptionType> descriptions = response.getDescription();
-                    for (DescriptionType description : descriptions) {
-                        descripcion.append(description.getValue());
-                    }
-                    if (sunatType.equalsIgnoreCase(Constants.IDENTIFICATORID_OSE)) { //cambio aqui NUMA
-                        identificador = documentResponseType.getDocumentReference().getID().getValue();
-                    } else {
-                        identificador = documentResponseType.getResponse().getReferenceID().getValue();
-                    }
-                    List<StatusType> statusTypes = response.getStatus();
-                    for (StatusType statusType : statusTypes) {
-                        List<StatusReasonType> statusReason = statusType.getStatusReason();
-                        String mensajes = statusReason.parallelStream().map(TextType::getValue).collect(Collectors.joining("\n"));
-                        StatusReasonCodeType statusReasonCode = statusType.getStatusReasonCode();
-                        codigoObservacion = Optional.ofNullable(statusReasonCode.getValue()).map(s -> s.isEmpty() ? null : s).map(Integer::parseInt).orElse(0);
-                        TransaccionRespuesta.Observacion observacion = new TransaccionRespuesta.Observacion();
-                        observacion.setCodObservacion(codigoObservacion);
-                        observacion.setMsjObservacion(mensajes);
-                        observaciones.add(observacion);
-                    }
-                }
-                descripcionRespuesta = descripcion.toString();
-                logger.info(descripcionRespuesta);
-                TransaccionRespuesta.Sunat sunatResponse = new TransaccionRespuesta.Sunat();
-                sunatResponse.setListaObs(observaciones);
-                sunatResponse.setId(identificador);
-                sunatResponse.setCodigo(codigoRespuesta);
-                sunatResponse.setMensaje(descripcionRespuesta);
-                sunatResponse.setEmisor(transaction.getDocIdentidad_Nro());
-                return sunatResponse;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new TransaccionRespuesta.Sunat();
-    }
-
-    private String getAttachmentPath(TransacctionDTO transaction, String doctype) {
-        Calendar fecha = Calendar.getInstance();
-        fecha.setTime(transaction.getDOC_FechaEmision());
-        int anio = fecha.get(Calendar.YEAR);
-        int mes = fecha.get(Calendar.MONTH) + 1;
-        int dia = fecha.get(Calendar.DAY_OF_MONTH);
-
-        return applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + "anexo" + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
     }
 
     private ConfigData createConfigData(Client client) {

@@ -11,6 +11,4 @@ public interface DocumentFormatInterface {
 
     byte[] createPDFDocument(UBLDocumentWRP wrp, TransacctionDTO transaction, ConfigData configuracion);
 
-    Optional<byte[]> unzipResponse(byte[] cdr) throws IOException;
-
 }

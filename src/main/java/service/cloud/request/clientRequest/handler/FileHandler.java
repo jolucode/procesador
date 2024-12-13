@@ -122,48 +122,6 @@ public class FileHandler {
         return documentPath;
     } //storeDocumentInDisk
 
-    public DataHandler compressUBLDocument(File document, String documentName, String rucCliente, String rucEmpresa) throws IOException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+compressUBLDocument() [" + this.docUUID + "]");
-        }
-        DataHandler zipDocument = null;
-        try {
-            String separator = File.separator;
-            File zip = new File(this.baseDirectory + separator + documentName + ISunatConnectorConfig.EE_ZIP);
-            File file = new File(this.baseDirectory);
-
-            if (!file.exists()) {
-                file.mkdir();
-            }
-            try (FileInputStream fis = new FileInputStream(document)) {
-                FileOutputStream fos = new FileOutputStream(zip);
-                try (ZipOutputStream zos = new ZipOutputStream(fos)) {
-                    byte[] array = new byte[10000];
-                    int read = 0;
-                    zos.putNextEntry(new ZipEntry(document.getName()));
-                    while ((read = fis.read(array, 0, array.length)) != -1) {
-                        zos.write(array, 0, read);
-                    }
-                    zos.closeEntry();
-                }
-            }
-            /* Retornando el objeto DATAHANDLER */
-            zipDocument = new DataHandler(new javax.activation.FileDataSource(zip));
-            if (logger.isDebugEnabled()) {
-                logger.debug("compressUBLDocument() [" + this.docUUID + "] El documento UBL fue convertido a formato ZIP correctamente.");
-            }
-        } catch (Exception e) {
-            logger.error("compressUBLDocument() [" + this.docUUID + "] " + e.getMessage());
-            throw new IOException(IVenturaError.ERROR_455.getMessage());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-compressUBLDocument() [" + this.docUUID + "]");
-        }
-        return zipDocument;
-    } //compressUBLDocument
-
-    //compressUBLDocument
-
     /**
      * Este metodo convierte un archivo, que se encuentra en una ruta
      * especifica, en bytes.
@@ -185,39 +143,6 @@ public class FileHandler {
         }
     } //convertFileToBytes
 
-    public boolean storePDFDocumentInDisk(byte[] pdfBytes, String documentName, String extension) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+storePDFDocumentInDisk() [" + this.docUUID + "]");
-        }
-        boolean flag = false;
-        try {
-            String separator = File.separator;
-            File file = new File(this.baseDirectory);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            String filePath = this.baseDirectory + separator + documentName + extension;
-            File newFile = new File(filePath);
-            if (!newFile.exists()) {
-                newFile.createNewFile();
-            } else {
-                boolean canWrite = newFile.canWrite();
-                if (!canWrite) {
-
-                    throw new VenturaExcepcion("No se puede guardar el documento PDF porque est\u00fa siendo usado por otro proceso. Cierre el documento y realice nuevamente el env\u00d3o");
-                }
-            }
-            Path path = Paths.get(filePath);
-            Files.write(path, pdfBytes);
-            flag = true;
-        } catch (IOException | VenturaExcepcion e) {
-            logger.error("storePDFDocumentInDisk() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("+storePDFDocumentInDisk() [" + this.docUUID + "]");
-        }
-        return flag;
-    } //storePDFDocumentInDisk
 
     public Object getSignedDocument(File signedDocument, String documentCode) {
         if (logger.isDebugEnabled()) {

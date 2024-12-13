@@ -1,0 +1,107 @@
+package service.cloud.request.clientRequest.utils;
+
+
+import org.eclipse.persistence.internal.oxm.ByteArrayDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StreamUtils;
+import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
+import service.cloud.request.clientRequest.exception.VenturaExcepcion;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Calendar;
+
+import javax.activation.DataHandler;
+import java.io.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+public class UtilsFile {
+
+    static Logger logger = LoggerFactory.getLogger(UtilsFile.class);
+
+    public static String getAttachmentPath(TransacctionDTO transaction, String doctype, String rutaBaseDoc) {
+        Calendar fecha = Calendar.getInstance();
+        fecha.setTime(transaction.getDOC_FechaEmision());
+        int anio = fecha.get(Calendar.YEAR);
+        int mes = fecha.get(Calendar.MONTH) + 1;
+        int dia = fecha.get(Calendar.DAY_OF_MONTH);
+
+        return rutaBaseDoc
+                + transaction.getDocIdentidad_Nro()
+                + File.separator
+                + "anexo"
+                + File.separator
+                + anio
+                + File.separator
+                + mes
+                + File.separator
+                + dia
+                + File.separator
+                + transaction.getSN_DocIdentidad_Nro()
+                + File.separator
+                + doctype;
+    }
+
+
+    public static boolean storePDFDocumentInDisk(byte[] pdfBytes, String baseDirectory, String documentName, String extension) {
+
+        boolean flag = false;
+        try {
+            String separator = File.separator;
+            File file = new File(baseDirectory);
+            if (!file.exists()) {
+                file.mkdirs(); // Crea el directorio si no existe
+            }
+            String filePath = baseDirectory + separator + documentName + extension;
+            File newFile = new File(filePath);
+            if (!newFile.exists()) {
+                newFile.createNewFile();
+            } else {
+                boolean canWrite = newFile.canWrite();
+                if (!canWrite) {
+                    throw new VenturaExcepcion("No se puede guardar el documento PDF porque está siendo usado por otro proceso. Cierre el documento y realice nuevamente el envío.");
+                }
+            }
+            Path path = Paths.get(filePath);
+            Files.write(path, pdfBytes); // Escribe los bytes en el archivo
+            flag = true;
+        } catch (IOException | VenturaExcepcion e) {
+            logger.error("storePDFDocumentInDisk() [" + "] Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("-storePDFDocumentInDisk() [" + "]");
+        }
+        return flag;
+    }
+
+
+    public static DataHandler compressUBLDocument(byte[] document, String documentName) throws IOException {
+        DataHandler zipDocument = null;
+
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(document);
+             ByteArrayOutputStream bos = new ByteArrayOutputStream();
+             ZipOutputStream zos = new ZipOutputStream(bos)) {
+
+            byte[] array = new byte[StreamUtils.BUFFER_SIZE];
+            int read;
+            zos.putNextEntry(new ZipEntry(documentName));
+
+            while ((read = bis.read(array)) != -1) {
+                zos.write(array, 0, read);
+            }
+            zos.closeEntry();
+
+            // Retornando el objeto DATAHANDLER
+            zipDocument = new DataHandler(new ByteArrayDataSource(bos.toByteArray(), "application/zip"));
+
+        } catch (Exception e) {
+            throw new IOException("Error al comprimir el documento UBL: " + e.getMessage(), e);
+        }
+
+        return zipDocument;
+    }
+}

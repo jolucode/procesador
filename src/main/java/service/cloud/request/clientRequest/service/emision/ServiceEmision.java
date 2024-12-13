@@ -31,6 +31,7 @@ import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
 import service.cloud.request.clientRequest.utils.CertificateUtils;
 import service.cloud.request.clientRequest.utils.DocumentNameUtils;
+import service.cloud.request.clientRequest.utils.UtilsFile;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
 import service.cloud.request.clientRequest.utils.exception.ConfigurationException;
 import service.cloud.request.clientRequest.utils.exception.DateUtils;
@@ -100,7 +101,7 @@ public class ServiceEmision implements IServiceEmision {
         UBLDocumentWRP documentWRP = new UBLDocumentWRP();
 
         // Configura la ruta de almacenamiento del archivo
-        String attachmentPath = getAttachmentPath(transaction, doctype);
+        String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDoc());
         fileHandler.setBaseDirectory(attachmentPath);
 
         String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
@@ -143,7 +144,7 @@ public class ServiceEmision implements IServiceEmision {
 
         ConfigData configuracion = createConfigData(client);
 
-        DataHandler zipDocument = compressUBLDocumentv2(signedXmlDocument, documentName + ".xml");
+        DataHandler zipDocument = UtilsFile.compressUBLDocument(signedXmlDocument, documentName + ".xml");
 
         byte[] zipBytes = extractBytesFromDataHandler(zipDocument); // Método para extraer bytes de DataHandler
         String base64Content = convertToBase64(zipBytes);
@@ -294,17 +295,6 @@ public class ServiceEmision implements IServiceEmision {
         return false;
     }
 
-
-    private String getAttachmentPath(TransacctionDTO transaction, String doctype) {
-        Calendar fecha = Calendar.getInstance();
-        fecha.setTime(transaction.getDOC_FechaEmision());
-        int anio = fecha.get(Calendar.YEAR);
-        int mes = fecha.get(Calendar.MONTH) + 1;
-        int dia = fecha.get(Calendar.DAY_OF_MONTH);
-
-        return applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + "anexo" + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
-    }
-
     private Client getClientData(TransacctionDTO transaction) {
         return clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
     }
@@ -345,38 +335,7 @@ public class ServiceEmision implements IServiceEmision {
     }
 
 
-    private DataHandler compressUBLDocumentv2(byte[] document, String documentName) throws IOException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+compressUBLDocument() [" + this.docUUID + "]");
-        }
-        DataHandler zipDocument = null;
-        try {
-            try (ByteArrayInputStream bis = new ByteArrayInputStream(document)) {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                try (ZipOutputStream zos = new ZipOutputStream(bos)) {
-                    byte[] array = new byte[10000];
-                    int read = 0;
-                    zos.putNextEntry(new ZipEntry(documentName));
-                    while ((read = bis.read(array, 0, array.length)) != -1) {
-                        zos.write(array, 0, read);
-                    }
-                    zos.closeEntry();
-                }
-                /* Retornando el objeto DATAHANDLER */
-                zipDocument = new DataHandler(new ByteArrayDataSource(bos.toByteArray(), "application/zip"));
-                if (logger.isDebugEnabled()) {
-                    logger.debug("compressUBLDocument() [" + this.docUUID + "] El documento UBL fue convertido a formato ZIP correctamente.");
-                }
-            }
-        } catch (Exception e) {
-            logger.error("compressUBLDocument() [" + this.docUUID + "] " + e.getMessage());
-            throw new IOException(IVenturaError.ERROR_455.getMessage());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-compressUBLDocument() [" + this.docUUID + "]");
-        }
-        return zipDocument;
-    }
+
 
     // Método genérico para convertir cualquier tipo de documento a bytes
     private <T> byte[] convertDocumentToBytes(T document) {

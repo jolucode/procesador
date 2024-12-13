@@ -90,33 +90,4 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
         }
         return pdfBytes;
     }
-
-    @Override
-    public Optional<byte[]> unzipResponse(byte[] cdr) throws IOException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(cdr);
-        ZipInputStream zis = new ZipInputStream(bais);
-        ZipEntry entry = zis.getNextEntry();
-        byte[] xml = null;
-        if (entry != null) { // valida dos veces lo mismo
-            while (entry != null) {
-                if (!entry.isDirectory()) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    byte[] bytesIn = new byte['?'];
-                    int read;
-                    while ((read = zis.read(bytesIn)) != -1) {
-                        baos.write(bytesIn, 0, read);
-                    }
-                    baos.close();
-                    xml = baos.toByteArray();
-                }
-                zis.closeEntry();
-                entry = zis.getNextEntry();
-            }
-            zis.close();
-            return Optional.ofNullable(xml);
-        } else {
-            zis.close();
-            return Optional.empty();
-        }
-    }
 }

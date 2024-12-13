@@ -31,12 +31,15 @@ import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
 import service.cloud.request.clientRequest.utils.CertificateUtils;
+import service.cloud.request.clientRequest.utils.UtilsFile;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
 import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
 
 import javax.activation.DataHandler;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -102,8 +105,6 @@ public class GuiaServiceImpl implements GuiaInterface {
         }
 
 
-
-
         ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
         validationHandler.checkBasicInformation(
                 transaction.getDOC_Id(),
@@ -137,19 +138,12 @@ public class GuiaServiceImpl implements GuiaInterface {
 
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
 
-        Calendar fecha2 = Calendar.getInstance();
-        fecha2.setTime(transaction.getDOC_FechaEmision());
-        int anio = fecha2.get(Calendar.YEAR);
-        int mes = fecha2.get(Calendar.MONTH) + 1;
-        int dia = fecha2.get(Calendar.DAY_OF_MONTH);
-
-        String attachmentPath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() +
-                File.separator + "anexo"  + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
-        fileHandler.setBaseDirectory(attachmentPath);
-
+        /**Ruta completa donde se dejara el documento*/
+        String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDoc());
         fileHandler.setBaseDirectory(attachmentPath);
 
         String documentPath = null;
+
         documentPath = fileHandler.storeDocumentInDisk(despatchAdviceType, documentName);
 
         SignerHandler signerHandler = SignerHandler.newInstance();
@@ -170,7 +164,9 @@ public class GuiaServiceImpl implements GuiaInterface {
         String fecha = simpleDateFormat.format(transaction.getDOC_FechaVencimiento());
         DespatchAdviceType guia = documentWRP.getAdviceType();
 
-        DataHandler zipDocument = fileHandler.compressUBLDocument(signedDocument, documentName, transaction.getSN_DocIdentidad_Nro(), transaction.getDocIdentidad_Nro());
+        byte[] xmlDocument = convertDocumentToBytes(despatchAdviceType);
+        byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+        DataHandler zipDocument = UtilsFile.compressUBLDocument(signedXmlDocument, documentName + ".xml");
 
         ConfigData configuracion = ConfigData
                 .builder()
@@ -190,8 +186,10 @@ public class GuiaServiceImpl implements GuiaInterface {
                 .build();
 
         logger.info("Se esta apuntando al ambiente : " + configuracion.getAmbiente() + " - " + configuracion.getIntegracionWs());
-        if(configuracion.getIntegracionWs().equals("OSE")) logger.info("Url Service: "+ applicationProperties.getUrlOse());
-        else if(configuracion.getIntegracionWs().equals("SUNAT")) logger.info("Url Service: "+ applicationProperties.getUrlSunatEmision());
+        if (configuracion.getIntegracionWs().equals("OSE"))
+            logger.info("Url Service: " + applicationProperties.getUrlOse());
+        else if (configuracion.getIntegracionWs().equals("SUNAT"))
+            logger.info("Url Service: " + applicationProperties.getUrlSunatEmision());
         logger.info("Usuario Sol: " + configuracion.getUserNameSunatSunat());
         logger.info("Clave Sol: " + configuracion.getPasswordSunatSunat());
         logger.info("Client id: " + configuracion.getClientId());
@@ -242,9 +240,9 @@ public class GuiaServiceImpl implements GuiaInterface {
                 if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("0")) {
                     transactionResponse = generateResponseRest(documentWRP, responseDTO);
 
-                    byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null, signedDocument, fileHandler, documentName,
-                            transaction.getDOC_Codigo(), documentWRP, transaction, configuracion);
-                    transactionResponse.setPdf(pdf);
+                    byte[] pdfBytes = documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion);
+                    //transaction.getDOC_Codigo(), documentWRP, transaction, configuracion);
+                    transactionResponse.setPdf(pdfBytes);
 
                     //AGREGAR A SAP CAMPO
                     logger.info("CODIGO TIKCET GUIAS SUNAT - [0]" + responseDTO.getNumTicket());
@@ -282,8 +280,7 @@ public class GuiaServiceImpl implements GuiaInterface {
                     //responseDTO.setCodRespuesta("0");
                     if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("0")) {
                         transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                        byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null, signedDocument, fileHandler, documentName,
-                                transaction.getDOC_Codigo(), documentWRP, transaction, configuracion);
+                        byte[] pdf = documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion);
                         transactionResponse.setPdf(pdf);
 
                         //AGREGAR A SAP CAMPO
@@ -308,7 +305,7 @@ public class GuiaServiceImpl implements GuiaInterface {
             logger.debug("-transactionRemissionGuideDocument() [" + this.docUUID + "]");
         }
 
-        if (client.getPdfBorrador().equals("true")){
+        if (client.getPdfBorrador().equals("true")) {
             transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
         }
 
@@ -324,6 +321,25 @@ public class GuiaServiceImpl implements GuiaInterface {
         return transactionResponse;
     }
 
+    // Método genérico para convertir cualquier tipo de documento a bytes
+    private <T> byte[] convertDocumentToBytes(T document) {
+        return convertToBytes(document, (Class<T>) document.getClass());
+    }
+
+    // Método privado para realizar la conversión a bytes
+    private <T> byte[] convertToBytes(T document, Class<T> documentClass) {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(documentClass);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            marshaller.marshal(document, baos);
+
+            return baos.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Error al convertir " + documentClass.getSimpleName() + " a byte[]", e);
+        }
+    }
 
     public ResponseDTO consult(String numTicket, String token) throws IOException {
 
