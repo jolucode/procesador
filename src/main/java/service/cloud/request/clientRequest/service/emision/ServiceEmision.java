@@ -89,7 +89,7 @@ public class ServiceEmision implements IServiceEmision {
 
         String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
         byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
-        CertificateUtils .validateCertificate(certificado,client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
+        CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
 
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
@@ -196,7 +196,18 @@ public class ServiceEmision implements IServiceEmision {
         soapRequest.setPassword(configuracion.getClaveSol());
         soapRequest.setFileName(DocumentNameHandler.getInstance().getZipName(documentName));
         soapRequest.setContentFile(base64Content);
+
+        //Mono<FileResponseDTO> monoResponse = documentEmissionService.processDocumentEmission(soapRequest.getService(), soapRequest);
+        long startTime = System.currentTimeMillis(); // Tiempos de inicio
+
+        // Realiza la llamada al servicio
         Mono<FileResponseDTO> monoResponse = documentEmissionService.processDocumentEmission(soapRequest.getService(), soapRequest);
+
+        long endTime = System.currentTimeMillis(); // Tiempos de finalización
+        long duration = endTime - startTime; // Duración en milisegundos
+
+        // Log del tiempo
+        logger.info("La llamada al servicio 'processDocumentEmission' tomó " + duration + " ms");
 
         FileResponseDTO responseDTO = monoResponse.block();
         if (responseDTO.getContent() != null) {

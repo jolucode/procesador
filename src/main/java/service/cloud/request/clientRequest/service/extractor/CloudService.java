@@ -15,9 +15,6 @@ import reactor.core.scheduler.Schedulers;
 import service.cloud.request.clientRequest.config.ProviderProperties;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
-import service.cloud.request.clientRequest.dto.dto.TransactionImpuestosDTO;
-import service.cloud.request.clientRequest.dto.dto.TransactionLineasDTO;
-import service.cloud.request.clientRequest.dto.dto.TransactionLineasImpuestoDTO;
 import service.cloud.request.clientRequest.dto.request.RequestPost;
 import service.cloud.request.clientRequest.dto.response.Data;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
@@ -27,12 +24,9 @@ import service.cloud.request.clientRequest.service.emision.ServiceBajaConsulta;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
 import service.cloud.request.clientRequest.service.publicar.PublicacionManager;
-import service.cloud.request.clientRequest.utils.Constants;
 
 
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Predicate;
 
 import static java.math.BigDecimal.valueOf;
 
@@ -60,7 +54,7 @@ public class CloudService implements CloudInterface {
     @Autowired
     ServiceBajaConsulta serviceBajaConsulta;
 
-    @Override
+    /*@Override
     public ResponseEntity<Void> proccessDocument(String stringRequestOnpremise) {
         String datePattern = "(\"\\w+\":\\s*\"\\d{4}-\\d{2}-\\d{2}) \\d{2}:\\d{2}:\\d{2}\\.\\d\"";
         String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
@@ -85,7 +79,32 @@ public class CloudService implements CloudInterface {
             logger.error("Error al procesar documentos: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }*/
+
+    @Override
+    public Mono<ResponseEntity<Object>> proccessDocument(String stringRequestOnpremise) {
+        String datePattern = "(\"\\w+\":\\s*\"\\d{4}-\\d{2}-\\d{2}) \\d{2}:\\d{2}:\\d{2}\\.\\d\"";
+        String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
+
+        return Mono.fromCallable(() -> {
+                    Gson gson = new Gson();
+                    return gson.fromJson(updatedJson, TransacctionDTO[].class);
+                })
+                .flatMapMany(Flux::fromArray) // Convertir el array en un flujo
+                .flatMap(transaccion ->
+                                processTransaction(transaccion) // Procesar cada transacción
+                                        .subscribeOn(Schedulers.boundedElastic()) // Ejecución en hilos aptos para operaciones bloqueantes
+                                        .doOnError(error -> logger.error("Error procesando transacción: {}", error.getMessage()))
+                        , 100) // Paralelismo: procesa hasta 5 transacciones simultáneamente
+                .onErrorContinue((error, obj) -> logger.warn("Continuando tras error: {} en transacción: {}", error.getMessage(), obj))
+                .then() // Completar después de procesar todas las transacciones
+                .map(ignored -> ResponseEntity.ok().build()) // Devolver ResponseEntity<Void>
+                .onErrorResume(error -> {
+                    logger.error("Error general al procesar documentos: {}", error.getMessage());
+                    return Mono.just(ResponseEntity.<Void>status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
+
 
     public int anexarDocumentos(RequestPost request) {
         HttpResponse<String> response = null;

@@ -1,9 +1,10 @@
 package service.cloud.request.clientRequest.service.extractor;
 
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Mono;
 
 public interface CloudInterface {
 
-    ResponseEntity<Void> proccessDocument(String ejemploString);
+    Mono<ResponseEntity<Object>> proccessDocument(String ejemploString);
 
 }

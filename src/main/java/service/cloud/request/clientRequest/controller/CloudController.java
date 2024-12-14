@@ -14,9 +14,14 @@ public class CloudController {
     @Autowired
     private CloudService cloudService;
 
-    @PostMapping("/procesar")
+    /*@PostMapping("/procesar")
     public ResponseEntity<Void> proccessDocument(@RequestBody String listDocument) {
         return cloudService.proccessDocument(listDocument);
+    }*/
+
+    @PostMapping("/procesar")
+    public Mono<ResponseEntity<Object>> processDocument(@RequestBody String stringRequestOnpremise) {
+        return cloudService.proccessDocument(stringRequestOnpremise);
     }
 
 }
