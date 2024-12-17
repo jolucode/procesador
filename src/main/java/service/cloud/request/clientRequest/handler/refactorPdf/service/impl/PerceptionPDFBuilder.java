@@ -85,7 +85,7 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
             perceptionObj.setSenderRuc(perceptionType.getPerceptionType().getAgentParty().getPartyIdentification().get(0).getID().getValue());
             perceptionObj.setSenderFiscalAddress(perceptionType.getPerceptionType().getAgentParty().getPostalAddress().getStreetName().getValue());
             perceptionObj.setSenderDepProvDist(formatDepProvDist(perceptionType.getPerceptionType().getAgentParty().getPostalAddress()));
-            perceptionObj.setSenderLogo("C:\\clientes\\files\\20510910517\\COMPANY_LOGO.jpg");
+            perceptionObj.setSenderLogo(perceptionType.getTransaccion().getDocIdentidad_Nro());
             perceptionObj.setTelValue(perceptionType.getTransaccion().getTelefono());
             perceptionObj.setWebValue(perceptionType.getTransaccion().getWeb());
             perceptionObj.setSenderMail(perceptionType.getTransaccion().getEMail());

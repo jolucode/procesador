@@ -87,7 +87,7 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
             retentionObject.setSenderRuc(retentionType.getRetentionType().getAgentParty().getPartyIdentification().get(0).getID().getValue());
             retentionObject.setSenderFiscalAddress(retentionType.getRetentionType().getAgentParty().getPostalAddress().getStreetName().getValue());
             retentionObject.setSenderDepProvDist(formatDepProvDist(retentionType.getRetentionType().getAgentParty().getPostalAddress()));
-            retentionObject.setSenderLogo("C:\\clientes\\files\\20510910517\\COMPANY_LOGO.jpg");
+            retentionObject.setSenderLogo(retentionType.getTransaccion().getDocIdentidad_Nro());
 
             retentionObject.setComentarios(retentionType.getTransaccion().getFE_Comentario());
             retentionObject.setTel(retentionType.getTransaccion().getTelefono());

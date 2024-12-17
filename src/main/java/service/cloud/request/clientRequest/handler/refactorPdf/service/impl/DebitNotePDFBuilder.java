@@ -108,7 +108,7 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
             debitNoteObj.setSenderDepProvDist(debitNoteType.getTransaccion().getDIR_Distrito() + " " + debitNoteType.getTransaccion().getDIR_Provincia() + " " + debitNoteType.getTransaccion().getDIR_Departamento());
             debitNoteObj.setSenderContact(debitNoteType.getTransaccion().getPersonContacto());
             debitNoteObj.setSenderMail(debitNoteType.getTransaccion().getEMail());
-            debitNoteObj.setSenderLogo("C:\\clientes\\files\\20510910517\\COMPANY_LOGO.jpg");
+            debitNoteObj.setSenderLogo(debitNoteType.getTransaccion().getDocIdentidad_Nro());
             debitNoteObj.setWeb(debitNoteType.getTransaccion().getWeb());
             debitNoteObj.setPorcentajeIGV(debitNoteType.getTransaccion().getDOC_PorcImpuesto());
             debitNoteObj.setComentarios(debitNoteType.getTransaccion().getFE_Comentario());

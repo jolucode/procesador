@@ -280,7 +280,7 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             creditNoteObj.setSenderDepProvDist(creditNoteType.getTransaccion().getDIR_Distrito() + " " + creditNoteType.getTransaccion().getDIR_Provincia() + " " + creditNoteType.getTransaccion().getDIR_Departamento());
             creditNoteObj.setSenderContact(creditNoteType.getTransaccion().getPersonContacto());
             creditNoteObj.setSenderMail(creditNoteType.getTransaccion().getEMail());
-            creditNoteObj.setSenderLogo("C:\\clientes\\files\\20510910517\\COMPANY_LOGO.jpg");
+            creditNoteObj.setSenderLogo(creditNoteType.getTransaccion().getDocIdentidad_Nro());
             creditNoteObj.setWeb(creditNoteType.getTransaccion().getWeb());
             creditNoteObj.setPorcentajeIGV(creditNoteType.getTransaccion().getDOC_PorcImpuesto());
             creditNoteObj.setComentarios(creditNoteType.getTransaccion().getFE_Comentario());
