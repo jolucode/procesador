@@ -161,7 +161,8 @@ public class ServiceEmision implements IServiceEmision {
         Thread.sleep(50);
 
         FileRequestDTO soapRequest = new FileRequestDTO();
-        soapRequest.setService("https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl");
+        String urlClient = applicationProperties.obtenerUrl(configuracion.getIntegracionWs(), transaction.getFE_Estado(), transaction.getFE_TipoTrans(), transaction.getDOC_Codigo());
+        soapRequest.setService(urlClient);
         soapRequest.setUsername(configuracion.getUsuarioSol());
         soapRequest.setPassword(configuracion.getClaveSol());
         soapRequest.setFileName(DocumentNameHandler.getInstance().getZipName(documentName));
@@ -190,7 +191,8 @@ public class ServiceEmision implements IServiceEmision {
     private TransaccionRespuesta processCancelledTransaction(TransacctionDTO transaction, byte[] signedXmlDocument, UBLDocumentWRP documentWRP, ConfigData configuracion, String documentName, String attachmentPath) throws Exception {
 
         FileRequestDTO soapRequest = new FileRequestDTO();
-        soapRequest.setService("https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl");
+        String urlClient = applicationProperties.obtenerUrl(configuracion.getIntegracionWs(), transaction.getFE_Estado(), transaction.getFE_TipoTrans(), transaction.getDOC_Codigo());
+        soapRequest.setService(urlClient);
         soapRequest.setUsername(configuracion.getUsuarioSol());
         soapRequest.setPassword(configuracion.getClaveSol());
         soapRequest.setRucComprobante(transaction.getDocIdentidad_Nro());

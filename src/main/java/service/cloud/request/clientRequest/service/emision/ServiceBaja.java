@@ -87,7 +87,7 @@ public class ServiceBaja implements IServiceBaja {
 
             String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
             byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
-            CertificateUtils .validateCertificate(certificado,client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
+            CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
 
             String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
             SignerHandler signerHandler = SignerHandler.newInstance();
@@ -103,7 +103,8 @@ public class ServiceBaja implements IServiceBaja {
             String base64Content = convertToBase64(zipBytes);
 
             FileRequestDTO soapRequest = new FileRequestDTO();
-            soapRequest.setService("https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl");
+            String urlClient = applicationProperties.obtenerUrl(client.getIntegracionWs(), transaction.getFE_Estado(), transaction.getFE_TipoTrans(), transaction.getDOC_Codigo());
+            soapRequest.setService(urlClient);
             soapRequest.setUsername(configuracion.getUsuarioSol());
             soapRequest.setPassword(configuracion.getClaveSol());
             soapRequest.setFileName(DocumentNameHandler.getInstance().getZipName(documentName));

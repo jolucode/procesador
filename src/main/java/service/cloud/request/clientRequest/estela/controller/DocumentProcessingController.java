@@ -38,15 +38,15 @@ public class DocumentProcessingController {
         switch (requestDTO.getService()) {
             case "SUNAT":
                 if (requestDTO.getFileName().contains("-20-") || requestDTO.getFileName().contains("-40-"))
-                    url = "https://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService";
+                    url = "h-ttps://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService";
                 else
-                    url = "https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService";
+                    url = "h-ttps://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService";
                 break;
             case "OSE":
-                url = "https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl";
+                url = "h-ttps://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl";
                 break;
             case "ESTELA":
-                url = "https://ose-test.com/ol-ti-itcpe/billService3";
+                url = "h-ttps://ose-test.com/ol-ti-itcpe/billService3";
                 break;
             default:
                 // En caso de que el servicio no sea uno de los conocidos, puedes asignar una URL por defecto o lanzar un error.
@@ -62,19 +62,19 @@ public class DocumentProcessingController {
 
     @PostMapping("/consulta")
     public Mono<ResponseEntity<FileResponseDTO>> processDocumentQuery(@RequestBody FileRequestDTO requestDTO) {
-        return documentQueryService.processAndSaveFile("https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl", requestDTO)
+        return documentQueryService.processAndSaveFile("h-ttps://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl", requestDTO)
                 .map(response -> ResponseEntity.ok(response)).defaultIfEmpty(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
     @PostMapping("/baja")
     public Mono<ResponseEntity<FileResponseDTO>> processDocumentBaja(@RequestBody FileRequestDTO requestDTO) {
-        return documentBajaService.processBajaRequest("https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl", requestDTO)
+        return documentBajaService.processBajaRequest("h-ttps://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl", requestDTO)
                 .map(response -> ResponseEntity.ok(response)).defaultIfEmpty(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
     @PostMapping("/consultabaja")
     public Mono<ResponseEntity<FileResponseDTO>> processDocumentBajaConsult(@RequestBody FileRequestDTO requestDTO) {
-        return documentBajaQueryService.processAndSaveFile("https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl", requestDTO)
+        return documentBajaQueryService.processAndSaveFile("h-ttps://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl", requestDTO)
                 .map(response -> ResponseEntity.ok(response)).defaultIfEmpty(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 }

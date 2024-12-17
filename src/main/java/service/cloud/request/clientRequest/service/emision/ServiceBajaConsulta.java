@@ -49,7 +49,8 @@ public class ServiceBajaConsulta implements IServiceBaja {
         try {
 
             FileRequestDTO soapRequest = new FileRequestDTO();
-            soapRequest.setService("https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl");
+            String urlClient = applicationProperties.obtenerUrl(client.getIntegracionWs(), transaction.getFE_Estado(), transaction.getFE_TipoTrans(), transaction.getDOC_Codigo());
+            soapRequest.setService(urlClient);
             soapRequest.setUsername(configuracion.getUsuarioSol());
             soapRequest.setPassword(configuracion.getClaveSol());
             soapRequest.setTicket(transaction.getTicket_Baja());

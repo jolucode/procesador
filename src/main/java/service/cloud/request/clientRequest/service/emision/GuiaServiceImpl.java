@@ -159,8 +159,8 @@ public class GuiaServiceImpl implements GuiaInterface {
 
         PDFBasicGenerateHandler db = new PDFBasicGenerateHandler(docUUID);
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String fecha = simpleDateFormat.format(transaction.getDOC_FechaVencimiento());
+
+        String fecha = transaction.getDOC_FechaVencimiento();
         DespatchAdviceType guia = documentWRP.getAdviceType();
 
         byte[] xmlDocument = DocumentConverterUtils.convertDocumentToBytes(despatchAdviceType);

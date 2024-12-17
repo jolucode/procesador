@@ -57,6 +57,7 @@ public class DocumentConverterUtils {
             }
 
             zos.closeEntry();
+            zos.finish(); // Forzar el cierre de la entrada ZIP antes de obtener los bytes
             zipDocument = bos.toByteArray(); // Devuelve directamente los bytes comprimidos
 
             if (logger.isDebugEnabled()) {
