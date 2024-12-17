@@ -55,32 +55,6 @@ public class CloudService implements CloudInterface {
     @Autowired
     ServiceBajaConsulta serviceBajaConsulta;
 
-    /*@Override
-    public ResponseEntity<Void> proccessDocument(String stringRequestOnpremise) {
-        String datePattern = "(\"\\w+\":\\s*\"\\d{4}-\\d{2}-\\d{2}) \\d{2}:\\d{2}:\\d{2}\\.\\d\"";
-        String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
-
-        try {
-            Gson gson = new Gson();
-            TransacctionDTO[] transacctionDTOs = gson.fromJson(updatedJson, TransacctionDTO[].class);
-
-            // Procesar los documentos de manera reactiva en paralelo
-            Flux.fromArray(transacctionDTOs)
-                    .flatMap(transaccion ->
-                            processTransaction(transaccion) // Procesar cada transacción
-                                    .subscribeOn(Schedulers.boundedElastic()) // Ejecutar en un hilo apto para operaciones bloqueantes
-                                    .doOnError(error -> logger.error("Error procesando documento: " + error.getMessage()))
-                    )
-                    .then() // Esperar a que todas las transacciones terminen
-                    .block(); // Bloquear hasta que todas las operaciones finalicen
-
-            return ResponseEntity.ok().build();
-
-        } catch (Exception e) {
-            logger.error("Error al procesar documentos: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }*/
 
     @Override
     public Mono<ResponseEntity<Object>> proccessDocument(String stringRequestOnpremise) {
