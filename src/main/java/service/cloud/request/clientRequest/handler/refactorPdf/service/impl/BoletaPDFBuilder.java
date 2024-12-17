@@ -407,7 +407,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
             /*
              * Generando el PDF de la FACTURA con la informacion recopilada.
              */
-            boletaInBytes = createBoletaPDF(boletaObj, configData);//PDFBoletaCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createBoletaPDF(boletaObj, docUUID, configData);
+            boletaInBytes = createBoletaPDF(boletaObj, configData);
         } catch (PDFReportException e) {
             logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {

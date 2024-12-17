@@ -21,20 +21,6 @@ public class TransaccionRespuesta {
 
     public static final int RQT_EMITDO_ESPERA = 100;
 
-
-    public static final int RQT_EMITIDO_EXCEPTION = 22;
-
-
-    public static final int RQT_EMITIDO_CDR_NULO = 399;
-
-
-    public static final int RQT_BAJA_EXCEPCION = 32;
-
-    public static final int RSP_EMITIDO_APROBADO = 41;
-
-    public static final int RSP_EMITIDO_RECHAZADO = 42;
-
-
     private int codigo = DEFAULT;
 
 
@@ -58,6 +44,7 @@ public class TransaccionRespuesta {
 
     private Sunat sunat;
 
+    private String estado;
 
     private String ticketRest;
 

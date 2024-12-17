@@ -363,7 +363,7 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
 
             debitNoteObj.setResolutionCodeValue("resolutionCde");
 
-            debitNoteInBytes = createDebitNotePDF(debitNoteObj, docUUID, configData); //PDFDebitNoteCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createDebitNotePDF(debitNoteObj, docUUID, configData);
+            debitNoteInBytes = createDebitNotePDF(debitNoteObj, docUUID, configData);
         } catch (PDFReportException e) {
             logger.error("generateDebitNotePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {

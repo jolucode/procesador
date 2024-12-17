@@ -74,11 +74,6 @@ public class ServiceEmision implements IServiceEmision {
 
     @Override
     public TransaccionRespuesta transactionDocument(TransacctionDTO transaction, String doctype) throws Exception {
-        long startTime = System.nanoTime();
-        LogDTO log = new LogDTO();
-        log.setRequestDate(DateUtils.formatDateToString(new Date()));
-        log.setRuc(transaction.getDocIdentidad_Nro());
-        log.setBusinessName(transaction.getSN_RazonSocial());
 
         boolean isContingencia = isContingencia(transaction);
         ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
@@ -86,23 +81,13 @@ public class ServiceEmision implements IServiceEmision {
 
         // Obtiene datos del cliente y valida certificado
         Client client = getClientData(transaction);
-
-        String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
-        byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
-        CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
-
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
-        FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
-        UBLDocumentWRP documentWRP = new UBLDocumentWRP();
 
         // Configura la ruta de almacenamiento del archivo
         String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDoc());
-        fileHandler.setBaseDirectory(attachmentPath);
 
         String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
-
         byte[] xmlDocument = null;
-
         if (doctype.equals("07")) {
             CreditNoteType creditNoteType = ublHandler.generateCreditNoteType(transaction, signerName);
             xmlDocument = DocumentConverterUtils.convertDocumentToBytes(creditNoteType); //generico
@@ -122,16 +107,18 @@ public class ServiceEmision implements IServiceEmision {
             xmlDocument = DocumentConverterUtils.convertDocumentToBytes(retentionType);
         }
 
-
+        /**PROCESAR CERTIFICADO*/
+        String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
+        byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
+        CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
         SignerHandler signerHandler = SignerHandler.newInstance();
         signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), client.getCertificadoTipoKeystore(), client.getCertificadoProveedor(), signerName);
-
         byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
 
-        log.setThirdPartyRequestXml(new String(signedXmlDocument, StandardCharsets.UTF_8));
 
         String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
-        documentWRP = configureDocumentWRP(documentWRP, signedXmlDocument, transaction.getDOC_Codigo(), doctype);
+
+        UBLDocumentWRP documentWRP = configureDocumentWRP(signedXmlDocument, transaction.getDOC_Codigo(), doctype);
         documentWRP.setTransaccion(transaction);
 
         ConfigData configuracion = createConfigData(client);
@@ -139,28 +126,12 @@ public class ServiceEmision implements IServiceEmision {
         byte[] zipBytes = DocumentConverterUtils.compressUBLDocument(signedXmlDocument, documentName + ".xml");
         String base64Content = convertToBase64(zipBytes);
 
-        log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
         TransaccionRespuesta transactionResponse = handleTransactionStatus(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
-        log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
 
         if (client.getPdfBorrador().equals("true")) {
             transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
         }
-
-        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
-        log.setSeriesAndCorrelative(documentName);
-        log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
-        log.setResponseDate(DateUtils.formatDateToString(new Date()));
-
         transactionResponse.setIdentificador(documentName);
-
-        transactionResponse.setLogDTO(log);
-        log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
-
-        long endTime = System.nanoTime();
-        double elapsedTime = (endTime - startTime) / 1_000_000_000.0;
-        System.out.println("El método EnviarTransaccion tomó " + elapsedTime + " segundos para ejecutarse.");
-
         return transactionResponse;
     }
 
@@ -173,7 +144,6 @@ public class ServiceEmision implements IServiceEmision {
                                                          byte[] signedXmlDocument, UBLDocumentWRP documentWRP,
                                                          ConfigData configuracion, String documentName,
                                                          String attachmentPath) throws Exception {
-
 
         String estado = transaction.getFE_Estado().toUpperCase();
         switch (estado) {
@@ -270,8 +240,9 @@ public class ServiceEmision implements IServiceEmision {
         return clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
     }
 
-    private UBLDocumentWRP configureDocumentWRP(UBLDocumentWRP documentWRP, byte[] signedXmlDocument, String docCodigo, String doctype) throws Exception {
-        Object ublDocument = getSignedDocumentV(signedXmlDocument, docCodigo);
+    private UBLDocumentWRP configureDocumentWRP(byte[] signedXmlDocument, String docCodigo, String doctype) throws Exception {
+        UBLDocumentWRP documentWRP = new UBLDocumentWRP(); // Crear directamente dentro del método
+        Object ublDocument = deserializeSignedDocument(signedXmlDocument, docCodigo);
 
         switch (doctype) {
             case "07":
@@ -296,33 +267,24 @@ public class ServiceEmision implements IServiceEmision {
         return documentWRP;
     }
 
-    // Método para deserializar un documento XML firmado basado en su tipo de documento.
-    private Object getSignedDocumentV(byte[] signedXmlDocument, String documentCode) {
+    public Object deserializeSignedDocument(byte[] signedXmlDocument, String documentCode) {
         if (logger.isDebugEnabled()) {
-            logger.debug("+-getSignedDocument()");
+            logger.debug("+-deserializeSignedDocument()");
         }
 
-        Map<String, Class<?>> documentTypeMap = new HashMap<>();
-        documentTypeMap.put(IUBLConfig.DOC_INVOICE_CODE, InvoiceType.class);
-        documentTypeMap.put(IUBLConfig.DOC_BOLETA_CODE, InvoiceType.class);
-        documentTypeMap.put(IUBLConfig.DOC_CREDIT_NOTE_CODE, CreditNoteType.class);
-        documentTypeMap.put(IUBLConfig.DOC_DEBIT_NOTE_CODE, DebitNoteType.class);
-        documentTypeMap.put(IUBLConfig.DOC_RETENTION_CODE, RetentionType.class);
-        documentTypeMap.put(IUBLConfig.DOC_PERCEPTION_CODE, PerceptionType.class);
-        documentTypeMap.put(IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE, DespatchAdviceType.class);
+        Class<?> documentClass = DocumentConfig.DOCUMENT_TYPE_MAP.get(documentCode);
 
-        Class<?> documentClass = documentTypeMap.get(documentCode);
         if (documentClass == null) {
             logger.error("Código de documento no reconocido: " + documentCode);
             return null;
         }
 
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(documentClass);
+            JAXBContext jaxbContext = DocumentConfig.getJAXBContext(documentClass);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             return unmarshaller.unmarshal(new ByteArrayInputStream(signedXmlDocument));
         } catch (Exception e) {
-            logger.error("getSignedDocument() ERROR: {}", e.getMessage(), e);
+            logger.error("Error deserializando documento: {}", e.getMessage(), e);
             return null;
         }
     }

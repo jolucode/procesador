@@ -69,17 +69,14 @@ public class ServiceBaja implements IServiceBaja {
 
         transaction.setANTICIPO_Id(generarIDyFecha(transaction));
 
-
         String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDoc());
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
         fileHandler.setBaseDirectory(attachmentPath);
-
 
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
         Client client = clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
         ConfigData configuracion = createConfigData(client);
         CdrStatusResponse cdrStatusResponse = new CdrStatusResponse(); //null;
-
 
         try {
 
@@ -89,7 +86,6 @@ public class ServiceBaja implements IServiceBaja {
             }
 
             String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
-
             byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
             CertificateUtils .validateCertificate(certificado,client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
 
@@ -135,18 +131,6 @@ public class ServiceBaja implements IServiceBaja {
             logger.error("El error capturado es : " + e.getMessage());
         }
         return transactionResponse;
-    }
-
-    // Método para extraer los bytes de DataHandler
-    private byte[] extractBytesFromDataHandler(DataHandler dataHandler) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        InputStream inputStream = dataHandler.getInputStream();
-        byte[] buffer = new byte[1024];
-        int bytesRead;
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, bytesRead);
-        }
-        return outputStream.toByteArray();
     }
 
     // Método para convertir los bytes a base64

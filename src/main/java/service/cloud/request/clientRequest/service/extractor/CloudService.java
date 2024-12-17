@@ -24,6 +24,7 @@ import service.cloud.request.clientRequest.service.emision.ServiceBajaConsulta;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
 import service.cloud.request.clientRequest.service.publicar.PublicacionManager;
+import service.cloud.request.clientRequest.utils.Constants;
 
 
 import java.util.*;
@@ -83,7 +84,7 @@ public class CloudService implements CloudInterface {
 
     @Override
     public Mono<ResponseEntity<Object>> proccessDocument(String stringRequestOnpremise) {
-        String datePattern = "(\"\\w+\":\\s*\"\\d{4}-\\d{2}-\\d{2}) \\d{2}:\\d{2}:\\d{2}\\.\\d\"";
+        String datePattern = Constants.PATTERN_ARRAY_TRANSACTION;
         String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
 
         return Mono.fromCallable(() -> {
@@ -127,6 +128,7 @@ public class CloudService implements CloudInterface {
         return Mono.fromCallable(() -> {
             TransaccionRespuesta tr = enviarTransaccion(transaccion);
             RequestPost request = generateDataRequestHana(transaccion, tr);
+
             return request;
         }).subscribeOn(Schedulers.boundedElastic());
     }
@@ -171,8 +173,9 @@ public class CloudService implements CloudInterface {
             request.setUrlOnpremise(providerProperties.getUrlOnpremise(tc.getDocIdentidad_Nro()));
 
             if (tr.getMensaje().contains("ha sido aceptad") || tr.getMensaje().contains("aprobado")) {
-
+                logger.info(tr.getMensaje());
                 tr.setPdf(tr.getPdfBorrador());
+                tr.setEstado("V"); //Aprobado
 
                 Map<String, Data.ResponseDocument> listMapDocuments = new HashMap<>();
                 if (tr.getMensaje().contains("Baja")) {
@@ -203,6 +206,7 @@ public class CloudService implements CloudInterface {
                 publicacionManager.publicarDocumento(tc, tc.getFE_Id(), tr);
 
             } else {
+                logger.warn(tr.getMensaje());
                 if (tr.getPdfBorrador() != null) {
                     Map<String, Data.ResponseDocument> listMapDocuments = new HashMap<>();
                     Data.ResponseDocument document1 = new Data.ResponseDocument("pdf", tr.getPdfBorrador());

@@ -544,7 +544,7 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
             /*
              * Generando el PDF de la FACTURA con la informacion recopilada.
              */
-            invoiceInBytes = createInvoicePDF(invoiceObj, docUUID, configuracion);//PDFInvoiceCreator.getInstance(this.documentReportPath, this.legendSubReportPath, this.paymentDetailReportPath).createInvoicePDF(invoiceObj, docUUID, configuracion);
+            invoiceInBytes = createInvoicePDF(invoiceObj, docUUID, configuracion);
         } catch (PDFReportException e) {
             logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {

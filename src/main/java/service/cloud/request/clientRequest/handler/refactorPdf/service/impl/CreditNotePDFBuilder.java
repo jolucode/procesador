@@ -476,7 +476,7 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             /*
              * Generando el PDF de la FACTURA con la informacion recopilada.
              */
-            creditNoteInBytes = createCreditNotePDF(creditNoteObj, docUUID, configData); //PDFCreditNoteCreator.getInstance(this.documentReportPath, this.legendSubReportPath, this.paymentDetailReportPath).createCreditNotePDF(creditNoteObj, docUUID, configData);
+            creditNoteInBytes = createCreditNotePDF(creditNoteObj, docUUID, configData);
         } catch (PDFReportException e) {
             logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {

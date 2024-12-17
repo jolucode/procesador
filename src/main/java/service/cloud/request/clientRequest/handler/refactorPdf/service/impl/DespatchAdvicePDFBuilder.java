@@ -214,7 +214,8 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
 
             despatchAdviceObject.setSenderLogo("C:\\clientes\\files\\20510910517\\COMPANY_LOGO.jpg");
 
-            despatchInBytes = createDespatchAdvicePDF(despatchAdviceObject, docUUID, configData); //PDFDespatchAdviceCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createDespatchAdvicePDF(despatchAdviceObject, docUUID, configData);
+            despatchInBytes = createDespatchAdvicePDF(despatchAdviceObject, docUUID, configData);
+
         } catch (PDFReportException e) {
             logger.error("generateDespatchAdvicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {
