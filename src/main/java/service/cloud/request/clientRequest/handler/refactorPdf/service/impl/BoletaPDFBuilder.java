@@ -258,7 +258,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
             boletaObj.setSenderDepProvDist(boletaType.getTransaccion().getDIR_Distrito() + " " + boletaType.getTransaccion().getDIR_Provincia() + " " + boletaType.getTransaccion().getDIR_Departamento());
             boletaObj.setSenderContact(boletaType.getTransaccion().getPersonContacto());
             boletaObj.setSenderMail(boletaType.getTransaccion().getEMail());
-            boletaObj.setSenderLogo(boletaType.getTransaccion().getDocIdentidad_Nro());
+            boletaObj.setSenderLogo(configData.getCompletePathLogo());
             boletaObj.setTelefono(boletaType.getTransaccion().getTelefono());
             boletaObj.setTelefono_1(boletaType.getTransaccion().getTelefono_1());
             boletaObj.setWeb(boletaType.getTransaccion().getWeb());

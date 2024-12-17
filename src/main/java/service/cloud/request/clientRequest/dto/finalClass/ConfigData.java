@@ -28,4 +28,5 @@ public class ConfigData {
     private String passwordSunatSunat;
     private String urlService;
     private String pdfIngles;
+    private String completePathLogo;
 }

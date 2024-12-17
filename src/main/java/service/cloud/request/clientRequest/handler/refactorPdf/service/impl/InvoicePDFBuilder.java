@@ -127,7 +127,7 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
             invoiceObj.setSenderDepProvDist(invoiceType.getTransaccion().getDIR_Distrito() + " " + invoiceType.getTransaccion().getDIR_Provincia() + " " + invoiceType.getTransaccion().getDIR_Departamento());
             invoiceObj.setSenderContact(invoiceType.getTransaccion().getPersonContacto());
             invoiceObj.setSenderMail(invoiceType.getTransaccion().getEMail());
-            invoiceObj.setSenderLogo(invoiceType.getTransaccion().getDocIdentidad_Nro());
+            invoiceObj.setSenderLogo(configuracion.getCompletePathLogo());
             invoiceObj.setTelefono(invoiceType.getTransaccion().getTelefono());
             invoiceObj.setTelefono_1(invoiceType.getTransaccion().getTelefono_1());
             invoiceObj.setWeb(invoiceType.getTransaccion().getWeb());

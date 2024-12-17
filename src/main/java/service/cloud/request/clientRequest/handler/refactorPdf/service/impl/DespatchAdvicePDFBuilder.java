@@ -212,7 +212,7 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
 
             despatchAdviceObject.setCodeQR(inputStream);
 
-            despatchAdviceObject.setSenderLogo(despatchAdvice.getTransaccion().getDocIdentidad_Nro());
+            despatchAdviceObject.setSenderLogo(configData.getCompletePathLogo());
 
             despatchInBytes = createDespatchAdvicePDF(despatchAdviceObject, docUUID, configData);
 

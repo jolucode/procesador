@@ -53,6 +53,9 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
 
         byte[] pdfBytes = null;
         List<TransactionTotalesDTO> transaccionTotales = new ArrayList<>(transaction.getTransactionTotalesDTOList());
+
+        String dirLogo = "C:\\clientes\\files\\" + transaction.getDocIdentidad_Nro() + "\\COMPANY_LOGO.jpg";
+        configuracion.setCompletePathLogo(dirLogo);
         try {
             switch (transaction.getDOC_Codigo()) {
                 case IUBLConfig.DOC_INVOICE_CODE:
