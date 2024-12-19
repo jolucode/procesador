@@ -528,7 +528,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                  * Agregar la ruta del directorio en donde se encuentran los
                  * sub-reportes en formato (.jasper)
                  */
-                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\files\\20510910517\\formatos\\legendReport.jasper");
+                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\files\\" + boletaObj.getSenderRuc() + "\\formatos\\legendReport.jasper");
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(boletaObj.getLegends()));
 
                 Map<String, String> legendMap = new HashMap<String, String>();
