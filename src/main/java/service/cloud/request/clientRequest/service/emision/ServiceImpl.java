@@ -230,6 +230,13 @@ public class ServiceImpl implements ServiceInterface {
 
                 log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
 
+                try {
+                    Thread.sleep(500); // Pausa por 500 milisegundos
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Restaurar el estado de interrupción
+                    throw new RuntimeException("Error al pausar la ejecución", e);
+                }
+
                 /**Enviamos ticket a Sunat*/
                 if (configuracion.getIntegracionWs().equals("OSE")) {
                     WSConsumer oseConsumer = WSConsumer.newInstance(transaction.getFE_Id());
