@@ -21,7 +21,7 @@ application:
 ventura:
   clientes:
     listaClientes:
-      '20510910517':
+      '20481139075':
 
         razonSocial: 'Ventura Soluciones1'
 
@@ -30,8 +30,8 @@ ventura:
         wsLocation: 'http://facturacion.vsperufe.com/'
 
         emisorElecRs: '205454844881/SUNAT'
-        usuarioSol: '20510910517'
-        claveSol: '20510910517'
+        usuarioSol: '20481139075'
+        claveSol: '20481139075'
 
         certificadoName: "CERTIFICATE_TEST.pfx"
         certificadoPassword: '1234'
