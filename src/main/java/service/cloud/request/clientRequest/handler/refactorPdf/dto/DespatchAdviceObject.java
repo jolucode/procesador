@@ -48,5 +48,48 @@ public class DespatchAdviceObject {
     private String senderLogo;
     private String licenciaConducir;
     private InputStream codeQR;
+
+    /** 29-02-2024 Harol PDF Guia Transportista*/
+    private String grtTipoDocRemitente;
+
+    private String grtDocumentoRemitente;
+
+    private String grtNombreRazonRemitente;
+
+    private String grtIndicadorPagadorFlete;
+
+    private String grtTipoDocDestinatario;
+
+    private String grtDocumentoDestinatario;
+
+    private String grtNombreRazonDestinatario;
+
+    private String nroRegistroMtc;
+
+    private String snDocIdentidadNro;
+
+    private String snRazonSocial;
+
+    private String nombreConductor;
+
+    private String indicadorTransbordoProgramado;
+
+    private String indicadorRetornoVehiculoVacio;
+
+    private String indicadorTransporteSubcontratado;
+
+    private String indicadorRetornoVehiculoEnvasesVacio;
+
+    private String grtNumeroTUCEPrincipal;
+
+    private String grtEntidadEmisoraPrincipal;
+
+    private String grtPlacaVehiculoSecundario;
+
+    private String grtNumeroTUCESecuendario;
+
+    private String grtEntidadEmisoraSecundario;
+
+    /** */
     Map<String, String> despatchAdvicePersonalizacion;
 }

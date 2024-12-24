@@ -117,7 +117,7 @@ public class CloudService implements CloudInterface {
 
         switch (tipoTransaccion.toUpperCase()) {
             case ISunatConnectorConfig.FE_TIPO_TRANS_EMISION:
-                if (IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE.equalsIgnoreCase(codigoDocumento)) {
+                if (IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE.equalsIgnoreCase(codigoDocumento) || IUBLConfig.DOC_SENDER_CARRIER_GUIDE_CODE.equalsIgnoreCase(codigoDocumento)) {
                     return iServiceEmisionGuia.transactionRemissionGuideDocumentRest(transaction, IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE);
                 }
 

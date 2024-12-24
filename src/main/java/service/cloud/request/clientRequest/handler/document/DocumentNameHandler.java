@@ -51,6 +51,18 @@ public class DocumentNameHandler {
     }
 
     /**
+     * Este metodo obtiene el nombre de un documento de tipo RETENCION.
+     *
+     * @param senderRUC     Numero de RUC del emisor.
+     * @param docIdentifier Identificador del documento (Serie y correlativo).
+     * @return Retorna el nombre del documento de tipo RETENCION.
+     */
+    public String getRemissionGuideTransportName(String senderRUC, String docIdentifier) {
+        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
+                IUBLConfig.DOC_SENDER_CARRIER_GUIDE_CODE, docIdentifier);
+    }
+
+    /**
      * Este metodo obtiene el nombre de un documento de tipo COMUNICACION DE
      * BAJA.
      *

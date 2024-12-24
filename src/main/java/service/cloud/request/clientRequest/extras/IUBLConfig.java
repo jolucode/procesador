@@ -72,6 +72,9 @@ public interface IUBLConfig {
     String DOC_PERCEPTION_CODE = "40";
     String DOC_DEBIT_NOTE_CODE = "08";
     String DOC_SENDER_REMISSION_GUIDE_CODE = "09";
+    /** Harol 05-02-2024 codigo guia de transportista*/
+    String DOC_SENDER_CARRIER_GUIDE_CODE = "31";
+    /** */
     String DOC_MACHINE_TICKET_CODE = "12";
     String DOC_FINANCIAL_BANKS_CODE = "13";
     String DOC_BANK_INSURANCE_CODE = "18";
@@ -109,6 +112,9 @@ public interface IUBLConfig {
     int SERIE_CORRELATIVE_LENGTH = 13;
 
     String REMISSION_GUIDE_SERIE_PREFIX = "T";
+    /** Harol 29-03-2024 Validacion*/
+    String CARRIER_GUIDE_SERIE_PREFIX = "V";
+    /** */
     String INVOICE_SERIE_PREFIX = "F";
     String RETENTION_SERIE_PREFIX = "R";
     String BOLETA_SERIE_PREFIX = "B";
@@ -224,12 +230,14 @@ public interface IUBLConfig {
     /**
      * @schemeAgencyName
      */
+    String PROPERTIES_SCHEME_NAME_UBIGEO = "Ubigeos";
     String PROPERTIES_NAME_ITEM = "Propiedad del Item";
     String SCHEME_AGENCY_NAME_PE_SUNAT = "PE:SUNAT";
     String SCHEME_AGENCY_NAME_PE_INEI = "PE:INEI";
     String SCHEME_AGENCY_NAME_UNECE = "United Nations Economic Commission for Europe";
     String GUIAS_LIST_NAME = "Tipo de Documento";
     String GUIAS_SCHEMA_NAME = "Documento de Identidad";
+    String CARRIER_ENTITY_AUTHORIZING = "Entidad Autorizadora";
     String DOCUMENT_REL = "Documento relacionado al transporte";
 
     /**
@@ -280,6 +288,7 @@ public interface IUBLConfig {
     String URI_CATALOG_59 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo59";
     String URI_CATALOG_63 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo63";
     String URI_CATALOG_61 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo61";
+    String URI_CATALOG_ATTACHED_37 = "urn:pe:gob:sunat:cpe:see:gem:catalogos:anexoD-37";
 
 
     String ADDRESS_TYPE_CODE_DEFAULT = "0000";

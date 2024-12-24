@@ -83,6 +83,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
                     break;
 
                 case IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE:
+                case IUBLConfig.DOC_SENDER_CARRIER_GUIDE_CODE:
                     pdfBytes = despatchAdviceBuilder.generateDespatchAdvicePDF(wrp, configuracion);
                     break;
                 default:

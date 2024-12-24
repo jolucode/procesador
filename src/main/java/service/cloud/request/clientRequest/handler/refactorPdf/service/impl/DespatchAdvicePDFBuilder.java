@@ -111,41 +111,157 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
                 despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getNombreRazonTransportista());
             }
 
+            /** Harol 29-03-2024 Guia Transportista 31*/
+            if (despatchAdvice.getTransaccion().getDOC_Codigo().equals("31")) {
+                despatchAdviceObject.setPlacaVehiculo(despatchAdvice.getTransaccion().getTransactionGuias().getPlacaVehiculo());
+                despatchAdviceObject.setLicenciaConducir(despatchAdvice.getTransaccion().getTransactionGuias().getLicenciaConductor());
+            }
+            /** */
+
             List<WrapperItemObject> listaItem = new ArrayList<>();
 
-            for (int i = 0; i < despatchAdvice.getTransaccion().getTransactionLineasDTOList().size(); i++) {
+            /** 01-03-2024 Guia de Transportista Detalle PDF*/
+            if (despatchAdvice.getTransaccion().getDOC_Codigo().equals("31")) {
+                String nombreDocumento = "";
+                List<String> datos = new ArrayList<>();
+                datos.add("documento");
+                datos.add("serie");
+                datos.add("ruc");
+                datos.add("titulo");
+                for (int p = 0; p < despatchAdvice.getTransaccion().getTransactionDocReferDTOList().size(); p++) {
+                    WrapperItemObject itemObject = new WrapperItemObject();
+                    Map<String, String> itemObjectHash = new HashMap<>();
+                    List<String> newlist = new ArrayList<>();
+                    for (int y = 0; y < datos.size(); y++) {
+                        switch (datos.get(y)) {
+                            case "documento":
+                                switch (despatchAdvice.getTransaccion().getTransactionDocReferDTOList().get(p).getTipo()) {
+                                    case "01":
+                                        nombreDocumento = "Factura";
+                                        break;
+                                    case "03":
+                                        nombreDocumento = "Boleta";
+                                        break;
+                                    case "07":
+                                        nombreDocumento = "Nota de Credito";
+                                        break;
+                                    case "08":
+                                        nombreDocumento = "Nota de Debito";
+                                        break;
+                                    case "09":
+                                        nombreDocumento = "Guía de Remisión";
+                                        break;
+                                    default:
+                                        nombreDocumento = "";
+                                        break;
+                                }
+                                itemObjectHash.put(datos.get(y), nombreDocumento);
+                                break;
+                            case "serie":
+                                itemObjectHash.put(datos.get(y), despatchAdvice.getTransaccion().getTransactionDocReferDTOList().get(p).getId());
+                                break;
+                            case "ruc":
+                                itemObjectHash.put(datos.get(y), despatchAdvice.getTransaccion().getTransactionGuias().getGRT_DocumentoRemitente());
+                                break;
+                            case "titulo":
+                                itemObjectHash.put(datos.get(y), "");
+                                break;
+                        }
+                    }
+                    newlist.add(despatchAdvice.getTransaccion().getTransactionDocReferDTOList().get(p).getId());
+                    itemObject.setLstItemHashMap(itemObjectHash);
+                    itemObject.setLstDinamicaItem(newlist);
+                    listaItem.add(itemObject);
+                }
+                WrapperItemObject itemObject2 = new WrapperItemObject();
+                Map<String, String> itemObjectHash2 = new HashMap<>();
+                List<String> newlist2 = new ArrayList<>();
+                newlist2.add("");
+                itemObjectHash2.put("documento", "");
+                itemObjectHash2.put("serie", "");
+                itemObjectHash2.put("ruc", "");
+                itemObjectHash2.put("titulo", "Bienes por Transportar:");
+                itemObject2.setLstItemHashMap(itemObjectHash2);
+                itemObject2.setLstDinamicaItem(newlist2);
+                listaItem.add(itemObject2);
+
+                WrapperItemObject itemObject3 = new WrapperItemObject();
+                Map<String, String> itemObjectHash3 = new HashMap<>();
+                itemObjectHash3.put("documento", "<style forecolor='#000000' isBold='true'>Cantidad</style>");
+                itemObjectHash3.put("serie", "<style forecolor='#000000' isBold='true'>Unidad</style>");
+                itemObjectHash3.put("ruc", "<style forecolor='#000000' isBold='true'>Descripción</style>");
+                itemObjectHash3.put("titulo", "");
+                itemObject3.setLstItemHashMap(itemObjectHash3);
+                itemObject3.setLstDinamicaItem(newlist2);
+                listaItem.add(itemObject3);
+
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Agregando datos al HashMap");
+                    logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos Transacciones Lineas");
                 }
 
-                WrapperItemObject itemObject = new WrapperItemObject();
-                Map<String, String> itemObjectHash = new HashMap<>();
-                List<String> newlist = new ArrayList<>();
-
-                // Obtener el mapa de transaccionLineasCamposUsuario
-                Map<String, String> camposUsuarioMap = despatchAdvice.getTransaccion().getTransactionLineasDTOList().get(i).getTransaccionLineasCamposUsuario();
-
-                // Iterar sobre las entradas del mapa
-                for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
-                    String nombreCampo = entry.getKey();
-                    String valorCampo = entry.getValue();
-
+                for (int i = 0; i < despatchAdvice.getTransaccion().getTransactionLineasDTOList().size(); i++) {
+                    WrapperItemObject itemObject = new WrapperItemObject();
+                    Map<String, String> itemObjectHash = new HashMap<>();
+                    List<String> newlist = new ArrayList<>();
+                    for (int y = 0; y < datos.size(); y++) {
+                        switch (datos.get(y)) {
+                            case "documento":
+                                itemObjectHash.put(datos.get(y), despatchAdvice.getTransaccion().getTransactionLineasDTOList().get(i).getCantidad().toString());
+                                break;
+                            case "serie":
+                                itemObjectHash.put(datos.get(y), despatchAdvice.getTransaccion().getTransactionLineasDTOList().get(i).getUnidad());
+                                break;
+                            case "ruc":
+                                itemObjectHash.put(datos.get(y), despatchAdvice.getTransaccion().getTransactionLineasDTOList().get(i).getDescripcion());
+                                break;
+                            case "titulo":
+                                itemObjectHash.put(datos.get(y), "");
+                                break;
+                        }
+                    }
+                    newlist.add(despatchAdvice.getTransaccion().getTransactionLineasDTOList().get(i).getDescripcion());
+                    itemObject.setLstItemHashMap(itemObjectHash);
+                    itemObject.setLstDinamicaItem(newlist);
+                    listaItem.add(itemObject);
+                }
+            } else {
+                /** */
+                for (int i = 0; i < despatchAdvice.getTransaccion().getTransactionLineasDTOList().size(); i++) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
+                        logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Agregando datos al HashMap");
                     }
 
-                    itemObjectHash.put(nombreCampo, valorCampo);
-                    newlist.add(valorCampo);
+                    WrapperItemObject itemObject = new WrapperItemObject();
+                    Map<String, String> itemObjectHash = new HashMap<>();
+                    List<String> newlist = new ArrayList<>();
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
+                    // Obtener el mapa de transaccionLineasCamposUsuario
+                    Map<String, String> camposUsuarioMap = despatchAdvice.getTransaccion().getTransactionLineasDTOList().get(i).getTransaccionLineasCamposUsuario();
+
+                    // Iterar sobre las entradas del mapa
+                    for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
+                        String nombreCampo = entry.getKey();
+                        String valorCampo = entry.getValue();
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
+                        }
+
+                        itemObjectHash.put(nombreCampo, valorCampo);
+                        newlist.add(valorCampo);
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
+                        }
                     }
+
+                    itemObject.setLstItemHashMap(itemObjectHash);
+                    itemObject.setLstDinamicaItem(newlist);
+                    listaItem.add(itemObject);
                 }
 
-                itemObject.setLstItemHashMap(itemObjectHash);
-                itemObject.setLstDinamicaItem(newlist);
-                listaItem.add(itemObject);
             }
+
 
             if (despatchAdvice.getTransaccion().getTransactionContractDocRefListDTOS() != null
                     && !despatchAdvice.getTransaccion().getTransactionContractDocRefListDTOS().isEmpty()) {
@@ -214,7 +330,7 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
 
             despatchAdviceObject.setSenderLogo(configData.getCompletePathLogo());
 
-            despatchInBytes = createDespatchAdvicePDF(despatchAdviceObject, docUUID, configData);
+            despatchInBytes = createDespatchAdvicePDF(despatchAdviceObject, docUUID, configData, despatchAdvice.getTransaccion().getDOC_Codigo());
 
         } catch (PDFReportException e) {
             logger.error("generateDespatchAdvicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
@@ -228,7 +344,7 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
         return despatchInBytes;
     }
 
-    public byte[] createDespatchAdvicePDF(DespatchAdviceObject despatchAdviceObject, String docUUID, ConfigData configuracion) throws PDFReportException {
+    public byte[] createDespatchAdvicePDF(DespatchAdviceObject despatchAdviceObject, String docUUID, ConfigData configuracion, String docCodigo) throws PDFReportException {
 
         Map<String, Object> parameterMap;
         Map<String, Object> cuotasMap;
@@ -262,6 +378,9 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
                 parameterMap.put(IPDFCreatorConfig.TIPO_DOCUMENTO_CONDUCTOR, despatchAdviceObject.getTipoDocumentoConductor());
                 parameterMap.put(IPDFCreatorConfig.TIPO_DOCUMENTO_TRANSPORTISTA, despatchAdviceObject.getTipoDocumentoTransportista());
                 parameterMap.put(IPDFCreatorConfig.UNIDAD_MEDIDA_PESONETO, despatchAdviceObject.getUMPesoBruto());
+                /** 04-03-2024  Harol Peso Guia Transportista*/
+                parameterMap.put(IPDFCreatorConfig.PESONETO, despatchAdviceObject.getPesoBruto());
+                /** */
                 parameterMap.put(IPDFCreatorConfig.VALIDEZPDF, despatchAdviceObject.getValidezPDF());
                 parameterMap.put(IPDFCreatorConfig.DOCUMENT_IDENTIFIER, despatchAdviceObject.getNumeroGuia());
                 parameterMap.put(IPDFCreatorConfig.SENDER_RUC, despatchAdviceObject.getNumeroDocEmisor());
@@ -276,19 +395,48 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
                 parameterMap.put(IPDFCreatorConfig.LICENCIA_CONDUCIR, despatchAdviceObject.getLicenciaConducir());
                 parameterMap.put(IPDFCreatorConfig.CAMPOS_USUARIO_CAB, despatchAdviceObject.getDespatchAdvicePersonalizacion());
 
+                /** 29-02-2024 Harol Guia Transportista*/
+                parameterMap.put(IPDFCreatorConfig.GRT_DOCUMENTO_REMITENTE, despatchAdviceObject.getGrtDocumentoRemitente());
+                parameterMap.put(IPDFCreatorConfig.GRT_NOMBRE_RAZON_REMITENTE, despatchAdviceObject.getGrtNombreRazonRemitente());
+                parameterMap.put(IPDFCreatorConfig.GRT_DOCUMENTO_DESTINATARIO, despatchAdviceObject.getGrtDocumentoDestinatario());
+                parameterMap.put(IPDFCreatorConfig.GRT_NOMBRE_RAZON_DESTINATARIO, despatchAdviceObject.getGrtNombreRazonDestinatario());
+                parameterMap.put(IPDFCreatorConfig.NRO_REGISTRO_MTC, despatchAdviceObject.getNroRegistroMtc());
+                parameterMap.put(IPDFCreatorConfig.SN_DOC_IDENTIDAD_NRO, despatchAdviceObject.getSnDocIdentidadNro());
+                parameterMap.put(IPDFCreatorConfig.SN_RAZON_SOCIAL, despatchAdviceObject.getSnRazonSocial());
+                parameterMap.put(IPDFCreatorConfig.NOMBRE_CONDUCTOR, despatchAdviceObject.getNombreConductor());
+
+                parameterMap.put(IPDFCreatorConfig.INDICADOR_TRANSBORDO_PROGRAMADO, despatchAdviceObject.getIndicadorTransbordoProgramado());
+                parameterMap.put(IPDFCreatorConfig.INDICADOR_RETORNO_VEHICULO_VACIO, despatchAdviceObject.getIndicadorRetornoVehiculoVacio());
+                parameterMap.put(IPDFCreatorConfig.INDICADOR_TRANSPORTE_SUBCONTRATADO, despatchAdviceObject.getIndicadorTransporteSubcontratado());
+                parameterMap.put(IPDFCreatorConfig.INDICADOR_RETORNO_VEHICULO_ENVASES_VACIO, despatchAdviceObject.getIndicadorRetornoVehiculoEnvasesVacio());
+                parameterMap.put(IPDFCreatorConfig.GRT_INDICADOR_PAGADOR_FLETE, despatchAdviceObject.getGrtIndicadorPagadorFlete());
+
+                parameterMap.put(IPDFCreatorConfig.GRT_NUMERO_TUCE_PRINCIPAL, despatchAdviceObject.getGrtNumeroTUCEPrincipal());
+                parameterMap.put(IPDFCreatorConfig.GRT_ENTIDAD_EMISORA_PRINCIPAL, despatchAdviceObject.getGrtEntidadEmisoraPrincipal());
+                parameterMap.put(IPDFCreatorConfig.GRT_PLACA_VEHICULO_SECUNDARIO, despatchAdviceObject.getGrtPlacaVehiculoSecundario());
+                parameterMap.put(IPDFCreatorConfig.GRT_NUMERO_TUCE_SECUNDARIO, despatchAdviceObject.getGrtNumeroTUCESecuendario());
+                parameterMap.put(IPDFCreatorConfig.GRT_ENTIDAD_EMISORA_SECUNDARIO, despatchAdviceObject.getGrtEntidadEmisoraSecundario());
+                /** */
+
                 if (configuracion.getImpresionPDF().equalsIgnoreCase("Codigo QR")) {
                     parameterMap.put(IPDFCreatorConfig.CODEQR, despatchAdviceObject.getCodeQR());
                 } else {
                     parameterMap.put(IPDFCreatorConfig.CODEQR, null);
                 }
-                String documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "remissionguideDocument_Ing.jrxml" : "remissionguideDocument.jrxml";
-                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(despatchAdviceObject.getRUCTransportista(),documentName );
+                String documentName = null;
+                if ("09".equals(docCodigo)) {
+                    documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "remissionguideDocument_Ing.jrxml" : "remissionguideDocument.jrxml";
+                } else if ("31".equals(docCodigo)) {
+                    documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "carrierguideDocument_Ing.jrxml" : "carrierguideDocument.jrxml";
+                }
+
+                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(despatchAdviceObject.getRUCTransportista(), documentName);
 
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap,
                         new JRBeanCollectionDataSource(despatchAdviceObject.getItemListDynamic()));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
-                pdfDocument =  outputStream.toByteArray();
+                pdfDocument = outputStream.toByteArray();
             } catch (Exception e) {
                 logger.error("createDespatchAdvicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
                 logger.error("createDespatchAdvicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));

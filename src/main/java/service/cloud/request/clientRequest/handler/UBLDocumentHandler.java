@@ -1176,6 +1176,119 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         return despatchAdviceType;
     } //generateDespatchAdviceType
 
+    /** Harol 29-03-2024 Guia Transportista*/
+    public DespatchAdviceType generateCarrierDespatchAdviceType(TransacctionDTO transaction, String signerName) throws UBLDocumentException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+generateTransportDespatchAdviceType() [" + this.identifier + "]");
+        }
+        DespatchAdviceType despatchAdviceType = null;
+
+        try {
+            /** Header Guia Transportista*/
+            /* Instanciar el objeto DespatchAdviceType para la GUIA DE TRANSPORTISTA */
+            despatchAdviceType = new DespatchAdviceType();
+            /* Agregar <DespatchAdvice><ext:UBLExtensions> */
+            despatchAdviceType.setUBLExtensions(getUBLExtensionsSigner());
+            /* Agregar <<DespatchAdvice><cbc:UBLVersionID> */
+            despatchAdviceType.setUBLVersionID(getUBLVersionID_2_1());
+            /* Agregar <<DespatchAdvice><cbc:CustomizationID> */
+            despatchAdviceType.setCustomizationID(getCustomizationID_2_0());
+            /* Agregar <DespatchAdvice><cbc:ID> */
+            if (logger.isInfoEnabled()) {
+                logger.info("generateTransportDespatchAdviceType() [" + this.identifier + "] Agregando DOC_Id: " + transaction.getDOC_Id());
+            }
+            despatchAdviceType.setID(getID(transaction.getDOC_Id()));
+            /* Agregar <DespatchAdvice><cbc:IssueDate> */
+            despatchAdviceType.setIssueDate(getIssueDate(transaction.getDOC_FechaEmision()));
+            /* Agregar <DespatchAdvice><cbc:IssueTime> */
+            despatchAdviceType.setIssueTime(getIssueTimeDefault());
+            /* Agregar <DespatchAdvice><cbc:NoteType> */
+            despatchAdviceType.setNote(getDespatchAdviceNote(transaction));
+            /* Agregar <DespatchAdvice><cbc:DespatchAdviceTypeCode> */
+            despatchAdviceType.setDespatchAdviceTypeCode(getDespatchAdviceTypeCode(transaction.getDOC_Codigo()));
+
+            /**  */
+
+            /* <DespatchAdvice><cac:AdditionalDocumentReference>*/
+            List<TransactionDocReferDTO> transaccionDocrefers = transaction.getTransactionDocReferDTOList();
+            // Realiza operaciones con cada elemento 'transaccion_docrefers'
+            despatchAdviceType.getAdditionalDocumentReference().addAll(getAdditionalDocumentReference(transaction.getTransactionGuias(), transaccionDocrefers));
+
+            /* Agregar <DespatchAdvice><cac:DespatchSupplierParty> */
+            despatchAdviceType.setDespatchSupplierParty(getDespatchSupplierParty(transaction.getDocIdentidad_Nro(), transaction.getDocIdentidad_Tipo(), transaction.getRazonSocial()));
+
+            /* Agregar <DespatchAdvice><cac:DeliveryCustomerParty> */
+            despatchAdviceType.setDeliveryCustomerParty(getDeliveryCustomerParty(transaction.getTransactionGuias().getGRT_DocumentoDestinatario(), transaction.getTransactionGuias().getGRT_TipoDocDestinatario(), transaction.getTransactionGuias().getGRT_NombreRazonDestinatario()));
+
+            /* Agregar <DespatchAdvice><cac:OriginatorCustomerParty>*/
+            despatchAdviceType.setOriginatorCustomerParty(getOriginatorCustomerParty(transaction.getSN_DocIdentidad_Nro(), transaction.getSN_DocIdentidad_Tipo(), transaction.getSN_RazonSocial()));
+
+            /* Agregar <DespatchAdvice><cac:Shipment> */
+            despatchAdviceType.setShipment(getShipmentCarrier(transaction.getTransactionGuias()));
+
+            /* Agregar <DespatchAdvice><cac:DespatchLine> */
+            despatchAdviceType.getDespatchLine().addAll(getAllDespatchLines(transaction.getTransactionLineasDTOList()));
+
+            /*DespatchLineType despatchLine = new DespatchLineType();
+            despatchLine.setID(getID("0"));
+            despatchAdviceType.getDespatchLine().add(despatchLine);*/
+            if (logger.isInfoEnabled()) {
+                logger.info("generateTransportDespatchAdviceType() [" + this.identifier + "] xxxxxxxxxxxxxxxxxxx DespatchLines(" + despatchAdviceType.getDespatchLine().size() + ") xxxxxxxxxxxxxxxxxxx");
+            }
+        } catch (Exception e) {
+            logger.error("generateDespatchAdviceType() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
+            throw new UBLDocumentException(IVenturaError.ERROR_369, e);
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("-generateTransportDespatchAdviceType() [" + this.identifier + "]");
+        }
+
+        return despatchAdviceType;
+    }//generateCarrierDespatchAdviceType
+
+    protected List<DocumentReferenceType> getAdditionalDocumentReference(TransactionGuiasDTO guia, List<TransactionDocReferDTO> transaccionDocrefersList) {
+
+        List<DocumentReferenceType> documentReferenceTypesList = new ArrayList<DocumentReferenceType>(transaccionDocrefersList.size());
+
+        for(TransactionDocReferDTO docref : transaccionDocrefersList) {
+            DocumentReferenceType documentReferenceType = new DocumentReferenceType();
+            /* <DespatchAdvice><cac:AdditionalDocumentReference><cbc:ID>*/
+
+            IDType idType = new IDType();
+            idType.setValue(docref.getId());
+            documentReferenceType.setID(idType);
+            /* <DespatchAdvice><cac:AdditionalDocumentReference><cbc:DocumentTypeCode>*/
+            DocumentTypeCodeType codeType = new DocumentTypeCodeType();
+            codeType.setListAgencyName(IUBLConfig.SCHEME_AGENCY_NAME_PE_SUNAT);
+            codeType.setListName(IUBLConfig.DOCUMENT_REL);
+            codeType.setListURI(IUBLConfig.URI_CATALOG_61);
+            codeType.setValue(docref.getTipo());
+            documentReferenceType.setDocumentTypeCode(codeType);
+            /* <DespatchAdvice><cac:AdditionalDocumentReference><cbc:DocumentType>*/
+            DocumentTypeType documentType = new DocumentTypeType();
+            documentType.setValue("Guia Remision Remitente");
+            documentReferenceType.setDocumentType(documentType);
+            /* <DespatchAdvice><cac:AdditionalDocumentReference><cac:IssuerParty>*/
+            PartyType issuerParty = new PartyType();
+            /* <DespatchAdvice><cac:AdditionalDocumentReference><cac:IssuerParty><cac:PartyIdentification>*/
+            PartyIdentificationType partyIdentificationParty = new PartyIdentificationType();
+            /* <DespatchAdvice><cac:AdditionalDocumentReference><cac:IssuerParty><cac:PartyIdentification><cbc:ID>*/
+            IDType idIdentification = new IDType();
+            idIdentification.setSchemeID(guia.getGRT_TipoDocRemitente());
+            idIdentification.setSchemeAgencyName(IUBLConfig.SCHEME_AGENCY_NAME_PE_SUNAT);
+            idIdentification.setSchemeURI(IUBLConfig.URI_CATALOG_06);
+            idIdentification.setValue(guia.getGRT_DocumentoRemitente());
+            partyIdentificationParty.setID(idIdentification);
+            issuerParty.getPartyIdentification().add(partyIdentificationParty);
+            documentReferenceType.setIssuerParty(issuerParty);
+
+            documentReferenceTypesList.add(documentReferenceType);
+        }
+        return documentReferenceTypesList;
+    }
+    /** */
+
     private DocumentReferenceType insertarDocRefers(TransactionGuiasDTO guia, TransacctionDTO transaccion) {
 
         DocumentReferenceType documentReferenceType = new DocumentReferenceType();

@@ -162,7 +162,7 @@ public class FileHandler {
                 jaxbContext = JAXBContext.newInstance(RetentionType.class);
             } else if (documentCode.equalsIgnoreCase(IUBLConfig.DOC_PERCEPTION_CODE)) {
                 jaxbContext = JAXBContext.newInstance(PerceptionType.class);
-            } else if (documentCode.equalsIgnoreCase(IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE)) {
+            } else if (documentCode.equalsIgnoreCase(IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE) || documentCode.equalsIgnoreCase(IUBLConfig.DOC_SENDER_CARRIER_GUIDE_CODE)) {
                 jaxbContext = JAXBContext.newInstance(DespatchAdviceType.class);
             }
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();

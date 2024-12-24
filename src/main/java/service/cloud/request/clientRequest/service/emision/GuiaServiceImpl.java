@@ -125,8 +125,12 @@ public class GuiaServiceImpl implements GuiaInterface {
 
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
         DespatchAdviceType despatchAdviceType = null;
-        despatchAdviceType = ublHandler.generateDespatchAdviceType(transaction, signerName);
 
+        if(IUBLConfig.DOC_SENDER_CARRIER_GUIDE_CODE.equals(transaction.getDOC_Codigo())) {
+            despatchAdviceType = ublHandler.generateDespatchAdviceType(transaction, signerName);
+        }else {
+            despatchAdviceType = ublHandler.generateCarrierDespatchAdviceType(transaction, signerName);
+        }
 
         validationHandler.checkRemissionGuideDocument(despatchAdviceType);
 
@@ -317,6 +321,8 @@ public class GuiaServiceImpl implements GuiaInterface {
         log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
         return transactionResponse;
     }
+
+
 
     public ResponseDTO consult(String numTicket, String token) throws IOException {
 
