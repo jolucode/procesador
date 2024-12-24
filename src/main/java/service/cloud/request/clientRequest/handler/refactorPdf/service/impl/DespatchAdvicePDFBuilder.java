@@ -101,15 +101,16 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
             despatchAdviceObject.setNumeroDocConsumidor(despatchAdvice.getTransaccion().getSN_DocIdentidad_Nro());
             despatchAdviceObject.setNumeroDocEmisor(despatchAdvice.getTransaccion().getDocIdentidad_Nro());
 
-            if (despatchAdvice.getTransaccion().getTransactionGuias().getModalidadTraslado().equalsIgnoreCase("01")) {
+            /** Harol 29-03-2024 Guia Transportista 31*/
+            //if (despatchAdvice.getTransaccion().getTransactionGuias().getModalidadTraslado().equalsIgnoreCase("01")) {
                 despatchAdviceObject.setPlacaVehiculo(despatchAdvice.getTransaccion().getTransactionGuias().getPlacaVehiculo());
                 despatchAdviceObject.setLicenciaConducir(despatchAdvice.getTransaccion().getTransactionGuias().getLicenciaConductor());
                 despatchAdviceObject.setRUCTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getRUCTransporista());
                 despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getNombreRazonTransportista());
-            } else {
+            /*} else {
                 despatchAdviceObject.setRUCTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getRUCTransporista());
                 despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getNombreRazonTransportista());
-            }
+            }*/
 
             /** Harol 29-03-2024 Guia Transportista 31*/
             if (despatchAdvice.getTransaccion().getDOC_Codigo().equals("31")) {
