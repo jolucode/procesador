@@ -33,17 +33,8 @@ public class ApplicationProperties {
     @Value("${application.soap-client.estela.base-url}")
     public String urlEstela;
 
-    @Value("${application.ambiente}")
-    public String ambiente;
-
-    @Value("${application.rutas.rutaBaseDoc}")
-    public String rutaBaseDoc;
-
     @Value("${application.soap-client.sunat.base-url}")
     public String urlSunat;
-
-    @Value("${application.soap-client.ose.base-url}")
-    public String urlOse;
 
 
     /**
