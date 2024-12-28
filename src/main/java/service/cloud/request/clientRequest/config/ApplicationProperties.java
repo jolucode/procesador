@@ -33,10 +33,6 @@ public class ApplicationProperties {
     @Value("${application.soap-client.estela.base-url}")
     public String urlEstela;
 
-    @Value("${application.soap-client.sunat.base-url}")
-    public String urlSunat;
-
-
     /**
      * Método para determinar la URL en base a los parámetros dados.
      *

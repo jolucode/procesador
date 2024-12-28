@@ -1070,7 +1070,6 @@ public abstract class UBLBasicHandler {
     }
 
 
-
     protected CustomerPartyType getAccountingCustomerPartyV21(String identifier, String identifierType, String socialReason, String commercialName, String fiscalAddress,
                                                               String department, String province, String district, String ubigeo, String countryCode, String contactName, String electronicMail) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
@@ -1634,7 +1633,7 @@ public abstract class UBLBasicHandler {
             shipment.setGrossWeightMeasure(grossWeightMeasure);
 
 
-            if (transaccionGuiaRemision.getCodigoMotivo() != null && ( transaccionGuiaRemision.getCodigoMotivo().equals("08") || transaccionGuiaRemision.getCodigoMotivo().equals("09"))) {
+            if (transaccionGuiaRemision.getCodigoMotivo() != null && (transaccionGuiaRemision.getCodigoMotivo().equals("08") || transaccionGuiaRemision.getCodigoMotivo().equals("09"))) {
                 if (transaccionGuiaRemision.getNumeroBultos() != null && transaccionGuiaRemision.getNumeroBultos().compareTo(BigDecimal.ZERO) > 0) {
                     /* <cac:Shipment><cbc:TotalTransportHandlingUnitQuantity> */
                     TotalTransportHandlingUnitQuantityType totalTransportHandlingUnitQuantity = new TotalTransportHandlingUnitQuantityType();
@@ -1679,7 +1678,6 @@ public abstract class UBLBasicHandler {
                 specialInstructions.setValue("SUNAT_Envio_IndicadorVehiculoConductoresTransp");
                 shipment.getSpecialInstructions().add(specialInstructions);
             }
-
 
 
             ShipmentStageType shipmentStage = new ShipmentStageType();
@@ -1841,7 +1839,7 @@ public abstract class UBLBasicHandler {
             /* <cac:Shipment><cac:Delivery><cac:Despatch><cac:DespatchAddress>*/
             AddressType despatchAddress = new AddressType();
 
-            if (transaccion.getTransactionGuias().getCodigoMotivo() !=null && (transaccion.getTransactionGuias().getCodigoMotivo().equals("02") || transaccion.getTransactionGuias().getCodigoMotivo().equals("08"))) {
+            if (transaccion.getTransactionGuias().getCodigoMotivo() != null && (transaccion.getTransactionGuias().getCodigoMotivo().equals("02") || transaccion.getTransactionGuias().getCodigoMotivo().equals("08"))) {
                 /* <cac:Shipment><cac:Delivery><cac:Despatch><cac:DespatchAddress><cbc:ID>*/
                 IDType idDespatch = new IDType();
                 idDespatch.setSchemeName("Ubigeos");
@@ -1922,7 +1920,7 @@ public abstract class UBLBasicHandler {
             }
 
 
-            if (transaccionGuiaRemision.getCodigoMotivo() != null && ( transaccionGuiaRemision.getCodigoMotivo().equals("08") || (transaccionGuiaRemision.getCodigoMotivo().equals("09")))) {
+            if (transaccionGuiaRemision.getCodigoMotivo() != null && (transaccionGuiaRemision.getCodigoMotivo().equals("08") || (transaccionGuiaRemision.getCodigoMotivo().equals("09")))) {
                 if (transaccionGuiaRemision.getNumeroContenedor() != null && !transaccionGuiaRemision.getNumeroContenedor().isEmpty()) {
                     transportHandlingUnit.getPackage().add(getPackage(transaccionGuiaRemision.getNumeroContenedor(), transaccionGuiaRemision.getNumeroPrecinto()));
                 }
@@ -1935,7 +1933,7 @@ public abstract class UBLBasicHandler {
 
             //</cac:Shipment><cac:FirstArrivalPortLocation>
 
-            if (transaccionGuiaRemision.getCodigoMotivo() != null && ( transaccionGuiaRemision.getCodigoMotivo().equals("08") || (transaccionGuiaRemision.getCodigoMotivo().equals("09")))) {
+            if (transaccionGuiaRemision.getCodigoMotivo() != null && (transaccionGuiaRemision.getCodigoMotivo().equals("08") || (transaccionGuiaRemision.getCodigoMotivo().equals("09")))) {
                 if (transaccionGuiaRemision.getCodigoPuerto() != null && !transaccionGuiaRemision.getCodigoPuerto().isEmpty()) {
                     shipment.setFirstArrivalPortLocation(getFirstArrivalPortLocation("Puertos", transaccionGuiaRemision.getCodigoPuerto(), "1", transaccionGuiaRemision.getDescripcionPuerto()));
                 }
@@ -1974,27 +1972,27 @@ public abstract class UBLBasicHandler {
 
             /* <cac:Shipment><cbc:SpecialInstructions> */
 
-            if (transaccionGuiaRemision.getGRT_IndicadorPagadorFlete().equalsIgnoreCase("Y")) {
+            if (transaccionGuiaRemision.getGRT_IndicadorPagadorFlete() != null && transaccionGuiaRemision.getGRT_IndicadorPagadorFlete().equalsIgnoreCase("Y")) {
                 SpecialInstructionsType specialInstructions = new SpecialInstructionsType();
                 specialInstructions.setValue("SUNAT_Envio_IndicadorPagadorFlete_Remitente");
                 shipment.getSpecialInstructions().add(specialInstructions);
             }
-            if (transaccionGuiaRemision.getIndicadorTransbordo().equalsIgnoreCase("Y")) {
+            if (transaccionGuiaRemision.getIndicadorTransbordo() != null && transaccionGuiaRemision.getIndicadorTransbordo().equalsIgnoreCase("Y")) {
                 SpecialInstructionsType specialInstructions = new SpecialInstructionsType();
                 specialInstructions.setValue("SUNAT_Envio_IndicadorTransbordoProgramado");
                 shipment.getSpecialInstructions().add(specialInstructions);
             }
-            if (transaccionGuiaRemision.getIndicadorRetorno().equalsIgnoreCase("Y")) {
+            if (transaccionGuiaRemision.getIndicadorRetorno() != null && transaccionGuiaRemision.getIndicadorRetorno().equalsIgnoreCase("Y")) {
                 SpecialInstructionsType specialInstructions = new SpecialInstructionsType();
                 specialInstructions.setValue("SUNAT_Envio_IndicadorRetornoVehiculoEnvaseVacio");
                 shipment.getSpecialInstructions().add(specialInstructions);
             }
-            if (transaccionGuiaRemision.getIndicadorRetornoVehiculo().equalsIgnoreCase("Y")) {
+            if (transaccionGuiaRemision.getIndicadorRetornoVehiculo() != null && transaccionGuiaRemision.getIndicadorRetornoVehiculo().equalsIgnoreCase("Y")) {
                 SpecialInstructionsType specialInstructions = new SpecialInstructionsType();
                 specialInstructions.setValue("SUNAT_Envio_IndicadorRetornoVehiculoVacio");
                 shipment.getSpecialInstructions().add(specialInstructions);
             }
-            if (transaccionGuiaRemision.getIndicadorRegistro().equalsIgnoreCase("Y")) {
+            if (transaccionGuiaRemision.getIndicadorRegistro() != null && transaccionGuiaRemision.getIndicadorRegistro().equalsIgnoreCase("Y")) {
                 SpecialInstructionsType specialInstructions = new SpecialInstructionsType();
                 specialInstructions.setValue("SUNAT_Envio_IndicadorVehiculoConductoresTransp");
                 shipment.getSpecialInstructions().add(specialInstructions);
@@ -2041,8 +2039,8 @@ public abstract class UBLBasicHandler {
                     String apellidos = listaPartes.get(1);
                     if (listaPartes.size() == 3) {
                         nombres = listaPartes.get(0);
-                        apellidos = listaPartes.get(1)+" "+listaPartes.get(2);
-                    }else if (listaPartes.size() > 3) {
+                        apellidos = listaPartes.get(1) + " " + listaPartes.get(2);
+                    } else if (listaPartes.size() > 3) {
                         nombres = "";
                         apellidos = "";
                         for (int i = 0; i < listaPartes.size(); i++) {
@@ -2223,7 +2221,7 @@ public abstract class UBLBasicHandler {
         carrierParty.getPartyLegalEntity().add(partyLegalEntity);
         /* <cac:Shipment><cac:ShipmentStage><cac:CarrierParty><cac:AgentParty> */
         PartyType agentParty = new PartyType();
-        PartyLegalEntityType partyLegalEntityAgentParty  = new PartyLegalEntityType();
+        PartyLegalEntityType partyLegalEntityAgentParty = new PartyLegalEntityType();
         CompanyIDType companyIdAgentParty = new CompanyIDType();
         companyIdAgentParty.setSchemeID("06");
         companyIdAgentParty.setSchemeName(IUBLConfig.CARRIER_ENTITY_AUTHORIZING);
@@ -2974,7 +2972,7 @@ public abstract class UBLBasicHandler {
                 } else if (tributo.equalsIgnoreCase(IUBLConfig.TAX_TOTAL_BPT_ID)) {
                     /**revisar*/
                     //BigDecimal cantidad =  lineaImpuesto.getTransaccionLineas().getCantidad();
-                    BigDecimal cantidad =  lineaImpuesto.getCantidad();
+                    BigDecimal cantidad = lineaImpuesto.getCantidad();
 
                     TaxSubtotalType taxSubtotal = new TaxSubtotalType();
                     TaxAmountType bolsaTaxAmount = new TaxAmountType();

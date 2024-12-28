@@ -21,7 +21,7 @@ application:
 ventura:
   clientes:
     listaClientes:
-      '20481139075':
+      '20510910517':
 
         razonSocial: 'Ventura Soluciones1'
 
@@ -30,8 +30,8 @@ ventura:
         wsLocation: 'http://facturacion.vsperufe.com/'
 
         emisorElecRs: '205454844881/SUNAT'
-        usuarioSol: '20481139075'
-        claveSol: '20481139075'
+        usuarioSol: '20510910517'
+        claveSol: '20510910517'
 
         certificadoName: "CERTIFICATE_TEST.pfx"
         certificadoPassword: '1234'
@@ -46,9 +46,9 @@ ventura:
         urlOnpremise: 'http://localhost:8101/'
 
         scope: 'https://api-cpe.sunat.gob.pe/'
-        clientId: 'a8a6c50a-d73c-4775-9ddc-6261df69fed8'
-        clientSecret: '5yr+sp24Q1J+LeYhnCooEw=='
-        UserNameSunatGuias: '20510910517JVENTUR1'
-        passwordSunatGuias: 'JVENTUR1'
+        clientId: 'a8a6c50a-d73c-4775-9ddc-6261df69fe2d8'
+        clientSecret: '5yr+sp24Q1J+LeYhnCooEw2=='
+        UserNameSunatGuias: '20510910517JVENTUR21'
+        passwordSunatGuias: 'JVENTUR21'
 server:
   port: 8081
