@@ -301,13 +301,11 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                             itemObjectHash.put(field.getName(), value.toString());
                             newlist.add(value.toString());
                         }
-                        if(field.getName().equals("DOC_FechaEmision"))
-                        {
+                        if (field.getName().equals("DOC_FechaEmision")) {
                             itemObjectHash.put("DOC_FechaEmision", DateConverter.convertToDate(value));
                         }
 
-                        if(field.getName().equals("CP_Fecha"))
-                        {
+                        if (field.getName().equals("CP_Fecha")) {
                             itemObjectHash.put("CP_Fecha", DateConverter.convertToDate(value));
                         }
                     } catch (IllegalAccessException e) {
@@ -612,7 +610,9 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
             boletaObj.setReceiverFullname(boletaType.getTransaccion().getSN_RazonSocial());
             boletaObj.setReceiverIdentifier(boletaType.getTransaccion().getSN_DocIdentidad_Nro());
             boletaObj.setReceiverIdentifierType(boletaType.getTransaccion().getSN_DocIdentidad_Tipo());
-            boletaObj.setReceiverFiscalAddress(boletaType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
+            if (boletaType.getTransaccion().getSN_DIR_NomCalle() != null && boletaType.getTransaccion().getSN_DIR_Distrito() != null && boletaType.getTransaccion().getSN_DIR_Provincia() != null && boletaType.getTransaccion().getSN_DIR_Departamento() != null)
+                boletaObj.setReceiverFiscalAddress(boletaType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
+
             if (logger.isDebugEnabled()) {
                 logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
             }
@@ -1150,7 +1150,7 @@ public class PDFGenerateHandler extends PDFBasicGenerateHandler {
                 logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
             }
 
-            if(!legendsMap.isEmpty()) {
+            if (!legendsMap.isEmpty()) {
                 LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
                 invoiceObj.setLetterAmountValue(legendLetters.getLegendValue());
                 legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
