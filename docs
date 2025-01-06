@@ -116,3 +116,60 @@ DESPLIEUGE ANGULAR
 https://www.youtube.com/watch?v=D2oOWgCuBIY
 
 DESPLIEUGE BACK
+
+
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/ventura2024
+scheduled:
+  fixedDelay: 10000
+application:
+  env: dev
+  ambiente: 'test'
+  rutas:
+    rutaBaseDoc: 'C:\clientes\files\'
+  soap-client:
+    sunat:
+      base-url-emision: 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService'
+      base-url-consulta: 'https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService'
+      base-url-retper: 'https://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService'
+    ose:
+      base-url: 'https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl'
+    estela:
+      base-url: 'https://ose-test.com/ol-ti-itcpe/billService3'
+ventura:
+  clientes:
+    listaClientes:
+      '20510910517':
+
+        razonSocial: 'Ventura Soluciones1'
+
+        wsUsuario: 'admin'
+        wsClave: 'ventura'
+        wsLocation: 'http://facturacion.vsperufe.com/'
+
+        emisorElecRs: '205454844881/SUNAT'
+        usuarioSol: '20510910517'
+        claveSol: '20510910517'
+
+        certificadoName: "CERTIFICATE_TEST.pfx"
+        certificadoPassword: '1234'
+        certificadoProveedor: 'SunJSSE'
+        certificadoTipoKeystore: 'Pkcs12'
+
+        integracionWs: SUNAT
+        mostrarSoap: 'true'
+        pdfBorrador: 'true'
+        impresion: 'Codigo QR'
+
+        urlOnpremise: 'http://localhost:8101/'
+
+        scope: 'https://api-cpe.sunat.gob.pe/'
+        clientId: 'a8a6c50a-d73c-4775-9ddc-6261df69fe2d8'
+        clientSecret: '5yr+sp24Q1J+LeYhnCooEw2=='
+        UserNameSunatGuias: '20510910517JVENTUR21'
+        passwordSunatGuias: 'JVENTUR21'
+server:
+  port: 8081

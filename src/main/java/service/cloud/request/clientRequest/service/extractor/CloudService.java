@@ -3,9 +3,11 @@ package service.cloud.request.clientRequest.service.extractor;
 import com.google.gson.Gson;
 import io.joshworks.restclient.http.HttpResponse;
 import io.joshworks.restclient.http.Unirest;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,9 @@ import service.cloud.request.clientRequest.dto.request.RequestPost;
 import service.cloud.request.clientRequest.dto.response.Data;
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
+import service.cloud.request.clientRequest.mongo.model.Log;
+import service.cloud.request.clientRequest.mongo.model.LogDTO;
+import service.cloud.request.clientRequest.mongo.service.ILogService;
 import service.cloud.request.clientRequest.service.emision.ServiceBaja;
 import service.cloud.request.clientRequest.service.emision.ServiceBajaConsulta;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
@@ -55,6 +60,12 @@ public class CloudService implements CloudInterface {
     @Autowired
     ServiceBajaConsulta serviceBajaConsulta;
 
+    @Autowired
+    private ILogService logEntryService;
+
+    @Autowired
+    @Qualifier("defaultMapper")
+    private ModelMapper mapper;
 
     @Override
     public Mono<ResponseEntity<Object>> proccessDocument(String stringRequestOnpremise) {
@@ -67,7 +78,7 @@ public class CloudService implements CloudInterface {
                 })
                 .flatMapMany(Flux::fromArray) // Convertir el array en un flujo
                 .flatMap(transaccion ->
-                                processTransaction(transaccion) // Procesar cada transacción
+                                processTransaction(transaccion, stringRequestOnpremise) // Procesar cada transacción
                                         .subscribeOn(Schedulers.boundedElastic()) // Ejecución en hilos aptos para operaciones bloqueantes
                                         .doOnError(error -> logger.error("Error procesando transacción: {}", error.getMessage()))
                         , 100) // Paralelismo: procesa hasta 5 transacciones simultáneamente
@@ -79,7 +90,6 @@ public class CloudService implements CloudInterface {
                     return Mono.just(ResponseEntity.<Void>status(HttpStatus.INTERNAL_SERVER_ERROR).build());
                 });
     }
-
 
     public int anexarDocumentos(RequestPost request) {
         HttpResponse<String> response = null;
@@ -98,13 +108,23 @@ public class CloudService implements CloudInterface {
         return response.getStatus();
     }
 
-    private Mono<RequestPost> processTransaction(TransacctionDTO transaccion) {
+    private Mono<RequestPost> processTransaction(TransacctionDTO transaccion, String requestOnPremise) {
         return Mono.fromCallable(() -> {
             TransaccionRespuesta tr = enviarTransaccion(transaccion);
             RequestPost request = generateDataRequestHana(transaccion, tr);
+            anexarDocumentos(request);
+
+            if (tr.getLogDTO() != null) {
+                tr.getLogDTO().setRequest(requestOnPremise);
+                logEntryService.saveLogEntryToMongoDB(convertToEntity(tr.getLogDTO())).subscribe();
+            }
 
             return request;
         }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    private Log convertToEntity(LogDTO dto) {
+        return mapper.map(dto, Log.class);
     }
 
     public TransaccionRespuesta enviarTransaccion(TransacctionDTO transaction) throws Exception {

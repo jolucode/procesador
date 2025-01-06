@@ -11,12 +11,13 @@ application:
     rutaBaseDoc: 'C:\clientes\files\'
   soap-client:
     sunat:
-      base-url-emision: 'h-ttps://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService?wsdl'
-      base-url-consulta: 'h-ttps://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl'
-      base-url-retper: 'h-ttps://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService?wsdl'
+      base-url-emision: 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService'
+      base-url-consulta: 'https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService'
+      base-url-retper: 'https://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService'
     ose:
-      base-url: 'h-ttps://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl'
-
+      base-url: 'https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl'
+    estela:
+      base-url: 'https://ose-test.com/ol-ti-itcpe/billService3'
 ventura:
   clientes:
     listaClientes:
@@ -37,7 +38,7 @@ ventura:
         certificadoProveedor: 'SunJSSE'
         certificadoTipoKeystore: 'Pkcs12'
 
-        integracionWs: OSE
+        integracionWs: SUNAT
         mostrarSoap: 'true'
         pdfBorrador: 'true'
         impresion: 'Codigo QR'
@@ -47,7 +48,7 @@ ventura:
         scope: 'https://api-cpe.sunat.gob.pe/'
         clientId: 'a8a6c50a-d73c-4775-9ddc-6261df69fe2d8'
         clientSecret: '5yr+sp24Q1J+LeYhnCooEw2=='
-        UserNameSunatGuias: '20510910517JVENTU2R1'
+        UserNameSunatGuias: '20510910517JVENTUR21'
         passwordSunatGuias: 'JVENTUR21'
 server:
-  port: 8080
+  port: 8081

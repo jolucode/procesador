@@ -75,6 +75,13 @@ public class ServiceEmision implements IServiceEmision {
     @Override
     public TransaccionRespuesta transactionDocument(TransacctionDTO transaction, String doctype) throws Exception {
 
+        /***/
+        LogDTO log = new LogDTO();
+        log.setRequestDate(DateUtils.formatDateToString(new Date()));
+        log.setRuc(transaction.getDocIdentidad_Nro());
+        log.setBusinessName(transaction.getSN_RazonSocial());
+        /***/
+
         boolean isContingencia = isContingencia(transaction);
         ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
         validationHandler.checkBasicInformation(transaction.getDOC_Id(), transaction.getDocIdentidad_Nro(), transaction.getDOC_FechaEmision(), transaction.getSN_EMail(), transaction.getEMail(), isContingencia);
@@ -115,9 +122,9 @@ public class ServiceEmision implements IServiceEmision {
         signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), client.getCertificadoTipoKeystore(), client.getCertificadoProveedor(), signerName);
         byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
 
+        log.setThirdPartyRequestXml(new String(signedXmlDocument, StandardCharsets.UTF_8));
 
         String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
-
         UBLDocumentWRP documentWRP = configureDocumentWRP(signedXmlDocument, transaction.getDOC_Codigo(), doctype);
         documentWRP.setTransaccion(transaction);
 
@@ -126,12 +133,22 @@ public class ServiceEmision implements IServiceEmision {
         byte[] zipBytes = DocumentConverterUtils.compressUBLDocument(signedXmlDocument, documentName + ".xml");
         String base64Content = convertToBase64(zipBytes);
 
+        log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
         TransaccionRespuesta transactionResponse = handleTransactionStatus(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
+        log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
 
         if (client.getPdfBorrador().equals("true")) {
             transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
         }
         transactionResponse.setIdentificador(documentName);
+
+
+        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
+        log.setSeriesAndCorrelative(documentName);
+        log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
+        log.setResponseDate(DateUtils.formatDateToString(new Date()));
+        transactionResponse.setLogDTO(log);
+
         return transactionResponse;
     }
 
