@@ -1999,7 +1999,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         invoiceTypeCode.setListName("Tipo de Documento");
         invoiceTypeCode.setListID("2001");
         invoiceTypeCode.setListAgencyName("PE:SUNAT");
-        invoiceTypeCode.setValue("01");
+        invoiceTypeCode.setValue(transaccion.getDOC_Codigo());
         return invoiceTypeCode;
     }
 

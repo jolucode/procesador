@@ -68,7 +68,7 @@ public class CloudService implements CloudInterface {
     private ModelMapper mapper;
 
     @Override
-    public Mono<ResponseEntity<Object>> proccessDocument(String stringRequestOnpremise) {
+    public Mono<ResponseEntity<Object>>   proccessDocument(String stringRequestOnpremise) {
         String datePattern = Constants.PATTERN_ARRAY_TRANSACTION;
         String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
 

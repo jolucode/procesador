@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://lbecerra:Lima40401010@cluster0.g1jnjjj.mongodb.net/ventura2024
+      uri: mongodb://localhost:27017/ventura2024
 scheduled:
   fixedDelay: 10000
 application:
@@ -21,34 +21,27 @@ application:
 ventura:
   clientes:
     listaClientes:
-      '20510910517':
-
-        razonSocial: 'Ventura Soluciones1'
-
-        wsUsuario: 'admin'
-        wsClave: 'ventura'
-        wsLocation: 'http://facturacion.vsperufe.com/'
-
-        emisorElecRs: '205454844881/SUNAT'
-        usuarioSol: '20510910517'
-        claveSol: '20510910517'
-
-        certificadoName: "CERTIFICATE_TEST.pfx"
-        certificadoPassword: '1234'
-        certificadoProveedor: 'SunJSSE'
-        certificadoTipoKeystore: 'Pkcs12'
-
-        integracionWs: SUNAT
-        mostrarSoap: 'true'
-        pdfBorrador: 'true'
-        impresion: 'Codigo QR'
-
-        urlOnpremise: 'http://localhost:8101/'
-
-        scope: 'https://api-cpe.sunat.gob.pe/'
-        clientId: 'a8a6c50a-d73c-4775-9ddc-6261df69fe2d8'
-        clientSecret: '5yr+sp24Q1J+LeYhnCooEw2=='
-        UserNameSunatGuias: '20510910517JVENTUR21'
-        passwordSunatGuias: 'JVENTUR21'
+      "20510910517":
+        razonSocial: CALZADOS AZALEIA PERU S.A
+        wsUsuario: admin
+        wsClave: ventura
+        wsLocation: No Aplica
+        emisorElecRs: 205454844881/SUNAT
+        usuarioSol: "20510910517"
+        claveSol: "20510910517"
+        certificadoName: CERTIFICATE_TEST.pfx
+        certificadoPassword: "1234"
+        certificadoProveedor: SunJSSE
+        certificadoTipoKeystore: Pkcs12
+        integracionWs: OSE
+        mostrarSoap: "true"
+        pdfBorrador: "true"
+        impresion: Codigo QR
+        urlOnpremise: http://190.119.245.254:60081/
+        scope: No aplica
+        clientId: No aplica
+        clientSecret: No aplica
+        UserNameSunatGuias: No aplica
+        passwordSunatGuias: No aplica
 server:
-  port: 8081
+  port: 8082

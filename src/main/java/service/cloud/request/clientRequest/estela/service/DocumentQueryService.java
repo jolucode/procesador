@@ -53,6 +53,7 @@ public class DocumentQueryService {
         if (matcher.find()) {
             return matcher.group(1); // Retorna el contenido capturado
         }
+
         throw new RuntimeException("No se encontró <applicationResponse> en la respuesta SOAP.");
     }
 }
