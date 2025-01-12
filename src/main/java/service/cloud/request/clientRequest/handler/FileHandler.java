@@ -174,4 +174,45 @@ public class FileHandler {
     } //getSignedDocument
 
 
+    /**
+     * Este metodo almacena un documento PDF en el DISCO DURO.
+     *
+     * @param pdfBytes     El document PDF en formato bytes.
+     * @param documentName El nombre del documento PDF.
+     * @return Retorna un valor booleano que indica si el documento fue
+     * almacenado o no.
+     */
+    public boolean storePDFDocumentInDisk(byte[] pdfBytes, String documentName, String extension) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("+storePDFDocumentInDisk() [" + this.docUUID + "]");
+        }
+        boolean flag = false;
+        try {
+            String separator = File.separator;
+            File file = new File(this.baseDirectory /*+ separator + this.pdfDirectory + separator + rucEmpresa + separator + rucCliente*/);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            String filePath = this.baseDirectory +/*+ separator + this.pdfDirectory + separator + rucEmpresa + separator + rucCliente + */separator + documentName + extension;
+            File newFile = new File(filePath);
+            if (!newFile.exists()) {
+                newFile.createNewFile();
+            } else {
+                boolean canWrite = newFile.canWrite();
+                if (!canWrite) {
+                    throw new VenturaExcepcion("No se puede guardar el documento PDF porque est\u00fa siendo usado por otro proceso. Cierre el documento y realice nuevamente el env\u00d3o");
+                }
+            }
+            Path path = Paths.get(filePath);
+            Files.write(path, pdfBytes);
+            flag = true;
+        } catch (IOException | VenturaExcepcion e) {
+            logger.error("storePDFDocumentInDisk() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("+storePDFDocumentInDisk() [" + this.docUUID + "]");
+        }
+        return flag;
+    } //storePDFDocumentInDisk
+
 } //FileHandler

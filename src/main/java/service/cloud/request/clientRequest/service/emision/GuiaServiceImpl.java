@@ -26,7 +26,9 @@ import service.cloud.request.clientRequest.handler.document.SignerHandler;
 import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.model.model.ResponseDTO;
 import service.cloud.request.clientRequest.model.model.ResponseDTOAuth;
+import service.cloud.request.clientRequest.mongo.model.GuiaTicket;
 import service.cloud.request.clientRequest.mongo.model.LogDTO;
+import service.cloud.request.clientRequest.mongo.repo.IGuiaTicketRepo;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
@@ -62,6 +64,9 @@ public class GuiaServiceImpl implements GuiaInterface {
 
     @Autowired
     DocumentFormatInterface documentFormatInterface;
+
+    @Autowired
+    private IGuiaTicketRepo guiaTicketRepo;
 
     @Override
     public TransaccionRespuesta transactionRemissionGuideDocumentRest(TransacctionDTO transaction, String doctype) throws Exception {
@@ -207,93 +212,102 @@ public class GuiaServiceImpl implements GuiaInterface {
         if (null != zipDocument) {
             if (transaction.getFE_Estado().equalsIgnoreCase("N")) {
 
-                ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
+                GuiaTicket ticketMongoSave = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
+                        transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
+                ).block();
 
-                if (responseDTOJWT.getStatusCode() == 400 || responseDTOJWT.getStatusCode() == 401) {
-                    return generateResponseRest(documentWRP, responseDTOJWT);
-                }
+                if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty()) {
+                    String ticketToUse = ticketMongoSave.getTicketSunat();
 
-                //DECLARE
-                ResponseDTO responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
 
-                //DECLARE
-                if (responseDTO.getStatusCode() == 401) {
-                    responseDTOJWT = getJwtSunat(configuracion);
-                    responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
-                }
+                    if (ticketToUse != null && !ticketToUse.isEmpty()) {
+                        // Consultar ticket en SUNAT
+                        ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
 
-                Thread.sleep(5000);
+                        // Manejar respuestas de SUNAT
+                        transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, signedDocument, fileHandler,
+                                documentName, transaction, configuracion);
 
-                //CONSULT
-                responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-                if (responseDTO.getStatusCode() == 401) {
-                    responseDTOJWT = getJwtSunat(configuracion);
-                    responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-                }
+                        if (transactionResponse != null) {
+                            byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
+                            transactionResponse.setXml(documentBytes);
+                        }
+                    }
 
-                int contador = 0;
-                while (responseDTO.getCodRespuesta().equals("98")) {
-                    Thread.sleep(5000);
-                    if (contador == 5) break;
-                    responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-                    contador++;
-                }
 
-                //EXTRAER ZIP
-                if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("0")) {
-                    transactionResponse = generateResponseRest(documentWRP, responseDTO);
-
-                    byte[] pdfBytes = documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion);
-                    transactionResponse.setPdf(pdfBytes);
-
-                    logger.info("CODIGO TIKCET GUIAS SUNAT - [0]" + responseDTO.getNumTicket());
-                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
-
-                } else if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("98")) {
-                    logger.info("CODIGO TIKCET GUIAS SUNAT - [98]" + responseDTO.getNumTicket());
-                    transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
-                } else if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("99")) {
-                    transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
-                }
-                byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
-                transactionResponse.setXml(documentBytes);
-
-            } else if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
-
-                if (transaction.getTransactionGuias().getTicketRest() != null && !transaction.getTransactionGuias().getTicketRest().isEmpty()) {
-
-                    //CONSULT
+                } else {
                     ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
 
-                    ResponseDTO responseDTO = consult(transaction.getTransactionGuias().getTicketRest(), responseDTOJWT.getAccess_token());
+
+
+
+                    if (responseDTOJWT.getStatusCode() == 400 || responseDTOJWT.getStatusCode() == 401) {
+                        return generateResponseRest(documentWRP, responseDTOJWT);
+                    }
+
+                    //DECLARE
+                    ResponseDTO responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
+                    //GUARDAR EN BASE DATOS
+                    saveTicketRest(transaction, responseDTO);
+
+
+                    //DECLARE
+                    if (responseDTO.getStatusCode() == 401) {
+                        responseDTOJWT = getJwtSunat(configuracion);
+                        responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
+                    }
+
+                    //sendQR(transaction.getDOCCodigo(), documentWRP);
+                    Thread.sleep(5000);
+
+                    //CONSULT
+                    responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
                     if (responseDTO.getStatusCode() == 401) {
                         responseDTOJWT = getJwtSunat(configuracion);
                         responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
                     }
 
-                    if (responseDTO.getStatusCode() == 400 || responseDTO.getStatusCode() == 404) {
-                        return generateResponseRest(documentWRP, responseDTO);
+                    int contador = 0;
+                    while (responseDTO.getCodRespuesta().equals("98")) {
+                        Thread.sleep(5000);
+                        if (contador == 5) break;
+                        responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
+                        contador++;
                     }
 
+                    //EXTRAER ZIP
+                    // Manejar respuestas de SUNAT
+                    transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, signedDocument, fileHandler,
+                            documentName, transaction, configuracion);
 
-                    //responseDTO.setCodRespuesta("0");
-                    if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("0")) {
-                        transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                        byte[] pdf = documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion);
-                        transactionResponse.setPdf(pdf);
-
-                        //AGREGAR A SAP CAMPO
-                        transactionResponse.setTicketRest(responseDTO.getNumTicket());
-                    } else if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("98")) {
-                        transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                    } else if (responseDTO.getCodRespuesta() != null && responseDTO.getCodRespuesta().equals("99")) {
-                        transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                    }
                     byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
+                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
                     transactionResponse.setXml(documentBytes);
 
+                }
+
+            } else if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
+
+                GuiaTicket ticketMongoSave = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
+                        transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
+                ).block(); // Bloquea y espera el resultado sincrónicamente
+
+                String ticketToUse = (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty())
+                        ? ticketMongoSave.getTicketSunat()
+                        : transaction.getTransactionGuias().getTicketRest();
+
+                if (ticketToUse != null && !ticketToUse.isEmpty()) {
+                    // Consultar ticket en SUNAT
+                    ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
+
+                    // Manejar respuestas de SUNAT
+                    transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, signedDocument, fileHandler,
+                            documentName, transaction, configuracion);
+
+                    if (transactionResponse != null) {
+                        byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
+                        transactionResponse.setXml(documentBytes);
+                    }
                 }
             }
         } else {
@@ -322,6 +336,56 @@ public class GuiaServiceImpl implements GuiaInterface {
         return transactionResponse;
     }
 
+    public void saveTicketRest(TransacctionDTO transaccion, ResponseDTO responseDTO) {
+        GuiaTicket guiaTicket = new GuiaTicket();
+        guiaTicket.setRucEmisor(transaccion.getDocIdentidad_Nro());
+        guiaTicket.setFeId(transaccion.getFE_Id());
+        guiaTicket.setTicketSunat(responseDTO.getNumTicket());
+        guiaTicketRepo.save(guiaTicket).subscribe();
+    }
+
+    private TransaccionRespuesta manejarRespuestaSunat(ResponseDTO responseDTO, UBLDocumentWRP documentWRP,
+                                                       File signedDocument, FileHandler fileHandler,
+                                                       String documentName, TransacctionDTO transaction,
+                                                       ConfigData configuracion) {
+        if (responseDTO.getStatusCode() == 400 || responseDTO.getStatusCode() == 404) {
+            return generateResponseRest(documentWRP, responseDTO);
+        }
+
+        if (responseDTO.getCodRespuesta() != null) {
+            switch (responseDTO.getCodRespuesta()) {
+                case "0":
+                    TransaccionRespuesta transactionResponse = generateResponseRest(documentWRP, responseDTO);
+                    byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null, signedDocument, fileHandler,
+                            documentName, transaction.getDOC_Codigo(), documentWRP, transaction, configuracion);
+                    transactionResponse.setPdf(pdf);
+                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
+                    return transactionResponse;
+
+                case "98":
+                case "99":
+                    return generateResponseRest(documentWRP, responseDTO);
+
+                default:
+                    return null;
+            }
+        }
+
+        return null;
+    }
+
+    private ResponseDTO consultarTicketEnSunat(String ticket, ConfigData configuracion) throws IOException {
+        ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
+        ResponseDTO responseDTO = consult(ticket, responseDTOJWT.getAccess_token());
+
+        if (responseDTO.getStatusCode() == 401) {
+            // Renovar token y volver a intentar
+            responseDTOJWT = getJwtSunat(configuracion);
+            responseDTO = consult(ticket, responseDTOJWT.getAccess_token());
+        }
+
+        return responseDTO;
+    }
 
 
     public ResponseDTO consult(String numTicket, String token) throws IOException {
