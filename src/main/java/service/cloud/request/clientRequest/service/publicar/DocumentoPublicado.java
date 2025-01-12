@@ -65,7 +65,7 @@ public class DocumentoPublicado {
         this.serie = (split.length > 0) ? split[0] : "";
         this.fecEmisionDoc = new SimpleDateFormat("dd/MM/yyyy").format(docPublicar.getDOC_FechaEmision());
         this.tipoDoc = docPublicar.getDOC_Codigo();
-        BigDecimal montoTotal = docPublicar.getDOC_MontoTotal().setScale(2, RoundingMode.HALF_UP);
+        BigDecimal montoTotal = docPublicar.getDOC_MontoTotal() == null ? BigDecimal.ZERO : docPublicar.getDOC_MontoTotal().setScale(2, RoundingMode.HALF_UP);
         this.total = montoTotal.toString();
         this.estadoSunat = transaccionRespuesta.getEstado(); //"V" - aprobado
         this.monedaTransaccion = docPublicar.getDOC_MON_Codigo();
