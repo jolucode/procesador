@@ -112,7 +112,7 @@ public class CloudService implements CloudInterface {
         return Mono.fromCallable(() -> {
             TransaccionRespuesta tr = enviarTransaccion(transaccion);
             RequestPost request = generateDataRequestHana(transaccion, tr);
-            //anexarDocumentos(request);
+            anexarDocumentos(request);
 
             logger.info("Ruc: " + request.getRuc() + " DocObject: " + request.getDocObject() + " DocEntry: " + request.getDocEntry());
             logger.info("Nombre Documento: " + request.getDocumentName());

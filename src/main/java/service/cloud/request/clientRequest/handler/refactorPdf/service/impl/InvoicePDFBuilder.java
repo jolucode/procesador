@@ -304,14 +304,17 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
             List<TransactionLineasDTO> transaccionLineas = invoiceType.getTransaccion().getTransactionLineasDTOList();
             for (TransactionLineasDTO transaccionLinea : transaccionLineas) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generateInvoicePDF() [" + this.docUUID + "] Agregando datos al HashMap" + transaccionLinea.getTransaccionLineasCamposUsuario().size());
+                    logger.debug("generateInvoicePDF() [" + this.docUUID + "] Agregando datos al HashMap");
                 }
+
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
                 List<String> newlist = new ArrayList<>();
-                Map<String, String> transaccionLineasCamposUsuario = transaccionLinea.getTransaccionLineasCamposUsuario();
-                if (transaccionLineasCamposUsuario != null && !transaccionLineasCamposUsuario.isEmpty()) {
-                    for (Map.Entry<String, String> entry : transaccionLineasCamposUsuario.entrySet()) {
+
+                // Obtener el mapa de campos de usuario desde transaccionLinea
+                Map<String, String> camposUsuarioMap = transaccionLinea.getTransaccionLineasCamposUsuario();
+                if (camposUsuarioMap != null && !camposUsuarioMap.isEmpty()) {
+                    for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
                         String nombreCampo = entry.getKey();
                         String valorCampo = entry.getValue();
 
@@ -325,64 +328,12 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
                         }
                         itemObjectHash.put(nombreCampo, valorCampo);
                         newlist.add(valorCampo);
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
-                        }
-                    }
-                }
-
-                List<Map<String, String>> contractDocRefs = invoiceType.getTransaccion().getTransactionContractDocRefListDTOS();
-                for (Map<String, String> contractDocRefMap : contractDocRefs) {
-                    // Asumimos que cada mapa en la lista contiene solo un par clave-valor para el campo y el valor.
-                    for (Map.Entry<String, String> entry : contractDocRefMap.entrySet()) {
-                        String nombreCampo = entry.getKey();
-                        String valorCampo = entry.getValue();
-
-                        itemObjectHash.put(nombreCampo, valorCampo);
-                        newlist.add(valorCampo);
-                    }
-                }
-
-
-                itemObject.setLstItemHashMap(itemObjectHash);
-                itemObject.setLstDinamicaItem(newlist);
-                listaItem.add(itemObject);
-            }
-
-            for (TransactionLineasDTO transaccionLinea : transaccionLineas) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateInvoicePDF() [" + this.docUUID + "] Agregando datos al HashMap");
-                }
-
-                WrapperItemObject itemObject = new WrapperItemObject();
-                Map<String, String> itemObjectHash = new HashMap<>();
-                List<String> newlist = new ArrayList<>();
-
-                // Obtener el mapa de campos de usuario desde transaccionLinea
-                Map<String, String> camposUsuarioMap = transaccionLinea.getTransaccionLineasCamposUsuario();
-
-                // Iterar sobre las entradas del mapa
-                for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
-                    String nombreCampo = entry.getKey();
-                    String valorCampo = entry.getValue();
-
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
-                    }
-
-                    itemObjectHash.put(nombreCampo, valorCampo);
-                    newlist.add(valorCampo);
-
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
                     }
                 }
 
                 // Obtener el mapa de campos de contrato desde invoiceType
                 List<Map<String, String>> contractDocRefs = invoiceType.getTransaccion().getTransactionContractDocRefListDTOS();
                 for (Map<String, String> contractDocRefMap : contractDocRefs) {
-                    // Asumimos que cada mapa en la lista contiene solo un par clave-valor para el campo y el valor.
                     for (Map.Entry<String, String> entry : contractDocRefMap.entrySet()) {
                         String nombreCampo = entry.getKey();
                         String valorCampo = entry.getValue();
@@ -396,6 +347,7 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
                 itemObject.setLstDinamicaItem(newlist);
                 listaItem.add(itemObject);
             }
+
             invoiceObj.setItemListDynamic(listaItem);
             for (int i = 0; i < invoiceObj.getItemListDynamic().size(); i++) {
                 for (int j = 0; j < invoiceObj.getItemListDynamic().get(i).getLstDinamicaItem().size(); j++) {
@@ -662,10 +614,10 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
                  * sub-reportes en formato (.jasper)
                  */
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DIR, "C:\\clientes\\files\\"+ invoiceObj.getSenderRuc() +"\\formatos\\InvoiceDocumentPaymentDetail.jasper"/*this.paymentDetailReportPath*/);
-                parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DATASOURCE, new JRBeanCollectionDataSource(invoiceObj.getItemListDynamicC()));
+                parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DATASOURCE, new JRBeanCollectionDataSource(new ArrayList<>(invoiceObj.getItemListDynamicC())));
 
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\files\\"+ invoiceObj.getSenderRuc() +"\\formatos\\legendReport.jasper"/*this.legendSubReportPath*/);
-                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(invoiceObj.getLegends()));
+                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(new ArrayList<>(invoiceObj.getLegends())));
 
                 Map<String, String> legendMap = new HashMap<>();
                 legendMap.put(IPDFCreatorConfig.LEGEND_DOCUMENT_TYPE, IPDFCreatorConfig.LEGEND_INVOICE_DOCUMENT);

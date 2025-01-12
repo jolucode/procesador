@@ -170,23 +170,6 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
 
             debitNoteObj.setItemsListDynamic(listaItem);
 
-            for (int i = 0; i < debitNoteObj.getItemsListDynamic().size(); i++) {
-
-                for (int j = 0; j < debitNoteObj.getItemsListDynamic().get(i).getLstDinamicaItem().size(); j++) {
-
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Columna " + j);
-                    }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Contenido " + debitNoteObj.getItemsListDynamic().get(i).getLstDinamicaItem().get(j));
-                    }
-
-                }
-
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
-            }
             debitNoteObj.setReceiverRegistrationName(debitNoteType.getTransaccion().getSN_RazonSocial());
             debitNoteObj.setReceiverIdentifier(debitNoteType.getTransaccion().getSN_DocIdentidad_Nro());
             debitNoteObj.setReceiverIdentifierType(debitNoteType.getTransaccion().getSN_DocIdentidad_Tipo());
@@ -293,16 +276,7 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
             } else {
                 debitNoteObj.setGratuitaAmountValue(getCurrency(BigDecimal.ZERO, currencyCode));
             }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
-            }
-
             String barcodeValue = generateBarCodeInfoString(debitNoteType.getTransaccion().getDocIdentidad_Nro(), debitNoteType.getTransaccion().getDOC_Codigo(), debitNoteType.getTransaccion().getDOC_Serie(), debitNoteType.getTransaccion().getDOC_Numero(), debitNoteType.getDebitNoteType().getTaxTotal(), debitNoteObj.getIssueDate(), debitNoteType.getTransaccion().getDOC_MontoTotal().toString(), debitNoteType.getTransaccion().getSN_DocIdentidad_Tipo(), debitNoteType.getTransaccion().getSN_DocIdentidad_Nro(), debitNoteType.getDebitNoteType().getUBLExtensions());
-
-            if (logger.isInfoEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
-            }
 
             InputStream inputStream;
             InputStream inputStreamPDF;

@@ -186,12 +186,6 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             creditNoteObj.setMontoRetencion(montoRetencion);
             BigDecimal baseImponibleRetencion = BigDecimal.ZERO;
 
-            /*if (creditNoteObj.getPorcentajeRetencion()!=BigDecimal.ZERO){
-                baseImponibleRetencion = montoRetencion.divide(creditNoteObj.getPorcentajeRetencion().divide(new BigDecimal(100.0)));
-            } else {
-                baseImponibleRetencion = BigDecimal.ZERO;
-            }*/
-
             creditNoteObj.setBaseImponibleRetencion(baseImponibleRetencion);
 
             // fin Cuotas
@@ -233,33 +227,6 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             }
 
             creditNoteObj.setItemsListDynamic(listaItem);
-
-            for (int i = 0; i < creditNoteObj.getItemsListDynamic().size(); i++) {
-
-                for (int j = 0; j < creditNoteObj.getItemsListDynamic().get(i).getLstDinamicaItem().size(); j++) {
-
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Columna " + j);
-                    }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Contenido " + creditNoteObj.getItemsListDynamic().get(i).getLstDinamicaItem().get(j));
-                    }
-
-                }
-
-            }
-
-            if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "] Condicion_pago: " + creditNoteObj.getPaymentCondition());
-
-            }
-            if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "]============= condicion pago------");
-            }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion de la NOTA DE CREDITO");
-            }
 
             if (Boolean.parseBoolean(configData.getPdfBorrador())) {
                 creditNoteObj.setValidezPDF("Este documento no tiene validez fiscal.");
@@ -370,11 +337,6 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
 
             BigDecimal iscValue = getTaxTotalValue(creditNoteType.getCreditNoteType().getTaxTotal(), IUBLConfig.TAX_TOTAL_ISC_ID);
             creditNoteObj.setIscValue(getCurrency(iscValue, currencyCode));
-//
-//            BigDecimal lineExtensionAmount = creditNoteType.getCreditNoteType()
-//                    .getLegalMonetaryTotal().getLineExtensionAmount()
-//                    .getValue();
-//            creditNoteObj.setAmountValue(getCurrency(lineExtensionAmount, currencyCode));
 
             if (null != creditNoteType.getCreditNoteType().getLegalMonetaryTotal().getAllowanceTotalAmount() && null != creditNoteType.getCreditNoteType().getLegalMonetaryTotal().getAllowanceTotalAmount().getValue()) {
                 creditNoteObj.setDiscountValue(getCurrency(creditNoteType.getCreditNoteType().getLegalMonetaryTotal().getAllowanceTotalAmount().getValue(), currencyCode));
