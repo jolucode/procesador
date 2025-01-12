@@ -286,7 +286,9 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
             boletaObj.setReceiverFullname(boletaType.getTransaccion().getSN_RazonSocial());
             boletaObj.setReceiverIdentifier(boletaType.getTransaccion().getSN_DocIdentidad_Nro());
             boletaObj.setReceiverIdentifierType(boletaType.getTransaccion().getSN_DocIdentidad_Tipo());
-            boletaObj.setReceiverFiscalAddress(boletaType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
+            if (boletaType.getTransaccion().getSN_DIR_NomCalle() != null && boletaType.getTransaccion().getSN_DIR_Distrito() != null && boletaType.getTransaccion().getSN_DIR_Provincia() != null && boletaType.getTransaccion().getSN_DIR_Departamento() != null)
+                boletaObj.setReceiverFiscalAddress(boletaType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
+
             if (logger.isDebugEnabled()) {
                 logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
             }
