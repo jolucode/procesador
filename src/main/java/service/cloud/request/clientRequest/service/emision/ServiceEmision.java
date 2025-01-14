@@ -121,10 +121,18 @@ public class ServiceEmision implements IServiceEmision {
         SignerHandler signerHandler = SignerHandler.newInstance();
         signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), client.getCertificadoTipoKeystore(), client.getCertificadoProveedor(), signerName);
         byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+        String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
+
+        try {
+            UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, "xml", attachmentPath );
+            logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
+        } catch (IOException e) {
+            logger.error("Error al guardar el archivo: " + e.getMessage());
+        }
 
         log.setThirdPartyRequestXml(new String(signedXmlDocument, StandardCharsets.UTF_8));
 
-        String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
+
         UBLDocumentWRP documentWRP = configureDocumentWRP(signedXmlDocument, transaction.getDOC_Codigo(), doctype);
         documentWRP.setTransaccion(transaction);
 

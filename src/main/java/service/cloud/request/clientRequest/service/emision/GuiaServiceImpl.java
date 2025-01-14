@@ -174,6 +174,15 @@ public class GuiaServiceImpl implements GuiaInterface {
 
         byte[] xmlDocument = DocumentConverterUtils.convertDocumentToBytes(despatchAdviceType);
         byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+
+        try {
+            UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, "xml", attachmentPath );
+            logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
+        } catch (IOException e) {
+            logger.error("Error al guardar el archivo: " + e.getMessage());
+        }
+
+
         DataHandler zipDocument = UtilsFile.compressUBLDocument(signedXmlDocument, documentName + ".xml");
 
         ConfigData configuracion = ConfigData

@@ -99,6 +99,14 @@ public class ServiceBaja implements IServiceBaja {
             byte[] xmlDocument = DocumentConverterUtils.convertDocumentToBytes(voidedDocumentType);
             byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
             String documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id());
+
+            try {
+                UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, "xml", attachmentPath );
+                logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
+            } catch (IOException e) {
+                logger.error("Error al guardar el archivo: " + e.getMessage());
+            }
+
             byte[] zipBytes = compressUBLDocumentv2(signedXmlDocument, documentName + ".xml");
             String base64Content = convertToBase64(zipBytes);
 

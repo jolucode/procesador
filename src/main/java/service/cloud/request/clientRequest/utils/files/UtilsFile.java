@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StreamUtils;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.exception.VenturaExcepcion;
+import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -44,6 +46,54 @@ public class UtilsFile {
                 + transaction.getSN_DocIdentidad_Nro()
                 + File.separator
                 + doctype;
+    }
+
+    /**
+     * Escribe un arreglo de bytes en una ruta especificada.
+     *
+     * @param bytes          el contenido en bytes del archivo.
+     * @param attachmentPath la ruta donde se guardará el archivo.
+     * @throws IOException si ocurre algún error al escribir el archivo.
+     */
+    public static void saveBytesToFile(byte[] bytes, String attachmentPath) throws IOException {
+        // Crear el directorio si no existe
+        Path path = Paths.get(attachmentPath).getParent();
+        if (path != null && !Files.exists(path)) {
+            Files.createDirectories(path);
+        }
+
+        // Escribir el archivo
+        try (FileOutputStream fos = new FileOutputStream(attachmentPath)) {
+            fos.write(bytes);
+        }
+    }
+
+    public static String storeDocumentInDisk(byte[] document, String documentName, String fileExtension, String rutaBaseDoc) throws Exception {
+
+        String documentPath = null;
+        try {
+            String separator = File.separator;
+            documentPath = rutaBaseDoc + separator + documentName + "." + fileExtension;
+
+            File file = new File(rutaBaseDoc);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(documentPath)) {
+                fos.write(document);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("storeDocumentInDisk()  ERROR: " + IVenturaError.ERROR_454.getMessage() + e.getMessage());
+            throw new Exception(IVenturaError.ERROR_454.getMessage());
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("-storeDocumentInDisk() ");
+        }
+        return documentPath;
     }
 
 
