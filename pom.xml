@@ -10,7 +10,7 @@
     </parent>
     <groupId>service.cloud.request</groupId>
     <artifactId>procesadorCloud</artifactId>
-    <version>2025.01.06</version>
+    <version>2025.01.07</version>
     <name>clientrequest</name>
     <description>Demo project for Spring Boot</description>
     <properties>

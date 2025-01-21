@@ -16,12 +16,13 @@ public class LogDTO {
   private String businessName;
   private String request;
   private String response;
-  private String thirdPartyRequestXml;
-  private String thirdPartyResponseXml;
+  private String pathThirdPartyRequestXml;
+  private String pathThirdPartyResponseXml;
   private String requestDate;
   private String responseDate;
   private String thirdPartyServiceInvocationDate;
   private String thirdPartyServiceResponseDate;
   private String objectTypeAndDocEntry;
   private String seriesAndCorrelative;
+  private String pathBase;
 }

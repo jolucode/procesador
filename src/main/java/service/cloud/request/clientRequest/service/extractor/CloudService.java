@@ -30,6 +30,7 @@ import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterfac
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
 import service.cloud.request.clientRequest.service.publicar.PublicacionManager;
 import service.cloud.request.clientRequest.utils.Constants;
+import service.cloud.request.clientRequest.utils.files.UtilsFile;
 
 
 import java.util.*;
@@ -68,7 +69,7 @@ public class CloudService implements CloudInterface {
     private ModelMapper mapper;
 
     @Override
-    public Mono<ResponseEntity<Object>>   proccessDocument(String stringRequestOnpremise) {
+    public Mono<ResponseEntity<Object>> proccessDocument(String stringRequestOnpremise) {
         String datePattern = Constants.PATTERN_ARRAY_TRANSACTION;
         String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
 
@@ -121,7 +122,9 @@ public class CloudService implements CloudInterface {
             logger.info("===============================================================================");
 
             if (tr.getLogDTO() != null) {
-                tr.getLogDTO().setRequest(requestOnPremise);
+                //String pathJsonRequest = tr.getLogDTO().getPathBase() + "\\" + tr.getLogDTO().getSeriesAndCorrelative() + ".json";
+                UtilsFile.saveJsonToFile(requestOnPremise, tr.getLogDTO().getPathBase());
+                tr.getLogDTO().setRequest(tr.getLogDTO().getPathBase());
                 logEntryService.saveLogEntryToMongoDB(convertToEntity(tr.getLogDTO())).subscribe();
             }
 

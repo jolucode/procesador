@@ -19,10 +19,10 @@ public class Log {
     private String id;
     private String ruc;
     private String businessName;
-    private String request;
+    private String request; //pathJsonRequest
     private String response;
-    private String thirdPartyRequestXml;
-    private String thirdPartyResponseXml;
+    private String thirdPartyRequestXml; //pathThirPartyRequestXml
+    private String thirdPartyResponseXml; //pathThirPartyResponseXml
     private String requestDate;
     private String responseDate;
     private String thirdPartyServiceInvocationDate;

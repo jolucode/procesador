@@ -154,4 +154,28 @@ public class UtilsFile {
 
         return zipDocument;
     }
+
+    /**
+     * Guarda un String JSON en una ruta específica.
+     *
+     * @param jsonString El contenido del JSON como String.
+     * @param filePath   La ruta donde se desea guardar el archivo (incluye el nombre del archivo).
+     * @throws IOException Si ocurre un error al guardar el archivo.
+     */
+    public static void saveJsonToFile(String jsonString, String filePath) throws IOException {
+        // Verificar que el jsonString y filePath no sean nulos o vacíos
+        if (jsonString == null || jsonString.isEmpty()) {
+            throw new IllegalArgumentException("El contenido JSON no puede ser nulo o vacío.");
+        }
+
+        if (filePath == null || filePath.isEmpty()) {
+            throw new IllegalArgumentException("La ruta del archivo no puede ser nula o vacía.");
+        }
+
+        try (FileWriter fileWriter = new FileWriter(filePath)) {
+            fileWriter.write(jsonString);
+            System.out.println("Archivo JSON guardado exitosamente en: " + filePath);
+        }
+    }
+
 }

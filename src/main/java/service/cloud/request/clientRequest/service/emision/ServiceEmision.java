@@ -124,13 +124,11 @@ public class ServiceEmision implements IServiceEmision {
         String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
 
         try {
-            UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, "xml", attachmentPath );
+            UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, "xml", attachmentPath);
             logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
         } catch (IOException e) {
             logger.error("Error al guardar el archivo: " + e.getMessage());
         }
-
-        log.setThirdPartyRequestXml(new String(signedXmlDocument, StandardCharsets.UTF_8));
 
 
         UBLDocumentWRP documentWRP = configureDocumentWRP(signedXmlDocument, transaction.getDOC_Codigo(), doctype);
@@ -150,12 +148,14 @@ public class ServiceEmision implements IServiceEmision {
         }
         transactionResponse.setIdentificador(documentName);
 
-
+        log.setPathThirdPartyRequestXml(attachmentPath + "\\" + documentName + ".xml");
+        log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
         log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
         log.setSeriesAndCorrelative(documentName);
         log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
         transactionResponse.setLogDTO(log);
+        log.setPathBase(attachmentPath + "\\" + documentName + ".json");
 
         return transactionResponse;
     }

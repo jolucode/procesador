@@ -31,6 +31,7 @@ import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.utils.files.CertificateUtils;
 import service.cloud.request.clientRequest.utils.files.DocumentConverterUtils;
 import service.cloud.request.clientRequest.utils.files.UtilsFile;
+import service.cloud.request.clientRequest.xmlFormatSunat.xsd.summarydocuments_1.SummaryDocumentsType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.voideddocuments_1.VoidedDocumentsType;
 
 import javax.activation.DataHandler;
@@ -94,11 +95,32 @@ public class ServiceBaja implements IServiceBaja {
             signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), client.getCertificadoTipoKeystore(), client.getCertificadoProveedor(), signerName);
 
             UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
-            VoidedDocumentsType voidedDocumentType = ublHandler.generateVoidedDocumentType(transaction, signerName);
+            SummaryDocumentsType summaryVoidedDocumentType = null;
+            VoidedDocumentsType voidedDocumentType = null;
 
-            byte[] xmlDocument = DocumentConverterUtils.convertDocumentToBytes(voidedDocumentType);
-            byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
             String documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id());
+            String documentPath = null;
+            byte[] xmlDocument = null; //DocumentConverterUtils.convertDocumentToBytes(voidedDocumentType);
+            if (transaction.getDOC_Serie().startsWith("B")) {
+                documentName = documentName.replace("RA", "RC");
+                summaryVoidedDocumentType = ublHandler.generateSummaryDocumentsTypeV2(transaction, signerName);
+                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(summaryVoidedDocumentType);
+                /**Guardando el documento UBL en DISCO*/
+                fileHandler.storeDocumentInDisk(summaryVoidedDocumentType, documentName);
+
+                //logger.info("Documento XML guardado en disco : " + documentPath);
+            } else {
+                voidedDocumentType = ublHandler.generateVoidedDocumentType(transaction, signerName);
+                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(voidedDocumentType);
+                ///**Guardando el documento UBL en DISCO*/
+                fileHandler.storeDocumentInDisk(voidedDocumentType, documentName);
+                //logger.info("Documento XML guardado en disco : " + documentPath);
+            }
+            //VoidedDocumentsType voidedDocumentType = ublHandler.generateVoidedDocumentType(transaction, signerName);
+
+
+            byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+            //String documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id());
 
             try {
                 UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, "xml", attachmentPath );
@@ -122,7 +144,14 @@ public class ServiceBaja implements IServiceBaja {
 
                 Mono<FileResponseDTO> fileResponseDTOMono = documentBajaService.processBajaRequest(soapRequest.getService(), soapRequest);
                 String ticket = fileResponseDTOMono.block().getTicket();
-                TransaccionBaja trb = updateTicketBajaIfNull(transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id(), ticket, transaction.getDOC_Id()).block();
+                TransaccionBaja trb = null;
+                try {
+                    trb = updateTicketBajaIfNull(transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id(), ticket, transaction.getDOC_Id()).block();
+                } catch (Exception e) {
+                    // Manejo del error: puedes registrar la excepción o manejarlo según sea necesario
+                    System.err.println("Ocurrió un error al actualizar el ticket: " + e.getMessage());
+                    // Continúa con el flujo
+                }
                 Thread.sleep(1000);
 
                 soapRequest.setTicket(ticket);
@@ -134,6 +163,10 @@ public class ServiceBaja implements IServiceBaja {
 
                 documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
                 transactionResponse = processOseResponseBAJA(cdrStatusResponse.getContent(), transaction, documentName, configuracion);
+                if (cdrStatusResponse.getContent() != null) {
+                    transactionResponse = processOseResponseBAJA(cdrStatusResponse.getContent(), transaction, documentName, configuracion);
+                }
+                transactionResponse.setIdentificador(documentName);
                 transactionResponse.setTicketRest(ticket);
             }
         } catch (Exception e) {

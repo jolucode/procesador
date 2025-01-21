@@ -16,6 +16,7 @@ public class RequestPost {
     private String digestValue;
     private String barcodeValue;
     private String documentName;
+    private String pathBase;
     private Data.ResponseRequest responseRequest;
     private Data.Error responseError;
     @JsonIgnore
