@@ -220,7 +220,7 @@ public class ServicePrincipal implements InterfacePrincipal {
         RequestPost request = new RequestPost();
         try {
 
-            request.setRuc(tc.getDocIdentidad_Nro());
+            request.setRuc(tc.getSN_DocIdentidad_Nro());
             request.setDocType(tc.getDOC_Codigo());
             request.setDocEntry(tc.getFE_DocEntry().toString());
             request.setDocObject(tc.getFE_ObjectType());
