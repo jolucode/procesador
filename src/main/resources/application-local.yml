@@ -6,7 +6,7 @@ spring:
   cloud:
     config:
       profile: dev
-      uri: http://localhost:7070
+      uri: http://localhost:8888
       username: TU_USUARIO_GIT
       password: TU_CONTRASEÑA_GIT
 

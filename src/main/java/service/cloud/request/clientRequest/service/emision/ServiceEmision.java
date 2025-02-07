@@ -152,7 +152,7 @@ public class ServiceEmision implements IServiceEmision {
         log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
         log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
         log.setSeriesAndCorrelative(documentName);
-        log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
+        log.setResponse((new Gson().toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (new Gson().toJson(transactionResponse.getSunat())));
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
         transactionResponse.setLogDTO(log);
         log.setPathBase(attachmentPath + "\\" + documentName + ".json");

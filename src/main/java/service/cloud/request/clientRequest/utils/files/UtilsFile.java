@@ -174,7 +174,7 @@ public class UtilsFile {
 
         try (FileWriter fileWriter = new FileWriter(filePath)) {
             fileWriter.write(jsonString);
-            System.out.println("Archivo JSON guardado exitosamente en: " + filePath);
+            logger.info("Archivo JSON guardado exitosamente en: " + filePath);
         }
     }
 

@@ -23,7 +23,9 @@ import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.mongo.model.Log;
 import service.cloud.request.clientRequest.mongo.model.LogDTO;
+import service.cloud.request.clientRequest.mongo.model.DocumentPublication;
 import service.cloud.request.clientRequest.mongo.service.ILogService;
+import service.cloud.request.clientRequest.mongo.service.IDocumentPublicationService;
 import service.cloud.request.clientRequest.service.emision.ServiceBaja;
 import service.cloud.request.clientRequest.service.emision.ServiceBajaConsulta;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
@@ -33,6 +35,7 @@ import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.files.UtilsFile;
 
 
+import java.io.IOException;
 import java.util.*;
 
 import static java.math.BigDecimal.valueOf;
@@ -65,6 +68,9 @@ public class CloudService implements CloudInterface {
     private ILogService logEntryService;
 
     @Autowired
+    private IDocumentPublicationService publicarService;
+
+    @Autowired
     @Qualifier("defaultMapper")
     private ModelMapper mapper;
 
@@ -92,44 +98,91 @@ public class CloudService implements CloudInterface {
                 });
     }
 
-    public int anexarDocumentos(RequestPost request) {
-        HttpResponse<String> response = null;
+    public void anexarDocumentos(RequestPost request) {
         try {
             Gson gson = new Gson();
             String jsonBody = gson.toJson(request);
-            response = Unirest.post(request.getUrlOnpremise() + "anexar")
+
+            HttpResponse<String> response = Unirest.post(request.getUrlOnpremise() + "anexar")
                     .header("Content-Type", "application/json")
                     .body(jsonBody)
                     .asString();
-            logger.info("Se envió de manera correcta al servidor OnPremise los documentos");
+
+            logger.info("Se envió de manera correcta al servidor OnPremise los documentos.");
+            logger.info("Estado de la respuesta del servidor OnPremise: " + response.getStatus());
         } catch (Exception e) {
-            logger.error("Error conexion con servidor destino: " + e.getMessage());
+            logger.error("Error de conexión con el servidor destino: " + e.getMessage());
+            logger.info("No se pudo dejar los doucmentos en la ruta ruta del servitor: " + request.getUrlOnpremise());
         }
-        logger.info("La ruta del servidor donde se esta dejando los documentos es : " + request.getUrlOnpremise());
-        return response.getStatus();
+
     }
 
     private Mono<RequestPost> processTransaction(TransacctionDTO transaccion, String requestOnPremise) {
         return Mono.fromCallable(() -> {
+            // Paso 1: Enviar transacción
             TransaccionRespuesta tr = enviarTransaccion(transaccion);
+
+            // Paso 2: Generar datos de solicitud
             RequestPost request = generateDataRequestHana(transaccion, tr);
-            anexarDocumentos(request);
 
-            logger.info("Ruc: " + request.getRuc() + " DocObject: " + request.getDocObject() + " DocEntry: " + request.getDocEntry());
-            logger.info("Nombre Documento: " + request.getDocumentName());
-            logger.info("Se realizo de manera exitosa la actualizacion del documento :" + transaccion.getFE_Id());
-            logger.info("Se anexo de manera correcta los documentos en SAP");
-            logger.info("===============================================================================");
+            // Paso 3: Anexar documentos
+            //anexarDocumentos(request);
 
-            if (tr.getLogDTO() != null) {
-                //String pathJsonRequest = tr.getLogDTO().getPathBase() + "\\" + tr.getLogDTO().getSeriesAndCorrelative() + ".json";
-                UtilsFile.saveJsonToFile(requestOnPremise, tr.getLogDTO().getPathBase());
-                tr.getLogDTO().setRequest(tr.getLogDTO().getPathBase());
-                logEntryService.saveLogEntryToMongoDB(convertToEntity(tr.getLogDTO())).subscribe();
-            }
+            // Logs agrupados en un solo bloque
+            logger.info("================================ LOG DE TRANSACCIÓN ================================");
+            logger.info("RUC: {}, DocObject: {}, DocEntry: {}", request.getRuc(), request.getDocObject(), request.getDocEntry());
+            logger.info("Nombre del Documento: {}", request.getDocumentName());
+            logger.info("Actualización exitosa del documento: {}", transaccion.getFE_Id());
+            logger.info("Documentos anexados correctamente en SAP.");
+            logger.info("===================================================================================");
+
+            // Paso 4: Manejar logs y documentos publicados
+            handleLogsAndDocuments(tr, requestOnPremise);
 
             return request;
         }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    private void handleLogsAndDocuments(TransaccionRespuesta tr, String requestOnPremise) {
+        if (tr.getLogDTO() != null) {
+            try {
+                saveRequestToFile(tr.getLogDTO(), requestOnPremise);
+            } catch (IOException e) {
+                logger.error("Error al guardar el archivo JSON en el path: " + tr.getLogDTO().getPathBase(), e);
+            }
+            logEntryService.saveLogEntryToMongoDB(convertToEntity(normalizeFilePaths(tr.getLogDTO()))).subscribe();
+
+            if (tr.getLogDTO().getResponse().contains("acept")) {
+                DocumentPublication publication = createDocumentPublication(tr.getLogDTO());
+                publicarService.saveLogEntryToMongoDB(publication).subscribe();
+            }
+        }
+    }
+
+    private LogDTO normalizeFilePaths(LogDTO logDTO) {
+        logDTO.setRequest(logDTO.getRequest().replace("\\", "/"));
+        logDTO.setPathThirdPartyRequestXml(logDTO.getPathThirdPartyRequestXml().replace("\\", "/"));
+        logDTO.setPathThirdPartyResponseXml(logDTO.getPathThirdPartyResponseXml().replace("\\", "/"));
+        logDTO.setPathBase(logDTO.getPathBase().replace("\\", "/"));
+        return logDTO;
+    }
+
+
+    private DocumentPublication createDocumentPublication(LogDTO logDTO) {
+        DocumentPublication publication = new DocumentPublication();
+        publication.setRuc(logDTO.getRuc());
+        publication.setBusinessName(logDTO.getBusinessName());
+        publication.setPathPdf(logDTO.getRequest().replace(".json", ".pdf"));
+        publication.setPathXml(logDTO.getPathThirdPartyRequestXml());
+        publication.setPathZip(logDTO.getPathThirdPartyResponseXml());
+        publication.setObjectTypeAndDocEntry(logDTO.getObjectTypeAndDocEntry());
+        publication.setSeriesAndCorrelative(logDTO.getSeriesAndCorrelative());
+        return publication;
+    }
+
+    private void saveRequestToFile(LogDTO logDTO, String requestOnPremise) throws IOException {
+        UtilsFile.saveJsonToFile(requestOnPremise, logDTO.getPathBase());
+        logDTO.setRequest(logDTO.getPathBase());
     }
 
     private Log convertToEntity(LogDTO dto) {
