@@ -247,7 +247,7 @@ public class GuiaServiceImpl implements GuiaInterface {
                         transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
                 ).block();
 
-                if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty()) {
+                if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ticketMongoSave.getStateDocument().equals("APROBADO")) {
                     String ticketToUse = ticketMongoSave.getTicketSunat();
 
 
@@ -270,16 +270,12 @@ public class GuiaServiceImpl implements GuiaInterface {
                     ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
 
 
-
-
                     if (responseDTOJWT.getStatusCode() == 400 || responseDTOJWT.getStatusCode() == 401) {
                         return generateResponseRest(documentWRP, responseDTOJWT);
                     }
 
-                    //DECLARE
+                    //DECLARE GENERA TICKET
                     ResponseDTO responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
-                    //GUARDAR EN BASE DATOS
-                    saveTicketRest(transaction, responseDTO);
 
 
                     //DECLARE
@@ -306,10 +302,13 @@ public class GuiaServiceImpl implements GuiaInterface {
                         contador++;
                     }
 
-                    //EXTRAER ZIP
                     // Manejar respuestas de SUNAT
                     transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, signedDocument, fileHandler,
                             documentName, transaction, configuracion);
+
+                    //GUARDAR EN BASE DATOS
+                    if (transactionResponse.getMensaje().contains("Documento aprobado"))
+                        saveTicketRest(transaction, responseDTO);
 
                     byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
                     transactionResponse.setTicketRest(responseDTO.getNumTicket());
@@ -323,7 +322,7 @@ public class GuiaServiceImpl implements GuiaInterface {
                         transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
                 ).block(); // Bloquea y espera el resultado sincrónicamente
 
-                String ticketToUse = (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty())
+                String ticketToUse = (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ticketMongoSave.getStateDocument().equals("APROBADO"))
                         ? ticketMongoSave.getTicketSunat()
                         : transaction.getTransaccionGuiaRemision().getTicketRest();
 
@@ -509,6 +508,7 @@ public class GuiaServiceImpl implements GuiaInterface {
         guiaTicket.setRucEmisor(transaccion.getDocIdentidad_Nro());
         guiaTicket.setFeId(transaccion.getFE_Id());
         guiaTicket.setTicketSunat(responseDTO.getNumTicket());
+        guiaTicket.setEstadoTicket("APROBADO");
         guiaTicketRepo.save(guiaTicket).subscribe();
     }
 

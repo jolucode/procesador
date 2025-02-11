@@ -23,4 +23,5 @@ public class GuiaTicket {
     private String errorDescripcion;    // Descripción del error, si existe
     private LocalDateTime creadoEn;     // Fecha de creación del registro
     private LocalDateTime actualizadoEn; // Fecha de la última actualización
+    private String stateDocument; // Estado del documento "APROBADO" "ERROR"
 }

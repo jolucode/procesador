@@ -58,10 +58,22 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
       String logoSociedad = providerProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + "COMPANY_LOGO.jpg";
       String rutaPaymentSelected = rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "InvoiceDocumentPaymentDetail.jasper");
 
+      String personalizacion = transaction.getTransaccionContractdocrefList().stream()
+              .filter(x -> x.getUsuariocampos().getNombre().equals("pdf_per"))
+              .map(x -> x.getValor())
+              .findFirst()
+              .orElse("");
+
+
       String documentName;
       switch (transaction.getDOC_Codigo()) {
         case IUBLConfig.DOC_INVOICE_CODE:
-          documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "invoiceDocument_Ing.jrxml" : "invoiceDocument.jrxml";
+          if (!personalizacion.isEmpty()) {
+            documentName = "invoiceDocument_" + personalizacion + ".jrxml";
+          }else {
+            documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "invoiceDocument_Ing.jrxml" : "invoiceDocument.jrxml";
+          }
+
           pdfHandler.setConfiguration(rutaRecursoPdf(transaction.getDocIdentidad_Nro(), documentName), rutaRecursoPdf(transaction.getDocIdentidad_Nro(), "legendReport.jasper"), rutaPaymentSelected, logoSociedad, "EmisorElectronico");
           pdfBytes = pdfHandler.generateInvoicePDF(wrp, configuracion);
           break;
