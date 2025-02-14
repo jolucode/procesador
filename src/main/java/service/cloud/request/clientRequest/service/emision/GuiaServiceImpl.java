@@ -247,7 +247,7 @@ public class GuiaServiceImpl implements GuiaInterface {
                         transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
                 ).block();
 
-                if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ticketMongoSave.getStateDocument().equals("APROBADO")) {
+                if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ticketMongoSave.getEstadoTicket().equals("APROBADO")) {
                     String ticketToUse = ticketMongoSave.getTicketSunat();
 
 
@@ -322,7 +322,7 @@ public class GuiaServiceImpl implements GuiaInterface {
                         transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
                 ).block(); // Bloquea y espera el resultado sincrónicamente
 
-                String ticketToUse = (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ticketMongoSave.getStateDocument().equals("APROBADO"))
+                String ticketToUse = (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ticketMongoSave.getEstadoTicket().equals("APROBADO"))
                         ? ticketMongoSave.getTicketSunat()
                         : transaction.getTransaccionGuiaRemision().getTicketRest();
 
