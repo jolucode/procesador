@@ -120,13 +120,17 @@ public class CloudService implements CloudInterface {
     private Mono<RequestPost> processTransaction(TransacctionDTO transaccion, String requestOnPremise) {
         return Mono.fromCallable(() -> {
             // Paso 1: Enviar transacción
+            if(transaccion.getSN_DocIdentidad_Tipo().equals("6")) {
+                transaccion.setSN_DocIdentidad_Nro("20600948131");
+                transaccion.setRazonSocial("DIGIFLOW");
+            }
             TransaccionRespuesta tr = enviarTransaccion(transaccion);
 
             // Paso 2: Generar datos de solicitud
             RequestPost request = generateDataRequestHana(transaccion, tr);
 
             // Paso 3: Anexar documentos
-            //anexarDocumentos(request);
+            anexarDocumentos(request);
 
             // Logs agrupados en un solo bloque
             logger.info("================================ LOG DE TRANSACCIÓN ================================");
@@ -234,7 +238,7 @@ public class CloudService implements CloudInterface {
                 tr.setEstado("V"); //Aprobado
 
                 Map<String, Data.ResponseDocument> listMapDocuments = new HashMap<>();
-                if (tr.getMensaje().contains("Baja") || tr.getMensaje().contains("El Resumen diario RC-")) {
+                if (tr.getMensaje().contains("Baja") || tr.getMensaje().contains("El Resumen diario RC-") || tr.getMensaje().contains("El Resumen de Boletas número RC")) {
                     Data.ResponseDocument document4 = new Data.ResponseDocument("zip", tr.getZip());
                     listMapDocuments.put("cdr_baja", document4);
                 } else {

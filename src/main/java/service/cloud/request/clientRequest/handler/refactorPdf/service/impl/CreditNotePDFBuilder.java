@@ -190,7 +190,7 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
 
             // fin Cuotas
 
-            List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
+            List<WrapperItemObject> listaItem = new ArrayList<>();
 
             for (int i = 0; i < creditNoteType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
                 if (logger.isDebugEnabled()) {
@@ -204,20 +204,27 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
                 // Obtener el mapa de transaccionLineasCamposUsuario
                 Map<String, String> camposUsuarioMap = creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransaccionLineasCamposUsuario();
 
-                // Iterar sobre las entradas del mapa
-                for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
-                    String nombreCampo = entry.getKey();
-                    String valorCampo = entry.getValue();
+                if (camposUsuarioMap != null && !camposUsuarioMap.isEmpty()) {
+                    // Iterar sobre las entradas del mapa
+                    for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
+                        String nombreCampo = entry.getKey();
+                        String valorCampo = entry.getValue();
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
-                    }
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
+                        }
 
-                    itemObjectHash.put(nombreCampo, valorCampo);
-                    newlist.add(valorCampo);
+                        // Si el campo empieza con "U_", se elimina antes de guardarlo
+                        if (nombreCampo.startsWith("U_")) {
+                            nombreCampo = nombreCampo.substring(2);
+                        }
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
+                        itemObjectHash.put(nombreCampo, valorCampo);
+                        newlist.add(valorCampo);
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
+                        }
                     }
                 }
 
@@ -225,6 +232,7 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
                 itemObject.setLstDinamicaItem(newlist);
                 listaItem.add(itemObject);
             }
+
 
             creditNoteObj.setItemsListDynamic(listaItem);
 

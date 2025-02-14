@@ -38,15 +38,15 @@ public class DocumentProcessingController {
         switch (requestDTO.getService()) {
             case "SUNAT":
                 if (requestDTO.getFileName().contains("-20-") || requestDTO.getFileName().contains("-40-"))
-                    url = "h-ttps://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService";
+                    url = "https://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService";
                 else
-                    url = "h-ttps://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService";
+                    url = "https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService";
                 break;
             case "OSE":
-                url = "h-ttps://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl";
+                url = "https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl";
                 break;
             case "ESTELA":
-                url = "h-ttps://ose-test.com/ol-ti-itcpe/billService3";
+                url = "https://ose-test.com/ol-ti-itcpe/billService3";
                 break;
             default:
                 // En caso de que el servicio no sea uno de los conocidos, puedes asignar una URL por defecto o lanzar un error.

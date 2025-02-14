@@ -25,4 +25,29 @@ public class TransactionComprobantesDTO {
     private String U_CP_Fecha;
     private String TC_MonedaRef;
     private String TC_Fecha;
+
+    // Campos agregados que faltaban en la clase original
+    private String U_TC_MonedaRef;
+    private String U_CP_Moneda;
+    private String U_PagoMoneda;
+    private String DOC_Tipo;
+    private String U_Moneda;
+    private Integer U_NroOrden;
+    private String CP_Fecha;
+    private BigDecimal U_CP_Importe;
+    private String U_PagoFecha;
+    private String U_TipoComprobante;
+    private String U_NroPago;
+    private String U_TC_Fecha;
+    private BigDecimal PagoImporteSR;
+    private String U_TC_MonedaObj;
+    private String U_CP_MonedaMontoNeto;
+    private String U_TipoMonedaTotal;
+    private String U_DOC_FechaEmision;
+    private BigDecimal TC_Factor;
+    private BigDecimal U_CP_ImporteTotal;
+    private Integer U_PagoNumero;
+    private String U_DOC_Numero;
+    private BigDecimal U_DOC_Importe;
+    private BigDecimal U_Importe_Pago_Soles;
 }

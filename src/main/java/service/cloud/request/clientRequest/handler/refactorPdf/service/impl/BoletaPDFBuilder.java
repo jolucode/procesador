@@ -146,20 +146,27 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 // Obtener el mapa de transaccionLineasCamposUsuario
                 Map<String, String> camposUsuarioMap = boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransaccionLineasCamposUsuario();
 
-                // Iterar sobre las entradas del mapa
-                for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
-                    String nombreCampo = entry.getKey();
-                    String valorCampo = entry.getValue();
+                if (camposUsuarioMap != null && !camposUsuarioMap.isEmpty()) {
+                    // Iterar sobre las entradas del mapa
+                    for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
+                        String nombreCampo = entry.getKey();
+                        String valorCampo = entry.getValue();
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
-                    }
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
+                        }
 
-                    itemObjectHash.put(nombreCampo, valorCampo);
-                    newlist.add(valorCampo);
+                        // Si el campo empieza con "U_", se elimina antes de guardarlo
+                        if (nombreCampo.startsWith("U_")) {
+                            nombreCampo = nombreCampo.substring(2);
+                        }
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
+                        itemObjectHash.put(nombreCampo, valorCampo);
+                        newlist.add(valorCampo);
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("generateBoletaPDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
+                        }
                     }
                 }
 
@@ -167,6 +174,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 itemObject.setLstDinamicaItem(newlist);
                 listaItem.add(itemObject);
             }
+
 
             boletaObj.setItemsDynamic(listaItem);
 

@@ -103,10 +103,10 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
 
             /** Harol 29-03-2024 Guia Transportista 31*/
             //if (despatchAdvice.getTransaccion().getTransactionGuias().getModalidadTraslado().equalsIgnoreCase("01")) {
-                despatchAdviceObject.setPlacaVehiculo(despatchAdvice.getTransaccion().getTransactionGuias().getPlacaVehiculo());
-                despatchAdviceObject.setLicenciaConducir(despatchAdvice.getTransaccion().getTransactionGuias().getLicenciaConductor());
-                despatchAdviceObject.setRUCTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getRUCTransporista());
-                despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getNombreRazonTransportista());
+            despatchAdviceObject.setPlacaVehiculo(despatchAdvice.getTransaccion().getTransactionGuias().getPlacaVehiculo());
+            despatchAdviceObject.setLicenciaConducir(despatchAdvice.getTransaccion().getTransactionGuias().getLicenciaConductor());
+            despatchAdviceObject.setRUCTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getRUCTransporista());
+            despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getNombreRazonTransportista());
             /*} else {
                 despatchAdviceObject.setRUCTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getRUCTransporista());
                 despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getNombreRazonTransportista());
@@ -239,20 +239,27 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
                     // Obtener el mapa de transaccionLineasCamposUsuario
                     Map<String, String> camposUsuarioMap = despatchAdvice.getTransaccion().getTransactionLineasDTOList().get(i).getTransaccionLineasCamposUsuario();
 
-                    // Iterar sobre las entradas del mapa
-                    for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
-                        String nombreCampo = entry.getKey();
-                        String valorCampo = entry.getValue();
+                    if (camposUsuarioMap != null && !camposUsuarioMap.isEmpty()) {
+                        // Iterar sobre las entradas del mapa
+                        for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
+                            String nombreCampo = entry.getKey();
+                            String valorCampo = entry.getValue();
 
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
-                        }
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
+                            }
 
-                        itemObjectHash.put(nombreCampo, valorCampo);
-                        newlist.add(valorCampo);
+                            // Si el campo empieza con "U_", se elimina antes de guardarlo
+                            if (nombreCampo.startsWith("U_")) {
+                                nombreCampo = nombreCampo.substring(2);
+                            }
 
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
+                            itemObjectHash.put(nombreCampo, valorCampo);
+                            newlist.add(valorCampo);
+
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
+                            }
                         }
                     }
 
@@ -260,6 +267,7 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
                     itemObject.setLstDinamicaItem(newlist);
                     listaItem.add(itemObject);
                 }
+
 
             }
 

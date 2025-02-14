@@ -138,15 +138,14 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
             List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
 
             for (TransactionComprobantesDTO transaccion : retentionType.getTransaccion().getTransactionComprobantesDTOList()) {
-
                 WrapperItemObject itemObject = new WrapperItemObject();
-                Map<String, String> itemObjectHash = new HashMap<String, String>();
-                List<String> newlist = new ArrayList<String>();
+                Map<String, String> itemObjectHash = new HashMap<>();
+                List<String> newlist = new ArrayList<>();
 
-                /***/
                 // Utilizar reflección para obtener los campos y valores del objeto
                 for (Field field : transaccion.getClass().getDeclaredFields()) {
                     field.setAccessible(true); // Permitir acceso a campos privados
+
                     try {
                         Object value = field.get(transaccion);
                         if (value != null) {
@@ -154,32 +153,33 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
 
                             // Si el nombre del campo comienza con "U_", corta los dos primeros caracteres
                             if (fieldName.startsWith("U_")) {
-                                String newName = fieldName.substring(2);
-                                itemObjectHash.put(newName, value.toString());
-                            } else {
-                                itemObjectHash.put(fieldName, value.toString());
+                                fieldName = fieldName.substring(2);
                             }
 
+                            itemObjectHash.put(fieldName, value.toString());
                             newlist.add(value.toString());
+
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("generateRetentionPDF() [" + this.docUUID + "] Campo procesado: " + fieldName + " = " + value);
+                            }
                         }
 
                         // Conversiones específicas para fechas
-                        if (field.getName().equals("DOC_FechaEmision")) {
-                            itemObjectHash.put("DOC_FechaEmision", DateConverter.convertToDate(value));
+                        if (field.getName().equals("DOC_FechaEmision") || field.getName().equals("CP_Fecha")) {
+                            String formattedDate = DateConverter.convertToDate(value);
+                            if (formattedDate != null) {
+                                itemObjectHash.put(field.getName(), formattedDate);
+                            }
                         }
 
-                        if (field.getName().equals("CP_Fecha")) {
-                            itemObjectHash.put("CP_Fecha", DateConverter.convertToDate(value));
-                        }
                     } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                        logger.error("Error accediendo al campo: " + field.getName(), e);
                     }
                 }
 
                 itemObject.setLstItemHashMap(itemObjectHash);
                 itemObject.setLstDinamicaItem(newlist);
                 listaItem.add(itemObject);
-
             }
 
             retentionObject.setItemListDynamic(listaItem);

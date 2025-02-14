@@ -99,24 +99,18 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
                 logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
             }
             perceptionObj.setPerceptionItems(getPerceptionItems(perceptionType.getPerceptionType().getSunatPerceptionDocumentReference(), new BigDecimal(perceptionType.getPerceptionType().getSunatPerceptionPercent().getValue())));
-            List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
+            List<WrapperItemObject> listaItem = new ArrayList<>();
+
             for (int i = 0; i < perceptionType.getTransaccion().getTransactionComprobantesDTOList().size(); i++) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Agregando datos al HashMap" + perceptionType.getTransaccion().getTransactionComprobantesDTOList().size());
+                    logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Agregando datos al HashMap - Total comprobantes: "
+                            + perceptionType.getTransaccion().getTransactionComprobantesDTOList().size());
                 }
+
                 WrapperItemObject itemObject = new WrapperItemObject();
-                Map<String, String> itemObjectHash = new HashMap<String, String>();
-                List<String> newlist = new ArrayList<String>();
-                /*for (int j = 0; j < perceptionType.getTransaccion().getTransactionComprobantesDTOList().size(); j++) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Extrayendo Campos " + perceptionType.getTransaccion().getTransactionComprobantesDTOList().get(i));
-                    }
-                    itemObjectHash.put(perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getUsuariocampos().getNombre(), perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());
-                    newlist.add(perceptionType.getTransaccion().getTransaccionComprobantePagoList().get(i).getTransaccionComprobantepagoUsuarioList().get(j).getValor());
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Nuevo Tamanio " + newlist.size());
-                    }
-                }*/
+                Map<String, String> itemObjectHash = new HashMap<>();
+                List<String> newlist = new ArrayList<>();
+
                 for (TransactionComprobantesDTO comprobantesDTO : perceptionType.getTransaccion().getTransactionComprobantesDTOList()) {
                     // Obtener todas las variables del objeto TransactionComprobantesDTO
                     Field[] fields = comprobantesDTO.getClass().getDeclaredFields();
@@ -130,12 +124,18 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
                             String nombreCampo = field.getName();
                             Object valorCampo = field.get(comprobantesDTO);
 
-                            // Añadir el nombre y el valor al HashMap, convirtiendo el valor a String
                             if (valorCampo != null) {
+                                // Si el campo empieza con "U_", se elimina antes de guardarlo
+                                if (nombreCampo.startsWith("U_")) {
+                                    nombreCampo = nombreCampo.substring(2);
+                                }
+
+                                // Añadir el nombre y el valor al HashMap, convirtiendo el valor a String
                                 itemObjectHash.put(nombreCampo, valorCampo.toString());
+                                newlist.add(valorCampo.toString());
                             }
                         } catch (IllegalAccessException e) {
-                            e.printStackTrace();
+                            logger.error("Error accediendo al campo: " + field.getName(), e);
                         }
                     }
                 }
@@ -144,6 +144,7 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
                 itemObject.setLstDinamicaItem(newlist);
                 listaItem.add(itemObject);
             }
+
 
             perceptionObj.setItemListDynamic(listaItem);
 

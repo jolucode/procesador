@@ -3424,9 +3424,9 @@ public abstract class UBLBasicHandler {
             consignment.setID(getID("01"));
             /* <cac:Shipment><cac:Consigment><cbc:ID> */
             if (null != valorPreliminarRef && valorPreliminarRef.compareTo(BigDecimal.ZERO) == 1) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("getShipmentForDelivery() [" + this.identifier + "] Agregar VALOR PRELIMINAR REFERENCIAL POR CARGA UTIL NOMINAL.");
-                }
+                //if (logger.isInfoEnabled()) {
+                //    logger.info("getShipmentForDelivery() [" + this.identifier + "] Agregar VALOR PRELIMINAR REFERENCIAL POR CARGA UTIL NOMINAL.");
+                //}
                 DeclaredForCarriageValueAmountType declaredForCarriageValueAmount = new DeclaredForCarriageValueAmountType();
                 declaredForCarriageValueAmount.setValue(valorPreliminarRef);
                 declaredForCarriageValueAmount.setCurrencyID("PEN");
@@ -3473,9 +3473,9 @@ public abstract class UBLBasicHandler {
              * Tipo de Carga: Carga Util (01)
              */
             if (null != cUtilVehiculoTM && cUtilVehiculoTM.compareTo(BigDecimal.ZERO) == 1) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("getShipmentForDelivery() [" + this.identifier + "] Agregar CARGA UTIL EN TM DEL VEHICULO.");
-                }
+                //if (logger.isInfoEnabled()) {
+                //    logger.info("getShipmentForDelivery() [" + this.identifier + "] Agregar CARGA UTIL EN TM DEL VEHICULO.");
+                //}
                 transportHandlingUnit.getMeasurementDimension().add(getMeasurementDimension("01", cUtilVehiculoTM));
             }
             /*

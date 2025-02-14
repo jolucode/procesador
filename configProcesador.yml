@@ -38,6 +38,7 @@ ventura:
         pdfBorrador: "true"
         impresion: Codigo QR
         urlOnpremise: http://190.119.245.254:60081/
+        #urlOnpremise: http://119.8.146.122:60089/
         scope: No aplica
         clientId: No aplica
         clientSecret: No aplica
