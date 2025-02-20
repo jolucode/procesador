@@ -78,7 +78,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
     }
 
     @Override
-    public byte[] processCDRResponseContigencia(byte[] cdrConstancy, File signedDocument, FileHandler fileHandler,
+    public byte[] processCDRResponseContigencia(byte[] cdrConstancy, FileHandler fileHandler,
                                                 String documentName, String documentCode, UBLDocumentWRP documentWRP, TransacctionDTO
                                                         transaccion, ConfigData configuracion) {
         byte[] pdfBytes = null;

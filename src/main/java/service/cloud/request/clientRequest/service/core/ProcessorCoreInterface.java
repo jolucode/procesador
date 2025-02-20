@@ -15,7 +15,7 @@ public interface ProcessorCoreInterface {
 
     TransaccionRespuesta processResponseSinCDR(TransacctionDTO transaction, FileResponseDTO cdrStatusResponse);
 
-    public byte[] processCDRResponseContigencia(byte[] cdrConstancy, File signedDocument,
+    public byte[] processCDRResponseContigencia(byte[] cdrConstancy,
                                                 FileHandler fileHandler, String documentName,
                                                 String documentCode, UBLDocumentWRP documentWRP,
                                                 TransacctionDTO transaccion, ConfigData configuracion);

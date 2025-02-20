@@ -32,83 +32,77 @@ import service.cloud.request.clientRequest.mongo.repo.IGuiaTicketRepo;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
-import service.cloud.request.clientRequest.utils.files.CertificateUtils;
-import service.cloud.request.clientRequest.utils.files.DocumentConverterUtils;
-import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
 import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
+import service.cloud.request.clientRequest.utils.files.CertificateUtils;
+import service.cloud.request.clientRequest.utils.files.DocumentConverterUtils;
+import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
 
 import javax.activation.DataHandler;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class GuiaServiceImpl implements GuiaInterface {
 
-    private final Logger logger = Logger.getLogger(GuiaServiceImpl.class);
+    private static final Logger logger = Logger.getLogger(GuiaServiceImpl.class);
+
+    //Estados
+    private static final String ESTADO_NUEVO = "N";
+    private static final String ESTADO_CONTINGENCIA = "C";
+    private static final String VALOR_CONTINGENCIA = "Si";
+    private static final String EXT_XML = "xml";
+    private static final String EXT_ZIP = "zip";
+    private static final String EMPTY = "";
 
     @Autowired
-    ClientProperties clientProperties;
-
-    private String docUUID;
+    private ClientProperties clientProperties;
 
     @Autowired
-    ApplicationProperties applicationProperties;
+    private ApplicationProperties applicationProperties;
 
     @Autowired
-    ProcessorCoreInterface processorCoreInterface;
+    private ProcessorCoreInterface processorCoreInterface;
 
     @Autowired
-    DocumentFormatInterface documentFormatInterface;
+    private DocumentFormatInterface documentFormatInterface;
 
     @Autowired
     private IGuiaTicketRepo guiaTicketRepo;
 
+    private String docUUID;
+
     @Override
     public TransaccionRespuesta transactionRemissionGuideDocumentRest(TransacctionDTO transaction, String doctype) throws Exception {
-
+        // Se inicializa el log con la fecha y algunos datos del emisor
         LogDTO log = new LogDTO();
         log.setRequestDate(DateUtils.formatDateToString(new Date()));
         log.setRuc(transaction.getDocIdentidad_Nro());
         log.setBusinessName(transaction.getSN_RazonSocial());
 
         TransaccionRespuesta transactionResponse = null;
-
         String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
 
+        // Determinar si es contingencia
         boolean isContingencia = false;
-        /*List<TransaccionContractdocref> contractdocrefs = transaction.getTransaccionContractdocrefList();
-        for (TransaccionContractdocref contractdocref : contractdocrefs) {
-            if ("cu31".equalsIgnoreCase(contractdocref.getUsuariocampos().getNombre())) {
-                isContingencia = "Si".equalsIgnoreCase(contractdocref.getValor());
+        for (Map<String, String> contractMap : transaction.getTransactionContractDocRefListDTOS()) {
+            String valor = contractMap.get("cu31");
+            if (valor != null && !valor.isEmpty()) {
+                isContingencia = VALOR_CONTINGENCIA.equalsIgnoreCase(valor);
                 break;
-            }
-        }*/
-        /*List<Map<String, String>> contractdocrefs = transaction.getTransactionContractDocRefListDTOS();
-        for (Map<String, String> contractdocref : contractdocrefs) {
-            if ("cu31".equalsIgnoreCase(contractdocref.get("nombre"))) {
-                isContingencia = "Si".equalsIgnoreCase(contractdocref.get("valor"));
-                break;
-            }
-        }*/
-
-
-        Optional<Map<String, String>> optional = transaction.getTransactionContractDocRefListDTOS().parallelStream()
-                .filter(docRef -> docRef.containsKey("cu31")) //
-                .findAny();
-
-        if (optional.isPresent()) {
-            String value = optional.get().get("cu31"); //
-            if (value != null) {
-                isContingencia = "Si".equalsIgnoreCase(value);
             }
         }
 
-
+        // Validaciones iniciales
         ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
         validationHandler.checkBasicInformation(
                 transaction.getDOC_Id(),
@@ -118,9 +112,10 @@ public class GuiaServiceImpl implements GuiaInterface {
                 transaction.getEMail(),
                 isContingencia);
 
+        // Obtención de datos del cliente y el certificado digital
         Client client = clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
-        byte[] certificado = CertificateUtils.getCertificateInBytes(applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator
-                + client.getCertificadoName());
+        String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
+        byte[] certificado = CertificateUtils.getCertificateInBytes(certificatePath);
 
         String certiPassword = client.getCertificadoPassword();
         String ksProvider = client.getCertificadoProveedor();
@@ -128,65 +123,80 @@ public class GuiaServiceImpl implements GuiaInterface {
 
         CertificateUtils.checkDigitalCertificateV2(certificado, certiPassword, ksProvider, ksType);
 
+        // Generar la guía
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
-        DespatchAdviceType despatchAdviceType = null;
+        DespatchAdviceType despatchAdviceType = ublHandler.generateDespatchAdviceType(transaction, signerName);
 
-        if(IUBLConfig.DOC_SENDER_CARRIER_GUIDE_CODE.equals(transaction.getDOC_Codigo())) {
-            despatchAdviceType = ublHandler.generateDespatchAdviceType(transaction, signerName);
-        }else {
-            despatchAdviceType = ublHandler.generateCarrierDespatchAdviceType(transaction, signerName);
-        }
-
+        // Validar la guía generada
         validationHandler.checkRemissionGuideDocument(despatchAdviceType);
 
+        // Obtener el nombre del documento
         String documentName = DocumentNameHandler.getInstance().getRemissionGuideName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
         if (logger.isDebugEnabled()) {
             logger.debug("transactionRemissionGuideDocument() [" + this.docUUID + "] El nombre del documento: " + documentName);
         }
 
+        // Manejo de archivos
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
+        Calendar fechaEmision = Calendar.getInstance();
+        fechaEmision.setTime(transaction.getDOC_FechaEmision());
+        int anio = fechaEmision.get(Calendar.YEAR);
+        int mes = fechaEmision.get(Calendar.MONTH) + 1;
+        int dia = fechaEmision.get(Calendar.DAY_OF_MONTH);
 
-        /**Ruta completa donde se dejara el documento*/
-        String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDoc());
+        String attachmentPath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() +
+                File.separator + "anexo" + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
         fileHandler.setBaseDirectory(attachmentPath);
+        if (logger.isDebugEnabled()) {
+            logger.debug("transactionRemissionGuideDocument() [" + this.docUUID + "] Ruta para los archivos adjuntos: " + attachmentPath);
+        }
 
-        String documentPath = null;
+        // Guardar el documento XML en disco
+        String documentPath = fileHandler.storeDocumentInDisk(despatchAdviceType, documentName);
+        if (logger.isInfoEnabled()) {
+            logger.info("transactionRemissionGuideDocument() [" + this.docUUID + "] El documento [" + documentName + "] fue guardado en DISCO en: " + documentPath);
+        }
 
-        documentPath = fileHandler.storeDocumentInDisk(despatchAdviceType, documentName);
-
+        // Firmar el documento
         SignerHandler signerHandler = SignerHandler.newInstance();
         signerHandler.setConfiguration(certificado, certiPassword, ksType, ksProvider, signerName);
+        File signedDocument = signerHandler.signDocument(documentPath, docUUID);
+        if (logger.isInfoEnabled()) {
+            logger.info("transactionRemissionGuideDocument() [" + this.docUUID + "] El documento [" + documentName + "] fue firmado correctamente en: " + signedDocument.getAbsolutePath());
+        }
 
-        File signedDocument = null;
-        signedDocument = signerHandler.signDocument(documentPath, docUUID);
-
+        // Obtener el documento firmado en memoria
         Object ublDocument = fileHandler.getSignedDocument(signedDocument, transaction.getDOC_Codigo());
-
         UBLDocumentWRP documentWRP = new UBLDocumentWRP();
         documentWRP.setTransaccion(transaction);
         documentWRP.setAdviceType((DespatchAdviceType) ublDocument);
 
-        PDFBasicGenerateHandler db = new PDFBasicGenerateHandler(docUUID);
-
-
-        String fecha = transaction.getDOC_FechaVencimiento();
+        // Generar el PDF
+        PDFBasicGenerateHandler pdfBasicHandler = new PDFBasicGenerateHandler(docUUID);
+        String fechaVenc = transaction.getDOC_FechaVencimiento();
         DespatchAdviceType guia = documentWRP.getAdviceType();
 
+        // Generar XML firmado en memoria
         byte[] xmlDocument = DocumentConverterUtils.convertDocumentToBytes(despatchAdviceType);
         byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
 
+        // Guardar el XML firmado en disco
         try {
-            UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, "xml", attachmentPath );
+            UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, EXT_XML, attachmentPath);
             logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
         } catch (IOException e) {
             logger.error("Error al guardar el archivo: " + e.getMessage());
         }
 
+        // Comprimir el documento
+        DataHandler zipDocument = UtilsFile.compressUBLDocument(signedXmlDocument, documentName + "." + EXT_XML);
+        if (logger.isInfoEnabled()) {
+            logger.info("transactionRemissionGuideDocument() [" + this.docUUID + "] El documento UBL fue convertido a formato ZIP.");
+        }
+        logger.error("ERRROR +++++++++ ==========" + zipDocument.toString());
 
-        DataHandler zipDocument = UtilsFile.compressUBLDocument(signedXmlDocument, documentName + ".xml");
-
-        ConfigData configuracion = ConfigData
-                .builder()
+        // Configuración para conectarse a SUNAT / OSE
+        ConfigData configuracion = ConfigData.builder()
                 .usuarioSol(client.getUsuarioSol())
                 .claveSol(client.getClaveSol())
                 .integracionWs(client.getIntegracionWs())
@@ -203,203 +213,184 @@ public class GuiaServiceImpl implements GuiaInterface {
                 .build();
 
         logger.info("Se esta apuntando al ambiente : " + configuracion.getAmbiente() + " - " + configuracion.getIntegracionWs());
-        if (configuracion.getIntegracionWs().equals("OSE"))
+        if ("OSE".equals(configuracion.getIntegracionWs())) {
             logger.info("Url Service: " + applicationProperties.getUrlOse());
-        else if (configuracion.getIntegracionWs().equals("SUNAT"))
+        } else if ("SUNAT".equals(configuracion.getIntegracionWs())) {
             logger.info("Url Service: " + applicationProperties.getUrlSunatEmision());
+        }
         logger.info("Usuario Sol: " + configuracion.getUserNameSunatSunat());
         logger.info("Clave Sol: " + configuracion.getPasswordSunatSunat());
         logger.info("Client id: " + configuracion.getClientId());
         logger.info("Client Secret: " + configuracion.getClientSecret());
         logger.info("Scope: " + configuracion.getScope());
 
-        logger.info("================================ LOG DE TRANSACCIÓN ================================");
-        String digestValue = db.generateDigestValue(documentWRP.getAdviceType().getUBLExtensions());
-        String barcodeValue = db.generateGuiaBarcodeInfoV2(guia.getID().getValue(), IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE, fecha, BigDecimal.ZERO, BigDecimal.ZERO,
-                guia.getDespatchSupplierParty(), guia.getDeliveryCustomerParty(), guia.getUBLExtensions());
+        // Generar valores digest y barcode
+        String digestValue = pdfBasicHandler.generateDigestValue(documentWRP.getAdviceType().getUBLExtensions());
+        String barcodeValue = pdfBasicHandler.generateGuiaBarcodeInfoV2(
+                guia.getID().getValue(),
+                IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE,
+                fechaVenc,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                guia.getDespatchSupplierParty(),
+                guia.getDeliveryCustomerParty(),
+                guia.getUBLExtensions()
+        );
 
+        // Log de fecha de invocación a servicio externo
         log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
-        if (null != zipDocument) {
-            if (transaction.getFE_Estado().equalsIgnoreCase("N")) {
 
-                GuiaTicket ticketMongoSave = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
-                        transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
-                ).block();
-
-                if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty()) {
-                    String ticketToUse = ticketMongoSave.getTicketSunat();
-
-
-                    if (ticketToUse != null && !ticketToUse.isEmpty()) {
-                        // Consultar ticket en SUNAT
-                        ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
-
-                        // Manejar respuestas de SUNAT
-                        transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, signedDocument, fileHandler,
-                                documentName, transaction, configuracion);
-
-                        if (transactionResponse != null) {
-                            byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
-                            transactionResponse.setXml(documentBytes);
-                        }
-                    }
-
-
-                } else {
-                    ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
-
-
-
-
-                    if (responseDTOJWT.getStatusCode() == 400 || responseDTOJWT.getStatusCode() == 401) {
-                        return generateResponseRest(documentWRP, responseDTOJWT);
-                    }
-
-                    //DECLARE
-                    ResponseDTO responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
-                    //GUARDAR EN BASE DATOS
-                    saveTicketRest(transaction, responseDTO);
-
-
-                    //DECLARE
-                    if (responseDTO.getStatusCode() == 401) {
-                        responseDTOJWT = getJwtSunat(configuracion);
-                        responseDTO = declareSunat(documentName, documentPath.replace("xml", "zip"), responseDTOJWT.getAccess_token());
-                    }
-
-                    //sendQR(transaction.getDOCCodigo(), documentWRP);
-                    Thread.sleep(5000);
-
-                    //CONSULT
-                    responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-                    if (responseDTO.getStatusCode() == 401) {
-                        responseDTOJWT = getJwtSunat(configuracion);
-                        responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-                    }
-
-                    int contador = 0;
-                    while (responseDTO.getCodRespuesta().equals("98")) {
-                        Thread.sleep(5000);
-                        if (contador == 5) break;
-                        responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-                        contador++;
-                    }
-
-                    //EXTRAER ZIP
-                    // Manejar respuestas de SUNAT
-                    transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, signedDocument, fileHandler,
-                            documentName, transaction, configuracion);
-
-                    byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
-                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
-                    transactionResponse.setXml(documentBytes);
-
-                }
-
-            } else if (transaction.getFE_Estado().equalsIgnoreCase("C")) {
-
-                GuiaTicket ticketMongoSave = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
-                        transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
-                ).block(); // Bloquea y espera el resultado sincrónicamente
-
-                String ticketToUse = (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty())
-                        ? ticketMongoSave.getTicketSunat()
-                        : transaction.getTransactionGuias().getTicketRest();
-
-                if (ticketToUse != null && !ticketToUse.isEmpty()) {
-                    // Consultar ticket en SUNAT
-                    ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
-
-                    // Manejar respuestas de SUNAT
-                    transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, signedDocument, fileHandler,
-                            documentName, transaction, configuracion);
-
-                    if (transactionResponse != null) {
-                        byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
-                        transactionResponse.setXml(documentBytes);
-                    }
-                }
+        if (zipDocument != null) {
+            String feEstado = transaction.getFE_Estado();
+            if (ESTADO_NUEVO.equalsIgnoreCase(feEstado)) {
+                // Estado "N", se declara o se consulta si ya está aprobado
+                transactionResponse = processEstadoN(transaction, configuracion, fileHandler, signedDocument,
+                        documentPath, documentName, documentWRP);
+            } else if (ESTADO_CONTINGENCIA.equalsIgnoreCase(feEstado)) {
+                // Estado "C", se consulta ticket
+                transactionResponse = processEstadoC(transaction, configuracion, fileHandler, signedDocument,
+                        documentName, documentWRP);
             }
         } else {
             logger.error("transactionRemissionGuideDocument() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_457.getMessage());
             throw new NullPointerException(IVenturaError.ERROR_457.getMessage());
         }
 
+        // Log de fecha de respuesta del servicio externo
         log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
         if (logger.isDebugEnabled()) {
             logger.debug("-transactionRemissionGuideDocument() [" + this.docUUID + "]");
         }
 
-        if (client.getPdfBorrador().equals("true")) {
-            transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
-        }
-
-        transactionResponse.setDigestValue(digestValue);
-        transactionResponse.setBarcodeValue(barcodeValue);
-        transactionResponse.setIdentificador(documentName);
-
-        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
-        log.setSeriesAndCorrelative(documentName);
-        log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
-        log.setResponseDate(DateUtils.formatDateToString(new Date()));
-        log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
-        return transactionResponse;
-    }
-
-    public void saveTicketRest(TransacctionDTO transaccion, ResponseDTO responseDTO) {
-        GuiaTicket guiaTicket = new GuiaTicket();
-        guiaTicket.setRucEmisor(transaccion.getDocIdentidad_Nro());
-        guiaTicket.setFeId(transaccion.getFE_Id());
-        guiaTicket.setTicketSunat(responseDTO.getNumTicket());
-        guiaTicketRepo.save(guiaTicket).subscribe();
-    }
-
-    private TransaccionRespuesta manejarRespuestaSunat(ResponseDTO responseDTO, UBLDocumentWRP documentWRP,
-                                                       File signedDocument, FileHandler fileHandler,
-                                                       String documentName, TransacctionDTO transaction,
-                                                       ConfigData configuracion) {
-        if (responseDTO.getStatusCode() == 400 || responseDTO.getStatusCode() == 404) {
-            return generateResponseRest(documentWRP, responseDTO);
-        }
-
-        if (responseDTO.getCodRespuesta() != null) {
-            switch (responseDTO.getCodRespuesta()) {
-                case "0":
-                    TransaccionRespuesta transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                    byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null, signedDocument, fileHandler,
-                            documentName, transaction.getDOC_Codigo(), documentWRP, transaction, configuracion);
-                    transactionResponse.setPdf(pdf);
-                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
-                    return transactionResponse;
-
-                case "98":
-                case "99":
-                    return generateResponseRest(documentWRP, responseDTO);
-
-                default:
-                    return null;
+        // Generar PDF borrador
+        if ("true".equals(client.getPdfBorrador())) {
+            if (transactionResponse != null) {
+                transactionResponse.setPdfBorrador(
+                        documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion)
+                );
             }
         }
 
-        return null;
-    }
-
-    private ResponseDTO consultarTicketEnSunat(String ticket, ConfigData configuracion) throws IOException {
-        ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
-        ResponseDTO responseDTO = consult(ticket, responseDTOJWT.getAccess_token());
-
-        if (responseDTO.getStatusCode() == 401) {
-            // Renovar token y volver a intentar
-            responseDTOJWT = getJwtSunat(configuracion);
-            responseDTO = consult(ticket, responseDTOJWT.getAccess_token());
+        // Asignar valores de digest y barcode a la respuesta
+        if (transactionResponse != null) {
+            transactionResponse.setDigestValue(digestValue);
+            transactionResponse.setBarcodeValue(barcodeValue);
+            transactionResponse.setIdentificador(documentName);
         }
 
-        return responseDTO;
+        // Log de detalles en DB
+        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
+        log.setSeriesAndCorrelative(documentName);
+        if (transactionResponse != null) {
+            log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
+            log.setResponseDate(DateUtils.formatDateToString(new Date()));
+            log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
+        }
+
+        return transactionResponse;
     }
 
+    private TransaccionRespuesta processEstadoN(TransacctionDTO transaction,
+                                                ConfigData configuracion,
+                                                FileHandler fileHandler,
+                                                File signedDocument,
+                                                String documentPath,
+                                                String documentName,
+                                                UBLDocumentWRP documentWRP) throws InterruptedException, IOException {
+        TransaccionRespuesta transactionResponse = null;
+        GuiaTicket ticketMongoSave = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
+                transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
+        ).block();
+
+        // Ticket ya aprobado
+        if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && "APROBADO".equals(ticketMongoSave.getEstadoTicket())) {
+            String ticketToUse = ticketMongoSave.getTicketSunat();
+            if (ticketToUse != null && !ticketToUse.isEmpty()) {
+                ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
+                transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
+                if (transactionResponse != null) {
+                    byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
+                    transactionResponse.setXml(documentBytes);
+                }
+            }
+        } else {
+            ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
+            if (responseDTOJWT.getStatusCode() == 400 || responseDTOJWT.getStatusCode() == 401) {
+                return generateResponseRest(documentWRP, responseDTOJWT);
+            }
+
+            // DECLARE GENERA TICKET
+            ResponseDTO responseDTO = declareSunat(documentName, documentPath.replace(EXT_XML, EXT_ZIP), responseDTOJWT.getAccess_token());
+
+            // Manejo 401
+            if (responseDTO.getStatusCode() == 401) {
+                responseDTOJWT = getJwtSunat(configuracion);
+                responseDTO = declareSunat(documentName, documentPath.replace(EXT_XML, EXT_ZIP), responseDTOJWT.getAccess_token());
+            }
+
+            // Esperar 5s
+            Thread.sleep(5000);
+
+            // CONSULT
+            responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
+            if (responseDTO.getStatusCode() == 401) {
+                responseDTOJWT = getJwtSunat(configuracion);
+                responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
+            }
+
+            AtomicInteger contador = new AtomicInteger(0);
+            while ("98".equals(responseDTO.getCodRespuesta())) {
+                Thread.sleep(5000);
+                if (contador.incrementAndGet() == 5) break;
+                responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
+            }
+
+            // Manejar respuestas de SUNAT
+            transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
+
+            // Guardar en DB si aprobado
+            if (transactionResponse != null && transactionResponse.getMensaje() != null && transactionResponse.getMensaje().contains("Documento aprobado")) {
+                saveTicketRest(transaction, responseDTO);
+            }
+
+            // Añadir XML firmado
+            if (transactionResponse != null) {
+                byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
+                transactionResponse.setTicketRest(responseDTO.getNumTicket());
+                transactionResponse.setXml(documentBytes);
+            }
+        }
+        return transactionResponse;
+    }
+
+    private TransaccionRespuesta processEstadoC(TransacctionDTO transaction,
+                                                ConfigData configuracion,
+                                                FileHandler fileHandler,
+                                                File signedDocument,
+                                                String documentName,
+                                                UBLDocumentWRP documentWRP) throws IOException {
+        TransaccionRespuesta transactionResponse = null;
+
+        GuiaTicket ticketMongoSave = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
+                transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
+        ).block();
+
+        String ticketToUse = (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && "APROBADO".equals(ticketMongoSave.getEstadoTicket()))
+                ? ticketMongoSave.getTicketSunat()
+                : transaction.getTransactionGuias().getTicketRest();
+
+        if (ticketToUse != null && !ticketToUse.isEmpty()) {
+            ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
+            transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
+            if (transactionResponse != null) {
+                byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
+                transactionResponse.setXml(documentBytes);
+            }
+        }
+        return transactionResponse;
+    }
 
     public ResponseDTO consult(String numTicket, String token) throws IOException {
-
         HttpResponse<String> response = Unirest.get("https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/envios/" + numTicket)
                 .header("Authorization", "Bearer " + token)
                 .asString();
@@ -409,13 +400,11 @@ public class GuiaServiceImpl implements GuiaInterface {
         responseDTO.setStatusCode(response.getStatus());
         responseDTO.setNumTicket(numTicket);
         return responseDTO;
-
     }
 
     public ResponseDTO declareSunat(String documentName, String documentPath, String token) throws IOException {
-
-        String fileTo64 = zipDocumentTo64(documentPath.replace("xml", "zip"));
-        String fileTo256Sha = zipDocumentTo265Sha(documentPath.replace("xml", "zip"));
+        String fileTo64 = zipDocumentTo64(documentPath);
+        String fileTo256Sha = zipDocumentTo265Sha(documentPath);
         String nombreArchivo = documentName + ".zip";
 
         HttpResponse<String> response = Unirest.post("https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/" + documentName)
@@ -432,7 +421,7 @@ public class GuiaServiceImpl implements GuiaInterface {
     }
 
     public String zipDocumentTo265Sha(String documentPath) {
-        String checksumSHA256 = "";
+        String checksumSHA256 = EMPTY;
         try {
             checksumSHA256 = DigestUtils.sha256Hex(new FileInputStream(documentPath));
         } catch (IOException e) {
@@ -459,51 +448,51 @@ public class GuiaServiceImpl implements GuiaInterface {
 
     public ResponseDTO getJwtSunat(ConfigData configuracion) throws IOException {
 
-
         HttpResponse<String> response = Unirest.post("https://api-seguridad.sunat.gob.pe/v1/clientessol/" + configuracion.getClientId() + "/oauth2/token/")
                 .header("Content-Type", "application/x-www-form-urlencoded")
-                .header("Cookie", "TS019e7fc2=014dc399cbcad00473c65166bab99ef2e22263ae15b2a9e259ff0e5d972578fa54549fe8acccb61b76d241060b054cc73beff45ea3")
                 .field("grant_type", "password")
                 .field("scope", configuracion.getScope())
                 .field("client_id", configuracion.getClientId())
                 .field("client_secret", configuracion.getClientSecret())
                 .field("username", configuracion.getUserNameSunatSunat())
                 .field("password", configuracion.getPasswordSunatSunat())
-                .field("", "")
+                .field(EMPTY, EMPTY)
                 .asString();
 
         ObjectMapper objectMapper = new ObjectMapper();
         ResponseDTO responseDTO = new ResponseDTO();
-        ResponseDTOAuth responseDTO400 = new ResponseDTOAuth();
+        ResponseDTOAuth responseDTO400;
 
         if (response.getStatus() == 400) {
-            responseDTO400 = objectMapper.readValue(response.body(), new TypeReference<ResponseDTOAuth>() {
-            });
+            responseDTO400 = objectMapper.readValue(response.body(), new TypeReference<ResponseDTOAuth>() {});
             responseDTO.setResponseDTO400(responseDTO400);
         } else {
-            responseDTO = objectMapper.readValue(response.body(), new TypeReference<ResponseDTO>() {
-            });
+            responseDTO = objectMapper.readValue(response.body(), new TypeReference<ResponseDTO>() {});
         }
         responseDTO.setStatusCode(response.getStatus());
         return responseDTO;
-
     }
 
     public TransaccionRespuesta generateResponseRest(UBLDocumentWRP documentWRP, ResponseDTO responseDTO) {
-
         TransaccionRespuesta.Sunat sunatResponse = new TransaccionRespuesta.Sunat();
         sunatResponse.setId(documentWRP.getTransaccion().getDOC_Serie() + "-" + documentWRP.getTransaccion().getDOC_Numero());
 
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
         if (responseDTO.getStatusCode() == 400 || responseDTO.getStatusCode() == 401) {
-            transactionResponse.setMensaje(responseDTO.getResponseDTO400().getError() + " - " + responseDTO.getResponseDTO400().getError_description());
+            // Error de token o credenciales
+            if(responseDTO.getResponseDTO400() != null) {
+                transactionResponse.setMensaje(responseDTO.getResponseDTO400().getError() + " - " + responseDTO.getResponseDTO400().getError_description());
+            } else {
+                transactionResponse.setMensaje("Error no especificado");
+            }
         } else if (responseDTO.getStatusCode() == 404) {
             transactionResponse.setMensaje("El número de ticket para consultar no existe");
             sunatResponse.setAceptado(false);
             transactionResponse.setSunat(sunatResponse);
         } else {
-            if (responseDTO.getCodRespuesta().equals("0")) {
-
+            // Manejo de códigos de respuesta
+            if ("0".equals(responseDTO.getCodRespuesta())) {
+                // Aprobado
                 String rptBase64 = responseDTO.getArcCdr();
                 byte[] bytesZip = Base64.decodeBase64(rptBase64);
                 transactionResponse.setMensaje(responseDTO.getCodRespuesta() + " - " + "Documento aprobado");
@@ -511,28 +500,84 @@ public class GuiaServiceImpl implements GuiaInterface {
                 sunatResponse.setAceptado(true);
                 transactionResponse.setSunat(sunatResponse);
 
-            } else if (responseDTO.getCodRespuesta().equals("98")) {
-
-                transactionResponse.setMensaje(responseDTO.getCodRespuesta() + " - " + "Documento en proceso, volver a consultar.");
+            } else if ("98".equals(responseDTO.getCodRespuesta())) {
+                // En proceso
+                transactionResponse.setMensaje(responseDTO.getCodRespuesta() + " - Documento en proceso, volver a consultar.");
                 sunatResponse.setAceptado(false);
                 transactionResponse.setSunat(sunatResponse);
 
-            } else if (responseDTO.getCodRespuesta().equals("99")) {
-
-                if (responseDTO.getIndCdrGenerado().equals("1")) { //con CDR
+            } else if ("99".equals(responseDTO.getCodRespuesta())) {
+                // Rechazado
+                if ("1".equals(responseDTO.getIndCdrGenerado())) {
                     String rptBase64 = responseDTO.getArcCdr();
                     byte[] bytesZip = Base64.decodeBase64(rptBase64);
                     transactionResponse.setZip(bytesZip);
                 }
-                //transactionResponse.setCodigo(TransaccionRespuesta.RSP_EMITIDO_RECHAZADO_REST);
                 transactionResponse.setMensaje(responseDTO.getError().getNumError() + " - " + responseDTO.getError().getDesError());
                 sunatResponse.setAceptado(false);
                 transactionResponse.setSunat(sunatResponse);
-
             }
         }
-
-        //transactionResponse.setCodigoWS(Integer.parseInt(responseDTO.getCodRespuesta()));
         return transactionResponse;
+    }
+
+    public void saveTicketRest(TransacctionDTO transaccion, ResponseDTO responseDTO) {
+        GuiaTicket guiaTicket = new GuiaTicket();
+        guiaTicket.setRucEmisor(transaccion.getDocIdentidad_Nro());
+        guiaTicket.setFeId(transaccion.getFE_Id());
+        guiaTicket.setTicketSunat(responseDTO.getNumTicket());
+        guiaTicket.setEstadoTicket("APROBADO");
+        guiaTicketRepo.save(guiaTicket).subscribe();
+    }
+
+    private ResponseDTO consultarTicketEnSunat(String ticket, ConfigData configuracion) throws IOException {
+        ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
+        ResponseDTO responseDTO = consult(ticket, responseDTOJWT.getAccess_token());
+        if (responseDTO.getStatusCode() == 401) {
+            // Renovar token y volver a intentar
+            responseDTOJWT = getJwtSunat(configuracion);
+            responseDTO = consult(ticket, responseDTOJWT.getAccess_token());
+        }
+        return responseDTO;
+    }
+
+    private TransaccionRespuesta manejarRespuestaSunat(ResponseDTO responseDTO,
+                                                       UBLDocumentWRP documentWRP,
+                                                       FileHandler fileHandler,
+                                                       String documentName,
+                                                       TransacctionDTO transaction,
+                                                       ConfigData configuracion) {
+        // Errores de credenciales o ticket
+        if (responseDTO.getStatusCode() == 400 || responseDTO.getStatusCode() == 404) {
+            return generateResponseRest(documentWRP, responseDTO);
+        }
+
+        // Manejo normal
+        if (responseDTO.getCodRespuesta() != null) {
+            switch (responseDTO.getCodRespuesta()) {
+                case "0":
+                    // Documento aprobado
+                    TransaccionRespuesta transactionResponse = generateResponseRest(documentWRP, responseDTO);
+                    // Generar PDF
+                    byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null,
+                            fileHandler,
+                            documentName,
+                            transaction.getDOC_Codigo(),
+                            documentWRP,
+                            transaction,
+                            configuracion);
+                    transactionResponse.setPdf(pdf);
+                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
+                    return transactionResponse;
+
+                case "98":
+                case "99":
+                    // Documento en proceso o rechazado
+                    return generateResponseRest(documentWRP, responseDTO);
+                default:
+                    return null;
+            }
+        }
+        return null;
     }
 }
