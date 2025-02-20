@@ -37,12 +37,12 @@ ventura:
         mostrarSoap: "true"
         pdfBorrador: "true"
         impresion: Codigo QR
-        urlOnpremise: http://190.119.245.254:60081/
-        #urlOnpremise: http://119.8.146.122:60089/
-        scope: No aplica
-        clientId: No aplica
-        clientSecret: No aplica
-        UserNameSunatGuias: No aplica
-        passwordSunatGuias: No aplica
+        #urlOnpremise: http://190.119.245.254:60081/
+        urlOnpremise: http://119.8.146.122:60089/
+        scope: https://api-cpe.sunat.gob.pe/
+        clientId: a8a6c50a-d73c-4775-9ddc-6261df69fed8
+        clientSecret: 5yr+sp24Q1J+LeYhnCooEw==
+        UserNameSunatGuias: 20510910517JVENTUR1
+        passwordSunatGuias: JVENTUR1
 server:
   port: 8082

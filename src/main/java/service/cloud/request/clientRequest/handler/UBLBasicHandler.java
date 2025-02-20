@@ -2380,7 +2380,7 @@ public abstract class UBLBasicHandler {
                 baseAmount.setValue(montoAnticipo.setScale(IUBLConfig.DECIMAL_ALLOWANCECHARGE_BASEAMOUNT, RoundingMode.HALF_UP));
                 baseAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
                 allowanceCharge.setBaseAmount(baseAmount);
-            } else if (discountReason.equals("02")) {//descuento global
+            } else if (discountReason.equals("03") || discountReason.equals("02")) {//descuento global
 
                 /* <cac:AllowanceCharge><cbc:MultiplierFactorNumeric> */
                 MultiplierFactorNumericType multiplierFactorNumeric = new MultiplierFactorNumericType();
@@ -2501,13 +2501,15 @@ public abstract class UBLBasicHandler {
                     logger.debug("getTaxTotalV21() [" + this.identifier + "] Agregando VALOR_VENTA(" + transaccionImpuesto.getValorVenta() + ") MONEDA(" + transaccionImpuesto.getMoneda() + ") - TAG TaxableAmount.");
                 }
                 TaxableAmountType taxableAmount = new TaxableAmountType();
-                if (contieneGratificacion)
-                    taxableAmount.setValue(totalTaxableAmount.setScale(2, RoundingMode.HALF_UP));
-                else {
-                    taxableAmount.setValue(transaccionImpuesto.getValorVenta().setScale(2, RoundingMode.HALF_UP));
-                    //taxableAmount.setValue((transaccion.getDOCImporteTotal().subtract(transaccion.getANTICIPOMonto())).setScale(2, RoundingMode.HALF_UP));
+
+                BigDecimal value = transaccion.getDOC_ImporteTotal(); // Inicializa con el importe total
+                // Validar que los valores no sean null antes de hacer la multiplicación
+                if (transaccion.getDOC_Descuento() != null) {
+                    value = value.add(transaccion.getDOC_Descuento());
                 }
+                taxableAmount.setValue(value.setScale(2, RoundingMode.HALF_UP));
                 taxableAmount.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionImpuesto.getMoneda()).value());
+
                 taxSubtotal.setTaxableAmount(taxableAmount);
 
                 /* <cac:TaxTotal><cac:TaxSubtotal><cbc:TaxAmount> */
@@ -2515,9 +2517,10 @@ public abstract class UBLBasicHandler {
                     logger.debug("getTaxTotalV21() [" + this.identifier + "] Agregando MONTO(" + transaccionImpuesto.getMonto() + ") MONEDA(" + transaccionImpuesto.getMoneda() + ") - TAG TaxAmount.");
                 }
                 TaxAmountType taxAmount = new TaxAmountType();
-                if (contieneGratificacion) {
+                /*if (contieneGratificacion) {
                     taxAmount.setValue(Utils.round(totalTaxAmount, 2));
-                } else if (isImpuestoBolsa) {
+                } else */
+                if (isImpuestoBolsa) {
                     taxAmount.setValue(Utils.round(transaccionImpuesto.getValorVenta(), 2));
                 } else {
                     taxAmount.setValue(Utils.round(transaccionImpuesto.getMonto(), 2));
@@ -2580,6 +2583,7 @@ public abstract class UBLBasicHandler {
 
     protected MonetaryTotalType getMonetaryTotal(final TransacctionDTO transaccion, final BigDecimal lineExtensionAmountValue, final BigDecimal taxInclusiveAmountValue, final boolean noContainsFreeItem, final BigDecimal chargeTotalAmountValue, final BigDecimal prepaidAmountValue, final BigDecimal payableAmountValue, final BigDecimal descuento, final String currencyCode, final boolean isInvoiceOrBoleta) throws UBLDocumentException {
         final boolean bandera = false;
+        boolean existEXP = false;
         if (this.logger.isDebugEnabled()) {
             this.logger.debug("+getMonetaryTotal() [" + this.identifier + "]");
         }
@@ -2600,15 +2604,20 @@ public abstract class UBLBasicHandler {
             monetaryTotal.setLineExtensionAmount(lineExtensionAmount);
             final TaxInclusiveAmountType taxInclusiveAmount = new TaxInclusiveAmountType();
             final BigDecimal b2 = new BigDecimal("1.18");
-            if (transaccion.getANTICIPO_Monto().intValue() > 0) {
+            /** Harol 19-03-2024 Condicional si TipoOperacionSunat empieza con 02 Aplicable para EXPORTACION*/
+            if (transaccion.getANTICIPO_Monto().intValue() > 0 && !transaccion.getTipoOperacionSunat().startsWith("02")) {
                 taxInclusiveAmount.setValue(lineExtensionAmountValue.multiply(b2).setScale(2, RoundingMode.HALF_UP));
                 taxInclusiveAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
             } else if (transaccion.getTransactionImpuestosDTOList() != null) {
+                BigDecimal suma = lineExtensionAmountValue;
                 boolean existIGV = false;
                 for (int i = 0; i < transaccion.getTransactionImpuestosDTOList().size(); ++i) {
-                    if (transaccion.getTransactionImpuestosDTOList().get(i).getNombre().equals("IGV")) {
+                    if (transaccion.getTransactionImpuestosDTOList().get(i).getNombre().equals("IGV")||
+                            transaccion.getTransactionImpuestosDTOList().get(i).getNombre().equals("GRA")) {
                         existIGV = true;
-                        taxInclusiveAmount.setValue(lineExtensionAmountValue.add(transaccion.getTransactionImpuestosDTOList().get(i).getMonto()).setScale(2, RoundingMode.HALF_UP));
+                        //taxInclusiveAmount.setValue(lineExtensionAmountValue.add(transaccion.getTransactionImpuestosDTOList().get(i).getMonto()).setScale(2, RoundingMode.HALF_UP));
+                        suma = suma.add(transaccion.getTransactionImpuestosDTOList().get(i).getMonto()).setScale(2, RoundingMode.HALF_UP);
+                        taxInclusiveAmount.setValue(suma);
                         taxInclusiveAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
                     }
                 }
@@ -2623,7 +2632,23 @@ public abstract class UBLBasicHandler {
                         taxInclusiveAmount.setValue(lineExtensionAmountValue.add(transaccion.getTransactionImpuestosDTOList().get(j).getMonto()).multiply(b2).setScale(2, RoundingMode.HALF_UP));
                         taxInclusiveAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
                     }
+                    /** Harol*/
+                    if(transaccion.getTransactionImpuestosDTOList().get(j).getNombre().equals("EXP")){
+                        existEXP = true;
+                        taxInclusiveAmount.setValue(lineExtensionAmountValue.add(transaccion.getTransactionImpuestosDTOList().get(j).getMonto()).setScale(2, RoundingMode.HALF_UP));
+                        taxInclusiveAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
+                    }
                 }
+            }
+
+            /** Harol 19-12-2024 Caso Mafie tag TaxInclusiveAmount se resta por Amount de AllowanceCharge solo si AllowanceChargeReasonCode es 02*/
+            if(validarResta(transaccion)){
+                BigDecimal taxInclusiveValue = taxInclusiveAmount.getValue().subtract(transaccion.getANTICIPO_Monto());
+                String taxInclusiveValueString = taxInclusiveValue.toString();
+                if (this.logger.isDebugEnabled()) {
+                    this.logger.debug(("+getMonetaryTotal() [" + this.identifier + "] <cbc:TaxInclusiveAmount>"+taxInclusiveValueString+""));
+                }
+                taxInclusiveAmount.setValue(taxInclusiveValue);
             }
             monetaryTotal.setTaxInclusiveAmount(taxInclusiveAmount);
         }
@@ -2646,8 +2671,15 @@ public abstract class UBLBasicHandler {
             BigDecimal totalAnticipos = transaccion.getTransactionActicipoDTOList().stream()
                     .map(TransactionActicipoDTO::getAnticipo_Monto)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
-            prepaidAmount.setValue(totalAnticipos);
+            //prepaidAmount.setValue(totalAnticipos);
             /***/
+            /** Harol 22-04-2024 se quita redondeo .setScale(2, RoundingMode.HALF_UP)*/
+            if(existEXP){
+                prepaidAmount.setValue(prepaidAmountValue.setScale(2, RoundingMode.HALF_UP));
+            }else {
+                prepaidAmount.setValue(prepaidAmountValue.multiply(b3).setScale(2, RoundingMode.HALF_UP));
+            }
+            /** */
             prepaidAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
             monetaryTotal.setPrepaidAmount(prepaidAmount);
         }
@@ -2677,9 +2709,31 @@ public abstract class UBLBasicHandler {
         if (this.logger.isDebugEnabled()) {
             this.logger.debug("-getMonetaryTotal() [" + this.identifier + "]");
         }
+
+        /** harol 13-09-2024 impresion AllowanceTotalAmount de tag solo si es exportacion*/
+        if(transaccion.getFE_FormSAP().contains("exportacion") || transaccion.getTipoOperacionSunat().startsWith("02")){
+            final AllowanceTotalAmountType allowanceTotalAmountType = new AllowanceTotalAmountType();
+            allowanceTotalAmountType.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
+            allowanceTotalAmountType.setValue(transaccion.getDOC_Descuento().setScale(2, RoundingMode.HALF_UP));
+            monetaryTotal.setAllowanceTotalAmount(allowanceTotalAmountType);
+        }
+
         return monetaryTotal;
     }
-
+    protected Boolean validarResta(final TransacctionDTO transaccion){
+        BigDecimal montoRetencion;
+        try {
+            montoRetencion = new BigDecimal(Optional.ofNullable(transaccion.getMontoRetencion()).orElse("0"));
+        } catch (NumberFormatException e) {
+            montoRetencion = BigDecimal.ZERO; // Si el String no es un número válido, asigna 0
+        }
+        if (transaccion.getMontoRetencion() != null && (montoRetencion.compareTo(BigDecimal.ZERO) > 0) && transaccion.getANTICIPO_Monto().compareTo(BigDecimal.ZERO) > 0) {
+            if(transaccion.getFE_FormSAP().contains("exportacion") || transaccion.getTipoOperacionSunat().startsWith("02")){
+                return true;
+            }
+        }
+        return false;
+    }
     protected InvoicedQuantityType getInvoicedQuantity(BigDecimal value, String unitCodeValue) throws Exception {
         InvoicedQuantityType invoicedQuantity = new InvoicedQuantityType();
         invoicedQuantity.setValue(value.setScale(IUBLConfig.DECIMAL_LINE_QUANTITY, RoundingMode.HALF_UP));

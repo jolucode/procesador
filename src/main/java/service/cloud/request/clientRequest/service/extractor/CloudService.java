@@ -109,7 +109,6 @@ public class CloudService implements CloudInterface {
                     .asString();
 
             logger.info("Se envió de manera correcta al servidor OnPremise los documentos.");
-            logger.info("Estado de la respuesta del servidor OnPremise: " + response.getStatus());
         } catch (Exception e) {
             logger.error("Error de conexión con el servidor destino: " + e.getMessage());
             logger.info("No se pudo dejar los doucmentos en la ruta ruta del servitor: " + request.getUrlOnpremise());
@@ -120,10 +119,6 @@ public class CloudService implements CloudInterface {
     private Mono<RequestPost> processTransaction(TransacctionDTO transaccion, String requestOnPremise) {
         return Mono.fromCallable(() -> {
             // Paso 1: Enviar transacción
-            if(transaccion.getSN_DocIdentidad_Tipo().equals("6")) {
-                transaccion.setSN_DocIdentidad_Nro("20600948131");
-                transaccion.setRazonSocial("DIGIFLOW");
-            }
             TransaccionRespuesta tr = enviarTransaccion(transaccion);
 
             // Paso 2: Generar datos de solicitud
@@ -133,11 +128,11 @@ public class CloudService implements CloudInterface {
             anexarDocumentos(request);
 
             // Logs agrupados en un solo bloque
-            logger.info("================================ LOG DE TRANSACCIÓN ================================");
+
             logger.info("RUC: {}, DocObject: {}, DocEntry: {}", request.getRuc(), request.getDocObject(), request.getDocEntry());
             logger.info("Nombre del Documento: {}", request.getDocumentName());
-            logger.info("Actualización exitosa del documento: {}", transaccion.getFE_Id());
             logger.info("Documentos anexados correctamente en SAP.");
+            logger.info(tr.getMensaje());
             logger.info("===================================================================================");
 
             // Paso 4: Manejar logs y documentos publicados
@@ -233,7 +228,6 @@ public class CloudService implements CloudInterface {
             request.setUrlOnpremise(providerProperties.getUrlOnpremise(tc.getDocIdentidad_Nro()));
 
             if (tr.getMensaje().contains("ha sido aceptad") || tr.getMensaje().contains("aprobado")) {
-                logger.info(tr.getMensaje());
                 tr.setPdf(tr.getPdfBorrador());
                 tr.setEstado("V"); //Aprobado
 

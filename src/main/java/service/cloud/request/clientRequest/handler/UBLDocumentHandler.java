@@ -534,7 +534,15 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 if (logger.isInfoEnabled()) {
                     logger.info("generateInvoiceType() [" + this.identifier + "] La transaccion contiene informacion de DESCUENTO GLOBAL");
                 }
-                invoiceType.getAllowanceCharge().add(getAllowanceCharge(transaction.getDOC_ImporteTotal(), transaction.getANTICIPO_Monto(), false, transaction.getDOC_PorDescuento(), transaction.getDOC_Descuento(), transaction.getDOC_ImporteTotal(), transaction.getDOC_MON_Codigo(), "02", new BigDecimal(transaction.getMontoRetencion()), transaction.getDOC_MontoTotal()));
+                BigDecimal montoRetencion = Optional.ofNullable(transaction.getMontoRetencion())
+                        .map(BigDecimal::new)
+                        .orElse(BigDecimal.ZERO);
+                /** Harol 28-05-2024 valor de allowanceChargeReasonCode no debe ser 02 sino 03*/
+                if(transaction.getTipoOperacionSunat().startsWith("02")){
+                    invoiceType.getAllowanceCharge().add(getAllowanceCharge(transaction.getDOC_ImporteTotal(), transaction.getANTICIPO_Monto(), false, transaction.getDOC_PorDescuento(), transaction.getDOC_Descuento(), transaction.getDOC_ImporteTotal(), transaction.getDOC_MON_Codigo(), "03", montoRetencion, transaction.getDOC_MontoTotal()));
+                }else {
+                    invoiceType.getAllowanceCharge().add(getAllowanceCharge(transaction.getDOC_ImporteTotal(), transaction.getANTICIPO_Monto(), false, transaction.getDOC_PorDescuento(), transaction.getDOC_Descuento(), transaction.getDOC_ImporteTotal(), transaction.getDOC_MON_Codigo(), "02", montoRetencion, transaction.getDOC_MontoTotal()));
+                }
             }
 
             if (transaction.getMontoRetencion() != null) {
@@ -555,7 +563,8 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             /* Agregar <Invoice><cac:LegalMonetaryTotal> */
             boolean noContainsFreeItem = false;
             for (TransactionLineasDTO transaccionLinea : transaccionLineas) {
-                if (Objects.equals(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE, transaccionLinea.getPrecioRef_Codigo())) {
+                if (Objects.equals(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE, transaccionLinea.getPrecioRef_Codigo()) ||
+                        Objects.equals(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE, transaccionLinea.getPrecioRef_Codigo()) ) {
                     noContainsFreeItem = true;
                     break;
                 }
@@ -567,11 +576,16 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
             BigDecimal otrosCargosValue = transaction.getDOC_OtrosCargos();
             String formSap = transaction.getFE_FormSAP();
-            if (socioDocIdentidad.equalsIgnoreCase("0") && formSap.contains("exportacion")) {
+            if (transaction.getTipoOperacionSunat().startsWith("02") ||  formSap.contains("exportacion")) {
                 logger.info("Entro a esta parte de la validacion");
                 lineExtensionAmount = transaction.getDOC_MontoTotal();
                 taxInclusiveAmount = lineExtensionAmount;
-                if(Objects.nonNull(otrosCargosValue)) payableAmount = taxInclusiveAmount.add(otrosCargosValue);
+                payableAmount = taxInclusiveAmount.add(otrosCargosValue);
+            }
+
+            if (transaction.getDOC_Descuento().compareTo(BigDecimal.ZERO) > 0){
+                taxInclusiveAmount= taxInclusiveAmount.add(transaction.getDOC_Descuento());
+                lineExtensionAmount = lineExtensionAmount.add(transaction.getDOC_Descuento());
             }
 
             BigDecimal docDescuentoTotal = transaction.getDOC_DescuentoTotal();
@@ -1126,7 +1140,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             despatchAdviceType.setDespatchAdviceTypeCode(getDespatchAdviceTypeCode(transaction.getDOC_Codigo()));
             /* Agregar <DespatchAdvice><cbc:NoteType> */
 
-
+            despatchAdviceType.setNote(getDespatchNoteList(transaction));
             /***/
 
             /* Agregar <DespatchAdvice><cac:DespatchSupplierParty> */
@@ -1175,6 +1189,25 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         }
         return despatchAdviceType;
     } //generateDespatchAdviceType
+
+
+    public List<NoteType> getDespatchNoteList(TransacctionDTO transaccion) {
+        List<NoteType> noteTypeList = new ArrayList<>();
+
+        for (Map<String, String> docRef : transaccion.getTransactionContractDocRefListDTOS()) {
+            if (docRef.containsKey("texto_amplio_certimin")) {
+                String value = docRef.get("texto_amplio_certimin");
+                if (value != null && !value.isEmpty()) {
+                    NoteType noteType = new NoteType();
+                    noteType.setValue(value);
+                    noteTypeList.add(noteType);
+                    break; // Rompe el ciclo una vez encontrado un valor válido
+                }
+            }
+        }
+
+        return noteTypeList;
+    }
 
     /** Harol 29-03-2024 Guia Transportista*/
     public DespatchAdviceType generateCarrierDespatchAdviceType(TransacctionDTO transaction, String signerName) throws UBLDocumentException {

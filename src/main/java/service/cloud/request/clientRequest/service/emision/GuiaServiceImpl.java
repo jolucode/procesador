@@ -213,6 +213,7 @@ public class GuiaServiceImpl implements GuiaInterface {
         logger.info("Client Secret: " + configuracion.getClientSecret());
         logger.info("Scope: " + configuracion.getScope());
 
+        logger.info("================================ LOG DE TRANSACCIÓN ================================");
         String digestValue = db.generateDigestValue(documentWRP.getAdviceType().getUBLExtensions());
         String barcodeValue = db.generateGuiaBarcodeInfoV2(guia.getID().getValue(), IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE, fecha, BigDecimal.ZERO, BigDecimal.ZERO,
                 guia.getDespatchSupplierParty(), guia.getDeliveryCustomerParty(), guia.getUBLExtensions());

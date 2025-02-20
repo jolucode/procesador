@@ -189,11 +189,11 @@ public class FileHandler {
         boolean flag = false;
         try {
             String separator = File.separator;
-            File file = new File(this.baseDirectory /*+ separator + this.pdfDirectory + separator + rucEmpresa + separator + rucCliente*/);
+            File file = new File(this.baseDirectory);
             if (!file.exists()) {
                 file.mkdirs();
             }
-            String filePath = this.baseDirectory +/*+ separator + this.pdfDirectory + separator + rucEmpresa + separator + rucCliente + */separator + documentName + extension;
+            String filePath = this.baseDirectory + separator + documentName + extension;
             File newFile = new File(filePath);
             if (!newFile.exists()) {
                 newFile.createNewFile();
@@ -206,6 +206,7 @@ public class FileHandler {
             Path path = Paths.get(filePath);
             Files.write(path, pdfBytes);
             flag = true;
+            logger.info(" El documento PDF fue almacenado en DICO: " + filePath);
         } catch (IOException | VenturaExcepcion e) {
             logger.error("storePDFDocumentInDisk() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
         }

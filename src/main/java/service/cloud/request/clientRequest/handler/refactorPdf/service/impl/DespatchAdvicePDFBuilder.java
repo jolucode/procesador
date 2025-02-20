@@ -85,7 +85,7 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
             DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
             String fechaEmision = format.format(despatchAdvice.getTransaccion().getDOC_FechaEmision());
             despatchAdviceObject.setFechaEmision(fechaEmision);
-            String fechaInicioTraslado = format.format(despatchAdvice.getTransaccion().getTransactionGuias().getFechaInicioTraslado());
+            String fechaInicioTraslado = despatchAdvice.getTransaccion().getTransactionGuias().getFechaInicioTraslado();
             despatchAdviceObject.setFechaTraslado(fechaInicioTraslado);
             despatchAdviceObject.setModalidadTraslado(despatchAdvice.getTransaccion().getTransactionGuias().getModalidadTraslado());
             despatchAdviceObject.setNombreConsumidor(despatchAdvice.getTransaccion().getSN_RazonSocial());
@@ -102,15 +102,10 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
             despatchAdviceObject.setNumeroDocEmisor(despatchAdvice.getTransaccion().getDocIdentidad_Nro());
 
             /** Harol 29-03-2024 Guia Transportista 31*/
-            //if (despatchAdvice.getTransaccion().getTransactionGuias().getModalidadTraslado().equalsIgnoreCase("01")) {
             despatchAdviceObject.setPlacaVehiculo(despatchAdvice.getTransaccion().getTransactionGuias().getPlacaVehiculo());
             despatchAdviceObject.setLicenciaConducir(despatchAdvice.getTransaccion().getTransactionGuias().getLicenciaConductor());
             despatchAdviceObject.setRUCTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getRUCTransporista());
             despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getNombreRazonTransportista());
-            /*} else {
-                despatchAdviceObject.setRUCTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getRUCTransporista());
-                despatchAdviceObject.setNombreTransportista(despatchAdvice.getTransaccion().getTransactionGuias().getNombreRazonTransportista());
-            }*/
 
             /** Harol 29-03-2024 Guia Transportista 31*/
             if (despatchAdvice.getTransaccion().getDOC_Codigo().equals("31")) {
@@ -245,10 +240,6 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
                             String nombreCampo = entry.getKey();
                             String valorCampo = entry.getValue();
 
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
-                            }
-
                             // Si el campo empieza con "U_", se elimina antes de guardarlo
                             if (nombreCampo.startsWith("U_")) {
                                 nombreCampo = nombreCampo.substring(2);
@@ -256,21 +247,13 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
 
                             itemObjectHash.put(nombreCampo, valorCampo);
                             newlist.add(valorCampo);
-
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
-                            }
                         }
                     }
-
                     itemObject.setLstItemHashMap(itemObjectHash);
                     itemObject.setLstDinamicaItem(newlist);
                     listaItem.add(itemObject);
                 }
-
-
             }
-
 
             if (despatchAdvice.getTransaccion().getTransactionContractDocRefListDTOS() != null
                     && !despatchAdvice.getTransaccion().getTransactionContractDocRefListDTOS().isEmpty()) {
@@ -297,35 +280,9 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
             despatchAdviceObject.setObervaciones(despatchAdvice.getTransaccion().getObservacione());
             despatchAdviceObject.setItemListDynamic(listaItem);
 
-            for (int i = 0; i < despatchAdviceObject.getItemListDynamic().size(); i++) {
-
-                for (int j = 0; j < despatchAdviceObject.getItemListDynamic().get(i).getLstDinamicaItem().size(); j++) {
-
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Fila " + i + " Columna " + j);
-                    }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Contenido " + despatchAdviceObject.getItemListDynamic().get(i).getLstDinamicaItem().get(j));
-                    }
-
-                }
-            }
-
             String barcodeValue = generateBarCodeInfoString(despatchAdvice.getTransaccion().getDocIdentidad_Nro(), despatchAdvice.getTransaccion().getDOC_Codigo(), despatchAdvice.getTransaccion().getDOC_Serie(), despatchAdvice.getTransaccion().getDOC_Numero(), null, despatchAdvice.getTransaccion().getDOC_FechaEmision().toString(), "00", despatchAdvice.getTransaccion().getSN_DocIdentidad_Tipo(), despatchAdvice.getTransaccion().getSN_DocIdentidad_Nro(), despatchAdvice.getAdviceType().getUBLExtensions());
 
-            //String barcodeValue = generateBarCodeInfoString(despatchAdvice.getInvoiceType().getID().getValue(), despatchAdvice.getInvoiceType().getInvoiceTypeCode().getValue(), despatchAdvice.getAdviceType().getIssueDate(), despatchAdvice.getTransaccion().getDOCNumero(), null, invoiceType.getInvoiceType().getAccountingSupplierParty(), despatchAdvice.getInvoiceType().getAccountingCustomerParty(), despatchAdvice.getInvoiceType().getUBLExtensions());
-            if (logger.isInfoEnabled()) {
-                //logger.info("generateInvoicePDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
-            }
-            //despatchAdviceObject.setBarcodeValue(barcodeValue);
-
             InputStream inputStream;
-            InputStream inputStreamPDF;
-            //String rutaPath = ADJUNTOS + File.separator + "CodigoQR" + File.separator + "09" + File.separator + despatchAdvice.getTransaccion().getDOCNumero() + ".png";
-            //File f = new File(ADJUNTOS + File.separator + "CodigoQR" + File.separator + "09");
-            // if (!f.exists()) {
-            //     f.mkdirs();
-            //}
 
             File f = new File(".." + File.separator + "ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "09");
             String rutaPath = ".." + File.separator + "ADJUNTOS" + File.separator + "CodigoPDF417" + File.separator + "09" + File.separator + despatchAdvice.getTransaccion().getDOC_Numero() + ".png";
@@ -439,7 +396,7 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
                     documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "carrierguideDocument_Ing.jrxml" : "carrierguideDocument.jrxml";
                 }
 
-                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(despatchAdviceObject.getRUCTransportista(), documentName);
+                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(despatchAdviceObject.getNumeroDocEmisor(), documentName);
 
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap,
                         new JRBeanCollectionDataSource(despatchAdviceObject.getItemListDynamic()));
