@@ -33,7 +33,7 @@ ventura:
         certificadoPassword: "1234"
         certificadoProveedor: SunJSSE
         certificadoTipoKeystore: Pkcs12
-        integracionWs: SUNAT
+        integracionWs: OSE
         mostrarSoap: "true"
         pdfBorrador: "true"
         impresion: Codigo QR
