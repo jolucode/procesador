@@ -33,12 +33,12 @@ ventura:
         certificadoPassword: "1234"
         certificadoProveedor: SunJSSE
         certificadoTipoKeystore: Pkcs12
-        integracionWs: OSE
+        integracionWs: SUNAT
         mostrarSoap: "true"
         pdfBorrador: "true"
         impresion: Codigo QR
-        #urlOnpremise: http://190.119.245.254:60081/
-        urlOnpremise: http://119.8.146.122:60089/
+        urlOnpremise: http://190.119.245.254:60081/
+        #urlOnpremise: http://119.8.146.122:60089/
         scope: https://api-cpe.sunat.gob.pe/
         clientId: a8a6c50a-d73c-4775-9ddc-6261df69fed8
         clientSecret: 5yr+sp24Q1J+LeYhnCooEw==

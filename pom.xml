@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>service.cloud.request</groupId>
-    <artifactId>procesadorCloud</artifactId>
+    <artifactId>procesadorCloudRx</artifactId>
     <version>2025.02.04</version>
     <name>clientrequest</name>
     <description>Demo project for Spring Boot</description>

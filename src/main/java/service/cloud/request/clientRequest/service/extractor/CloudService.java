@@ -119,6 +119,7 @@ public class CloudService implements CloudInterface {
     private Mono<RequestPost> processTransaction(TransacctionDTO transaccion, String requestOnPremise) {
         return Mono.fromCallable(() -> {
             // Paso 1: Enviar transacción
+            
             TransaccionRespuesta tr = enviarTransaccion(transaccion);
 
             // Paso 2: Generar datos de solicitud

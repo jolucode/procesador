@@ -41,15 +41,14 @@ import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
 
 import javax.activation.DataHandler;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class GuiaServiceImpl implements GuiaInterface {
@@ -245,7 +244,7 @@ public class GuiaServiceImpl implements GuiaInterface {
             if (ESTADO_NUEVO.equalsIgnoreCase(feEstado)) {
                 // Estado "N", se declara o se consulta si ya está aprobado
                 transactionResponse = processEstadoN(transaction, configuracion, fileHandler, signedDocument,
-                        documentPath, documentName, documentWRP);
+                        signedXmlDocument, documentName, documentWRP);
             } else if (ESTADO_CONTINGENCIA.equalsIgnoreCase(feEstado)) {
                 // Estado "C", se consulta ticket
                 transactionResponse = processEstadoC(transaction, configuracion, fileHandler, signedDocument,
@@ -294,7 +293,7 @@ public class GuiaServiceImpl implements GuiaInterface {
                                                 ConfigData configuracion,
                                                 FileHandler fileHandler,
                                                 File signedDocument,
-                                                String documentPath,
+                                                byte[] documentPath,
                                                 String documentName,
                                                 UBLDocumentWRP documentWRP) throws InterruptedException, IOException {
         TransaccionRespuesta transactionResponse = null;
@@ -320,12 +319,12 @@ public class GuiaServiceImpl implements GuiaInterface {
             }
 
             // DECLARE GENERA TICKET
-            ResponseDTO responseDTO = declareSunat(documentName, documentPath.replace(EXT_XML, EXT_ZIP), responseDTOJWT.getAccess_token());
+            ResponseDTO responseDTO = declareSunat(documentName, documentPath/*.replace(EXT_XML, EXT_ZIP)*/, responseDTOJWT.getAccess_token());
 
             // Manejo 401
             if (responseDTO.getStatusCode() == 401) {
                 responseDTOJWT = getJwtSunat(configuracion);
-                responseDTO = declareSunat(documentName, documentPath.replace(EXT_XML, EXT_ZIP), responseDTOJWT.getAccess_token());
+                responseDTO = declareSunat(documentName, documentPath/*.replace(EXT_XML, EXT_ZIP)*/, responseDTOJWT.getAccess_token());
             }
 
             // Esperar 5s
@@ -402,9 +401,15 @@ public class GuiaServiceImpl implements GuiaInterface {
         return responseDTO;
     }
 
-    public ResponseDTO declareSunat(String documentName, String documentPath, String token) throws IOException {
-        String fileTo64 = zipDocumentTo64(documentPath);
-        String fileTo256Sha = zipDocumentTo265Sha(documentPath);
+    public ResponseDTO declareSunat(String documentName, byte[] fileContent, String token) throws IOException {
+
+        // 1. Comprimir los bytes en memoria para generar un .zip
+        //    Suponiendo que 'documentName + ".xml"' es el nombre interno del archivo dentro del ZIP.
+        byte[] zipBytes = compressToZip(fileContent, documentName + ".xml");
+
+
+        String fileTo64 = zipDocumentTo64(zipBytes);
+        String fileTo256Sha = zipDocumentTo265Sha(zipBytes);
         String nombreArchivo = documentName + ".zip";
 
         HttpResponse<String> response = Unirest.post("https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/" + documentName)
@@ -420,43 +425,63 @@ public class GuiaServiceImpl implements GuiaInterface {
         return responseDTO;
     }
 
-    public String zipDocumentTo265Sha(String documentPath) {
-        String checksumSHA256 = EMPTY;
-        try {
-            checksumSHA256 = DigestUtils.sha256Hex(new FileInputStream(documentPath));
-        } catch (IOException e) {
-            e.printStackTrace();
+    /**
+     * Comprime en memoria el arreglo de bytes (por ejemplo, un XML) a un archivo ZIP.
+     * @param fileContent Arreglo de bytes a comprimir.
+     * @param internalFileName Nombre del archivo dentro del ZIP (ej: 'documento.xml').
+     * @return bytes que representan un archivo ZIP en memoria.
+     */
+    private byte[] compressToZip(byte[] fileContent, String internalFileName) throws IOException {
+        if (fileContent == null || fileContent.length == 0) {
+            return new byte[0];
         }
-        return checksumSHA256;
+
+        // ByteArrayOutputStream para almacenar el ZIP en memoria
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ZipOutputStream zos = new ZipOutputStream(baos)) {
+
+            // Crear una entrada en el ZIP con el nombre interno
+            ZipEntry entry = new ZipEntry(internalFileName);
+            zos.putNextEntry(entry);
+
+            // Escribir los bytes en la entrada
+            zos.write(fileContent, 0, fileContent.length);
+            zos.closeEntry();
+            zos.finish();
+
+            // Retornar todos los bytes del ZIP
+            return baos.toByteArray();
+        }
     }
 
-    public String zipDocumentTo64(String documentPath) {
-        File originalFile = new File(documentPath);
-        String encodedBase64 = null;
-        try {
-            FileInputStream fileInputStreamReader = new FileInputStream(originalFile);
-            byte[] bytes = new byte[(int) originalFile.length()];
-            fileInputStreamReader.read(bytes);
-            encodedBase64 = new String(Base64.encodeBase64(bytes));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public String zipDocumentTo265Sha(byte[] documentContent) {
+        if (documentContent == null || documentContent.length == 0) {
+            return "";
         }
-        return encodedBase64;
+        // DigestUtils.sha256Hex procesa los bytes y retorna el hash en formato hexadecimal
+        return DigestUtils.sha256Hex(documentContent);
+    }
+
+    public String zipDocumentTo64(byte[] fileContent) {
+        if (fileContent == null || fileContent.length == 0) {
+            return null;
+        }
+        // Codifica los bytes en Base64 y los convierte a String
+        return new String(Base64.encodeBase64(fileContent));
     }
 
     public ResponseDTO getJwtSunat(ConfigData configuracion) throws IOException {
 
         HttpResponse<String> response = Unirest.post("https://api-seguridad.sunat.gob.pe/v1/clientessol/" + configuracion.getClientId() + "/oauth2/token/")
                 .header("Content-Type", "application/x-www-form-urlencoded")
+                .header("Cookie", "TS019e7fc2=014dc399cbcad00473c65166bab99ef2e22263ae15b2a9e259ff0e5d972578fa54549fe8acccb61b76d241060b054cc73beff45ea3")
                 .field("grant_type", "password")
                 .field("scope", configuracion.getScope())
                 .field("client_id", configuracion.getClientId())
                 .field("client_secret", configuracion.getClientSecret())
                 .field("username", configuracion.getUserNameSunatSunat())
                 .field("password", configuracion.getPasswordSunatSunat())
-                .field(EMPTY, EMPTY)
+                .field("", "")
                 .asString();
 
         ObjectMapper objectMapper = new ObjectMapper();
