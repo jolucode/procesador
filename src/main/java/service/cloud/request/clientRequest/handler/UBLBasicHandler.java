@@ -2832,17 +2832,11 @@ public abstract class UBLBasicHandler {
         try {
             /* <cac:Delivery><cac:DeliveryLocation> */
             if (StringUtils.isNotBlank(codUbigeoDestino) && StringUtils.isNotBlank(direccionDestino)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("getDeliveryForLine() [" + this.identifier + "] Agregar PUNTO DE DESTINO.");
-                }
                 delivery.setDeliveryLocation(getDeliveryLocationForDelivery(codUbigeoDestino, direccionDestino));
             }
 
             /* <cac:Delivery><cac:Despatch> */
             if (StringUtils.isNotBlank(codUbigeoOrigen) && StringUtils.isNotBlank(direccionOrigen)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("getDeliveryForLine() [" + this.identifier + "] Agregar PUNTO DE ORIGEN.");
-                }
                 delivery.setDespatch(getDespatchForDelivery(codUbigeoOrigen, direccionOrigen, detalleViaje));
             }
 
@@ -2864,9 +2858,6 @@ public abstract class UBLBasicHandler {
              * Valor Referencial sobre la Carga Efectiva
              */
             if (null != valorCargaEfectiva && valorCargaEfectiva.compareTo(BigDecimal.ZERO) == 1) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("getDeliveryForLine() [" + this.identifier + "] Agregar VALOR REFERENCIAL SOBRE LA CARGA EFECTIVA.");
-                }
                 delivery.getDeliveryTerms().add(getDeliveryTermsForDelivery("02", valorCargaEfectiva));
             }
 
@@ -2876,9 +2867,6 @@ public abstract class UBLBasicHandler {
              * Valor Referencial sobre la Carga Util Nominal
              */
             if (null != valorCargaUtil && valorCargaUtil.compareTo(BigDecimal.ZERO) == 1) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("getDeliveryForLine() [" + this.identifier + "] Agregar VALOR REFERENCIAL SOBRE LA CARGA UTIL NOMINAL.");
-                }
                 delivery.getDeliveryTerms().add(getDeliveryTermsForDelivery("03", valorCargaUtil));
             }
 
@@ -3507,9 +3495,6 @@ public abstract class UBLBasicHandler {
             }
             /* <cac:Shipment><cac:Consigment><cac:TransportHandlingUnit><cac:TransportEquipment><cac:Delivery> */
             if (null != valorReferencialTM && valorReferencialTM.compareTo(BigDecimal.ZERO) == 1) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("getShipmentForDelivery() [" + this.identifier + "] Agregar VALOR REFERENCIAL POR TM.");
-                }
                 DeliveryType delivery = new DeliveryType();
                 DeliveryTermsType deliveryTerms = new DeliveryTermsType();
                 AmountType amount = new AmountType();
@@ -3543,9 +3528,6 @@ public abstract class UBLBasicHandler {
              * Tipo de Carga: Carga Efectiva (02)
              */
             if (null != cEfectivaVehiculoTM && cEfectivaVehiculoTM.compareTo(BigDecimal.ZERO) == 1) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("getShipmentForDelivery() [" + this.identifier + "] Agregar CARGA EFECTIVA EN TM DEL VEHICULO.");
-                }
                 transportHandlingUnit.getMeasurementDimension().add(getMeasurementDimension("02", cEfectivaVehiculoTM));
             }
             consignment.getTransportHandlingUnit().add(transportHandlingUnit);
