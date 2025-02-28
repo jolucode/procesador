@@ -583,13 +583,18 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             String socioDocIdentidad = transaction.getSN_DocIdentidad_Tipo();
 
             BigDecimal otrosCargosValue = transaction.getDOC_OtrosCargos();
+            if (otrosCargosValue == null) {
+                otrosCargosValue = BigDecimal.ZERO;
+            }
+
             String formSap = transaction.getFE_FormSAP();
-            if (transaction.getTipoOperacionSunat().startsWith("02") ||  formSap.contains("exportacion")) {
+            if (transaction.getTipoOperacionSunat().startsWith("02") || formSap.contains("exportacion")) {
                 logger.info("Entro a esta parte de la validacion");
                 lineExtensionAmount = transaction.getDOC_MontoTotal();
                 taxInclusiveAmount = lineExtensionAmount;
                 payableAmount = taxInclusiveAmount.add(otrosCargosValue);
             }
+
 
             if (transaction.getDOC_Descuento().compareTo(BigDecimal.ZERO) > 0){
                 taxInclusiveAmount= taxInclusiveAmount.add(transaction.getDOC_Descuento());

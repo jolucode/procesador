@@ -2886,10 +2886,10 @@ public abstract class UBLBasicHandler {
         if (logger.isDebugEnabled()) {
             logger.debug("+getTaxTotalLineV21() [" + this.identifier + "]");
         }
-        if (null == transaccionLineaImpuestos || transaccionLineaImpuestos.isEmpty()) {
+        /*if (null == transaccionLineaImpuestos || transaccionLineaImpuestos.isEmpty()) {
             logger.error("getTaxTotalLineV21() [" + this.identifier + "] " + IVenturaError.ERROR_322.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_322);
-        }
+        }*/
         TaxTotalType taxTotal = new TaxTotalType();
         try {
             /* <cac:TaxTotal><cbc:TaxAmount> */
