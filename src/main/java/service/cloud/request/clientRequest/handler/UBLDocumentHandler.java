@@ -522,8 +522,13 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 if (logger.isInfoEnabled()) {
                     logger.info("generateInvoiceType() [" + this.identifier + "] La transaccion contiene informacion de ANTICIPOS RELACIONADOS.");
                 }
+                // Inicializar el valor de MontoRetencion con 0 si es null o vacío
+                BigDecimal montoRetencion = (transaction.getMontoRetencion() != null && !transaction.getMontoRetencion().isEmpty())
+                        ? new BigDecimal(transaction.getMontoRetencion())
+                        : BigDecimal.ZERO;
+
                 invoiceType.getPrepaidPayment().addAll(getPrepaidPaymentV21(transaction.getTransactionActicipoDTOList()));
-                invoiceType.getAllowanceCharge().add(getAllowanceCharge(transaction.getDOC_ImporteTotal(), transaction.getANTICIPO_Monto(), false, transaction.getDOC_PorDescuento(), transaction.getDOC_Descuento(), transaction.getDOC_ImporteTotal(), transaction.getDOC_MON_Codigo(), "04", new BigDecimal(transaction.getMontoRetencion()), transaction.getDOC_MontoTotal()));
+                invoiceType.getAllowanceCharge().add(getAllowanceCharge(transaction.getDOC_ImporteTotal(), transaction.getANTICIPO_Monto(), false, transaction.getDOC_PorDescuento(), transaction.getDOC_Descuento(), transaction.getDOC_ImporteTotal(), transaction.getDOC_MON_Codigo(), "04", montoRetencion, transaction.getDOC_MontoTotal()));
 
             }
             /*
@@ -544,10 +549,13 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                     invoiceType.getAllowanceCharge().add(getAllowanceCharge(transaction.getDOC_ImporteTotal(), transaction.getANTICIPO_Monto(), false, transaction.getDOC_PorDescuento(), transaction.getDOC_Descuento(), transaction.getDOC_ImporteTotal(), transaction.getDOC_MON_Codigo(), "02", montoRetencion, transaction.getDOC_MontoTotal()));
                 }
             }
-
+            // Inicializar el valor de MontoRetencion con 0 si es null o vacío
+            BigDecimal montoRetencion = (transaction.getMontoRetencion() != null && !transaction.getMontoRetencion().isEmpty())
+                    ? new BigDecimal(transaction.getMontoRetencion())
+                    : BigDecimal.ZERO;
             if (transaction.getMontoRetencion() != null) {
-                if ((new BigDecimal(transaction.getMontoRetencion())).compareTo(BigDecimal.ZERO) > 0) {
-                    invoiceType.getAllowanceCharge().add(getAllowanceCharge(transaction.getDOC_ImporteTotal(), transaction.getANTICIPO_Monto(), false, transaction.getDOC_PorDescuento(), transaction.getDOC_Descuento(), transaction.getDOC_ImporteTotal(), transaction.getDOC_MON_Codigo(), "62", new BigDecimal(transaction.getMontoRetencion()), transaction.getDOC_MontoTotal()));
+                if (montoRetencion.compareTo(BigDecimal.ZERO) > 0) {
+                    invoiceType.getAllowanceCharge().add(getAllowanceCharge(transaction.getDOC_ImporteTotal(), transaction.getANTICIPO_Monto(), false, transaction.getDOC_PorDescuento(), transaction.getDOC_Descuento(), transaction.getDOC_ImporteTotal(), transaction.getDOC_MON_Codigo(), "62", montoRetencion, transaction.getDOC_MontoTotal()));
                 }
 
             }

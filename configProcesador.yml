@@ -25,7 +25,8 @@ ventura:
         razonSocial: CALZADOS AZALEIA PERU S.A
         wsUsuario: admin
         wsClave: ventura
-        wsLocation: No Aplica
+        wsLocation: ""
+        #wsLocation: "https://facturacion.venturafe.com/"
         emisorElecRs: 205454844881/SUNAT
         usuarioSol: "20510910517"
         claveSol: "20510910517"
@@ -33,16 +34,38 @@ ventura:
         certificadoPassword: "1234"
         certificadoProveedor: SunJSSE
         certificadoTipoKeystore: Pkcs12
-        integracionWs: SUNAT
+        integracionWs: OSE
         mostrarSoap: "true"
         pdfBorrador: "true"
         impresion: Codigo QR
-        urlOnpremise: http://190.119.245.254:60081/
-        #urlOnpremise: http://119.8.146.122:60089/
+        #urlOnpremise: http://190.119.245.254:60081/
+        urlOnpremise: http://119.8.146.122:60089/
         scope: https://api-cpe.sunat.gob.pe/
         clientId: a8a6c50a-d73c-4775-9ddc-6261df69fed8
         clientSecret: 5yr+sp24Q1J+LeYhnCooEw==
         UserNameSunatGuias: 20510910517JVENTUR1
         passwordSunatGuias: JVENTUR1
+      "20612456268":
+        razonSocial: Polimes S.A.C
+        wsUsuario: admin
+        wsClave: ventura
+        wsLocation: "https://facturacion.venturafe.com/"
+        emisorElecRs: 205454844881/SUNAT
+        usuarioSol: "20612456268"
+        claveSol: "20612456268"
+        certificadoName: sistema_de_facturacion.pfx
+        certificadoPassword: "20612456268"
+        certificadoProveedor: SunJSSE
+        certificadoTipoKeystore: Pkcs12
+        integracionWs: OSE
+        mostrarSoap: "true"
+        pdfBorrador: "true"
+        impresion: Codigo QR
+        urlOnpremise: http://101.44.10.195:60082/
+        scope: https://api-cpe.sunat.gob.pe/
+        clientId: 95c4b729-1d8d-4644-a2cb-54a19b0b4bfa
+        clientSecret: pa1RiZ0jrwDU5uNNkF0HhA==
+        UserNameSunatGuias: 20612456268VENTUSAP
+        passwordSunatGuias: Poli2025
 server:
   port: 8082

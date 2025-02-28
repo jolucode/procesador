@@ -109,6 +109,7 @@ public class CloudService implements CloudInterface {
                     .asString();
 
             logger.info("Se envió de manera correcta al servidor OnPremise los documentos.");
+            logger.info("Estado de la respuesta del servidor OnPremise: " + response.getStatus());
         } catch (Exception e) {
             logger.error("Error de conexión con el servidor destino: " + e.getMessage());
             logger.info("No se pudo dejar los doucmentos en la ruta ruta del servitor: " + request.getUrlOnpremise());
@@ -118,8 +119,8 @@ public class CloudService implements CloudInterface {
 
     private Mono<RequestPost> processTransaction(TransacctionDTO transaccion, String requestOnPremise) {
         return Mono.fromCallable(() -> {
-            // Paso 1: Enviar transacción
-            
+                    // Paso 1: Enviar transacción
+
             TransaccionRespuesta tr = enviarTransaccion(transaccion);
 
             // Paso 2: Generar datos de solicitud
@@ -129,7 +130,7 @@ public class CloudService implements CloudInterface {
             anexarDocumentos(request);
 
             // Logs agrupados en un solo bloque
-
+            logger.info("================================ LOG DE TRANSACCIÓN ================================");
             logger.info("RUC: {}, DocObject: {}, DocEntry: {}", request.getRuc(), request.getDocObject(), request.getDocEntry());
             logger.info("Nombre del Documento: {}", request.getDocumentName());
             logger.info("Documentos anexados correctamente en SAP.");

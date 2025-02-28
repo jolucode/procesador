@@ -2502,14 +2502,18 @@ public abstract class UBLBasicHandler {
                 }
                 TaxableAmountType taxableAmount = new TaxableAmountType();
 
-                BigDecimal value = transaccion.getDOC_ImporteTotal(); // Inicializa con el importe total
-                // Validar que los valores no sean null antes de hacer la multiplicación
+                /*BigDecimal value = transaccion.getDOC_ImporteTotal(); // Inicializa con el importe total
                 if (transaccion.getDOC_Descuento() != null) {
                     value = value.add(transaccion.getDOC_Descuento());
                 }
-                taxableAmount.setValue(value.setScale(2, RoundingMode.HALF_UP));
-                taxableAmount.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionImpuesto.getMoneda()).value());
+                taxableAmount.setValue(value.setScale(2, RoundingMode.HALF_UP));*/
 
+                if (contieneGratificacion)
+                    taxableAmount.setValue(totalTaxableAmount.setScale(2, RoundingMode.HALF_UP));
+                else {
+                    taxableAmount.setValue(transaccionImpuesto.getValorVenta().setScale(2, RoundingMode.HALF_UP));
+                }
+                taxableAmount.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionImpuesto.getMoneda()).value());
                 taxSubtotal.setTaxableAmount(taxableAmount);
 
                 /* <cac:TaxTotal><cac:TaxSubtotal><cbc:TaxAmount> */
