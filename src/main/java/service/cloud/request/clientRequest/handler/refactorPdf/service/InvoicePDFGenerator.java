@@ -4,5 +4,5 @@ import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
 
 public interface InvoicePDFGenerator {
-    byte[] generateInvoicePDF(UBLDocumentWRP invoiceType, ConfigData configuracion);
+    byte[] generateInvoicePDF(UBLDocumentWRP invoiceType, ConfigData configuracion, String personalizacion);
 }

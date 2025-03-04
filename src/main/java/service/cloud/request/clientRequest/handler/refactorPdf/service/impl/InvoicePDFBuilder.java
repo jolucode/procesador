@@ -64,7 +64,7 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
 
 
     @Override
-    public byte[] generateInvoicePDF(UBLDocumentWRP invoiceType, ConfigData configuracion) {
+    public byte[] generateInvoicePDF(UBLDocumentWRP invoiceType, ConfigData configuracion, String personalizacion) {
         if (logger.isDebugEnabled()) {
             logger.debug("+generateInvoicePDF() [" + this.docUUID + "]");
         }
@@ -498,7 +498,7 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
             /*
              * Generando el PDF de la FACTURA con la informacion recopilada.
              */
-            invoiceInBytes = createInvoicePDF(invoiceObj, docUUID, configuracion);
+            invoiceInBytes = createInvoicePDF(invoiceObj, docUUID, configuracion, personalizacion);
         } catch (PDFReportException e) {
             logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {
@@ -511,7 +511,7 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
         return invoiceInBytes;
     } // generateInvoicePDF
 
-    public byte[] createInvoicePDF(InvoiceObject invoiceObj, String docUUID, ConfigData configuracion) throws PDFReportException {
+    public byte[] createInvoicePDF(InvoiceObject invoiceObj, String docUUID, ConfigData configuracion, String personalizacion) throws PDFReportException {
         Map<String, Object> parameterMap;
         Map<String, Object> cuotasMap;
         if (logger.isDebugEnabled()) {
@@ -656,7 +656,15 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
                  * electronica
                  */
 
-                String documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "invoiceDocument_Ing.jrxml" : "invoiceDocument.jrxml";
+                String documentName;
+                if (!personalizacion.isEmpty()) {
+                    documentName = "invoiceDocument_" + personalizacion + ".jrxml";
+                }else {
+                    documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "invoiceDocument_Ing.jrxml" : "invoiceDocument.jrxml";
+                }
+
+
+                //String documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "invoiceDocument_Ing.jrxml" : "invoiceDocument.jrxml";
                 JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(invoiceObj.getSenderRuc(), documentName);
 
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap,

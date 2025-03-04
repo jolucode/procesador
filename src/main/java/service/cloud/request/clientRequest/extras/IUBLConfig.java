@@ -127,6 +127,7 @@ public interface IUBLConfig {
      * Parametros de los impuestos en UBL - ID : Identificador del impuesto -
      * NAME : Nombre del impuesto - CODE : Codigo asignado al impuesto
      */
+    String TAX_TOTAL_OTH_CODE = "OTH";
     String TAX_TOTAL_IGV_ID = "1000";
     String TAX_TOTAL_ISC_ID = "2000";
     String TAX_TOTAL_EXP_ID = "9995";

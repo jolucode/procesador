@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -56,10 +57,17 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
 
         String dirLogo = "C:\\clientes\\files\\" + transaction.getDocIdentidad_Nro() + "\\COMPANY_LOGO.jpg";
         configuracion.setCompletePathLogo(dirLogo);
+
+        String personalizacion = transaction.getTransactionContractDocRefListDTOS().stream()
+                .map(contractMap -> contractMap.get("pdf_per"))
+                .filter(valor -> valor != null && !valor.isEmpty())
+                .findFirst()
+                .orElse("");
+
         try {
             switch (transaction.getDOC_Codigo()) {
                 case IUBLConfig.DOC_INVOICE_CODE:
-                    pdfBytes = invoiceBuilder.generateInvoicePDF(wrp, configuracion); //pdfHandler.generateInvoicePDF(wrp, configuracion);
+                    pdfBytes = invoiceBuilder.generateInvoicePDF(wrp, configuracion, personalizacion); //pdfHandler.generateInvoicePDF(wrp, configuracion);
                     break;
 
                 case IUBLConfig.DOC_BOLETA_CODE:

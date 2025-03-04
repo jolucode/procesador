@@ -1529,6 +1529,16 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 if (logger.isDebugEnabled()) {
                     logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando IMPUESTOS DE LINEA.");
                 }
+
+
+                boolean existBolsa = false;
+                /*if(transaccionLinea.getItmBolsa().equals("A") && insertarImpuestoBolsa(transaccion.getTransactionLineasDTOList(), transaccion).isPresent()) {
+                    existBolsa = true;
+                    System.out.println("Se inserto una fila adicional a los impuesto cuando es Bolsa");
+                }*/
+
+
+
                 invoiceLine.getTaxTotal().add(getTaxTotalLineV21(transaccionLinea.getTransactionLineasImpuestoListDTO(), transaccionLinea.getLineaImpuesto(), currencyCode));
 
                 /* Agregar <cac:InvoiceLine><cac:Item> */
@@ -1545,7 +1555,10 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                     logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando VALOR UNITARIO - TAG Price.");
                 }
                 invoiceLine.setPrice(getPriceForLine(transaccionLinea.getTransaccionLineasBillrefListDTO(), currencyCode));
-                invoiceLineList.add(invoiceLine);
+                if (!transaccionLinea.getItmBolsa().equals("I")) {
+                    invoiceLineList.add(invoiceLine);
+                }
+
             } //for
             for (int i = 0; i < IUBLConfig.lstImporteIGV.size(); i++) {
                 if (logger.isDebugEnabled()) {
@@ -1564,6 +1577,52 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         }
         return invoiceLineList;
     } //getAllInvoiceLines
+
+    private Optional<TransactionLineasImpuestoDTO> insertarImpuestoBolsa(List<TransactionLineasDTO> transactionLineas, TransacctionDTO transacctionDTO) {
+        // Buscar una línea con "ItemBolsa" = "A" (Bolsa plástica)
+        Optional<TransactionLineasDTO> bolsaOptional = transactionLineas.stream()
+                .filter(linea -> "A".equals(linea.getItmBolsa()))
+                .findAny();
+
+        if (bolsaOptional.isPresent()) {
+            TransactionLineasDTO lineaBolsa = bolsaOptional.get();
+
+            // Buscar una línea con "ItemBolsa" = "I" (Impuesto a la bolsa)
+            Optional<TransactionLineasDTO> impuestoBolsaOptional = transactionLineas.stream()
+                    .filter(linea -> "I".equals(linea.getItmBolsa()))
+                    .findAny();
+
+            if (impuestoBolsaOptional.isPresent()) {
+                TransactionLineasDTO lineaImpuesto = impuestoBolsaOptional.get();
+
+                // Crear objeto de impuesto con los valores requeridos
+                TransactionLineasImpuestoDTO impuestoBolsa = new TransactionLineasImpuestoDTO();
+                impuestoBolsa.setLineId(lineaImpuesto.getNroOrden()); // ID de la línea de impuesto
+                //impuestoBolsa.setNroOrden(lineaImpuesto.getNroOrden());
+                impuestoBolsa.setNombre("ICBPER - Impuesto Consumo Bolsa Plástica");
+                impuestoBolsa.setValorVenta(lineaBolsa.getPrecioRef_Monto());
+                impuestoBolsa.setAbreviatura("OTH");
+                impuestoBolsa.setCodigo("C");
+                impuestoBolsa.setMoneda(transacctionDTO.getDOC_MON_Codigo());
+                impuestoBolsa.setMonto(lineaBolsa.getPrecioRef_Monto()); // Total del impuesto
+                impuestoBolsa.setPorcentaje(BigDecimal.valueOf(100));
+                impuestoBolsa.setTipoTributo("7152"); // Código del tributo ICBPER
+                impuestoBolsa.setTipoAfectacion("30"); // Tipo de afectación para impuestos específicos
+                impuestoBolsa.setTierRange("");
+                impuestoBolsa.setCantidad(lineaBolsa.getCantidad()); // Cantidad de bolsas
+                impuestoBolsa.setUnidadSunat("NIU"); // Unidad estándar para bolsas
+
+                // Agregar el impuesto en la lista de impuestos de la línea de la bolsa
+                lineaBolsa.getTransactionLineasImpuestoListDTO().add(impuestoBolsa);
+
+                // Retornar el objeto creado
+                return Optional.of(impuestoBolsa);
+            }
+        }
+        return Optional.empty(); // Retornar vacío si no se cumplen las condiciones
+    }
+
+
 
     private List<CreditNoteLineType> getAllCreditNoteLines(TransacctionDTO transaccion, List<TransactionLineasDTO> transaccionLineasList, List<TransactionPropertiesDTO> transaccionPropiedadesList, String currencyCode) throws UBLDocumentException {
         if (logger.isDebugEnabled()) {
