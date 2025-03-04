@@ -1555,7 +1555,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                     logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando VALOR UNITARIO - TAG Price.");
                 }
                 invoiceLine.setPrice(getPriceForLine(transaccionLinea.getTransaccionLineasBillrefListDTO(), currencyCode));
-                if (!transaccionLinea.getItmBolsa().equals("I")) {
+                if (transaccionLinea.getItmBolsa() == null || !transaccionLinea.getItmBolsa().equals("I")) {
                     invoiceLineList.add(invoiceLine);
                 }
 

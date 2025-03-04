@@ -2707,7 +2707,7 @@ public abstract class UBLBasicHandler {
 
         }
         final PayableAmountType payableAmount = new PayableAmountType();
-        payableAmount.setValue(payableAmountValue.setScale(2, RoundingMode.HALF_UP));
+        payableAmount.setValue((payableAmountValue != null ? payableAmountValue : BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP));
         payableAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
         monetaryTotal.setPayableAmount(payableAmount);
         if (this.logger.isDebugEnabled()) {
