@@ -2453,25 +2453,29 @@ public abstract class UBLBasicHandler {
             logger.debug("+getTaxTotalV21() [" + this.identifier + "]");
         }
 
-        if (null == transaccionImpuestos || transaccionImpuestos.isEmpty()) {
+        /*if (null == transaccionImpuestos || transaccionImpuestos.isEmpty()) {
             logger.error("getTaxTotalV21() [" + this.identifier + "] " + IVenturaError.ERROR_316.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_316);
-        }
+        }*/
 
         TaxTotalType taxTotal = new TaxTotalType();
         boolean contieneGratificacion;
         BigDecimal totalTaxAmount = BigDecimal.ZERO;
         BigDecimal totalTaxableAmount = BigDecimal.ZERO;
-        List<TransactionLineasDTO> transaccionLineas = transaccion.getTransactionLineasDTOList();
-        for (TransactionLineasDTO transaccionLinea : transaccionLineas) {
-            List<TransactionLineasImpuestoDTO> transaccionLineaImpuestos = transaccionLinea.getTransactionLineasImpuestoListDTO();
-            for (TransactionLineasImpuestoDTO lineaImpuesto : transaccionLineaImpuestos) {
+
+        for (TransactionLineasDTO transaccionLinea : transaccion.getTransactionLineasDTOList()) {
+            for (TransactionLineasImpuestoDTO lineaImpuesto : transaccionLinea.getTransactionLineasImpuestoListDTO()) {
                 if (IUBLConfig.TAX_TOTAL_GRA_NAME.equalsIgnoreCase(lineaImpuesto.getNombre())) {
-                    totalTaxAmount = totalTaxAmount.add(lineaImpuesto.getMonto());
-                    totalTaxableAmount = totalTaxableAmount.add(lineaImpuesto.getValorVenta());
+                    totalTaxAmount = totalTaxAmount.add(
+                            Objects.requireNonNullElse(lineaImpuesto.getMonto(), BigDecimal.ZERO)
+                    );
+                    totalTaxableAmount = totalTaxableAmount.add(
+                            Objects.requireNonNullElse(lineaImpuesto.getValorVenta(), BigDecimal.ZERO)
+                    );
                 }
             }
         }
+
 
         try {
             /* <cac:TaxTotal><cbc:TaxAmount> */

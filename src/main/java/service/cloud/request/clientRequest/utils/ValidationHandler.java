@@ -132,10 +132,10 @@ public class ValidationHandler {
         if (!docIdentifier.contains("-")) {
             throw new ValidationException(IVenturaError.ERROR_516);
         }
-        if (!docIdentifier.startsWith(IUBLConfig.REMISSION_GUIDE_SERIE_PREFIX)&& !docIdentifier.startsWith(IUBLConfig.CARRIER_GUIDE_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.INVOICE_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.BOLETA_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.PERCEPCION_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.RETENTION_SERIE_PREFIX)) {
+        /*if (!docIdentifier.startsWith(IUBLConfig.REMISSION_GUIDE_SERIE_PREFIX)&& !docIdentifier.startsWith(IUBLConfig.CARRIER_GUIDE_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.INVOICE_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.BOLETA_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.PERCEPCION_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.RETENTION_SERIE_PREFIX)) {
             if (!isContingencia)
                 throw new ValidationException(IVenturaError.ERROR_517);
-        }
+        }*/
         try {
             Integer.valueOf(docIdentifier.substring(5));
         } catch (Exception e) {
