@@ -134,7 +134,7 @@ public class ServiceEmision implements IServiceEmision {
         UBLDocumentWRP documentWRP = configureDocumentWRP(signedXmlDocument, transaction.getDOC_Codigo(), doctype);
         documentWRP.setTransaccion(transaction);
 
-        ConfigData configuracion = createConfigData(client);
+        ConfigData configuracion = createConfigData(client, transaction);
 
         byte[] zipBytes = DocumentConverterUtils.compressUBLDocument(signedXmlDocument, documentName + ".xml");
         String base64Content = convertToBase64(zipBytes);
@@ -235,12 +235,14 @@ public class ServiceEmision implements IServiceEmision {
         }
     }
 
-    private ConfigData createConfigData(Client client) {
-        /*String valor = transaction.getTransaccionContractdocrefList().stream()
-                .filter(x -> x.getUsuariocampos().getNombre().equals("pdfadicional"))
-                .map(x -> x.getValor())
+    private ConfigData createConfigData(Client client, TransacctionDTO transacctionDTO) {
+
+        String valorIngles = transacctionDTO.getTransactionContractDocRefListDTOS().stream()
+                .map(contractMap -> contractMap.get("pdfadicional"))
+                .filter(valor -> valor != null && !valor.isEmpty())
                 .findFirst()
-                .orElse("No");*/
+                .orElse("");
+
         return ConfigData.builder()
                 .usuarioSol(client.getUsuarioSol())
                 .claveSol(client.getClaveSol())
@@ -250,6 +252,7 @@ public class ServiceEmision implements IServiceEmision {
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
                 .rutaBaseDoc(applicationProperties.getRutaBaseDoc())
+                .pdfIngles(valorIngles)
                 .build();
     }
 
