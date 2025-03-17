@@ -404,7 +404,10 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 logger.debug("generateBoletaPDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
             }
             LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
-            boletaObj.setLetterAmountValue(legendLetters.getLegendValue());
+            if(!legendsMap.isEmpty()) {
+                boletaObj.setLetterAmountValue(legendLetters.getLegendValue());
+            }
+
             legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
 
             if (logger.isDebugEnabled()) {

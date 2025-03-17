@@ -433,7 +433,10 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
                 logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
             }
             LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
-            creditNoteObj.setLetterAmountValue(legendLetters.getLegendValue());
+            if(legendLetters!=null) {
+                creditNoteObj.setLetterAmountValue(legendLetters.getLegendValue());
+            }
+            //
             legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
 
             if (logger.isDebugEnabled()) {

@@ -334,7 +334,10 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                 logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
             }
             LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
-            debitNoteObj.setLetterAmountValue(legendLetters.getLegendValue());
+            if(!legendsMap.isEmpty()) {
+                debitNoteObj.setLetterAmountValue(legendLetters.getLegendValue());
+            }
+
             legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
 
             if (logger.isDebugEnabled()) {
