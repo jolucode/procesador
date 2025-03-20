@@ -1,5 +1,6 @@
 package service.cloud.request.clientRequest.service.emision;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,15 @@ import service.cloud.request.clientRequest.estela.service.DocumentBajaQueryServi
 import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.model.Client;
+import service.cloud.request.clientRequest.mongo.model.LogDTO;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
 import service.cloud.request.clientRequest.utils.SunatResponseUtils;
+import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
+
+import java.util.Date;
 
 @Service
 public class ServiceBajaConsulta implements IServiceBaja {
@@ -39,6 +44,13 @@ public class ServiceBajaConsulta implements IServiceBaja {
     @Override
     public TransaccionRespuesta transactionVoidedDocument(TransacctionDTO transaction, String doctype) {
 
+        /***/
+        LogDTO log = new LogDTO();
+        log.setRequestDate(DateUtils.formatDateToString(new Date()));
+        log.setRuc(transaction.getDocIdentidad_Nro());
+        log.setBusinessName(transaction.getRazonSocial());
+        /***/
+
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
 
         String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDoc());
@@ -46,6 +58,7 @@ public class ServiceBajaConsulta implements IServiceBaja {
         Client client = clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
         ConfigData configuracion = createConfigData(client);
 
+        String documentName = "";
         try {
 
             FileRequestDTO soapRequest = new FileRequestDTO();
@@ -55,14 +68,26 @@ public class ServiceBajaConsulta implements IServiceBaja {
             soapRequest.setPassword(configuracion.getClaveSol());
             soapRequest.setTicket(transaction.getTicket_Baja());
 
+            log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
             Mono<FileResponseDTO> fileResponseDTOMono = documentBajaQueryService.processAndSaveFile(soapRequest.getService(), soapRequest);
             FileResponseDTO fileRequestDTO = fileResponseDTOMono.block();
-            String documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
+            log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
+
+            documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
             transactionResponse = processOseResponseBAJA(fileRequestDTO.getContent(), transaction, attachmentPath, documentName, configuracion);
 
         } catch (Exception e) {
             logger.error("El error capturado es : " + e.getMessage());
         }
+
+        log.setPathThirdPartyRequestXml(attachmentPath + "\\" + documentName + ".xml");
+        log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
+        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
+        log.setSeriesAndCorrelative(documentName);
+        log.setResponse((new Gson().toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (new Gson().toJson(transactionResponse.getSunat())));
+        log.setResponseDate(DateUtils.formatDateToString(new Date()));
+        transactionResponse.setLogDTO(log);
+        log.setPathBase(attachmentPath + "\\" + documentName + ".json");
 
         return transactionResponse;
     }

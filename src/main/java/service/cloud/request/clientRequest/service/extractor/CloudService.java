@@ -206,7 +206,7 @@ public class CloudService implements CloudInterface {
 
                 return iServiceEmision.transactionDocument(transaction, codigoDocumento);
             case ISunatConnectorConfig.FE_TIPO_TRANS_BAJA:
-                if (transaction.getFE_Estado().equals("C"))
+                if (transaction.getFE_Estado().equals("C") || transaction.getFE_Estado().equals("G"))
                     return serviceBajaConsulta.transactionVoidedDocument(transaction, codigoDocumento);
                 else return iServiceBaja.transactionVoidedDocument(transaction, codigoDocumento);
             default:
