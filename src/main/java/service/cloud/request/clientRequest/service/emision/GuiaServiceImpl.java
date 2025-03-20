@@ -278,13 +278,14 @@ public class GuiaServiceImpl implements GuiaInterface {
         }
 
         // Log de detalles en DB
+        log.setPathThirdPartyRequestXml(attachmentPath + "\\" + documentName + ".xml");
+        log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
         log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
         log.setSeriesAndCorrelative(documentName);
-        if (transactionResponse != null) {
-            log.setResponse(new Gson().toJson(transactionResponse.getSunat()));
-            log.setResponseDate(DateUtils.formatDateToString(new Date()));
-            log.setResponse(new Gson().toJson(transactionResponse.getMensaje()));
-        }
+        log.setResponse((new Gson().toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (new Gson().toJson(transactionResponse.getSunat())));
+        log.setResponseDate(DateUtils.formatDateToString(new Date()));
+        transactionResponse.setLogDTO(log);
+        log.setPathBase(attachmentPath + "\\" + documentName + ".json");
 
         return transactionResponse;
     }

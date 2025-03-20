@@ -79,7 +79,7 @@ public class ServiceEmision implements IServiceEmision {
         LogDTO log = new LogDTO();
         log.setRequestDate(DateUtils.formatDateToString(new Date()));
         log.setRuc(transaction.getDocIdentidad_Nro());
-        log.setBusinessName(transaction.getSN_RazonSocial());
+        log.setBusinessName(transaction.getRazonSocial());
         /***/
 
         boolean isContingencia = isContingencia(transaction);
