@@ -224,7 +224,7 @@ ventura:
         razonSocial: "Sego Seguridad Optima S a"
         wsUsuario: "admin"
         wsClave: "ventura"
-        wsLocation: "http://facturacion.sego.com.pe"
+        wsLocation: ""
         emisorElecRs: "205454844881/SUNAT"
         usuarioSol: "20106836451"
         claveSol: "FQMvRMV9bK"
