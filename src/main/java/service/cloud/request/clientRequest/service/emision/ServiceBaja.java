@@ -1,5 +1,6 @@
 package service.cloud.request.clientRequest.service.emision;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,14 @@ import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
 import service.cloud.request.clientRequest.model.Client;
+import service.cloud.request.clientRequest.mongo.model.LogDTO;
 import service.cloud.request.clientRequest.mongo.model.TransaccionBaja;
 import service.cloud.request.clientRequest.mongo.repo.ITransaccionBajaRepository;
 import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
 import service.cloud.request.clientRequest.utils.*;
+import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.utils.files.CertificateUtils;
 import service.cloud.request.clientRequest.utils.files.DocumentConverterUtils;
@@ -68,6 +71,13 @@ public class ServiceBaja implements IServiceBaja {
     @Override
     public TransaccionRespuesta transactionVoidedDocument(TransacctionDTO transaction, String doctype) throws Exception {
 
+        /***/
+        LogDTO log = new LogDTO();
+        log.setRequestDate(DateUtils.formatDateToString(new Date()));
+        log.setRuc(transaction.getDocIdentidad_Nro());
+        log.setBusinessName(transaction.getRazonSocial());
+        /***/
+
         // 1. Validación inicial de entrada
         if (transaction == null) {
             throw new IllegalArgumentException("La transacción no puede ser nula.");
@@ -90,7 +100,7 @@ public class ServiceBaja implements IServiceBaja {
 
         ConfigData configuracion = createConfigData(client);
         CdrStatusResponse cdrStatusResponse = new CdrStatusResponse();
-
+        String documentName = "";
         try {
             // 3. Validar comentario
             if (transaction.getFE_Comentario() == null || transaction.getFE_Comentario().isEmpty()) {
@@ -110,7 +120,7 @@ public class ServiceBaja implements IServiceBaja {
 
             // 6. Generar documento UBL
             UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
-            String documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id());
+            documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id());
             byte[] xmlDocument;
 
             if (transaction.getDOC_Serie().startsWith("B")) {
@@ -155,8 +165,10 @@ public class ServiceBaja implements IServiceBaja {
             soapRequest.setContentFile(base64Content);
 
             // 11. Enviar a SUNAT y obtener ticket
+            log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
             Mono<FileResponseDTO> fileResponseDTOMono = documentBajaService.processBajaRequest(soapRequest.getService(), soapRequest);
             FileResponseDTO fileResponseDTO = fileResponseDTOMono.block();
+            log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
 
             if (fileResponseDTO == null || fileResponseDTO.getTicket() == null) {
                 transactionResponse.setMensaje("No se recibió ticket de SUNAT.");
@@ -199,6 +211,15 @@ public class ServiceBaja implements IServiceBaja {
             logger.error("Error en transactionVoidedDocument: " + e.getMessage(), e);
             transactionResponse.setMensaje("Ocurrió un error en el proceso de anulación.");
         }
+
+        log.setPathThirdPartyRequestXml(attachmentPath + "\\" + documentName + ".xml");
+        log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
+        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
+        log.setSeriesAndCorrelative(documentName);
+        log.setResponse((new Gson().toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (new Gson().toJson(transactionResponse.getSunat())));
+        log.setResponseDate(DateUtils.formatDateToString(new Date()));
+        transactionResponse.setLogDTO(log);
+        log.setPathBase(attachmentPath + "\\" + documentName + ".json");
 
         return transactionResponse;
     }
