@@ -2620,7 +2620,7 @@ public abstract class UBLBasicHandler {
                 BigDecimal suma = lineExtensionAmountValue;
                 boolean existIGV = false;
                 for (int i = 0; i < transaccion.getTransactionImpuestosDTOList().size(); ++i) {
-                    if (transaccion.getTransactionImpuestosDTOList().get(i).getNombre().equals("IGV")) {
+                    if (transaccion.getTransactionImpuestosDTOList().get(i).getNombre().equals("IGV") || transaccion.getTransactionImpuestosDTOList().get(i).getNombre().contains("ICBPER")) {
                         existIGV = true;
                         //taxInclusiveAmount.setValue(lineExtensionAmountValue.add(transaccion.getTransactionImpuestosDTOList().get(i).getMonto()).setScale(2, RoundingMode.HALF_UP));
                         suma = suma.add(transaccion.getTransactionImpuestosDTOList().get(i).getMonto()).setScale(2, RoundingMode.HALF_UP);

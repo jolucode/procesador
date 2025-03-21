@@ -227,7 +227,7 @@ ventura:
         wsLocation: ""
         emisorElecRs: "205454844881/SUNAT"
         usuarioSol: "20106836451"
-        claveSol: "FQMvRMV9bK"
+        claveSol: "FQMvRMV9bssK"
         certificadoName: "SEGOSEGURIDADOPTIMA.claveprivada.pfx"
         certificadoPassword: "$3GO*2022"
         certificadoProveedor: "SunJSSE"
