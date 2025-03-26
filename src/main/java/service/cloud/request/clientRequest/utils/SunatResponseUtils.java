@@ -23,7 +23,10 @@ import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -88,6 +91,29 @@ public class SunatResponseUtils {
             e.printStackTrace();
         }
         return new TransaccionRespuesta.Sunat();
+    }
+
+    public static String proccessResponseUrlPdfGuia(byte[] cdrConstancy) {
+        try {
+            Optional<byte[]> unzippedResponse = unzipResponse(cdrConstancy);
+            if (unzippedResponse.isEmpty()) {
+                return null;
+            }
+
+            String xmlContent = new String(unzippedResponse.get(), StandardCharsets.UTF_8);
+
+            Pattern pattern = Pattern.compile("<cbc:DocumentDescription>(.*?)</cbc:DocumentDescription>");
+            Matcher matcher = pattern.matcher(xmlContent);
+
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public static Optional<byte[]> unzipResponse(byte[] cdr) throws IOException {

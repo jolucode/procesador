@@ -32,6 +32,7 @@ import service.cloud.request.clientRequest.mongo.repo.IGuiaTicketRepo;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
+import service.cloud.request.clientRequest.utils.SunatResponseUtils;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
 import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
@@ -265,9 +266,17 @@ public class GuiaServiceImpl implements GuiaInterface {
         if ("true".equals(client.getPdfBorrador())) {
             if (transactionResponse != null) {
                 transactionResponse.setPdfBorrador(
-                        documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion)
+                        transactionResponse.getPdf()
                 );
             }
+        }
+
+        //guardar .zip
+        try {
+            UtilsFile.storeDocumentInDisk(transactionResponse.getZip(), documentName, EXT_ZIP, attachmentPath);
+            logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
+        } catch (IOException e) {
+            logger.error("Error al guardar el archivo: " + e.getMessage());
         }
 
         // Asignar valores de digest y barcode a la respuesta
@@ -584,6 +593,10 @@ public class GuiaServiceImpl implements GuiaInterface {
                 case "0":
                     // Documento aprobado
                     TransaccionRespuesta transactionResponse = generateResponseRest(documentWRP, responseDTO);
+                    String rptBase64 = responseDTO.getArcCdr();
+                    byte[] bytesZip = Base64.decodeBase64(rptBase64);
+                    String sunatResponseUrlPdfGuia = SunatResponseUtils.proccessResponseUrlPdfGuia(bytesZip);//proccessResponse(statusResponse, transaction, configuracion.getIntegracionWs());
+                    configuracion.setUrlGuias(sunatResponseUrlPdfGuia);
                     // Generar PDF
                     byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null,
                             fileHandler,
