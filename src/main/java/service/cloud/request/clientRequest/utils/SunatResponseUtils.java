@@ -61,7 +61,7 @@ public class SunatResponseUtils {
                     for (DescriptionType description : descriptions) {
                         descripcion.append(description.getValue());
                     }
-                    if (sunatType.equalsIgnoreCase(Constants.IDENTIFICATORID_OSE)) {
+                    if (sunatType.equalsIgnoreCase(Constants.IDENTIFICATORID_OSE) || sunatType.equalsIgnoreCase(Constants.IDENTIFICATORID_ESTELA)) {
                         identificador = documentResponseType.getDocumentReference().getID().getValue();
                     } else {
                         identificador = documentResponseType.getResponse().getReferenceID().getValue();

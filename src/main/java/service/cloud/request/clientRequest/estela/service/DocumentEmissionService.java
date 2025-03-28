@@ -48,13 +48,18 @@ public class DocumentEmissionService {
         return Base64.getDecoder().decode(base64String);
     }
 
-    private String extractApplicationResponseWithRegex(String soapResponse) {
-        Pattern pattern = Pattern.compile("<applicationResponse>(.*?)</applicationResponse>");
+    public static String extractApplicationResponseWithRegex(String soapResponse) {
+        // Regex que busca el contenido entre <applicationResponse> y </applicationResponse>
+        Pattern pattern = Pattern.compile("<applicationResponse[^>]*>(.*?)</applicationResponse>", Pattern.DOTALL);
         Matcher matcher = pattern.matcher(soapResponse);
+
         if (matcher.find()) {
-            return matcher.group(1); // Retorna el contenido capturado
+            String base64Content = matcher.group(1).trim();
+            return base64Content;
+        } else {
+            // Puedes lanzar una excepción o manejar el caso donde no se encuentra la etiqueta
+            throw new IllegalArgumentException("No se encontró applicationResponse en el contenido SOAP.");
         }
-        throw new RuntimeException("No se encontró <applicationResponse> en la respuesta SOAP.");
     }
 
     private String extractErrorMessage(String xmlResponse) {
