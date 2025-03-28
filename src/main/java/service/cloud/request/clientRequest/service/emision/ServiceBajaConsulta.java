@@ -117,7 +117,6 @@ public class ServiceBajaConsulta implements IServiceBaja {
                 .claveSol(client.getClaveSol())
                 .integracionWs(client.getIntegracionWs())
                 .ambiente(applicationProperties.getAmbiente())
-                .mostrarSoap(client.getMostrarSoap())
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
                 .rutaBaseDoc(applicationProperties.getRutaBaseDoc())

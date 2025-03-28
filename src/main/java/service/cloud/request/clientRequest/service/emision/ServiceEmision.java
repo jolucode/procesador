@@ -117,9 +117,9 @@ public class ServiceEmision implements IServiceEmision {
         /**PROCESAR CERTIFICADO*/
         String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
         byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
-        CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
+        CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), applicationProperties.getSupplierCertificate(), applicationProperties.getKeystoreCertificateType());
         SignerHandler signerHandler = SignerHandler.newInstance();
-        signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), client.getCertificadoTipoKeystore(), client.getCertificadoProveedor(), signerName);
+        signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), applicationProperties.getKeystoreCertificateType(), applicationProperties.getSupplierCertificate(), signerName);
         byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
         String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
 
@@ -248,7 +248,6 @@ public class ServiceEmision implements IServiceEmision {
                 .claveSol(client.getClaveSol())
                 .integracionWs(client.getIntegracionWs())
                 .ambiente(applicationProperties.getAmbiente())
-                .mostrarSoap(client.getMostrarSoap())
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
                 .rutaBaseDoc(applicationProperties.getRutaBaseDoc())

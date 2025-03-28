@@ -118,8 +118,8 @@ public class GuiaServiceImpl implements GuiaInterface {
         byte[] certificado = CertificateUtils.getCertificateInBytes(certificatePath);
 
         String certiPassword = client.getCertificadoPassword();
-        String ksProvider = client.getCertificadoProveedor();
-        String ksType = client.getCertificadoTipoKeystore();
+        String ksProvider = applicationProperties.getSupplierCertificate();
+        String ksType = applicationProperties.getKeystoreCertificateType();
 
         CertificateUtils.checkDigitalCertificateV2(certificado, certiPassword, ksProvider, ksType);
 
@@ -201,10 +201,8 @@ public class GuiaServiceImpl implements GuiaInterface {
                 .claveSol(client.getClaveSol())
                 .integracionWs(client.getIntegracionWs())
                 .ambiente(applicationProperties.getAmbiente())
-                .mostrarSoap(client.getMostrarSoap())
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
-                .scope(client.getScope())
                 .clientId(client.getClientId())
                 .clientSecret(client.getClientSecret())
                 .userNameSunatSunat(client.getUserNameSunatGuias())
@@ -222,7 +220,6 @@ public class GuiaServiceImpl implements GuiaInterface {
         logger.info("Clave Sol: " + configuracion.getPasswordSunatSunat());
         logger.info("Client id: " + configuracion.getClientId());
         logger.info("Client Secret: " + configuracion.getClientSecret());
-        logger.info("Scope: " + configuracion.getScope());
 
         // Generar valores digest y barcode
         String digestValue = pdfBasicHandler.generateDigestValue(documentWRP.getAdviceType().getUBLExtensions());
@@ -486,7 +483,7 @@ public class GuiaServiceImpl implements GuiaInterface {
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .header("Cookie", "TS019e7fc2=014dc399cbcad00473c65166bab99ef2e22263ae15b2a9e259ff0e5d972578fa54549fe8acccb61b76d241060b054cc73beff45ea3")
                 .field("grant_type", "password")
-                .field("scope", configuracion.getScope())
+                .field("scope", "https://api-cpe.sunat.gob.pe/")
                 .field("client_id", configuracion.getClientId())
                 .field("client_secret", configuracion.getClientSecret())
                 .field("username", configuracion.getUserNameSunatSunat())

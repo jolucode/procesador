@@ -12,6 +12,12 @@ import java.util.List;
 @Configuration
 public class ApplicationProperties {
 
+    @Value("${certificate.supplierCertificate}")
+    public String supplierCertificate;
+
+    @Value("${certificate.keystoreCertificateType}")
+    public String keystoreCertificateType;
+
     @Value("${application.ambiente}")
     public String ambiente;
 

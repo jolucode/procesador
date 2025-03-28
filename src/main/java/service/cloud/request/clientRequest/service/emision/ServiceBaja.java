@@ -111,12 +111,12 @@ public class ServiceBaja implements IServiceBaja {
             // 4. Cargar y validar certificado
             String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
             byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
-            CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
+            CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), applicationProperties.getSupplierCertificate(), applicationProperties.getKeystoreCertificateType());
 
             // 5. Configurar firma
             String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
             SignerHandler signerHandler = SignerHandler.newInstance();
-            signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), client.getCertificadoTipoKeystore(), client.getCertificadoProveedor(), signerName);
+            signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), applicationProperties.getKeystoreCertificateType(), applicationProperties.getSupplierCertificate(), signerName);
 
             // 6. Generar documento UBL
             UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
@@ -246,11 +246,11 @@ public class ServiceBaja implements IServiceBaja {
 
             String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
             byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
-            CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), client.getCertificadoProveedor(), client.getCertificadoTipoKeystore());
+            CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), applicationProperties.getSupplierCertificate(), applicationProperties.getKeystoreCertificateType());
 
             String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
             SignerHandler signerHandler = SignerHandler.newInstance();
-            signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), client.getCertificadoTipoKeystore(), client.getCertificadoProveedor(), signerName);
+            signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), applicationProperties.getKeystoreCertificateType(), applicationProperties.getSupplierCertificate(), signerName);
 
             UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
             SummaryDocumentsType summaryVoidedDocumentType = null;
@@ -419,7 +419,6 @@ public class ServiceBaja implements IServiceBaja {
                 .claveSol(client.getClaveSol())
                 .integracionWs(client.getIntegracionWs())
                 .ambiente(applicationProperties.getAmbiente())
-                .mostrarSoap(client.getMostrarSoap())
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
                 .rutaBaseDoc(applicationProperties.getRutaBaseDoc())

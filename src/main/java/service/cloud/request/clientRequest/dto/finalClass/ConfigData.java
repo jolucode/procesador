@@ -16,12 +16,10 @@ public class ConfigData {
     private String claveSol;
     private String integracionWs;
     private String ambiente;
-    private String mostrarSoap;
     private String pdfBorrador;
     private String impresionPDF;
     private String rutaBaseDoc;
     private String impresion;
-    private String scope;
     private String clientId;
     private String clientSecret;
     private String userNameSunatSunat;
