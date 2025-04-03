@@ -2589,7 +2589,7 @@ public abstract class UBLBasicHandler {
         return taxTotal;
     } //getTaxTotalV21
 
-    protected MonetaryTotalType getMonetaryTotal(final TransacctionDTO transaccion, final BigDecimal lineExtensionAmountValue, final BigDecimal taxInclusiveAmountValue, final boolean noContainsFreeItem, final BigDecimal chargeTotalAmountValue, final BigDecimal prepaidAmountValue, final BigDecimal payableAmountValue, final BigDecimal descuento, final String currencyCode, final boolean isInvoiceOrBoleta) throws UBLDocumentException {
+    protected MonetaryTotalType getMonetaryTotal(final TransacctionDTO transaccion, final BigDecimal lineExtensionAmountValue, final BigDecimal taxInclusiveAmountValue, final boolean noContainsFreeItem, final BigDecimal chargeTotalAmountValue, final BigDecimal prepaidAmountValue, BigDecimal payableAmountValue, final BigDecimal descuento, final String currencyCode, final boolean isInvoiceOrBoleta) throws UBLDocumentException {
         final boolean bandera = false;
         boolean existEXP = false;
         if (this.logger.isDebugEnabled()) {
@@ -2710,7 +2710,12 @@ public abstract class UBLBasicHandler {
 
         }
         final PayableAmountType payableAmount = new PayableAmountType();
+
+        if (transaccion.getANTICIPO_Monto().compareTo(BigDecimal.ZERO) > 0) {
+            payableAmountValue = payableAmountValue.subtract(transaccion.getANTICIPO_Monto());
+        }
         payableAmount.setValue((payableAmountValue != null ? payableAmountValue : BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP));
+
         payableAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
         monetaryTotal.setPayableAmount(payableAmount);
         if (this.logger.isDebugEnabled()) {

@@ -31,14 +31,15 @@ ventura:
         wsUsuario: admin
         wsClave: ventura
         wsLocation: "https://facturacion.venturafe.com/"
-        usuarioSol: "20510910517MODDATOS"
-        claveSol: "QAEUW1YLSD"
+        usuarioSol: "20510910517"
+        claveSol: "20510910517"
         certificadoName: CERTIFICATE_TEST.pfx
         certificadoPassword: "1234"
-        integracionWs: ESTELA
+        integracionWs: SUNAT
         pdfBorrador: "true"
         impresion: Codigo QR
-        urlOnpremise: http://190.119.245.254:60081/
+        urlOnpremise: "http://104.208.219.120:60108/"
+        #urlOnpremise: http://190.119.245.254:60081/AZALAIA
         #urlOnpremise: http://119.8.146.122:60089/
         #urlOnpremise: http://104.208.219.120:60108/
         clientId: a8a6c50a-d73c-4775-9ddc-6261df69fed8
@@ -55,6 +56,23 @@ ventura:
         certificadoName: "INSTALADOR2.pfx"
         certificadoPassword: "4443"
         integracionWs: SUNAT
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://101.44.10.195:60084/"
+        clientId: "d234c505-541c-4060-8e89-f6a547f7ecf8"
+        clientSecret: "xZJIhomKys4vQgXVP3zQ+Q=="
+        UserNameSunatGuias: "20100067596VENTUSAP"
+        passwordSunatGuias: "Facu2025"
+      "20520575236":
+        razonSocial: "PRUEBAS CLIENTE AGROMIGIVA"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.venturafe.com/"
+        usuarioSol: "20520575236MODDATOS"
+        claveSol: "YTBFW1YLUS"
+        certificadoName: "CERTIFICATE_TEST.pfx"
+        certificadoPassword: "4443"
+        integracionWs: ESTELA
         pdfBorrador: "true"
         impresion: "Codigo QR"
         urlOnpremise: "http://101.44.10.195:60084/"
