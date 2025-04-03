@@ -290,7 +290,11 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
                 f.mkdirs();
             }
 
-            inputStream = generateQRCode(configData.getUrlGuias(), rutaPath);
+            if(configData.getUrlGuias() != null )
+                inputStream = generateQRCode(configData.getUrlGuias(), rutaPath);
+            else {
+                inputStream = generateQRCode(barcodeValue, rutaPath);
+            }
 
             despatchAdviceObject.setCodeQR(inputStream);
 

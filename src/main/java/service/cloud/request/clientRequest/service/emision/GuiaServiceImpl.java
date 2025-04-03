@@ -269,12 +269,8 @@ public class GuiaServiceImpl implements GuiaInterface {
         }
 
         //guardar .zip
-        try {
+        if(transactionResponse.getZip()!= null)
             UtilsFile.storeDocumentInDisk(transactionResponse.getZip(), documentName, EXT_ZIP, attachmentPath);
-            logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
-        } catch (IOException e) {
-            logger.error("Error al guardar el archivo: " + e.getMessage());
-        }
 
         // Asignar valores de digest y barcode a la respuesta
         if (transactionResponse != null) {
@@ -574,6 +570,64 @@ public class GuiaServiceImpl implements GuiaInterface {
     }
 
     private TransaccionRespuesta manejarRespuestaSunat(ResponseDTO responseDTO,
+                                                       UBLDocumentWRP documentWRP,
+                                                       FileHandler fileHandler,
+                                                       String documentName,
+                                                       TransacctionDTO transaction,
+                                                       ConfigData configuracion) {
+        // Errores de credenciales o ticket
+        if (responseDTO.getStatusCode() == 400 || responseDTO.getStatusCode() == 404) {
+            return generateResponseRest(documentWRP, responseDTO);
+        }
+
+        TransaccionRespuesta transactionResponse = null;
+
+        if (responseDTO.getCodRespuesta() != null) {
+            switch (responseDTO.getCodRespuesta()) {
+                case "0":
+                    // Documento aprobado
+                    transactionResponse = generateResponseRest(documentWRP, responseDTO);
+
+                    // Procesar ZIP y URL de guía
+                    String rptBase64 = responseDTO.getArcCdr();
+                    byte[] bytesZip = Base64.decodeBase64(rptBase64);
+                    String sunatResponseUrlPdfGuia = SunatResponseUtils.proccessResponseUrlPdfGuia(bytesZip);
+                    configuracion.setUrlGuias(sunatResponseUrlPdfGuia);
+
+                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
+                    break;
+
+                case "98":
+                case "99":
+                    // Documento en proceso o rechazado
+                    transactionResponse = generateResponseRest(documentWRP, responseDTO);
+                    break;
+
+                default:
+                    transactionResponse = generateResponseRest(documentWRP, responseDTO);
+                    break;
+            }
+
+            // Generar PDF para todos los casos válidos
+            if (transactionResponse != null) {
+                byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null,
+                        fileHandler,
+                        documentName,
+                        transaction.getDOC_Codigo(),
+                        documentWRP,
+                        transaction,
+                        configuracion);
+                transactionResponse.setPdf(pdf);
+            }
+
+            return transactionResponse;
+        }
+
+        return null;
+    }
+
+
+    private TransaccionRespuesta manejarRespuestaSunat2(ResponseDTO responseDTO,
                                                        UBLDocumentWRP documentWRP,
                                                        FileHandler fileHandler,
                                                        String documentName,
