@@ -45,17 +45,10 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
 
     @Override
     public byte[] generateCreditNotePDF(UBLDocumentWRP creditNoteType, List<TransactionTotalesDTO> transaccionTotales, ConfigData configData) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateCreditNotePDF() [" + this.docUUID + "]");
-        }
         byte[] creditNoteInBytes = null;
-
         try {
             CreditNoteObject creditNoteObj = new CreditNoteObject();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
-            }
             creditNoteObj.setDocumentIdentifier(creditNoteType.getCreditNoteType().getID().getValue());
             creditNoteObj.setIssueDate(formatIssueDate(creditNoteType.getCreditNoteType().getIssueDate().getValue()));
 
@@ -71,41 +64,17 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
                 creditNoteObj.setDueDate(formatDueDate(DateUtil.parseDate(creditNoteType.getTransaccion().getDOC_FechaVencimiento())));
             }
 
-            /* Informacion de SUNATTransaction */
             String sunatTransInfo = getSunatTransactionInfo(creditNoteType.getCreditNoteType().getUBLExtensions().getUBLExtension());
             if (StringUtils.isNotBlank(sunatTransInfo)) {
                 creditNoteObj.setSunatTransaction(sunatTransInfo);
             }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo guias de remision.");
-            }
             creditNoteObj.setRemissionGuides(getRemissionGuides(creditNoteType.getCreditNoteType().getDespatchDocumentReference()));
-
-            if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "] Guias de remision: " + creditNoteObj.getRemissionGuides());
-            }
-            if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "]============= remision");
-            }
-
             creditNoteObj.setPaymentCondition(creditNoteType.getTransaccion().getDOC_CondPago());
-
-            if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "]============= remision");
-            }
             creditNoteObj.setDateDocumentReference(creditNoteType.getTransaccion().getFechaDOCRe());
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + creditNoteType.getTransaccion().getTransactionContractDocRefListDTOS().size());
-            }
             if (creditNoteType.getTransaccion().getTransactionContractDocRefListDTOS() != null
                     && !creditNoteType.getTransaccion().getTransactionContractDocRefListDTOS().isEmpty()) {
-
                 Map<String, String> hashedMap = new HashMap<>();
-
                 for (Map<String, String> map : creditNoteType.getTransaccion().getTransactionContractDocRefListDTOS()) {
-                    // Asumiendo que cada mapa contiene un único par clave-valor
                     for (Map.Entry<String, String> entry : map.entrySet()) {
                         hashedMap.put(entry.getKey(), entry.getValue());
                     }
@@ -113,17 +82,10 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
 
                 creditNoteObj.setInvoicePersonalizacion(hashedMap);
             }
-            // Cuotas
-
             List<WrapperItemObject> listaItemC = new ArrayList<>();
-
             List<TransactionCuotasDTO> transaccionCuotas = creditNoteType.getTransaccion().getTransactionCuotasDTOList();
-
             DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-
-            //BigDecimal montoRetencion  = (creditNoteType.getTransaccion().getMontoRetencion() != null ? creditNoteType.getTransaccion().getMontoRetencion() : new BigDecimal(0.0));
             BigDecimal montoRetencion = BigDecimal.ZERO; // ocultar retencion en el subreporte
-
 
             Integer totalCuotas = 0;
             BigDecimal montoPendiente = BigDecimal.ZERO;
@@ -181,27 +143,18 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             creditNoteObj.setC1(c1);
             creditNoteObj.setC2(c2);
             creditNoteObj.setC3(c3);
-            //creditNoteObj.setPorcentajeRetencion( retentionpercentage == null ? BigDecimal.ZERO : retentionpercentage);
             creditNoteObj.setPorcentajeRetencion(BigDecimal.ZERO);
             creditNoteObj.setMontoRetencion(montoRetencion);
             BigDecimal baseImponibleRetencion = BigDecimal.ZERO;
 
             creditNoteObj.setBaseImponibleRetencion(baseImponibleRetencion);
 
-            // fin Cuotas
-
             List<WrapperItemObject> listaItem = new ArrayList<>();
 
             for (int i = 0; i < creditNoteType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Agregando datos al HashMap");
-                }
-
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
                 List<String> newlist = new ArrayList<>();
-
-                // Obtener el mapa de transaccionLineasCamposUsuario
                 Map<String, String> camposUsuarioMap = creditNoteType.getTransaccion().getTransactionLineasDTOList().get(i).getTransaccionLineasCamposUsuario();
 
                 if (camposUsuarioMap != null && !camposUsuarioMap.isEmpty()) {
@@ -209,22 +162,11 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
                     for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
                         String nombreCampo = entry.getKey();
                         String valorCampo = entry.getValue();
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
-                        }
-
-                        // Si el campo empieza con "U_", se elimina antes de guardarlo
                         if (nombreCampo.startsWith("U_")) {
                             nombreCampo = nombreCampo.substring(2);
                         }
-
                         itemObjectHash.put(nombreCampo, valorCampo);
                         newlist.add(valorCampo);
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
-                        }
                     }
                 }
 
@@ -245,10 +187,6 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             creditNoteObj.setTypeOfCreditNote(creditNoteType.getTransaccion().getREFDOC_MotivCode());
             creditNoteObj.setDescOfCreditNote(creditNoteType.getCreditNoteType().getDiscrepancyResponse().get(0).getDescription().get(0).getValue().toUpperCase());
             creditNoteObj.setDocumentReferenceToCn(getDocumentReferenceValue(creditNoteType.getCreditNoteType().getBillingReference().get(0)));
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
-            }
             creditNoteObj.setSenderSocialReason(creditNoteType.getTransaccion().getRazonSocial());
             creditNoteObj.setSenderRuc(creditNoteType.getTransaccion().getDocIdentidad_Nro());
             creditNoteObj.setSenderFiscalAddress(creditNoteType.getTransaccion().getDIR_NomCalle());
@@ -259,21 +197,11 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             creditNoteObj.setWeb(creditNoteType.getTransaccion().getWeb());
             creditNoteObj.setPorcentajeIGV(creditNoteType.getTransaccion().getDOC_PorcImpuesto());
             creditNoteObj.setComentarios(creditNoteType.getTransaccion().getFE_Comentario());
-
             creditNoteObj.setTelefono(creditNoteType.getTransaccion().getTelefono());
             creditNoteObj.setTelefono1(creditNoteType.getTransaccion().getTelefono_1());
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
-            }
             creditNoteObj.setReceiverRegistrationName(creditNoteType.getTransaccion().getSN_RazonSocial());
             creditNoteObj.setReceiverIdentifier(creditNoteType.getTransaccion().getSN_DocIdentidad_Nro());
             creditNoteObj.setReceiverIdentifierType(creditNoteType.getTransaccion().getSN_DocIdentidad_Tipo());
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion de la percepción.");
-            }
-
             BigDecimal percepctionAmount = null;
             BigDecimal perceptionPercentage = null;
             for (int i = 0; i < creditNoteType.getTransaccion().getTransactionTotalesDTOList().size(); i++) {
@@ -283,10 +211,6 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
                     creditNoteObj.setPerceptionAmount(creditNoteType.getCreditNoteType().getDocumentCurrencyCode().getValue() + " " + creditNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getMonto().toString());
                     creditNoteObj.setPerceptionPercentage(creditNoteType.getTransaccion().getTransactionTotalesDTOList().get(i).getPrcnt().toString() + "%");
                 }
-            }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo monto de ISC.");
             }
             BigDecimal retentionpercentage = null;
 
@@ -312,35 +236,18 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             }
 
             if (creditNoteType.getCreditNoteType().getID().getValue().startsWith(IUBLConfig.INVOICE_SERIE_PREFIX)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateCreditNotePDF() [" + this.docUUID + "] El receptor es de un documento afectado de tipo FACTURA.");
-                }
                 creditNoteObj.setReceiverFiscalAddress(creditNoteType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
-
             } else if (creditNoteType.getCreditNoteType().getID().getValue().startsWith(IUBLConfig.BOLETA_SERIE_PREFIX)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateCreditNotePDF() [" + this.docUUID + "] El receptor es de un documento afectado de tipo BOLETA.");
-                }
                 creditNoteObj.setReceiverFiscalAddress(creditNoteType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + creditNoteType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
             } else {
-                logger.error("generateCreditNotePDF() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_431.getMessage());
                 throw new PDFReportException(IVenturaError.ERROR_431);
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
-            }
-            // creditNoteObj.setCreditNoteItems(getCreditNoteItems(creditNoteType.getCreditNoteType().getCreditNoteLine()));
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion de los MONTOS.");
-            }
             String currencyCode = creditNoteType.getCreditNoteType().getDocumentCurrencyCode().getValue();
-
             BigDecimal subtotalValue = getSubtotalValueFromTransaction(transaccionTotales, creditNoteObj.getDocumentIdentifier());
             creditNoteObj.setSubtotalValue(getCurrency(subtotalValue, currencyCode));
-            BigDecimal igvValue = getTaxTotalValue2(creditNoteType.getTransaccion().getTransactionImpuestosDTOList(), IUBLConfig.TAX_TOTAL_IGV_ID);
 
+            BigDecimal igvValue = getTaxTotalValue2(creditNoteType.getTransaccion().getTransactionImpuestosDTOList(), IUBLConfig.TAX_TOTAL_IGV_ID);
             creditNoteObj.setIgvValue(getCurrency(igvValue, currencyCode));
 
             BigDecimal iscValue = getTaxTotalValue(creditNoteType.getCreditNoteType().getTaxTotal(), IUBLConfig.TAX_TOTAL_ISC_ID);
@@ -366,25 +273,12 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
 
             BigDecimal gratuitaAmount = getTransaccionTotales(creditNoteType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
             if (!gratuitaAmount.equals(BigDecimal.ZERO)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Existe Op. Gratuitas.");
-                }
                 creditNoteObj.setGratuitaAmountValue(getCurrency(gratuitaAmount, currencyCode));
             } else {
                 creditNoteObj.setGratuitaAmountValue(getCurrency(BigDecimal.ZERO, currencyCode));
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
-            }
-
             String barcodeValue = generateBarCodeInfoString(creditNoteType.getTransaccion().getDocIdentidad_Nro(), creditNoteType.getTransaccion().getDOC_Codigo(), creditNoteType.getTransaccion().getDOC_Serie(), creditNoteType.getTransaccion().getDOC_Numero(), creditNoteType.getCreditNoteType().getTaxTotal(), creditNoteObj.getIssueDate(), creditNoteType.getTransaccion().getDOC_MontoTotal().toString(), creditNoteType.getTransaccion().getSN_DocIdentidad_Tipo(), creditNoteType.getTransaccion().getSN_DocIdentidad_Nro(), creditNoteType.getCreditNoteType().getUBLExtensions());
-
-//            String barcodeValue = generateBarCodeInfoString(invoiceType.getInvoiceType().getID().getValue(), invoiceType.getInvoiceType().getInvoiceTypeCode().getValue(),invoiceObj.getIssueDate(), invoiceType.getInvoiceType().getLegalMonetaryTotal().getPayableAmount().getValue(), invoiceType.getInvoiceType().getTaxTotal(), invoiceType.getInvoiceType().getAccountingSupplierParty(), invoiceType.getInvoiceType().getAccountingCustomerParty(),invoiceType.getInvoiceType().getUBLExtensions());
-            if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
-            }
-            //invoiceObj.setBarcodeValue(barcodeValue);
 
             InputStream inputStream;
             InputStream inputStreamPDF;
@@ -407,48 +301,17 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
 
             creditNoteObj.setBarcodeValue(inputStreamPDF);
             String digestValue = generateDigestValue(creditNoteType.getCreditNoteType().getUBLExtensions());
-
-            if (logger.isInfoEnabled()) {
-                logger.info("generateCreditNotePDF() [" + this.docUUID + "] VALOR RESUMEN: \n" + digestValue);
-            }
-
             creditNoteObj.setDigestValue(digestValue);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
-            }
-
-            /*
-            Map<String, LegendObject> legendsMap = getaddLeyends(creditNoteType.getCreditNoteType().getNote());
-             */
             Map<String, LegendObject> legendsMap = null;
-
-            //if (TipoVersionUBL.notacredito.equals("21")) {
             legendsMap = getaddLeyends(creditNoteType.getCreditNoteType().getNote());
-            /*} else if (TipoVersionUBL.notadebito.equals("20")) {
-                legendsMap = getAdditionalProperties(creditNoteType.getCreditNoteType().getUBLExtensions().getUBLExtension());
-            }*/
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
-            }
             LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
             if(legendLetters!=null) {
                 creditNoteObj.setLetterAmountValue(legendLetters.getLegendValue());
             }
-            //
             legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
-            }
             creditNoteObj.setLegends(getLegendList(legendsMap));
-
             creditNoteObj.setResolutionCodeValue("resolutionCde");
-
-            /*
-             * Generando el PDF de la FACTURA con la informacion recopilada.
-             */
             creditNoteInBytes = createCreditNotePDF(creditNoteObj, docUUID, configData);
         } catch (PDFReportException e) {
             logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());

@@ -9,7 +9,6 @@ import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.data.specification.unqualifieddatatypesschemamodule._2.IdentifierType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.AddressType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.PartyType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.perception_1.PerceptionType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.retention_1.RetentionType;
 
@@ -120,9 +119,6 @@ public class ValidationHandler {
         if (logger.isDebugEnabled()) {
             logger.debug("+checkBasicInformation() [" + this.docUUID + "]");
         }
-        /*
-         * Validando identificador del documento
-         */
         if (StringUtils.isBlank(docIdentifier)) {
             throw new ValidationException(IVenturaError.ERROR_514);
         }
@@ -132,19 +128,11 @@ public class ValidationHandler {
         if (!docIdentifier.contains("-")) {
             throw new ValidationException(IVenturaError.ERROR_516);
         }
-        /*if (!docIdentifier.startsWith(IUBLConfig.REMISSION_GUIDE_SERIE_PREFIX)&& !docIdentifier.startsWith(IUBLConfig.CARRIER_GUIDE_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.INVOICE_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.BOLETA_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.PERCEPCION_SERIE_PREFIX) && !docIdentifier.startsWith(IUBLConfig.RETENTION_SERIE_PREFIX)) {
-            if (!isContingencia)
-                throw new ValidationException(IVenturaError.ERROR_517);
-        }*/
         try {
             Integer.valueOf(docIdentifier.substring(5));
         } catch (Exception e) {
             throw new ValidationException(IVenturaError.ERROR_518);
         }
-
-        /*
-         * Validando RUC del emisor electronico
-         */
         if (IUBLConfig.DOC_RUC_LENGTH != senderIdentifier.length()) {
             throw new ValidationException(IVenturaError.ERROR_519);
         }
@@ -154,9 +142,6 @@ public class ValidationHandler {
             throw new ValidationException(IVenturaError.ERROR_520);
         }
 
-        /*
-         * Validando la fecha de emision
-         */
         if (null == issueDate) {
             throw new ValidationException(IVenturaError.ERROR_521);
         }
@@ -166,22 +151,9 @@ public class ValidationHandler {
         if (null == ccorreoElctroinico || ccorreoElctroinico.isEmpty()) {
             throw new ValidationException(IVenturaError.ERROR_550);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-checkBasicInformation() [" + this.docUUID + "]");
-        }
     } //checkBasicInformation
 
     public void checkRetentionDocument(RetentionType retentionType) throws ValidationException {
-        long startTime = System.currentTimeMillis();
-        if (logger.isDebugEnabled()) {
-            logger.debug("+checkRetentionDocument() [" + this.docUUID + "]");
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("+checkRetentionDocument() [getSunatRetentionPercent]" + retentionType.getSunatRetentionPercent().getValue().length());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("+checkRetentionDocument() [getSunatRetentionPercent]" + retentionType.getSunatRetentionPercent().getValue());
-        }
         if (retentionType.getSunatRetentionSystemCode().getValue().length() != 2) {
             throw new ValidationException(IVenturaError.ERROR_540);
         }
@@ -213,15 +185,7 @@ public class ValidationHandler {
         }
     }
 
-    public void checkRemissionGuideDocument(DespatchAdviceType retentionType) throws ValidationException {
-        long startTime = System.currentTimeMillis();
-    }
-
     public void checkPerceptionDocument(PerceptionType perceptionType) throws ValidationException {
-        long startTime = System.currentTimeMillis();
-        if (logger.isDebugEnabled()) {
-            logger.debug("+checkPerceptionDocument() [" + this.docUUID + "]");
-        }
         if (perceptionType.getSunatTotalCashed().getValue().compareTo(BigDecimal.ZERO) == 0) {
             throw new ValidationException(IVenturaError.ERROR_531);
         }

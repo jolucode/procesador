@@ -48,10 +48,8 @@ public class SignerHandler {
 
     private final Logger logger = Logger.getLogger(SignerHandler.class);
 
-    /* Identicador del objeto */
     private String identifier;
 
-    /* Configuracion del certificado */
     private byte[] certificate;
 
     private String password;
@@ -62,63 +60,29 @@ public class SignerHandler {
 
     private String signerName;
 
-    /* Informacion confidencial del certificado */
     private X509Certificate x509Certificate;
 
     private PrivateKey privateKey;
 
     private PublicKey publicKey;
 
-
-    /**
-     * Constructor privado basico para evitar la creacion de
-     * instancias usando el constructor.
-     */
     private SignerHandler() {
     }
 
-    /**
-     * Constructor privado para evitar la creacion de instancias
-     * usando el constructor.
-     *
-     * @param identifier Identificador del objeto SignerHandler.
-     */
     private SignerHandler(String identifier) {
         this.identifier = identifier;
     } //SignerHandler
 
-    /**
-     * Este metodo crea una nueva instancia de la clase SignerHandler.
-     *
-     * @return Retorna una nueva instancia de la clase SignerHandler.
-     */
+
     public static synchronized SignerHandler newInstance() {
         return new SignerHandler();
     } //newInstance
 
-    /**
-     * Este metodo crea una nueva instancia de la clase SignerHandler.
-     *
-     * @param identifier Identificador del objeto SignerHandler.
-     * @return Retorna una nueva instancia de la clase SignerHandler.
-     */
     public static synchronized SignerHandler newInstance(String identifier) {
         return new SignerHandler(identifier);
     } //newInstance
 
 
-    /**
-     * Este metodo guarda la configuracion del objeto SignerHandler. Guarda el
-     * certificado digital, la contrasenia del certificado digital y el nombre
-     * del firmante en memoria.
-     * <p>
-     * El nombre del firmante tiene que ser el mismo que esta en el documento UBL
-     * en el TAG SignatureType.
-     *
-     * @param certificate    El certificado digital en bytes.
-     * @param certificatePwd La contrasenia del certificado digital.
-     * @param signerName     El nombre del firmante del certificado digital.
-     */
     public void setConfiguration(byte[] certificate, String certificatePwd, String keystoreType, String keystoreProvider, String signerName)
             throws SignerDocumentException {
         if (logger.isDebugEnabled()) {
@@ -138,15 +102,6 @@ public class SignerHandler {
     } //setConfiguration
 
 
-    /**
-     * Este metodo firma el documento UBL especificado en la ruta 'documentPath' y
-     * retorna un objeto File con la nueva ruta del documento UBL firmado.
-     *
-     * @param documentPath La ruta del documento UBL sin firmar.
-     * @param docUUID      UUID del documento correspondiente al registro del objeto Homologationdocument.
-     * @return Retorna un objeto File con la ruta del documento UBL firmado.
-     * @throws SignerDocumentException
-     */
     @SuppressWarnings("unused")
     public File signDocument(String documentPath, String docUUID) throws SignerDocumentException {
         if (logger.isDebugEnabled()) {

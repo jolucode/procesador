@@ -33,11 +33,6 @@ import java.util.zip.ZipInputStream;
 
 public class SunatResponseUtils {
 
-    static Logger logger = LoggerFactory.getLogger(UtilsFile.class);
-
-
-
-
     public static TransaccionRespuesta.Sunat proccessResponse(byte[] cdrConstancy, TransacctionDTO transaction, String sunatType) {
         try {
             String descripcionRespuesta = "";

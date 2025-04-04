@@ -48,17 +48,10 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
 
     @Override
     public byte[] generateBoletaPDF(UBLDocumentWRP boletaType, ConfigData configData) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateBoletaPDF() [" + this.docUUID + "]");
-        }
         byte[] boletaInBytes = null;
-
         try {
             BoletaObject boletaObj = new BoletaObject();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
-            }
             boletaObj.setDocumentIdentifier(boletaType.getInvoiceType().getID().getValue());
             boletaObj.setIssueDate(formatIssueDate(boletaType.getInvoiceType().getIssueDate().getValue()));
 
@@ -74,7 +67,6 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 boletaObj.setDueDate(boletaType.getTransaccion().getDOC_FechaVencimiento());
             } else {
                 boletaObj.setDueDate(boletaType.getTransaccion().getDOC_FechaVencimiento());
-                //boletaObj.setDueDate(IPDFCreatorConfig.EMPTY_VALUE);
             }
             List<TaxTotalType> taxTotal = boletaType.getInvoiceType().getTaxTotal();
             for (TaxTotalType taxTotalType : taxTotal) {
@@ -97,66 +89,35 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 boletaObj.setSunatTransaction(sunatTransInfo);
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo guias de remision.");
-            }
             boletaObj.setRemissionGuides(getRemissionGuides(boletaType.getInvoiceType().getDespatchDocumentReference()));
-
-            if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "] Guias de remision: " + boletaObj.getRemissionGuides());
-            }
-            if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "]============= remision");
-            }
             boletaObj.setPaymentCondition(boletaType.getTransaccion().getDOC_CondPago());
-            // No se encontraron impuestos en uno de los items de la transaccion.
-            //boletaObj.setPaymentCondition(getContractDocumentReference(boletaType.getBoletaType().getContractDocumentReference(),
-            // IUBLConfig.CONTRACT_DOC_REF_PAYMENT_COND_CODE));
-
-            if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "] Condicion_pago: " + boletaObj.getPaymentCondition());
-            }
 
             if (null != boletaType.getTransaccion().getTransactionContractDocRefListDTOS()
                     && !boletaType.getTransaccion().getTransactionContractDocRefListDTOS().isEmpty()) {
 
                 Map<String, String> hashedMap = new HashMap<>();
-
                 for (Map<String, String> map : boletaType.getTransaccion().getTransactionContractDocRefListDTOS()) {
                     // Suponiendo que cada mapa tiene solo un par clave-valor
                     for (Map.Entry<String, String> entry : map.entrySet()) {
                         hashedMap.put(entry.getKey(), entry.getValue());
                     }
                 }
-
                 boletaObj.setInvoicePersonalizacion(hashedMap);
             }
 
             List<WrapperItemObject> listaItem = new ArrayList<WrapperItemObject>();
 
             for (int i = 0; i < boletaType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateBoletaPDF() [" + this.docUUID + "] Agregando datos al HashMap");
-                }
-
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
                 List<String> newlist = new ArrayList<>();
 
-                // Obtener el mapa de transaccionLineasCamposUsuario
                 Map<String, String> camposUsuarioMap = boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransaccionLineasCamposUsuario();
-
                 if (camposUsuarioMap != null && !camposUsuarioMap.isEmpty()) {
-                    // Iterar sobre las entradas del mapa
                     for (Map.Entry<String, String> entry : camposUsuarioMap.entrySet()) {
                         String nombreCampo = entry.getKey();
                         String valorCampo = entry.getValue();
 
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
-                        }
-
-                        // Si el campo empieza con "U_", se elimina antes de guardarlo
                         if (nombreCampo.startsWith("U_")) {
                             nombreCampo = nombreCampo.substring(2);
                         }
@@ -164,9 +125,6 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                         itemObjectHash.put(nombreCampo, valorCampo);
                         newlist.add(valorCampo);
 
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("generateBoletaPDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
-                        }
                     }
                 }
 
@@ -177,29 +135,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
 
 
             boletaObj.setItemsDynamic(listaItem);
-
-            for (int i = 0; i < boletaObj.getItemsDynamic().size(); i++) {
-
-                for (int j = 0; j < boletaObj.getItemsDynamic().get(i).getLstDinamicaItem().size(); j++) {
-
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Columna " + j);
-                    }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateInvoicePDF() [" + this.docUUID + "] Fila " + i + " Contenido " + boletaObj.getItemsDynamic().get(i).getLstDinamicaItem().get(j));
-                    }
-
-                }
-            }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion de los MONTOS.");
-            }
             String currencyCode = boletaType.getInvoiceType().getDocumentCurrencyCode().getValue();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo monto de Percepcion.");
-            }
             BigDecimal percepctionAmount = null;
             BigDecimal perceptionPercentage = null;
             for (int i = 0; i < boletaType.getTransaccion().getTransactionTotalesDTOList().size(); i++) {
@@ -210,12 +146,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                     boletaObj.setPerceptionPercentage(boletaType.getTransaccion().getTransactionTotalesDTOList().get(i).getPrcnt().toString() + "%");
                 }
             }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo monto de ISC.");
-            }
             BigDecimal retentionpercentage = null;
-
             for (int i = 0; i < boletaType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
                 for (int j = 0; j < boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().size(); j++) {
                     if (boletaType.getTransaccion().getTransactionLineasDTOList().get(i).getTransactionLineasImpuestoListDTO().get(j).getTipoTributo().equalsIgnoreCase("2000")) {
@@ -238,28 +169,15 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
             }
 
             BigDecimal prepaidAmount = null;
-            /* Agregando el monto de ANTICIPO con valor NEGATIVO */
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo monto de Anticipo. " + boletaType.getTransaccion().getANTICIPO_Monto());
-            }
 
             if (null != boletaType.getInvoiceType().getPrepaidPayment() && !boletaType.getInvoiceType().getPrepaidPayment().isEmpty() && null != boletaType.getInvoiceType().getPrepaidPayment().get(0).getPaidAmount()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateBoletaPDF() [" + this.docUUID + "] Monto de Anticipo Mayor a 0. ");
-                }
-
                 prepaidAmount = boletaType.getInvoiceType().getLegalMonetaryTotal().getPrepaidAmount().getValue().negate();
-                // invoiceType.getInvoiceType().getPrepaidPayment().get(0).getPaidAmount().getValue().negate();
                 boletaObj.setPrepaidAmountValue(getCurrencyV3(prepaidAmount, currencyCode));
             } else {
                 boletaObj.setPrepaidAmountValue(currencyCode + " 0.00");
                 prepaidAmount = BigDecimal.ZERO;
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
-            }
             boletaObj.setSenderSocialReason(boletaType.getTransaccion().getRazonSocial());
             boletaObj.setSenderRuc(boletaType.getTransaccion().getDocIdentidad_Nro());
             boletaObj.setSenderFiscalAddress(boletaType.getTransaccion().getDIR_NomCalle());
@@ -273,7 +191,6 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
             boletaObj.setWeb(boletaType.getTransaccion().getWeb());
             boletaObj.setPorcentajeIGV(boletaType.getTransaccion().getDOC_PorcImpuesto());
             boletaObj.setComentarios(boletaType.getTransaccion().getFE_Comentario());
-//            boletaObj.setImpuestoBolsa(boletaType.getBoletaType());
 
             if (Boolean.parseBoolean(configData.getPdfBorrador())) {
                 boletaObj.setValidezPDF("Este documento no tiene validez fiscal.");
@@ -282,35 +199,19 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
             }
             List<TransactionActicipoDTO> anticipoList = boletaType.getTransaccion().getTransactionActicipoDTOList();
             String anticipos = anticipoList.parallelStream().map(TransactionActicipoDTO::getAntiDOC_Serie_Correlativo).collect(Collectors.joining(" "));
-//            String Anticipos = "";
-//            for (int i = 0; i < boletaType.getTransaccion().getTransaccionAnticipoList().size(); i++) {
-//                Anticipos.concat(boletaType.getTransaccion().getTransaccionAnticipoList().get(i).getAntiDOCSerieCorrelativo() + " ");
-//            }
             boletaObj.setAnticipos(anticipos);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
-            }
             boletaObj.setReceiverFullname(boletaType.getTransaccion().getSN_RazonSocial());
             boletaObj.setReceiverIdentifier(boletaType.getTransaccion().getSN_DocIdentidad_Nro());
             boletaObj.setReceiverIdentifierType(boletaType.getTransaccion().getSN_DocIdentidad_Tipo());
             if (boletaType.getTransaccion().getSN_DIR_NomCalle() != null && boletaType.getTransaccion().getSN_DIR_Distrito() != null && boletaType.getTransaccion().getSN_DIR_Provincia() != null && boletaType.getTransaccion().getSN_DIR_Departamento() != null)
                 boletaObj.setReceiverFiscalAddress(boletaType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + boletaType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
-            }
-            // boletaObj.setBoletaItems(getBoletaItems(boletaType.getBoletaType().getInvoiceLine()));
-
             BigDecimal subtotalValue = getTransaccionTotales(boletaType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1005);
             if (null != boletaType.getInvoiceType().getPrepaidPayment() && !boletaType.getInvoiceType().getPrepaidPayment().isEmpty() && null != boletaType.getInvoiceType().getPrepaidPayment().get(0).getPaidAmount()) {
                 boletaObj.setSubtotalValue(getCurrency(subtotalValue.add(prepaidAmount.multiply(BigDecimal.ONE.negate())), currencyCode));
             } else {
                 boletaObj.setSubtotalValue(getCurrency(subtotalValue, currencyCode));
-            }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + boletaType.getTransaccion().getTransactionContractDocRefListDTOS().size());
             }
 
             BigDecimal igvValue = getTaxTotalValue2(boletaType.getTransaccion().getTransactionImpuestosDTOList(), IUBLConfig.TAX_TOTAL_IGV_ID);
@@ -340,27 +241,11 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
 
             BigDecimal gratuitaAmount = getTransaccionTotales(boletaType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
             if (!gratuitaAmount.equals(BigDecimal.ZERO)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateBoletaPDF() [" + this.docUUID + "] Existe Op. Gratuitas.");
-                }
                 boletaObj.setGratuitaAmountValue(getCurrency(gratuitaAmount, currencyCode));
             } else {
                 boletaObj.setGratuitaAmountValue(getCurrency(BigDecimal.ZERO, currencyCode));
             }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
-            }
-
             String barcodeValue = generateBarCodeInfoString(boletaType.getTransaccion().getDocIdentidad_Nro(), boletaType.getTransaccion().getDOC_Codigo(), boletaType.getTransaccion().getDOC_Serie(), boletaType.getTransaccion().getDOC_Numero(), boletaType.getInvoiceType().getTaxTotal(), boletaObj.getIssueDate(), boletaType.getTransaccion().getDOC_MontoTotal().toString(), boletaType.getTransaccion().getSN_DocIdentidad_Tipo(), boletaType.getTransaccion().getSN_DocIdentidad_Nro(), boletaType.getInvoiceType().getUBLExtensions());
-
-//            String barcodeValue = generateBarCodeInfoString(invoiceType.getInvoiceType().getID().getValue(), invoiceType.getInvoiceType().getInvoiceTypeCode().getValue(),invoiceObj.getIssueDate(), invoiceType.getInvoiceType().getLegalMonetaryTotal().getPayableAmount().getValue(), invoiceType.getInvoiceType().getTaxTotal(), invoiceType.getInvoiceType().getAccountingSupplierParty(), invoiceType.getInvoiceType().getAccountingCustomerParty(),invoiceType.getInvoiceType().getUBLExtensions());
-            if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
-            }
-            //invoiceObj.setBarcodeValue(barcodeValue);
-
-
             String rutaPath = configData.getRutaBaseDoc() + File.separator + boletaType.getTransaccion().getDocIdentidad_Nro() + File.separator + "CodigoQR" + File.separator + "03" + File.separator + boletaType.getInvoiceType().getID().getValue() + ".png";
             File f = new File(configData.getRutaBaseDoc() + File.separator + boletaType.getTransaccion().getDocIdentidad_Nro() + File.separator + "CodigoQR" + File.separator + "03");
             if (!f.exists()) {
@@ -380,46 +265,17 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
             boletaObj.setBarcodeValue(inputStreamPDF);
             String digestValue = generateDigestValue(boletaType.getInvoiceType().getUBLExtensions());
 
-            if (logger.isInfoEnabled()) {
-                logger.info("generateBoletaPDF() [" + this.docUUID + "] VALOR RESUMEN: \n" + digestValue);
-            }
-
             boletaObj.setDigestValue(digestValue);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
-            }
-
             Map<String, LegendObject> legendsMap = null;
 
-            //if (TipoVersionUBL.boleta.equals("21")) {
             legendsMap = getaddLeyends(boletaType.getInvoiceType().getNote());
-            /*} else if (TipoVersionUBL.boleta.equals("20")) {
-                legendsMap = getAdditionalProperties(boletaType.getInvoiceType().getUBLExtensions().getUBLExtension());
-            }*/
-            /*
-            Map<String, LegendObject> legendsMap = getaddLeyends(boletaType.getBoletaType().getNote());
-             */
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
-            }
             LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
             if(!legendsMap.isEmpty()) {
                 boletaObj.setLetterAmountValue(legendLetters.getLegendValue());
             }
-
             legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
-            }
             boletaObj.setLegends(getLegendList(legendsMap));
-
             boletaObj.setResolutionCodeValue("resolutionCde");
-
-            /*
-             * Generando el PDF de la FACTURA con la informacion recopilada.
-             */
             boletaInBytes = createBoletaPDF(boletaObj, configData);
         } catch (PDFReportException e) {
             logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
@@ -436,40 +292,22 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
     public byte[] createBoletaPDF(BoletaObject boletaObj, ConfigData configData) throws PDFReportException {
 
         Map<String, Object> parameterMap;
-        Map<String, Object> cuotasMap;
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("+createBoletaPDF() [" + docUUID + "]");
-        }
         byte[] pdfDocument = null;
 
         if (null == boletaObj) {
             throw new PDFReportException(IVenturaError.ERROR_407);
         } else {
             try {
-                /* Crea instancia del MAP */
                 parameterMap = new HashMap<String, Object>();
-
-                //================================================================================================
-                //================================= AGREGANDO INFORMACION AL MAP =================================
-                //================================================================================================
                 parameterMap.put(IPDFCreatorConfig.DOCUMENT_IDENTIFIER, boletaObj.getDocumentIdentifier());
                 parameterMap.put(IPDFCreatorConfig.ISSUE_DATE, boletaObj.getIssueDate());
                 parameterMap.put(IPDFCreatorConfig.DUE_DATE, boletaObj.getDueDate());
                 parameterMap.put(IPDFCreatorConfig.CURRENCY_VALUE, boletaObj.getCurrencyValue());
-
-                /*if (StringUtils.isNotBlank(boletaObj.getSunatTransaction())) {
-                    parameterMap.put(IPDFCreatorConfig.OPERATION_TYPE_LABEL, IPDFCreatorConfig.OPERATION_TYPE_DSC);
-                    parameterMap.put(IPDFCreatorConfig.OPERATION_TYPE_VALUE, boletaObj.getSunatTransaction());
-                }*/
-
                 parameterMap.put(IPDFCreatorConfig.OPERATION_TYPE_VALUE, boletaObj.getFormSap());
-
                 parameterMap.put(IPDFCreatorConfig.PAYMENT_CONDITION, boletaObj.getPaymentCondition());
                 parameterMap.put(IPDFCreatorConfig.SELL_ORDER, boletaObj.getSellOrder());
                 parameterMap.put(IPDFCreatorConfig.SELLER_NAME, boletaObj.getSellerName());
                 parameterMap.put(IPDFCreatorConfig.REMISSION_GUIDE, boletaObj.getRemissionGuides());
-
                 parameterMap.put(IPDFCreatorConfig.SENDER_SOCIAL_REASON, boletaObj.getSenderSocialReason());
                 parameterMap.put(IPDFCreatorConfig.SENDER_RUC, boletaObj.getSenderRuc());
                 parameterMap.put(IPDFCreatorConfig.SENDER_FISCAL_ADDRESS, boletaObj.getSenderFiscalAddress());
@@ -483,17 +321,13 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 parameterMap.put(IPDFCreatorConfig.ANTICIPO_APLICADO, boletaObj.getAnticipos());
                 parameterMap.put(IPDFCreatorConfig.COMMENTS, boletaObj.getComentarios());
                 parameterMap.put(IPDFCreatorConfig.PORCIGV, boletaObj.getPorcentajeIGV());
-
                 parameterMap.put(IPDFCreatorConfig.VALIDEZPDF, boletaObj.getValidezPDF());
-
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_FULLNAME, boletaObj.getReceiverFullname());
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_IDENTIFIER, boletaObj.getReceiverIdentifier());
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_IDENTIFIER_TYPE, boletaObj.getReceiverIdentifierType());
                 parameterMap.put(IPDFCreatorConfig.RECEIVER_FISCAL_ADDRESS, boletaObj.getReceiverFiscalAddress());
-
                 parameterMap.put(IPDFCreatorConfig.PERCENTAGE_PERCEPTION, boletaObj.getPerceptionPercentage());
                 parameterMap.put(IPDFCreatorConfig.AMOUNT_PERCEPTION, boletaObj.getPerceptionAmount());
-
                 parameterMap.put(IPDFCreatorConfig.PREPAID_AMOUNT_VALUE, boletaObj.getPrepaidAmountValue());
                 parameterMap.put(IPDFCreatorConfig.SUBTOTAL_VALUE, boletaObj.getSubtotalValue());
                 parameterMap.put(IPDFCreatorConfig.IGV_VALUE, boletaObj.getIgvValue());
@@ -514,7 +348,6 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                     parameterMap.put(IPDFCreatorConfig.GRATUITA_AMOUNT_VALUE, boletaObj.getGratuitaAmountValue());
                 }
 
-
                 if (configData.getImpresionPDF().equalsIgnoreCase("Codigo QR")) {
                     parameterMap.put(IPDFCreatorConfig.CODEQR, boletaObj.getCodeQR());
                 } else {
@@ -534,26 +367,13 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 }
 
                 parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, boletaObj.getLetterAmountValue());
-
-                /*
-                 * IMPORTANTE!!
-                 *
-                 * Agregar la ruta del directorio en donde se encuentran los
-                 * sub-reportes en formato (.jasper)
-                 */
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\files\\" + boletaObj.getSenderRuc() + "\\formatos\\legendReport.jasper");
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(boletaObj.getLegends()));
-
                 Map<String, String> legendMap = new HashMap<String, String>();
                 legendMap.put(IPDFCreatorConfig.LEGEND_DOCUMENT_TYPE, IPDFCreatorConfig.LEGEND_BOLETA_DOCUMENT);
                 legendMap.put(IPDFCreatorConfig.RESOLUTION_CODE_VALUE, boletaObj.getResolutionCodeValue());
-
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_MAP, legendMap);
 
-                /*
-                 * Generar el reporte con la informacion de la boleta
-                 * de venta electronica
-                 */
                 String documentName = (configData.getPdfIngles() != null && configData.getPdfIngles().equals("Si")) ? "boletaDocument_Ing.jrxml" : "boletaDocument.jrxml";
                 JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(boletaObj.getSenderRuc(), documentName);
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap,

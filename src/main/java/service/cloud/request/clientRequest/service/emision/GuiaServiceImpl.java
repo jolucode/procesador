@@ -127,9 +127,6 @@ public class GuiaServiceImpl implements GuiaInterface {
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
         DespatchAdviceType despatchAdviceType = ublHandler.generateDespatchAdviceType(transaction, signerName);
 
-        // Validar la guía generada
-        validationHandler.checkRemissionGuideDocument(despatchAdviceType);
-
         // Obtener el nombre del documento
         String documentName = DocumentNameHandler.getInstance().getRemissionGuideName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
         if (logger.isDebugEnabled()) {
@@ -428,12 +425,6 @@ public class GuiaServiceImpl implements GuiaInterface {
         return responseDTO;
     }
 
-    /**
-     * Comprime en memoria el arreglo de bytes (por ejemplo, un XML) a un archivo ZIP.
-     * @param fileContent Arreglo de bytes a comprimir.
-     * @param internalFileName Nombre del archivo dentro del ZIP (ej: 'documento.xml').
-     * @return bytes que representan un archivo ZIP en memoria.
-     */
     private byte[] compressToZip(byte[] fileContent, String internalFileName) throws IOException {
         if (fileContent == null || fileContent.length == 0) {
             return new byte[0];
@@ -626,48 +617,4 @@ public class GuiaServiceImpl implements GuiaInterface {
         return null;
     }
 
-
-    private TransaccionRespuesta manejarRespuestaSunat2(ResponseDTO responseDTO,
-                                                       UBLDocumentWRP documentWRP,
-                                                       FileHandler fileHandler,
-                                                       String documentName,
-                                                       TransacctionDTO transaction,
-                                                       ConfigData configuracion) {
-        // Errores de credenciales o ticket
-        if (responseDTO.getStatusCode() == 400 || responseDTO.getStatusCode() == 404) {
-            return generateResponseRest(documentWRP, responseDTO);
-        }
-
-        // Manejo normal
-        if (responseDTO.getCodRespuesta() != null) {
-            switch (responseDTO.getCodRespuesta()) {
-                case "0":
-                    // Documento aprobado
-                    TransaccionRespuesta transactionResponse = generateResponseRest(documentWRP, responseDTO);
-                    String rptBase64 = responseDTO.getArcCdr();
-                    byte[] bytesZip = Base64.decodeBase64(rptBase64);
-                    String sunatResponseUrlPdfGuia = SunatResponseUtils.proccessResponseUrlPdfGuia(bytesZip);//proccessResponse(statusResponse, transaction, configuracion.getIntegracionWs());
-                    configuracion.setUrlGuias(sunatResponseUrlPdfGuia);
-                    // Generar PDF
-                    byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null,
-                            fileHandler,
-                            documentName,
-                            transaction.getDOC_Codigo(),
-                            documentWRP,
-                            transaction,
-                            configuracion);
-                    transactionResponse.setPdf(pdf);
-                    transactionResponse.setTicketRest(responseDTO.getNumTicket());
-                    return transactionResponse;
-
-                case "98":
-                case "99":
-                    // Documento en proceso o rechazado
-                    return generateResponseRest(documentWRP, responseDTO);
-                default:
-                    return null;
-            }
-        }
-        return null;
-    }
 }

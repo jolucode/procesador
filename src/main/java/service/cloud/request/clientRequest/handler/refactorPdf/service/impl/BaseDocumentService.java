@@ -150,8 +150,6 @@ public abstract class BaseDocumentService {
     }
 
 
-    /***/
-
     protected BigDecimal getPricingReferenceValue(
             List<PriceType> alternativeConditionPrice, String priceTypeCode)
             throws PDFReportException {
@@ -177,10 +175,6 @@ public abstract class BaseDocumentService {
         BigDecimal value = BigDecimal.ZERO;
 
         if (null != allowanceCharges && 0 < allowanceCharges.size()) {
-            /*
-             * Se entiende que en el caso exista una lista, solo debe tener un
-             * solo valor
-             */
             value = allowanceCharges.get(0).getAmount().getValue();
         }
         return value;
@@ -236,9 +230,6 @@ public abstract class BaseDocumentService {
         if (null != legendsMap && 0 < legendsMap.size()) {
             legendList = new ArrayList<LegendObject>(legendsMap.values());
         } else {
-            /*
-             * No existe LEYENDAS.
-             */
             LegendObject legendObj = new LegendObject();
             legendObj.setLegendValue(IPDFCreatorConfig.LEGEND_DEFAULT_EMPTY);
 
@@ -251,9 +242,6 @@ public abstract class BaseDocumentService {
 
     protected Map<String, LegendObject> getaddLeyends(List<NoteType> lstNote) throws PDFReportException {
         Map<String, LegendObject> legendsMap = null;
-        String id = null;
-        String value = null;
-
         try {
             legendsMap = new HashMap<String, LegendObject>();
             if (lstNote != null) {
@@ -312,13 +300,7 @@ public abstract class BaseDocumentService {
 
         String digestValue = null;
         try {
-
-
-            /* i.) Valor resumen <ds:DigestValue> */
             digestValue = getDigestValue(ublExtensions);
-            // String digestValue=null;
-            /* j.) Valor de la Firma digital <ds:SignatureValue> */
-
         } catch (PDFReportException e) {
             logger.error("generateBarcodeInfo() [" + "] ERROR: "
                     + e.getError().getId() + "-" + e.getError().getMessage());
@@ -338,18 +320,10 @@ public abstract class BaseDocumentService {
         String barcodeValue = "";
         try {
 
-            /***/
             String digestValue = getDigestValue(ublExtensions);
-            logger.debug("Digest Value" + digestValue);
-
-            /**El elemento opcional KeyInfo contiene información sobre la llave que se necesita para validar la firma, como lo muestra*/
-            String signatureValue = getSignatureValue(ublExtensions);
-            logger.debug("signatureValue" + signatureValue);
-
             String Sumatoria_IGV = "";
             if (taxTotalList != null) {
                 Sumatoria_IGV = getTaxTotalValueV21(taxTotalList).toString();
-                logger.debug("Sumatoria_IGV" + Sumatoria_IGV);
             }
             barcodeValue = MessageFormat.format(IPDFCreatorConfig.BARCODE_PATTERN, RUC_emisor_electronico, documentType, serie, correlativo, Sumatoria_IGV, Importe_total_venta, issueDate, Tipo_documento_adquiriente, Numero_documento_adquiriente, digestValue);
 
@@ -368,35 +342,16 @@ public abstract class BaseDocumentService {
 
     protected BigDecimal getTaxTotalValue2(List<TransactionImpuestosDTO> taxTotalList,
                                            String taxTotalCode) throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-getTaxTotalValue() ["
-                    + "] taxTotalCode: " + taxTotalCode);
-        }
         BigDecimal taxValue = BigDecimal.ZERO;
-
         for (int i = 0; i < taxTotalList.size(); i++) {
             if (taxTotalList.get(i).getTipoTributo().equalsIgnoreCase(taxTotalCode)) {
                 taxValue = taxValue.add(taxTotalList.get(i).getMonto());
-                if (logger.isDebugEnabled()) {
-                    logger.debug("+-getTaxTotalValue() ["
-                            + "] taxValue: " + taxValue);
-                }
             }
-        }
-
-        if (null == taxTotalList && 0 > taxTotalList.size()) {
-            logger.error("getTaxTotalValue() ERROR: "
-                    + IVenturaError.ERROR_462.getMessage());
-            throw new PDFReportException(IVenturaError.ERROR_462);
         }
         return taxValue;
     }
 
     protected BigDecimal getTaxTotalValue(List<TaxTotalType> taxTotalList, String taxTotalCode) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-getTaxTotalValue() ["
-                    + "] taxTotalCode: " + taxTotalCode);
-        }
         BigDecimal taxValue = BigDecimal.ZERO;
 
         for (int i = 0; i < taxTotalList.size(); i++) {
@@ -415,24 +370,13 @@ public abstract class BaseDocumentService {
             throws Exception {
         String moneyStr = null;
 
-        /*
-         * Obtener el objeto Locale de PERU
-         */
         Locale locale = new Locale(IPDFCreatorConfig.LANG_PATTERN,
                 IPDFCreatorConfig.LOCALE_PE);
-
-        /*
-         * Obtener el formato de moneda local
-         */
         java.text.NumberFormat format = java.text.NumberFormat
                 .getCurrencyInstance(locale);
 
         if (StringUtils.isNotBlank(currencyCode)) {
             Currency currency = Currency.getInstance(currencyCode);
-
-            /*
-             * Establecer el currency en el formato
-             */
             format.setCurrency(currency);
         }
 
@@ -447,7 +391,6 @@ public abstract class BaseDocumentService {
                 String tempDesc = format.format(money);
                 java.text.DecimalFormat decF = new java.text.DecimalFormat(
                         IPDFCreatorConfig.PATTERN_FLOAT_DEC);
-                //System.out.println(decF.format(money));
                 moneyStr = tempDesc.substring(1, 4) + " " + decF.format(money);
             } else {
                 moneyStr = format.format(money);
@@ -463,24 +406,16 @@ public abstract class BaseDocumentService {
 
     protected List<InvoiceItemObject> getInvoiceItems(
             List<InvoiceLineType> invoiceLines) throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getInvoiceItems() ["
-                    + "] invoiceLines: " + invoiceLines);
-        }
         List<InvoiceItemObject> itemList = null;
 
         if (null != invoiceLines && 0 < invoiceLines.size()) {
-            /* Instanciando la lista de objetos */
             itemList = new ArrayList<InvoiceItemObject>(invoiceLines.size());
-
             try {
                 for (InvoiceLineType iLine : invoiceLines) {
                     InvoiceItemObject invoiceItemObj = new InvoiceItemObject();
 
                     invoiceItemObj.setQuantityItem(iLine.getInvoicedQuantity()
                             .getValue());
-                    // invoiceItemObj.setQuantityItem(iLine.getInvoicedQuantity().getValue().setScale(IPDFCreatorConfig.DECIMAL_ITEM_QUANTITY,
-                    // RoundingMode.HALF_UP).toString());
                     invoiceItemObj
                             .setUnitMeasureItem((null != iLine.getNote()) ? iLine
                                     .getNote().get(0).getValue() : "");
@@ -488,17 +423,11 @@ public abstract class BaseDocumentService {
                             .getDescription().get(0).getValue().toUpperCase());
                     invoiceItemObj.setUnitValueItem(iLine.getPrice()
                             .getPriceAmount().getValue());
-                    // invoiceItemObj.setUnitValueItem(getCurrencyV2(iLine.getPrice().getPriceAmount().getValue(),
-                    // null, IPDFCreatorConfig.PATTERN_FLOAT_DEC_3));
-
                     BigDecimal unitPrice = getPricingReferenceValue(iLine
                                     .getPricingReference()
                                     .getAlternativeConditionPrice(),
                             IPDFCreatorConfig.ALTERNATIVE_COND_UNIT_PRICE);
                     invoiceItemObj.setUnitPriceItem(unitPrice);
-                    // invoiceItemObj.setUnitPriceItem(getCurrencyV2(unitPrice,
-                    // null, IPDFCreatorConfig.PATTERN_FLOAT_DEC_3));
-
                     invoiceItemObj.setDiscountItem(getCurrency(
                             getDiscountItem(iLine.getAllowanceCharge()), null));
                     invoiceItemObj.setAmountItem(getCurrency(iLine
@@ -544,24 +473,14 @@ public abstract class BaseDocumentService {
             throws Exception {
         String moneyStr = null;
 
-        /*
-         * Obtener el objeto Locale de PERU
-         */
+
         Locale locale = new Locale(IPDFCreatorConfig.LANG_PATTERN,
                 IPDFCreatorConfig.LOCALE_PE);
-
-        /*
-         * Obtener el formato de moneda local
-         */
         java.text.NumberFormat format = java.text.NumberFormat
                 .getCurrencyInstance(locale);
 
         if (StringUtils.isNotBlank(currencyCode)) {
             Currency currency = Currency.getInstance(currencyCode);
-
-            /*
-             * Establecer el currency en el formato
-             */
             format.setCurrency(currency);
         }
 
@@ -766,10 +685,6 @@ public abstract class BaseDocumentService {
 
     protected String getContractDocumentReference(
             List<DocumentReferenceType> contractDocumentReferences, String code) {
-        if (logger.isInfoEnabled()) {
-            logger.info("generateCreditNotePDF() [Lista contractDocumentReferences ]"
-                    + contractDocumentReferences.size());
-        }
         String contractDocRefResponse = null;
 
         if (null != contractDocumentReferences
@@ -777,10 +692,6 @@ public abstract class BaseDocumentService {
             for (DocumentReferenceType contDocumentRef : contractDocumentReferences) {
                 if (contDocumentRef.getDocumentTypeCode().getValue()
                         .equalsIgnoreCase(code)) {
-                    if (logger.isInfoEnabled()) {
-                        logger.info("generateCreditNotePDF() [Lista contractDocumentReferences ]"
-                                + contDocumentRef.getID().getValue());
-                    }
                     contractDocRefResponse = contDocumentRef.getID().getValue();
                 }
             }

@@ -3517,24 +3517,9 @@ public abstract class UBLBasicHandler {
             returnabilityIndicator.setValue(valorPreliminarRef.equals("Y"));
             transportEquipment.setReturnabilityIndicator(returnabilityIndicator);
             transportHandlingUnit.getTransportEquipment().add(transportEquipment);
-            /*
-             * <cac:Shipment><cac:Consigment><cac:TransportHandlingUnit><cac:MeasurementDimension>
-             *
-             * Carga Util en TM del Vehiculo.
-             * Tipo de Carga: Carga Util (01)
-             */
             if (null != cUtilVehiculoTM && cUtilVehiculoTM.compareTo(BigDecimal.ZERO) == 1) {
-                //if (logger.isInfoEnabled()) {
-                //    logger.info("getShipmentForDelivery() [" + this.identifier + "] Agregar CARGA UTIL EN TM DEL VEHICULO.");
-                //}
                 transportHandlingUnit.getMeasurementDimension().add(getMeasurementDimension("01", cUtilVehiculoTM));
             }
-            /*
-             * <cac:Shipment><cac:Consigment><cac:TransportHandlingUnit><cac:MeasurementDimension>
-             *
-             * Carga Efectiva en TM del Vehiculo.
-             * Tipo de Carga: Carga Efectiva (02)
-             */
             if (null != cEfectivaVehiculoTM && cEfectivaVehiculoTM.compareTo(BigDecimal.ZERO) == 1) {
                 transportHandlingUnit.getMeasurementDimension().add(getMeasurementDimension("02", cEfectivaVehiculoTM));
             }
@@ -3605,13 +3590,6 @@ public abstract class UBLBasicHandler {
                     + IVenturaError.ERROR_330.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_330);
         }
-
-        //if (null == subtotal) {
-        //    logger.error("getSubtotalValueFromTransaction() ["
-        //            + this.identifier + "] ERROR: "
-        //            + IVenturaError.ERROR_348.getMessage());
-        //    throw new UBLDocumentException(IVenturaError.ERROR_348);
-        //}
         return subtotal;
     }
 

@@ -18,8 +18,6 @@ public class CertificateUtils {
 
     private final static Logger logger = Logger.getLogger(CertificateUtils.class);
 
-
-
     // Método para cargar un certificado en bytes desde una ruta
     public static byte[] loadCertificate(String certificatePath) throws FileNotFoundException, ConfigurationException {
         return getCertificateInBytes(certificatePath);
