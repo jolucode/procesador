@@ -281,11 +281,11 @@ public class GuiaServiceImpl implements GuiaInterface {
         log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
         log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
         log.setSeriesAndCorrelative(documentName);
-        log.setResponse((new Gson().toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (new Gson().toJson(transactionResponse.getSunat())));
+        String messageResponse = (new Gson().toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (new Gson().toJson(transactionResponse.getSunat()));
+        log.setResponse(messageResponse + " - " + transactionResponse.getTicketRest());
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
         transactionResponse.setLogDTO(log);
         log.setPathBase(attachmentPath + "\\" + documentName + ".json");
-
         return transactionResponse;
     }
 
@@ -302,7 +302,7 @@ public class GuiaServiceImpl implements GuiaInterface {
         ).block();
 
         // Ticket ya aprobado
-        if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && "APROBADO".equals(ticketMongoSave.getEstadoTicket())) {
+        if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ("APROBADO".equals(ticketMongoSave.getEstadoTicket()) || "PROCESO".equals(ticketMongoSave.getEstadoTicket()))) {
             String ticketToUse = ticketMongoSave.getTicketSunat();
             if (ticketToUse != null && !ticketToUse.isEmpty()) {
                 ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
@@ -320,6 +320,9 @@ public class GuiaServiceImpl implements GuiaInterface {
 
             // DECLARE GENERA TICKET
             ResponseDTO responseDTO = declareSunat(documentName, documentPath/*.replace(EXT_XML, EXT_ZIP)*/, responseDTOJWT.getAccess_token());
+
+            // Guardar ticket en estado "EN PROCESO"
+            saveTicketRest(transaction, responseDTO);
 
             // Manejo 401
             if (responseDTO.getStatusCode() == 401) {
@@ -348,9 +351,9 @@ public class GuiaServiceImpl implements GuiaInterface {
             transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
 
             // Guardar en DB si aprobado
-            if (transactionResponse != null && transactionResponse.getMensaje() != null && transactionResponse.getMensaje().contains("Documento aprobado")) {
-                saveTicketRest(transaction, responseDTO);
-            }
+            //if (transactionResponse != null && transactionResponse.getMensaje() != null && transactionResponse.getMensaje().contains("Documento aprobado")) {
+            //    saveTicketRest(transaction, responseDTO);
+            //}
 
             // Añadir XML firmado
             if (transactionResponse != null) {
@@ -374,7 +377,7 @@ public class GuiaServiceImpl implements GuiaInterface {
                 transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
         ).block();
 
-        String ticketToUse = (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && "APROBADO".equals(ticketMongoSave.getEstadoTicket()))
+        String ticketToUse = (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ("APROBADO".equals(ticketMongoSave.getEstadoTicket()) || "PROCESO".equals(ticketMongoSave.getEstadoTicket())))
                 ? ticketMongoSave.getTicketSunat()
                 : transaction.getTransactionGuias().getTicketRest();
 
@@ -545,7 +548,11 @@ public class GuiaServiceImpl implements GuiaInterface {
         guiaTicket.setRucEmisor(transaccion.getDocIdentidad_Nro());
         guiaTicket.setFeId(transaccion.getFE_Id());
         guiaTicket.setTicketSunat(responseDTO.getNumTicket());
-        guiaTicket.setEstadoTicket("APROBADO");
+        guiaTicket.setCreadoEn(DateUtils.formatDateToString(new Date()));
+        if("98".equals(responseDTO.getCodRespuesta()))
+            guiaTicket.setEstadoTicket("PROCESO");
+        else if("0".equals(responseDTO.getCodRespuesta()))
+            guiaTicket.setEstadoTicket("APROBADO");
         guiaTicketRepo.save(guiaTicket).subscribe();
     }
 

@@ -381,7 +381,6 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
                 parameterMap.put(IPDFCreatorConfig.INDICADOR_RETORNO_VEHICULO_ENVASES_VACIO, despatchAdviceObject.getIndicadorRetornoVehiculoEnvasesVacio());
                 parameterMap.put(IPDFCreatorConfig.GRT_INDICADOR_PAGADOR_FLETE, despatchAdviceObject.getGrtIndicadorPagadorFlete());
 
-                despatchAdviceObject = null;
                 parameterMap.put(IPDFCreatorConfig.GRT_NUMERO_TUCE_PRINCIPAL, despatchAdviceObject.getGrtNumeroTUCEPrincipal());
                 parameterMap.put(IPDFCreatorConfig.GRT_ENTIDAD_EMISORA_PRINCIPAL, despatchAdviceObject.getGrtEntidadEmisoraPrincipal());
                 parameterMap.put(IPDFCreatorConfig.GRT_PLACA_VEHICULO_SECUNDARIO, despatchAdviceObject.getGrtPlacaVehiculoSecundario());
