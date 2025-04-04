@@ -2711,9 +2711,9 @@ public abstract class UBLBasicHandler {
         }
         final PayableAmountType payableAmount = new PayableAmountType();
 
-        if (transaccion.getANTICIPO_Monto().compareTo(BigDecimal.ZERO) > 0) {
+        /*if (transaccion.getANTICIPO_Monto().compareTo(BigDecimal.ZERO) > 0) {
             payableAmountValue = payableAmountValue.subtract(transaccion.getANTICIPO_Monto());
-        }
+        }*/
         payableAmount.setValue((payableAmountValue != null ? payableAmountValue : BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP));
 
         payableAmount.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
