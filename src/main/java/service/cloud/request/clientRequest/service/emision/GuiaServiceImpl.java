@@ -35,6 +35,7 @@ import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterfac
 import service.cloud.request.clientRequest.utils.SunatResponseUtils;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
 import service.cloud.request.clientRequest.utils.exception.DateUtils;
+import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 import service.cloud.request.clientRequest.utils.files.CertificateUtils;
 import service.cloud.request.clientRequest.utils.files.DocumentConverterUtils;
@@ -256,12 +257,24 @@ public class GuiaServiceImpl implements GuiaInterface {
             logger.debug("-transactionRemissionGuideDocument() [" + this.docUUID + "]");
         }
 
+        String errorPdf = "";
         // Generar PDF borrador
         if ("true".equals(client.getPdfBorrador())) {
-            if (transactionResponse != null) {
-                transactionResponse.setPdfBorrador(
-                        transactionResponse.getPdf()
-                );
+            if (transactionResponse != null && transactionResponse.getPdf() != null) {
+                transactionResponse.setPdfBorrador(transactionResponse.getPdf());
+            } else {
+                try {
+                    byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null,
+                            fileHandler,
+                            documentName,
+                            transaction.getDOC_Codigo(),
+                            documentWRP,
+                            transaction,
+                            configuracion);
+                    transactionResponse.setPdfBorrador(pdf);
+                } catch (Exception e) {
+                    errorPdf = e.getMessage();
+                }
             }
         }
 
@@ -282,10 +295,11 @@ public class GuiaServiceImpl implements GuiaInterface {
         log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
         log.setSeriesAndCorrelative(documentName);
         String messageResponse = (new Gson().toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (new Gson().toJson(transactionResponse.getSunat()));
-        log.setResponse(messageResponse + " - " + transactionResponse.getTicketRest());
+        log.setResponse(messageResponse + " - " + transactionResponse.getTicketRest() + " " + errorPdf );
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
         transactionResponse.setLogDTO(log);
         log.setPathBase(attachmentPath + "\\" + documentName + ".json");
+        transactionResponse.setMensaje(transactionResponse.getMensaje() + " - " + errorPdf);
         return transactionResponse;
     }
 
@@ -608,13 +622,21 @@ public class GuiaServiceImpl implements GuiaInterface {
 
             // Generar PDF para todos los casos válidos
             if (transactionResponse != null) {
-                byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null,
-                        fileHandler,
-                        documentName,
-                        transaction.getDOC_Codigo(),
-                        documentWRP,
-                        transaction,
-                        configuracion);
+                byte[] pdf = null;
+
+
+                try {
+                    pdf = processorCoreInterface.processCDRResponseContigencia(null,
+                            fileHandler,
+                            documentName,
+                            transaction.getDOC_Codigo(),
+                            documentWRP,
+                            transaction,
+                            configuracion);
+                } catch (PDFReportException e) {
+                    transactionResponse.setErrorPdf(e.getMessage());
+                    throw new RuntimeException(e);
+                }
                 transactionResponse.setPdf(pdf);
             }
 

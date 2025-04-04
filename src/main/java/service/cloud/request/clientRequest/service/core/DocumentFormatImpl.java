@@ -11,6 +11,7 @@ import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.handler.refactorPdf.service.impl.*;
 import service.cloud.request.clientRequest.utils.exception.ConfigurationException;
+import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 
 import java.io.ByteArrayInputStream;
@@ -50,7 +51,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
     DespatchAdvicePDFBuilder despatchAdviceBuilder;
 
     @Override
-    public byte[] createPDFDocument(UBLDocumentWRP wrp, TransacctionDTO transaction, ConfigData configuracion) {
+    public byte[] createPDFDocument(UBLDocumentWRP wrp, TransacctionDTO transaction, ConfigData configuracion) throws PDFReportException {
 
         byte[] pdfBytes = null;
         List<TransactionTotalesDTO> transaccionTotales = new ArrayList<>(transaction.getTransactionTotalesDTOList());
@@ -99,6 +100,8 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
             }
         } catch (ConfigurationException e) {
             logger.error(e.getMessage());
+        } catch (PDFReportException e) {
+            throw new PDFReportException(e.getMessage());
         }
         return pdfBytes;
     }

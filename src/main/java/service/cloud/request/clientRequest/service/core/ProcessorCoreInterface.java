@@ -6,6 +6,7 @@ import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
 import service.cloud.request.clientRequest.estela.dto.FileResponseDTO;
 import service.cloud.request.clientRequest.handler.FileHandler;
+import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 
 import java.io.File;
 
@@ -18,5 +19,5 @@ public interface ProcessorCoreInterface {
     public byte[] processCDRResponseContigencia(byte[] cdrConstancy,
                                                 FileHandler fileHandler, String documentName,
                                                 String documentCode, UBLDocumentWRP documentWRP,
-                                                TransacctionDTO transaccion, ConfigData configuracion);
+                                                TransacctionDTO transaccion, ConfigData configuracion) throws PDFReportException;
 }

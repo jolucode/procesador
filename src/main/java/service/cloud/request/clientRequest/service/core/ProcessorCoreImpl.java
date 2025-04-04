@@ -14,6 +14,7 @@ import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.SunatResponseUtils;
+import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 
 import java.io.File;
@@ -80,7 +81,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
     @Override
     public byte[] processCDRResponseContigencia(byte[] cdrConstancy, FileHandler fileHandler,
                                                 String documentName, String documentCode, UBLDocumentWRP documentWRP, TransacctionDTO
-                                                        transaccion, ConfigData configuracion) {
+                                                        transaccion, ConfigData configuracion) throws PDFReportException {
         byte[] pdfBytes = null;
 
         if (logger.isDebugEnabled()) {
@@ -105,6 +106,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
         } catch (Exception e) {
             logger.error("processCDRResponse() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
             logger.error("processCDRResponse() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
+            throw new PDFReportException(e.getMessage());
         }
         if (logger.isDebugEnabled()) {
             logger.debug("-processCDRResponse() [" + this.docUUID + "]");

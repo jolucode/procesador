@@ -50,6 +50,8 @@ public class TransaccionRespuesta {
 
     private LogDTO logDTO;
 
+    private String errorPdf;
+
     public byte[] getPdfBorrador() {
         return pdfBorrador;
     }

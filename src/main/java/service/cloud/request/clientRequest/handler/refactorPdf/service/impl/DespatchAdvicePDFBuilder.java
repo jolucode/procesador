@@ -63,7 +63,7 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
     String docUUID = "asd";
 
     @Override
-    public synchronized byte[] generateDespatchAdvicePDF(UBLDocumentWRP despatchAdvice, ConfigData configData) {
+    public synchronized byte[] generateDespatchAdvicePDF(UBLDocumentWRP despatchAdvice, ConfigData configData) throws PDFReportException {
 
         if (logger.isDebugEnabled()) {
             logger.debug("+generateDespatchAdvicePDF() [" + this.docUUID + "]");
@@ -302,14 +302,8 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
 
             despatchInBytes = createDespatchAdvicePDF(despatchAdviceObject, docUUID, configData, despatchAdvice.getTransaccion().getDOC_Codigo());
 
-        } catch (PDFReportException e) {
-            logger.error("generateDespatchAdvicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {
-            logger.error("generateDespatchAdvicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
-            ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateDespatchAdvicePDF() [" + this.docUUID + "]");
+            throw new PDFReportException(e.getMessage());
         }
         return despatchInBytes;
     }
@@ -410,7 +404,7 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
             } catch (Exception e) {
                 logger.error("createDespatchAdvicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
                 logger.error("createDespatchAdvicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
-                throw new PDFReportException(IVenturaError.ERROR_441);
+                throw new PDFReportException(e.getMessage());
             }
         }
         if (logger.isDebugEnabled()) {
