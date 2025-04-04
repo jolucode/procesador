@@ -48,6 +48,7 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
             transactionResponse.setXml(signedDocument);
             transactionResponse.setZip(statusResponse);
             transactionResponse.setPdf(pdfBytes);
+            transactionResponse.setDigestValue(SunatResponseUtils.extractDigestValue(statusResponse));
         } else {
             //documento rechazado
             transactionResponse.setXml(signedDocument);

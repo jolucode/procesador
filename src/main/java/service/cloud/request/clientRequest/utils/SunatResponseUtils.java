@@ -111,6 +111,30 @@ public class SunatResponseUtils {
         return null;
     }
 
+    public static String extractDigestValue(byte[] cdrConstancy) {
+        try {
+            Optional<byte[]> unzippedResponse = unzipResponse(cdrConstancy);
+            if (unzippedResponse.isEmpty()) {
+                return null;
+            }
+
+            String xmlContent = new String(unzippedResponse.get(), StandardCharsets.UTF_8);
+
+            // Regex para capturar el contenido entre <DigestValue>...</DigestValue>
+            Pattern pattern = Pattern.compile("<[^>]*:?DigestValue>(.*?)</[^>]*:?DigestValue>");
+            Matcher matcher = pattern.matcher(xmlContent);
+
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public static Optional<byte[]> unzipResponse(byte[] cdr) throws IOException {
         ByteArrayInputStream bais = new ByteArrayInputStream(cdr);
         ZipInputStream zis = new ZipInputStream(bais);
