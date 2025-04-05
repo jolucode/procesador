@@ -8,8 +8,6 @@ import service.cloud.request.clientRequest.estela.dto.FileResponseDTO;
 import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 
-import java.io.File;
-
 public interface ProcessorCoreInterface {
 
     TransaccionRespuesta processCDRResponseV2(byte[] cdrConstancy, byte[] signedDocument, UBLDocumentWRP documentWRP, TransacctionDTO transaction, ConfigData configuracion, String documentName, String attachmentPath) throws Exception;

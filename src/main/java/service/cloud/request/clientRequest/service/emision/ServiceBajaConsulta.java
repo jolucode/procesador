@@ -18,7 +18,6 @@ import service.cloud.request.clientRequest.extras.ISunatConnectorConfig;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.mongo.model.LogDTO;
-import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
 import service.cloud.request.clientRequest.utils.SunatResponseUtils;
 import service.cloud.request.clientRequest.utils.exception.DateUtils;

@@ -194,36 +194,6 @@ public abstract class BaseDocumentService {
         return BigDecimal.ZERO;
     }
 
-    private String getSignatureValue(UBLExtensionsType ublExtensions)
-            throws Exception {
-        String signatureValue = null;
-        try {
-            int lastIndex = ublExtensions.getUBLExtension().size() - 1;
-            UBLExtensionType ublExtension = ublExtensions.getUBLExtension()
-                    .get(lastIndex);
-
-            NodeList nodeList = ublExtension.getExtensionContent().getAny()
-                    .getElementsByTagName(IUBLConfig.UBL_SIGNATUREVALUE_TAG);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i).getNodeName()
-                        .equalsIgnoreCase(IUBLConfig.UBL_SIGNATUREVALUE_TAG)) {
-                    signatureValue = nodeList.item(i).getTextContent();
-                    break;
-                }
-            }
-
-            if (StringUtils.isBlank(signatureValue)) {
-                throw new PDFReportException(IVenturaError.ERROR_424);
-            }
-        } catch (PDFReportException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("getSignatureValue() Exception -->" + e.getMessage());
-            throw e;
-        }
-        return signatureValue;
-    } // getSignatureValue
-
     protected List<LegendObject> getLegendList(
             Map<String, LegendObject> legendsMap) {
         List<LegendObject> legendList = null;
@@ -403,57 +373,6 @@ public abstract class BaseDocumentService {
 
         return moneyStr;
     } // getCurrency
-
-    protected List<InvoiceItemObject> getInvoiceItems(
-            List<InvoiceLineType> invoiceLines) throws PDFReportException {
-        List<InvoiceItemObject> itemList = null;
-
-        if (null != invoiceLines && 0 < invoiceLines.size()) {
-            itemList = new ArrayList<InvoiceItemObject>(invoiceLines.size());
-            try {
-                for (InvoiceLineType iLine : invoiceLines) {
-                    InvoiceItemObject invoiceItemObj = new InvoiceItemObject();
-
-                    invoiceItemObj.setQuantityItem(iLine.getInvoicedQuantity()
-                            .getValue());
-                    invoiceItemObj
-                            .setUnitMeasureItem((null != iLine.getNote()) ? iLine
-                                    .getNote().get(0).getValue() : "");
-                    invoiceItemObj.setDescriptionItem(iLine.getItem()
-                            .getDescription().get(0).getValue().toUpperCase());
-                    invoiceItemObj.setUnitValueItem(iLine.getPrice()
-                            .getPriceAmount().getValue());
-                    BigDecimal unitPrice = getPricingReferenceValue(iLine
-                                    .getPricingReference()
-                                    .getAlternativeConditionPrice(),
-                            IPDFCreatorConfig.ALTERNATIVE_COND_UNIT_PRICE);
-                    invoiceItemObj.setUnitPriceItem(unitPrice);
-                    invoiceItemObj.setDiscountItem(getCurrency(
-                            getDiscountItem(iLine.getAllowanceCharge()), null));
-                    invoiceItemObj.setAmountItem(getCurrency(iLine
-                            .getLineExtensionAmount().getValue(), null));
-
-                    itemList.add(invoiceItemObj);
-                }
-            } catch (PDFReportException e) {
-                logger.error("getInvoiceItems() [" + "] ERROR: "
-                        + e.getMessage());
-                throw e;
-            } catch (Exception e) {
-                logger.error("getInvoiceItems() [" + "] ERROR: "
-                        + IVenturaError.ERROR_415.getMessage());
-                throw new PDFReportException(IVenturaError.ERROR_415);
-            }
-        } else {
-            logger.error("getInvoiceItems() [" + "] ERROR: "
-                    + IVenturaError.ERROR_411.getMessage());
-            throw new PDFReportException(IVenturaError.ERROR_411);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getInvoiceItems()");
-        }
-        return itemList;
-    } // getInvoiceItems
 
     protected BigDecimal getTransaccionTotales(List<TransactionTotalesDTO> lstTotales, String addiMonetaryValue) {
 

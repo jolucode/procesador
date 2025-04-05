@@ -44,5 +44,4 @@ public class Utils {
         return prefijo + fecha + "-" + nuevoId;
     }
 
-
 }

@@ -13,7 +13,6 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.invoice_2.InvoiceT
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.perception_1.PerceptionType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.retention_1.RetentionType;
 
-import javax.activation.DataHandler;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -22,8 +21,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Esta clase HANDLER contiene metodos para transformar archivos y carpetas.

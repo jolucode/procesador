@@ -1,6 +1,5 @@
 package service.cloud.request.clientRequest.service.core;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,6 @@ import service.cloud.request.clientRequest.utils.Constants;
 import service.cloud.request.clientRequest.utils.SunatResponseUtils;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
-
-import java.io.File;
 
 @Service
 public class ProcessorCoreImpl implements ProcessorCoreInterface {
@@ -64,7 +61,6 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
     private void saveAllFiles(TransaccionRespuesta transactionResponse, String documentName, String attachmentPath) throws Exception {
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
         fileHandler.setBaseDirectory(attachmentPath);
-
         fileHandler.storeDocumentInDisk(transactionResponse.getXml(), documentName, "xml");
         fileHandler.storeDocumentInDisk(transactionResponse.getPdf(), documentName, "pdf");
         fileHandler.storeDocumentInDisk(transactionResponse.getZip(), documentName, "zip");
@@ -72,7 +68,6 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
     }
 
     @Override
-    //interface nueva:
     public TransaccionRespuesta processResponseSinCDR(TransacctionDTO transaction, FileResponseDTO responseDTO) {
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
         transactionResponse.setMensaje(responseDTO.getMessage());
@@ -84,38 +79,17 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
                                                 String documentName, String documentCode, UBLDocumentWRP documentWRP, TransacctionDTO
                                                         transaccion, ConfigData configuracion) throws PDFReportException {
         byte[] pdfBytes = null;
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("+processCDRResponse() [" + this.docUUID + "]");
-        }
-
         try {
             pdfBytes = documentFormatInterface.createPDFDocument( documentWRP, transaccion, configuracion);
-
             if (null != pdfBytes && 0 < pdfBytes.length) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("processCDRResponse() [" + this.docUUID + "] Si existe PDF en bytes.");
-                }
-                /*
-                 * Guardar el PDF en DISCO
-                 */
                 fileHandler.storePDFDocumentInDisk(pdfBytes, documentName, ISunatConnectorConfig.EE_PDF);
             } else {
                 logger.error("processCDRResponse() [" + this.docUUID + "] " + IVenturaError.ERROR_461.getMessage());
             }
-
         } catch (Exception e) {
-            logger.error("processCDRResponse() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
-            logger.error("processCDRResponse() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             throw new PDFReportException(e.getMessage());
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-processCDRResponse() [" + this.docUUID + "]");
-        }
-
         return pdfBytes;
-
     }
-
 
 }

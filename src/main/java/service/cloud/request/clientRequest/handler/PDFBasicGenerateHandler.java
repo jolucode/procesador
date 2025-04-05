@@ -21,7 +21,6 @@ public class PDFBasicGenerateHandler {
 
     Logger logger = LoggerFactory.getLogger(PDFBasicGenerateHandler.class);
 
-    /* Identificador del documento */
     protected String docUUID;
 
     public PDFBasicGenerateHandler(String docUUID) {
@@ -30,25 +29,16 @@ public class PDFBasicGenerateHandler {
 
     public String generateDigestValue(UBLExtensionsType ublExtensions)
             throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateDigestValueInfo()");
-        }
 
         String digestValue = null;
         try {
             digestValue = getDigestValue(ublExtensions);
         } catch (PDFReportException e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
-                    + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
-                    + IVenturaError.ERROR_418.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_418);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateBarcodeInfo()");
-        }
+
         return digestValue;
     }
 
@@ -76,7 +66,6 @@ public class PDFBasicGenerateHandler {
         } catch (PDFReportException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("getDigestValue() Exception -->" + e.getMessage());
             throw e;
         }
         return digestValue;
@@ -106,7 +95,6 @@ public class PDFBasicGenerateHandler {
         } catch (PDFReportException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("getSignatureValue() Exception -->" + e.getMessage());
             throw e;
         }
         return signatureValue;
@@ -114,10 +102,6 @@ public class PDFBasicGenerateHandler {
 
     protected String getContractDocumentReference(
             List<DocumentReferenceType> contractDocumentReferences, String code) {
-        if (logger.isInfoEnabled()) {
-            logger.info("generateCreditNotePDF() [Lista contractDocumentReferences ]"
-                    + contractDocumentReferences.size());
-        }
         String contractDocRefResponse = null;
 
         if (null != contractDocumentReferences
@@ -125,10 +109,6 @@ public class PDFBasicGenerateHandler {
             for (DocumentReferenceType contDocumentRef : contractDocumentReferences) {
                 if (contDocumentRef.getDocumentTypeCode().getValue()
                         .equalsIgnoreCase(code)) {
-                    if (logger.isInfoEnabled()) {
-                        logger.info("generateCreditNotePDF() [Lista contractDocumentReferences ]"
-                                + contDocumentRef.getID().getValue());
-                    }
                     contractDocRefResponse = contDocumentRef.getID().getValue();
                 }
             }
@@ -141,9 +121,6 @@ public class PDFBasicGenerateHandler {
     } // getContractDocumentReference
 
     public String generateGuiaBarcodeInfoV2(String identifier, String documentType, String issueDate, BigDecimal payableAmountVal, BigDecimal taxTotalList, SupplierPartyType accSupplierParty, CustomerPartyType accCustomerParty, UBLExtensionsType ublExtensions) throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateBarcodeInfo()");
-        }
         String barcodeValue = null;
         try {
             /* a.) Numero de RUC del emisor electronico */
@@ -175,10 +152,8 @@ public class PDFBasicGenerateHandler {
              */
             barcodeValue = MessageFormat.format(IPDFCreatorConfig.BARCODE_PATTERN, senderRuc, documentType, serie, correlative, igvTax, payableAmount, issueDate, receiverDocType, receiverDocNumber, digestValue, signatureValue);
         } catch (PDFReportException e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_418.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_418);
         }
         return barcodeValue;

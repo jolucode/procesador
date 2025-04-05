@@ -22,7 +22,6 @@ public class JasperReportConfig {
         InputStream inputStream = new BufferedInputStream(new FileInputStream(reportTemplate));
         JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
 
-        // Compilar y retornar el reporte Jasper dinámicamente
         return JasperCompileManager.compileReport(jasperDesign);
     }
 }

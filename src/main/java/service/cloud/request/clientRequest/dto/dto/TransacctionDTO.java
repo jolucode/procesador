@@ -88,7 +88,6 @@ public class TransacctionDTO {
     private BigDecimal DOC_PorPercepcion;
     private String DOC_Numero;
 
-    //private List<TransactionContractDocRefDTO> transactionContractDocRefListDTOS;
     private List<Map<String, String>> transactionContractDocRefListDTOS;
     private List<TransactionPropertiesDTO> transactionPropertiesDTOList;
     private List<TransactionImpuestosDTO> transactionImpuestosDTOList;

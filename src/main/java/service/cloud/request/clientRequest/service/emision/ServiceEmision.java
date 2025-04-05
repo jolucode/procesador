@@ -17,13 +17,10 @@ import service.cloud.request.clientRequest.estela.dto.FileResponseDTO;
 import service.cloud.request.clientRequest.estela.service.DocumentEmissionService;
 import service.cloud.request.clientRequest.estela.service.DocumentQueryService;
 import service.cloud.request.clientRequest.extras.ISignerConfig;
-import service.cloud.request.clientRequest.extras.IUBLConfig;
-import service.cloud.request.clientRequest.handler.FileHandler;
 import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
 import service.cloud.request.clientRequest.mongo.model.LogDTO;
-import service.cloud.request.clientRequest.proxy.model.CdrStatusResponse;
 import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
@@ -36,7 +33,6 @@ import service.cloud.request.clientRequest.utils.files.DocumentNameUtils;
 import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.creditnote_2.CreditNoteType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.debitnote_2.DebitNoteType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.invoice_2.InvoiceType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.perception_1.PerceptionType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.retention_1.RetentionType;
@@ -44,7 +40,6 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.retention_1.Retent
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -193,7 +188,6 @@ public class ServiceEmision implements IServiceEmision {
         soapRequest.setFileName(DocumentNameHandler.getInstance().getZipName(documentName));
         soapRequest.setContentFile(base64Content);
 
-        //Mono<FileResponseDTO> monoResponse = documentEmissionService.processDocumentEmission(soapRequest.getService(), soapRequest);
         long startTime = System.currentTimeMillis(); // Tiempos de inicio
 
         // Realiza la llamada al servicio
@@ -256,12 +250,6 @@ public class ServiceEmision implements IServiceEmision {
     }
 
     private boolean isContingencia(TransacctionDTO transaction) {
-        List<Map<String, String>> contractdocrefs = transaction.getTransactionContractDocRefListDTOS();
-        for (Map<String, String> contractdocref : contractdocrefs) {
-            //if ("cu31".equalsIgnoreCase(contractdocref.get("Usuariocampos").get("Nombre"))) {
-            //    return "Si".equalsIgnoreCase(contractdocref.get("Valor"));
-            // }
-        }
         return false;
     }
 

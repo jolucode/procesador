@@ -14,15 +14,8 @@ import service.cloud.request.clientRequest.utils.exception.ConfigurationExceptio
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 @Component
 public class DocumentFormatImpl implements DocumentFormatInterface {

@@ -71,17 +71,14 @@ public class ApplicationProperties {
             }
         }
 
-        // Lógica para OSE
         if ("OSE".equalsIgnoreCase(client)) {
                 return urlOse;
         }
 
-        // Lógica para ESTELA
         if ("ESTELA".equalsIgnoreCase(client)) {
                 return urlEstela;
         }
 
-        // Si no se cumple ninguna condición
         throw new IllegalArgumentException("No se pudo determinar la URL con los parámetros proporcionados.");
     }
 }
