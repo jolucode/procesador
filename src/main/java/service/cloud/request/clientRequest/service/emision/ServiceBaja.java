@@ -216,7 +216,7 @@ public class ServiceBaja implements IServiceBaja {
         log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
         log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
         log.setSeriesAndCorrelative(documentName);
-        log.setResponse((new Gson().toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (new Gson().toJson(transactionResponse.getSunat())));
+        log.setResponse((JsonUtils.toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (JsonUtils.toJson(transactionResponse.getSunat())));
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
         transactionResponse.setLogDTO(log);
         log.setPathBase(attachmentPath + "\\" + documentName + ".json");

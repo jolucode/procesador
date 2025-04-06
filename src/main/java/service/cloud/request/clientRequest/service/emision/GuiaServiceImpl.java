@@ -32,6 +32,7 @@ import service.cloud.request.clientRequest.mongo.repo.IGuiaTicketRepo;
 import service.cloud.request.clientRequest.service.core.DocumentFormatInterface;
 import service.cloud.request.clientRequest.service.core.ProcessorCoreInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
+import service.cloud.request.clientRequest.utils.JsonUtils;
 import service.cloud.request.clientRequest.utils.SunatResponseUtils;
 import service.cloud.request.clientRequest.utils.ValidationHandler;
 import service.cloud.request.clientRequest.utils.exception.DateUtils;
@@ -279,7 +280,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
         log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
         log.setSeriesAndCorrelative(documentName);
-        String messageResponse = (new Gson().toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (new Gson().toJson(transactionResponse.getSunat()));
+        String messageResponse = (JsonUtils.toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (JsonUtils.toJson(transactionResponse.getSunat()));
         log.setResponse(messageResponse + " - " + transactionResponse.getTicketRest() + " " + errorPdf );
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
         transactionResponse.setLogDTO(log);

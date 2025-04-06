@@ -19,6 +19,7 @@ import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.mongo.model.LogDTO;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
+import service.cloud.request.clientRequest.utils.JsonUtils;
 import service.cloud.request.clientRequest.utils.SunatResponseUtils;
 import service.cloud.request.clientRequest.utils.exception.DateUtils;
 import service.cloud.request.clientRequest.utils.files.UtilsFile;
@@ -83,7 +84,7 @@ public class ServiceBajaConsulta implements IServiceBaja {
         log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
         log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
         log.setSeriesAndCorrelative(documentName);
-        log.setResponse((new Gson().toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (new Gson().toJson(transactionResponse.getSunat())));
+        log.setResponse((JsonUtils.toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (JsonUtils.toJson(transactionResponse.getSunat())));
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
         transactionResponse.setLogDTO(log);
         log.setPathBase(attachmentPath + "\\" + documentName + ".json");

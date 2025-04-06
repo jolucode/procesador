@@ -32,6 +32,7 @@ import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterfac
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
 import service.cloud.request.clientRequest.service.publicar.PublicacionManager;
 import service.cloud.request.clientRequest.utils.Constants;
+import service.cloud.request.clientRequest.utils.JsonUtils;
 import service.cloud.request.clientRequest.utils.files.UtilsFile;
 
 
@@ -80,8 +81,7 @@ public class CloudService implements CloudInterface {
         String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
 
         return Mono.fromCallable(() -> {
-                    Gson gson = new Gson();
-                    return gson.fromJson(updatedJson, TransacctionDTO[].class);
+                    return JsonUtils.fromJson(updatedJson, TransacctionDTO[].class);
                 })
                 .flatMapMany(Flux::fromArray) // Convertir el array en un flujo
                 .flatMap(transaccion ->
@@ -100,8 +100,7 @@ public class CloudService implements CloudInterface {
 
     public void anexarDocumentos(RequestPost request) {
         try {
-            Gson gson = new Gson();
-            String jsonBody = gson.toJson(request);
+            String jsonBody = JsonUtils.toJson(request);
 
             HttpResponse<String> response = Unirest.post(request.getUrlOnpremise() + "anexar")
                     .header("Content-Type", "application/json")
@@ -129,15 +128,13 @@ public class CloudService implements CloudInterface {
             // Paso 3: Anexar documentos
             anexarDocumentos(request);
 
-            // Logs agrupados en un solo bloque
-            logger.info("================================ LOG DE TRANSACCIÓN ================================");
-            logger.info("RUC: {}, DocObject: {}, DocEntry: {}", request.getRuc(), request.getDocObject(), request.getDocEntry());
-            logger.info("Nombre del Documento: {}", request.getDocumentName());
-            logger.info("Documentos anexados correctamente en SAP.");
-            logger.info(tr.getMensaje());
-            logger.info("===================================================================================");
+            // Paso 4: Limpieza de memoria (ayuda al GC)
+            liberarRecursosPesados(tr, request);
 
-            // Paso 4: Manejar logs y documentos publicados
+            // Paso 5: Log de seguimiento
+            logTransaccionExitosa(request, tr);
+
+            // Paso 6: Guardado en Mongo / Publicación
             handleLogsAndDocuments(tr, requestOnPremise);
 
             return request;
@@ -287,5 +284,24 @@ public class CloudService implements CloudInterface {
         return request;
     }
 
+    private void liberarRecursosPesados(TransaccionRespuesta tr, RequestPost request) {
+        tr.setPdf(null);
+        tr.setXml(null);
+        tr.setZip(null);
+        tr.setPdfBorrador(null);
+        request.setResponseRequest(null);
+
+        // Opcional: solo si estás seguro que hay presión de memoria fuerte
+        System.gc();
+    }
+
+    private void logTransaccionExitosa(RequestPost request, TransaccionRespuesta tr) {
+        logger.info("================================ LOG DE TRANSACCIÓN ================================");
+        logger.info("RUC: {}, DocObject: {}, DocEntry: {}", request.getRuc(), request.getDocObject(), request.getDocEntry());
+        logger.info("Nombre del Documento: {}", request.getDocumentName());
+        logger.info("Documentos anexados correctamente en SAP.");
+        logger.info(tr.getMensaje());
+        logger.info("===================================================================================");
+    }
 
 }
