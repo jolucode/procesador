@@ -52,7 +52,6 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
             transactionResponse.setZip(statusResponse);
         }
 
-        logger.info("Respuesta del servicio invocado: " + sunatResponse.getMensaje());
 
         saveAllFiles(transactionResponse, documentName, attachmentPath);
         return transactionResponse;

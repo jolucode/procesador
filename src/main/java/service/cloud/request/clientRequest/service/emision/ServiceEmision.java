@@ -218,7 +218,7 @@ public class ServiceEmision implements IServiceEmision {
         soapRequest.setSerieComprobante(transaction.getDOC_Serie());
         soapRequest.setNumeroComprobante(transaction.getDOC_Numero());
 
-        Mono<FileResponseDTO> monoResponse = documentQueryService.processAndSaveFile(soapRequest.getService(), soapRequest);//ioseClient.getStatusCDR(transaction.getDocIdentidad_Nro(), transaction.getDOC_Codigo(), transaction.getDOC_Serie(), Integer.valueOf(transaction.getDOC_Numero()));
+        Mono<FileResponseDTO> monoResponse = documentQueryService.processAndSaveFile(soapRequest.getService(), soapRequest);
         FileResponseDTO responseDTO = monoResponse.block();
 
         if (responseDTO.getContent() != null) {
@@ -256,7 +256,7 @@ public class ServiceEmision implements IServiceEmision {
         return clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
     }
 
-    private UBLDocumentWRP configureDocumentWRP(byte[] signedXmlDocument, String docCodigo, String doctype) throws Exception {
+    private UBLDocumentWRP configureDocumentWRP(byte[] signedXmlDocument, String docCodigo, String doctype) {
         UBLDocumentWRP documentWRP = new UBLDocumentWRP(); // Crear directamente dentro del método
         Object ublDocument = deserializeSignedDocument(signedXmlDocument, docCodigo);
 

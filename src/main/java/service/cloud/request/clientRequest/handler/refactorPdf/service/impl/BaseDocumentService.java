@@ -16,7 +16,6 @@ import service.cloud.request.clientRequest.dto.dto.TransactionImpuestosDTO;
 import service.cloud.request.clientRequest.dto.dto.TransactionTotalesDTO;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.extras.pdf.IPDFCreatorConfig;
-import service.cloud.request.clientRequest.handler.refactorPdf.dto.item.InvoiceItemObject;
 import service.cloud.request.clientRequest.handler.refactorPdf.dto.legend.LegendObject;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.UBLDocumentException;
@@ -26,7 +25,6 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccompone
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonextensioncomponents_2.UBLExtensionType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonextensioncomponents_2.UBLExtensionsType;
 
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -54,8 +54,7 @@ public class DocumentEmissionService {
         Matcher matcher = pattern.matcher(soapResponse);
 
         if (matcher.find()) {
-            String base64Content = matcher.group(1).trim();
-            return base64Content;
+            return matcher.group(1).trim();
         } else {
             // Puedes lanzar una excepción o manejar el caso donde no se encuentra la etiqueta
             throw new IllegalArgumentException("No se encontró applicationResponse en el contenido SOAP.");
