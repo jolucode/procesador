@@ -20,6 +20,7 @@ import service.cloud.request.clientRequest.handler.refactorPdf.dto.WrapperItemOb
 import service.cloud.request.clientRequest.handler.refactorPdf.dto.legend.LegendObject;
 import service.cloud.request.clientRequest.handler.refactorPdf.config.JasperReportConfig;
 import service.cloud.request.clientRequest.handler.refactorPdf.service.DebitNotePDFGenerator;
+import service.cloud.request.clientRequest.utils.DateUtil;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.ErrorObj;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
@@ -53,7 +54,7 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                 logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
             }
             debitNoteObj.setDocumentIdentifier(debitNoteType.getDebitNoteType().getID().getValue());
-            debitNoteObj.setIssueDate(formatIssueDate(debitNoteType.getDebitNoteType().getIssueDate().getValue()));
+            debitNoteObj.setIssueDate(DateUtil.formatIssueDate(debitNoteType.getDebitNoteType().getIssueDate().getValue()));
 
             if (StringUtils.isNotBlank(debitNoteType.getDebitNoteType().getDocumentCurrencyCode().getName())) {
                 debitNoteObj.setCurrencyValue(debitNoteType.getDebitNoteType().getDocumentCurrencyCode().getName().toUpperCase());
@@ -360,7 +361,7 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
         return debitNoteInBytes;
     } // generateDebitNotePDF
 
-    public byte[] createDebitNotePDF(DebitNoteObject debitNoteObj, String docUUID, ConfigData configData) throws PDFReportException {
+    private byte[] createDebitNotePDF(DebitNoteObject debitNoteObj, String docUUID, ConfigData configData) throws PDFReportException {
         Map<String, Object> parameterMap;
         Map<String, Object> cuotasMap;
 

@@ -90,6 +90,5 @@ public class DespatchAdviceObject {
 
     private String grtEntidadEmisoraSecundario;
 
-    /** */
     Map<String, String> despatchAdvicePersonalizacion;
 }

@@ -11,7 +11,6 @@ public class WebClientConfig {
     public WebClient webClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder
                 .defaultHeader("Content-Type", "text/xml")
-                //.defaultHeader("SOAPAction", "urn:sendBill")
                 .build();
     }
 }

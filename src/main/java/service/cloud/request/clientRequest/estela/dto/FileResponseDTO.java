@@ -17,5 +17,4 @@ public class FileResponseDTO {
     private byte[] content;
     private String ticket;
 
-    // Getters, setters, constructor y toString
 }

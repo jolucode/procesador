@@ -30,6 +30,7 @@ import service.cloud.request.clientRequest.handler.refactorPdf.dto.item.Retentio
 import service.cloud.request.clientRequest.handler.refactorPdf.config.JasperReportConfig;
 import service.cloud.request.clientRequest.handler.refactorPdf.service.RetentionPDFGenerator;
 import service.cloud.request.clientRequest.utils.DateConverter;
+import service.cloud.request.clientRequest.utils.DateUtil;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.ErrorObj;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
@@ -72,7 +73,7 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
                 logger.debug("generateRetentionPDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
             }
             retentionObject.setDocumentIdentifier(retentionType.getRetentionType().getId().getValue());
-            retentionObject.setIssueDate(formatIssueDate(retentionType.getRetentionType().getIssueDate().getValue()));
+            retentionObject.setIssueDate(DateUtil.formatIssueDate(retentionType.getRetentionType().getIssueDate().getValue()));
 
             /* Informacion de SUNATTransaction */
             if (logger.isDebugEnabled()) {
@@ -329,7 +330,7 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
         // createInvoicePDF
     }
 
-    protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
+    /*protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
             throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+formatIssueDate() [" + this.docUUID + "]");
@@ -347,7 +348,7 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
             logger.debug("-formatIssueDate() [" + this.docUUID + "]");
         }
         return issueDate;
-    }
+    }*/
 
     public String generateDigestValue(UBLExtensionsType ublExtensions)
             throws PDFReportException {
@@ -579,8 +580,8 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
                 for (SUNATRetentionDocumentReferenceType iLine : retentionLines) {
                     RetentionItemObject retencionItemObj = new RetentionItemObject();
 
-                    retencionItemObj.setFechaEmision(formatIssueDate(iLine.getIssueDate().getValue()));
-                    retencionItemObj.setFechaPago(formatIssueDate(iLine.getPayment().getPaidDate().getValue()));
+                    retencionItemObj.setFechaEmision(DateUtil.formatIssueDate(iLine.getIssueDate().getValue()));
+                    retencionItemObj.setFechaPago(DateUtil.formatIssueDate(iLine.getPayment().getPaidDate().getValue()));
                     retencionItemObj.setTipoDocumento(iLine.getId().getSchemeID());
                     retencionItemObj.setNroDoc(iLine.getId().getValue());
                     retencionItemObj.setMontoTotal(iLine.getTotalInvoiceAmount().getValue().toString());

@@ -19,6 +19,7 @@ import service.cloud.request.clientRequest.handler.refactorPdf.dto.WrapperItemOb
 import service.cloud.request.clientRequest.handler.refactorPdf.dto.item.PerceptionItemObject;
 import service.cloud.request.clientRequest.handler.refactorPdf.config.JasperReportConfig;
 import service.cloud.request.clientRequest.handler.refactorPdf.service.PerceptionPDFGenerator;
+import service.cloud.request.clientRequest.utils.DateUtil;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.ErrorObj;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
@@ -59,7 +60,7 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
             if (logger.isDebugEnabled()) {
                 logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de la fecha." + perceptionType.getPerceptionType().getIssueDate().getValue());
             }
-            perceptionObj.setIssueDate(formatIssueDate(perceptionType.getPerceptionType().getIssueDate().getValue()));
+            perceptionObj.setIssueDate(DateUtil.formatIssueDate(perceptionType.getPerceptionType().getIssueDate().getValue()));
             if (logger.isDebugEnabled()) {
                 logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
             }
@@ -286,7 +287,7 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
         return pdfDocument;
     }
 
-    protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
+    /*protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
             throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+formatIssueDate() [" + this.docUUID + "]");
@@ -304,7 +305,7 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
             logger.debug("-formatIssueDate() [" + this.docUUID + "]");
         }
         return issueDate;
-    }
+    }*/
 
     protected String formatDepProvDist(AddressType postalAddress)
             throws PDFReportException {
@@ -340,7 +341,7 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
                 for (SUNATPerceptionDocumentReferenceType iLine : perceptionLines) {
                     PerceptionItemObject invoiceItemObj = new PerceptionItemObject();
 
-                    invoiceItemObj.setFechaEmision(formatIssueDate(iLine
+                    invoiceItemObj.setFechaEmision(DateUtil.formatIssueDate(iLine
                             .getIssueDate().getValue()));
                     invoiceItemObj
                             .setTipoDocumento(iLine.getId().getSchemeID());

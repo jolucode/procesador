@@ -428,7 +428,7 @@ public abstract class BaseDocumentService {
         return moneyStr;
     } // getCurrency
 
-    protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
+    /*protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
             throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+formatIssueDate() [" + "]");
@@ -446,7 +446,7 @@ public abstract class BaseDocumentService {
             logger.debug("-formatIssueDate() [" + "]");
         }
         return issueDate;
-    }
+    }*/
 
     protected String getRemissionGuides(
             List<DocumentReferenceType> despatchDocumentReferences) {

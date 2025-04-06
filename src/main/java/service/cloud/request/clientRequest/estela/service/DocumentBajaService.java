@@ -47,7 +47,7 @@ public class DocumentBajaService {
         Pattern pattern = Pattern.compile("<ticket>(.*?)</ticket>");
         Matcher matcher = pattern.matcher(soapResponse);
         if (matcher.find()) {
-            return matcher.group(1); // Retorna el valor del ticket
+            return matcher.group(1);
         }
         throw new RuntimeException("No se encontró <ticket> en la respuesta SOAP.");
     }

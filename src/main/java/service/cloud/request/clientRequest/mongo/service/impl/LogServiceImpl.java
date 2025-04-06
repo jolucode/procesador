@@ -15,7 +15,6 @@ public class LogServiceImpl implements ILogService {
     private final ILogRepo repo;
 
     public Mono<Log> saveLogEntryToMongoDB(Log logEntry) {
-        // Puedes realizar operaciones adicionales antes de guardar, si es necesario
         return repo.save(logEntry);
     }
 
@@ -46,7 +45,6 @@ public class LogServiceImpl implements ILogService {
                 .flatMap(valor -> {
                     if (valor) {
                         return repo.deleteById(id).thenReturn(valor);
-                        //return Mono.just(valor);
                     } else {
                         return Mono.just(!valor);
                     }

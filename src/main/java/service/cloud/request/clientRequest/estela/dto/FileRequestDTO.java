@@ -18,5 +18,4 @@ public class FileRequestDTO {
     private String serieComprobante;
     private String numeroComprobante;
 
-    // Getters, setters, constructor y toString
 }

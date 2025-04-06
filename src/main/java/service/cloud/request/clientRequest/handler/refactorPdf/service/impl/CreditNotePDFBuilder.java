@@ -50,7 +50,7 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             CreditNoteObject creditNoteObj = new CreditNoteObject();
 
             creditNoteObj.setDocumentIdentifier(creditNoteType.getCreditNoteType().getID().getValue());
-            creditNoteObj.setIssueDate(formatIssueDate(creditNoteType.getCreditNoteType().getIssueDate().getValue()));
+            creditNoteObj.setIssueDate(DateUtil.formatIssueDate(creditNoteType.getCreditNoteType().getIssueDate().getValue()));
 
             if (StringUtils.isNotBlank(creditNoteType.getCreditNoteType().getDocumentCurrencyCode().getName())) {
                 creditNoteObj.setCurrencyValue(creditNoteType.getCreditNoteType().getDocumentCurrencyCode().getName().toUpperCase());
@@ -325,7 +325,7 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
         return creditNoteInBytes;
     } // generateCreditNotePDF
 
-    public byte[] createCreditNotePDF(CreditNoteObject creditNoteObj, String docUUID, ConfigData configData) throws PDFReportException {
+    private byte[] createCreditNotePDF(CreditNoteObject creditNoteObj, String docUUID, ConfigData configData) throws PDFReportException {
         Map<String, Object> parameterMap;
         Map<String, Object> cuotasMap;
 

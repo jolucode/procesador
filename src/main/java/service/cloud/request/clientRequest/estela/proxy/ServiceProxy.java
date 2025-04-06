@@ -30,7 +30,7 @@ public class ServiceProxy implements ServiceClient {
                         response.bodyToMono(String.class)
                                 .flatMap(body -> Mono.error(new RuntimeException(body)))
                 )
-                .bodyToMono(String.class); // Devuelve la respuesta como String, sin analizarla.
+                .bodyToMono(String.class);
     }
 }
 

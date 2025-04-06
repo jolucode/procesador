@@ -21,6 +21,7 @@ import service.cloud.request.clientRequest.handler.refactorPdf.dto.legend.Boleta
 import service.cloud.request.clientRequest.handler.refactorPdf.dto.legend.LegendObject;
 import service.cloud.request.clientRequest.handler.refactorPdf.config.JasperReportConfig;
 import service.cloud.request.clientRequest.handler.refactorPdf.service.BoletaPDFGenerator;
+import service.cloud.request.clientRequest.utils.DateUtil;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.ErrorObj;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
@@ -53,7 +54,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
             BoletaObject boletaObj = new BoletaObject();
 
             boletaObj.setDocumentIdentifier(boletaType.getInvoiceType().getID().getValue());
-            boletaObj.setIssueDate(formatIssueDate(boletaType.getInvoiceType().getIssueDate().getValue()));
+            boletaObj.setIssueDate(DateUtil.formatIssueDate(boletaType.getInvoiceType().getIssueDate().getValue()));
 
             boletaObj.setFormSap(boletaType.getTransaccion().getFE_FormSAP());
 
@@ -289,7 +290,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
         return boletaInBytes;
     } // generateBoletaPDF
 
-    public byte[] createBoletaPDF(BoletaObject boletaObj, ConfigData configData) throws PDFReportException {
+    private byte[] createBoletaPDF(BoletaObject boletaObj, ConfigData configData) throws PDFReportException {
 
         Map<String, Object> parameterMap;
         byte[] pdfDocument = null;

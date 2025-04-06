@@ -16,10 +16,10 @@ public class TransaccionBaja {
 
     @Id
     @EqualsAndHashCode.Include
-    private String id; // Identificador único del documento en MongoDB
+    private String id;
     private String rucEmpresa;
-    private String fecha; // Fecha en formato yyyyMMdd
-    private Integer idd; // Último número usado
+    private String fecha;
+    private Integer idd;
     private String serie;
     private String ticketBaja;
     private String docId;

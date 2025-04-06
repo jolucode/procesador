@@ -254,15 +254,9 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             /* Instanciar el objeto InvoiceType para la FACTURA */
             invoiceType = new InvoiceType();
 
-            //UBLExtensionsType ublExtensions = new UBLExtensionsType();
-
             /* Agregar <Invoice><ext:UBLExtensions> */
-            //invoiceType.setUBLExtensions(getUBLExtensionsSigner());
-
             UBLExtensionsType ublExtensions = new UBLExtensionsType();
 
-
-            //ublExtensions.getUBLExtension().add(getUBLExtensionTotalAndProperty(transaction, transaction.getTransaccionTotalesList(), transaction.getTransactionPropertiesDTOList(), transaction.getSUNAT_Transact()));
             ublExtensions.getUBLExtension().add(getUBLExtensionTotalAndProperty(transaction, transaction.getTransactionTotalesDTOList(), transaction.getTransactionPropertiesDTOList(), transaction.getSUNAT_Transact()));
 
             List<Map<String, String>> contractdocrefs = transaction.getTransactionContractDocRefListDTOS();
@@ -1893,7 +1887,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         allowanceCharge.setAmount(amountType);
         BaseAmountType baseAmount = new BaseAmountType();
         baseAmount.setCurrencyID(CurrencyCodeContentType.valueOf(transaccion.getDOC_MON_Codigo()).value());
-        //baseAmount.setValue(transaccion.getDOCImporteTotal().setScale(2, BigDecimal.ROUND_HALF_UP));
         baseAmount.setValue(transaccion.getDOC_SinPercepcion().setScale(2, RoundingMode.HALF_UP));
         allowanceCharge.setBaseAmount(baseAmount);
         return allowanceCharge;
@@ -2023,8 +2016,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             summaryDocumentsType.getSignature().add(getSignature(transaction.getDocIdentidad_Nro(), transaction.getRazonSocial(), signerName));
 
             /* Agregar <SummaryDocuments><cac:AccountingSupplierParty> */
-            //SupplierPartyType accountingSupplierParty = generateAccountingSupplierParty(transaction.getNumeroRuc(), transaction.getDocIdentidadTipo(), transaction.getRazonSocial(), transaction.getNombreComercial(), transaction.getDIRDireccion(), transaction.getDIRDepartamento(), transaction.getDIRProvincia(), transaction.getDIRDistrito(), transaction.getDIRUbigeo(), transaction.getDIRPais(), transaction.getPersonContacto(), transaction.getEMail());
-            //summaryDocumentsType.setAccountingSupplierParty(accountingSupplierParty);
             SupplierPartyType accountingSupplierParty = generateAccountingSupplierParty(transaction.getDocIdentidad_Nro(), transaction.getDocIdentidad_Tipo(), transaction.getRazonSocial(), transaction.getNombreComercial(), transaction.getDIR_Direccion(), transaction.getDIR_Departamento(), transaction.getDIR_Provincia(), transaction.getDIR_Distrito(), transaction.getDIR_Ubigeo(), transaction.getDIR_Pais(), transaction.getPersonContacto(), transaction.getEMail());
             summaryDocumentsType.setAccountingSupplierParty(accountingSupplierParty);
 

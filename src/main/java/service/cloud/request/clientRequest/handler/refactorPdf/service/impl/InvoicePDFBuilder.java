@@ -30,6 +30,7 @@ import service.cloud.request.clientRequest.handler.refactorPdf.dto.item.InvoiceI
 import service.cloud.request.clientRequest.handler.refactorPdf.dto.legend.LegendObject;
 import service.cloud.request.clientRequest.handler.refactorPdf.config.JasperReportConfig;
 import service.cloud.request.clientRequest.handler.refactorPdf.service.InvoicePDFGenerator;
+import service.cloud.request.clientRequest.utils.DateUtil;
 import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 import service.cloud.request.clientRequest.utils.exception.error.ErrorObj;
 import service.cloud.request.clientRequest.utils.exception.error.IVenturaError;
@@ -75,7 +76,7 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
                 logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
             }
             invoiceObj.setDocumentIdentifier(invoiceType.getInvoiceType().getID().getValue());
-            invoiceObj.setIssueDate(formatIssueDate(invoiceType.getInvoiceType().getIssueDate().getValue()));
+            invoiceObj.setIssueDate(DateUtil.formatIssueDate(invoiceType.getInvoiceType().getIssueDate().getValue()));
             List<TaxTotalType> taxTotal = invoiceType.getInvoiceType().getTaxTotal();
             for (TaxTotalType taxTotalType : taxTotal) {
                 List<TaxSubtotalType> taxSubtotal = taxTotalType.getTaxSubtotal();
@@ -709,7 +710,7 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
         return remissionGuides;
     }
 
-    protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
+    /*protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
             throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("+formatIssueDate() [" + this.docUUID + "]");
@@ -727,7 +728,7 @@ public class InvoicePDFBuilder implements InvoicePDFGenerator {
             logger.debug("-formatIssueDate() [" + this.docUUID + "]");
         }
         return issueDate;
-    }
+    }*/
 
     protected String getCurrencyV3(BigDecimal value, String currencyCode)
             throws Exception {
