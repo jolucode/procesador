@@ -42,17 +42,10 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
 
     @Override
     public  byte[] generateDebitNotePDF(UBLDocumentWRP debitNoteType, List<TransactionTotalesDTO> transactionTotalList, ConfigData configData) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateDebitNotePDF() [" + this.docUUID + "]");
-        }
         byte[] debitNoteInBytes = null;
 
         try {
             DebitNoteObject debitNoteObj = new DebitNoteObject();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
-            }
             debitNoteObj.setDocumentIdentifier(debitNoteType.getDebitNoteType().getID().getValue());
             debitNoteObj.setIssueDate(DateUtil.formatIssueDate(debitNoteType.getDebitNoteType().getIssueDate().getValue()));
 
@@ -67,42 +60,13 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
             if (StringUtils.isNotBlank(sunatTransInfo)) {
                 debitNoteObj.setSunatTransaction(sunatTransInfo);
             }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo guias de remision.");
-            }
             debitNoteObj.setRemissionGuides(getRemissionGuides(debitNoteType.getDebitNoteType().getDespatchDocumentReference()));
-
-            if (logger.isInfoEnabled()) {
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "] Guias de remision: " + debitNoteObj.getRemissionGuides());
-            }
-            if (logger.isInfoEnabled()) {
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "]============= remision");
-            }
-
             debitNoteObj.setPaymentCondition(debitNoteType.getTransaccion().getDOC_CondPago());
-
             debitNoteObj.setSellOrder(getContractDocumentReference(debitNoteType.getDebitNoteType().getContractDocumentReference(), IUBLConfig.CONTRACT_DOC_REF_SELL_ORDER_CODE));
-            if (logger.isInfoEnabled()) {
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "] Condicion_pago: " + debitNoteObj.getPaymentCondition());
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "] Orden de venta: " + debitNoteObj.getSellOrder());
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "] Nombre_vendedor: " + debitNoteObj.getSellerName());
-            }
-            if (logger.isInfoEnabled()) {
-                logger.info("generateDebitNotePDF() [" + this.docUUID + "]============= condicion pago------");
-            }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion de la NOTA DE DEBITO");
-            }
             debitNoteObj.setTypeOfDebitNote(debitNoteType.getTransaccion().getREFDOC_MotivCode());
             debitNoteObj.setDescOfDebitNote(debitNoteType.getDebitNoteType().getDiscrepancyResponse().get(0).getDescription().get(0).getValue().toUpperCase());
             debitNoteObj.setDocumentReferenceToCn(getDocumentReferenceValue(debitNoteType.getDebitNoteType().getBillingReference().get(0)));
             debitNoteObj.setDateDocumentReference(debitNoteType.getTransaccion().getFechaDOCRe());
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
-            }
             debitNoteObj.setSenderSocialReason(debitNoteType.getTransaccion().getRazonSocial());
             debitNoteObj.setSenderRuc(debitNoteType.getTransaccion().getDocIdentidad_Nro());
             debitNoteObj.setSenderFiscalAddress(debitNoteType.getTransaccion().getDIR_NomCalle());
@@ -117,9 +81,6 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
             debitNoteObj.setTelefono(debitNoteType.getTransaccion().getTelefono());
             debitNoteObj.setTelefono_1(debitNoteType.getTransaccion().getTelefono_1());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo Campos de usuarios personalizados." + debitNoteType.getTransaccion().getTransactionContractDocRefListDTOS().size());
-            }
             if (null != debitNoteType.getTransaccion().getTransactionContractDocRefListDTOS()
                     && 0 < debitNoteType.getTransaccion().getTransactionContractDocRefListDTOS().size()) {
                 Map<String, String> hashedMap = new HashMap<>();
@@ -136,9 +97,6 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
             List<WrapperItemObject> listaItem = new ArrayList<>();
 
             for (int i = 0; i < debitNoteType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Agregando datos al HashMap");
-                }
 
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
@@ -153,10 +111,6 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                         String nombreCampo = entry.getKey();
                         String valorCampo = entry.getValue();
 
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo Campos " + nombreCampo);
-                        }
-
                         // Si el campo empieza con "U_", se elimina antes de guardarlo
                         if (nombreCampo.startsWith("U_")) {
                             nombreCampo = nombreCampo.substring(2);
@@ -165,9 +119,6 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                         itemObjectHash.put(nombreCampo, valorCampo);
                         newlist.add(valorCampo);
 
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Nuevo Tamaño " + newlist.size());
-                        }
                     }
                 }
 
@@ -183,28 +134,13 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
             debitNoteObj.setReceiverIdentifierType(debitNoteType.getTransaccion().getSN_DocIdentidad_Tipo());
 
             if (debitNoteType.getDebitNoteType().getID().getValue().startsWith(IUBLConfig.INVOICE_SERIE_PREFIX)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateDebitNotePDF() [" + this.docUUID + "] El receptor es de un documento afectado de tipo FACTURA.");
-                }
                 debitNoteObj.setReceiverFiscalAddress(debitNoteType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
             } else if (debitNoteType.getDebitNoteType().getID().getValue().startsWith(IUBLConfig.BOLETA_SERIE_PREFIX)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateDebitNotePDF() [" + this.docUUID + "] El receptor es de un documento afectado de tipo BOLETA.");
-                }
                 debitNoteObj.setReceiverFiscalAddress(debitNoteType.getTransaccion().getSN_DIR_NomCalle().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Distrito().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Provincia().toUpperCase() + " - " + debitNoteType.getTransaccion().getSN_DIR_Departamento().toUpperCase());
             } else {
-                logger.error("generateDebitNotePDF() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_431.getMessage());
                 throw new PDFReportException(IVenturaError.ERROR_431);
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
-            }
-            // debitNoteObj.setDebitNoteItems(getDebitNoteItems(debitNoteType.getDebitNoteType().getDebitNoteLine()));
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo informacion de los MONTOS.");
-            }
             String currencyCode = debitNoteType.getTransaccion().getDOC_MON_Codigo();
             BigDecimal subtotalValue = getSubtotalValueFromTransaction(transactionTotalList, debitNoteObj.getDocumentIdentifier());
 //
@@ -215,10 +151,6 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
 
             BigDecimal iscValue = getTaxTotalValue(debitNoteType.getDebitNoteType().getTaxTotal(), IUBLConfig.TAX_TOTAL_ISC_ID);
             debitNoteObj.setIscValue(getCurrency(iscValue, currencyCode));
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateCreditNotePDF() [" + this.docUUID + "] Extrayendo informacion de la percepción.");
-            }
 
             BigDecimal percepctionAmount = null;
             BigDecimal perceptionPercentage = null;
@@ -231,9 +163,6 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                 }
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo monto de ISC.");
-            }
             BigDecimal retentionpercentage = null;
 
             for (int i = 0; i < debitNoteType.getTransaccion().getTransactionLineasDTOList().size(); i++) {
@@ -277,9 +206,6 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
 
             BigDecimal gratuitaAmount = getTransaccionTotales(debitNoteType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1004);
             if (!gratuitaAmount.equals(BigDecimal.ZERO)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Existe Op. Gratuitas.");
-                }
                 debitNoteObj.setGratuitaAmountValue(getCurrency(gratuitaAmount, currencyCode));
             } else {
                 debitNoteObj.setGratuitaAmountValue(getCurrency(BigDecimal.ZERO, currencyCode));
@@ -292,10 +218,6 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
             File f = new File(".." + File.separator + "ADJUNTOS" + File.separator + "CodigoQR" + File.separator + "08");
             if (!f.exists()) {
                 f.mkdirs();
-            }
-
-            if (logger.isInfoEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] rutaPath: \n" + rutaPath);
             }
 
             inputStream = generateQRCode(barcodeValue, rutaPath);
@@ -313,10 +235,6 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
 
             String digestValue = generateDigestValue(debitNoteType.getDebitNoteType().getUBLExtensions());
 
-            if (logger.isInfoEnabled()) {
-                logger.debug("generateBoletaPDF() [" + this.docUUID + "] VALOR RESUMEN: \n" + digestValue);
-            }
-
             debitNoteObj.setDigestValue(digestValue);
 
             if (Boolean.parseBoolean(configData.getPdfBorrador())) {
@@ -325,15 +243,8 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                 debitNoteObj.setValidezPDF("");
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
-            }
-
             Map<String, LegendObject> legendsMap = null;
             legendsMap = getaddLeyends(debitNoteType.getDebitNoteType().getNote());
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
-            }
             LegendObject legendLetters = legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
             if(!legendsMap.isEmpty()) {
                 debitNoteObj.setLetterAmountValue(legendLetters.getLegendValue());
@@ -341,22 +252,14 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
 
             legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDebitNotePDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
-            }
             debitNoteObj.setLegends(getLegendList(legendsMap));
 
             debitNoteObj.setResolutionCodeValue("resolutionCde");
 
             debitNoteInBytes = createDebitNotePDF(debitNoteObj, docUUID, configData);
         } catch (PDFReportException e) {
-            logger.error("generateDebitNotePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {
-            logger.error("generateDebitNotePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateDebitNotePDF() [" + this.docUUID + "]");
         }
         return debitNoteInBytes;
     } // generateDebitNotePDF
@@ -365,9 +268,6 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
         Map<String, Object> parameterMap;
         Map<String, Object> cuotasMap;
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("+createDebitNotePDF() [" + docUUID + "]");
-        }
         byte[] pdfDocument = null;
 
         if (null == debitNoteObj) {
@@ -465,13 +365,9 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
                 pdfDocument = outputStream.toByteArray();
             } catch (Exception e) {
-                logger.error("createDebitNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
                 logger.error("createDebitNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
                 throw new PDFReportException(IVenturaError.ERROR_444);
             }
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-createDebitNotePDF() [" + docUUID + "]");
         }
         return pdfDocument;
     }

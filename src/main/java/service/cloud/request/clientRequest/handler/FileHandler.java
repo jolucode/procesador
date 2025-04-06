@@ -44,15 +44,9 @@ public class FileHandler {
 
     public void setBaseDirectory(String directoryPath) {
         this.baseDirectory = directoryPath;
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-setBaseDirectory() [" + this.docUUID + "] baseDirectory: " + this.baseDirectory);
-        }
     } //setBaseDirectory
 
     public String storeDocumentInDisk(byte[] fileData, String documentName, String fileExtension) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+storeDocumentInDisk() [" + this.docUUID + "]");
-        }
         String documentPath = null;
         try {
             String separator = File.separator;
@@ -67,34 +61,22 @@ public class FileHandler {
                 fos.write(fileData);
             }
 
-            logger.info("Se guardo el documento " + fileExtension + " : " + documentPath);
-
         } catch (IOException e) {
             e.printStackTrace();
             logger.error("storeDocumentInDisk() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_454.getMessage() + e.getMessage());
             throw new Exception(IVenturaError.ERROR_454.getMessage());
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("-storeDocumentInDisk() [" + this.docUUID + "]");
-        }
         return documentPath;
     }
 
     public String storeDocumentInDisk(Object ublDocument, String documentName) throws Exception {
 
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("+storeDocumentInDisk() [" + this.docUUID + "]");
-        }
         String documentPath = null;
         try {
             String separator = File.separator;
             documentPath = this.baseDirectory + separator + documentName + ISunatConnectorConfig.EE_XML;
 
-            if (logger.isDebugEnabled()) {
-                logger.info("storeDocumentInDisk() [" + this.docUUID + "] Se guardo el documento UBL en: " + documentPath);
-            }
             File file = new File(this.baseDirectory);
             if (!file.exists()) {
                 file.mkdirs();
@@ -104,17 +86,10 @@ public class FileHandler {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.setProperty(Marshaller.JAXB_ENCODING, ISunatConnectorConfig.ENCODING_UTF);
             marshaller.marshal(ublDocument, new File(documentPath));
-            if (logger.isDebugEnabled()) {
-                logger.debug("storeDocumentInDisk() [" + this.docUUID + "] Se guardo el documento UBL en: " + documentPath);
-            }
         } catch (JAXBException e) {
             e.printStackTrace();
             logger.error("storeDocumentInDisk() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_454.getMessage() + e.getMessage());
             throw new Exception(IVenturaError.ERROR_454.getMessage());
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("-storeDocumentInDisk() [" + this.docUUID + "]");
         }
         return documentPath;
     } //storeDocumentInDisk
@@ -127,9 +102,6 @@ public class FileHandler {
      * @return Retorna el archivo convertido en bytes.
      */
     public byte[] convertFileToBytes(File signedDocument) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+convertFileToBytes() signedDocument: " + signedDocument.getAbsolutePath());
-        }
         try {
             Path path = Paths.get(signedDocument.toURI());
             byte[] documentBytes = Files.readAllBytes(path);
@@ -142,9 +114,6 @@ public class FileHandler {
 
 
     public Object getSignedDocument(File signedDocument, String documentCode) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-getSignedDocument()");
-        }
         JAXBContext jaxbContext = null;
         Object object = null;
 
@@ -180,9 +149,6 @@ public class FileHandler {
      * almacenado o no.
      */
     public boolean storePDFDocumentInDisk(byte[] pdfBytes, String documentName, String extension) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+storePDFDocumentInDisk() [" + this.docUUID + "]");
-        }
         boolean flag = false;
         try {
             String separator = File.separator;
@@ -203,12 +169,8 @@ public class FileHandler {
             Path path = Paths.get(filePath);
             Files.write(path, pdfBytes);
             flag = true;
-            logger.info(" El documento PDF fue almacenado en DICO: " + filePath);
         } catch (IOException | VenturaExcepcion e) {
             logger.error("storePDFDocumentInDisk() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("+storePDFDocumentInDisk() [" + this.docUUID + "]");
         }
         return flag;
     } //storePDFDocumentInDisk

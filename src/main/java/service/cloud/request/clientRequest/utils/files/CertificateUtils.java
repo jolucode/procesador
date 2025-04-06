@@ -29,9 +29,6 @@ public class CertificateUtils {
     }
 
     public static synchronized byte[] getCertificateInBytes(String certificatePath) throws ConfigurationException, FileNotFoundException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getCertificateInBytes() certificatePath: " + certificatePath);
-        }
         byte[] certificateBytes = null;
         ByteArrayOutputStream baos = null;
         FileInputStream fis = null;
@@ -55,17 +52,10 @@ public class CertificateUtils {
             logger.error("getCertificateInBytes() Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
             throw new ConfigurationException(IVenturaError.ERROR_251.getMessage());
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getCertificateInBytes()");
-        }
         return certificateBytes;
     }
 
     public static boolean checkDigitalCertificateV2(byte[] certificate, String certificatePwd, String keystoreProvider, String keystoreType) throws SignerDocumentException {
-        long startTime = System.currentTimeMillis();
-        if (logger.isDebugEnabled()) {
-            logger.debug("+checkDigitalCertificateV2()");
-        }
         boolean flag = false;
 
         try {
@@ -74,9 +64,6 @@ public class CertificateUtils {
                 keystore.load(new ByteArrayInputStream(certificate), certificatePwd.toCharArray());
 
                 String alias = getAliasFromCertificate(keystore);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("checkDigitalCertificateV2() alias: " + alias);
-                }
 
                 X509Certificate x509Cert = (X509Certificate) keystore.getCertificate(alias);
                 if (null != x509Cert) {
@@ -91,9 +78,6 @@ public class CertificateUtils {
         } catch (Exception e) {
             logger.error("checkDigitalCertificate() ERROR_ID: " + IVenturaError.ERROR_258.getId() + " ERROR_MSG: " + IVenturaError.ERROR_258.getMessage() + e.getMessage());
             throw new SignerDocumentException(IVenturaError.ERROR_258);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-checkDigitalCertificateV2() TIME: " + (System.currentTimeMillis() - startTime) + " ms");
         }
         return flag;
     } //checkDigitalCertificate

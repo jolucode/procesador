@@ -34,7 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component
-public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
+public class PerceptionPDFBuilder extends BaseDocumentService implements PerceptionPDFGenerator {
 
     private static final Logger logger = Logger.getLogger(PerceptionPDFBuilder.class);
 
@@ -45,25 +45,16 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
 
     @Override
     public synchronized byte[] generatePerceptionPDF(UBLDocumentWRP perceptionType, ConfigData configData) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateInvoicePDF() [" + this.docUUID + "]");
-        }
+
         byte[] perceptionBytes = null;
 
         try {
             PerceptionObject perceptionObj = new PerceptionObject();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
-            }
             perceptionObj.setDocumentIdentifier(perceptionType.getPerceptionType().getId().getValue());
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de la fecha." + perceptionType.getPerceptionType().getIssueDate().getValue());
-            }
+
             perceptionObj.setIssueDate(DateUtil.formatIssueDate(perceptionType.getPerceptionType().getIssueDate().getValue()));
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
-            }
+
             perceptionObj.setSenderSocialReason(perceptionType.getPerceptionType().getAgentParty().getPartyLegalEntity().get(0).getRegistrationName().getValue().toUpperCase());
             perceptionObj.setSenderRuc(perceptionType.getPerceptionType().getAgentParty().getPartyIdentification().get(0).getID().getValue());
             perceptionObj.setSenderFiscalAddress(perceptionType.getPerceptionType().getAgentParty().getPostalAddress().getStreetName().getValue());
@@ -73,22 +64,13 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
             perceptionObj.setWebValue(perceptionType.getTransaccion().getWeb());
             perceptionObj.setSenderMail(perceptionType.getTransaccion().getEMail());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
-            }
             perceptionObj.setReceiverSocialReason(perceptionType.getPerceptionType().getReceiverParty().getPartyLegalEntity().get(0).getRegistrationName().getValue().toUpperCase());
             perceptionObj.setReceiverRuc(perceptionType.getPerceptionType().getReceiverParty().getPartyIdentification().get(0).getID().getValue());
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
-            }
+
             perceptionObj.setPerceptionItems(getPerceptionItems(perceptionType.getPerceptionType().getSunatPerceptionDocumentReference(), new BigDecimal(perceptionType.getPerceptionType().getSunatPerceptionPercent().getValue())));
             List<WrapperItemObject> listaItem = new ArrayList<>();
 
             for (int i = 0; i < perceptionType.getTransaccion().getTransactionComprobantesDTOList().size(); i++) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generatePerceptionPDF() [" + this.docUUID + "] Agregando datos al HashMap - Total comprobantes: "
-                            + perceptionType.getTransaccion().getTransactionComprobantesDTOList().size());
-                }
 
                 WrapperItemObject itemObject = new WrapperItemObject();
                 Map<String, String> itemObjectHash = new HashMap<>();
@@ -130,18 +112,8 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
 
 
             perceptionObj.setItemListDynamic(listaItem);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo la informacion de PROPIEDADES (AdditionalProperty).");
-            }
-            // Map<String, LegendObject> legendsMap = new HashMap<String,
-            // LegendObject>();
-
             perceptionObj.setTotalAmountValue(perceptionType.getPerceptionType().getTotalInvoiceAmount().getValue().toString());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
-            }
             perceptionType.getTransaccion();
             for (int i = 0; i < perceptionType.getTransaccion().getTransactionPropertiesDTOList().size(); i++) {
                 if (perceptionType.getTransaccion().getTransactionPropertiesDTOList().get(i).getId().equalsIgnoreCase("1000")) {
@@ -155,45 +127,14 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
                 perceptionObj.setValidezPDF("");
             }
 
-            // LegendObject legendLetters =
-            // legendsMap.get(IUBLConfig.ADDITIONAL_PROPERTY_1000);
-            // perceptionObj.setLetterAmountValue(legendLetters.getLegendValue());
-            // legendsMap.remove(IUBLConfig.ADDITIONAL_PROPERTY_1000);
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
-            }
-            // String barcodeValue =
-            // generateBarcodeInfoV2(perceptionType.getPerceptionType().getId().getValue(),
-            // "40",
-            // perceptionType.getPerceptionType().getIssueDate().toString(),
-            // perceptionType.getPerceptionType().getTotalInvoiceAmount().getValue(),
-            // perceptionType.getPerceptionType().getAgentParty(),
-            // perceptionType.getPerceptionType().getReceiverParty(),
-            // perceptionType.getPerceptionType().getUblExtensions());
-            // if (logger.isInfoEnabled()) {logger.info("generateInvoicePDF() ["
-            // + this.docUUID + "] BARCODE: \n" + barcodeValue);}
-            // perceptionObj.setBarcodeValue(barcodeValue);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
-            }
-            // perceptionObj.setLegends(getLegendList(legendsMap));
-
             perceptionObj.setResolutionCodeValue("resolutionCde");
             perceptionObj.setImporteTexto(perceptionType.getTransaccion().getTransactionPropertiesDTOList().get(0).getValor());
 
-            /*
-             * Generando el PDF de la FACTURA con la informacion recopilada.
-             */
             perceptionBytes = createPerceptionPDF(perceptionObj, docUUID, configData);// PDFPerceptionCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createPerceptionPDF(perceptionObj, docUUID);
         } catch (PDFReportException e) {
             logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateInvoicePDF() [" + this.docUUID + "]");
         }
         return perceptionBytes;
     } // generateInvoicePDF
@@ -201,9 +142,7 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
     public byte[] createPerceptionPDF(PerceptionObject perceptionObj,
                                       String docUUID, ConfigData configData) throws PDFReportException {
         Map<String, Object> parameterMap;
-        if (logger.isDebugEnabled()) {
-            logger.debug("+createInvoicePDF() [" + docUUID + "]");
-        }
+
         byte[] pdfDocument = null;
 
         if (null == perceptionObj) {
@@ -281,55 +220,12 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
                 throw new PDFReportException(IVenturaError.ERROR_441);
             }
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-createInvoicePDF() [" + docUUID + "]");
-        }
         return pdfDocument;
     }
 
-    /*protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
-            throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+formatIssueDate() [" + this.docUUID + "]");
-        }
-        Date inputDate = xmlGregorianCal.toGregorianCalendar().getTime();
 
-        Locale locale = new Locale(IPDFCreatorConfig.LOCALE_ES,
-                IPDFCreatorConfig.LOCALE_PE);
-
-        SimpleDateFormat sdf = new SimpleDateFormat(
-                IPDFCreatorConfig.PATTERN_DATE, locale);
-        String issueDate = sdf.format(inputDate);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("-formatIssueDate() [" + this.docUUID + "]");
-        }
-        return issueDate;
-    }*/
-
-    protected String formatDepProvDist(AddressType postalAddress)
-            throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-formatDepProvDist() [" + this.docUUID + "]");
-        }
-        String depProvDist = null;
-        if (null != postalAddress) {
-            String department = postalAddress.getCountrySubentity().getValue();
-            String province = postalAddress.getCityName().getValue();
-            String district = postalAddress.getDistrict().getValue();
-
-            depProvDist = district + " - " + province + " - " + department;
-
-        } else {
-            throw new PDFReportException(IVenturaError.ERROR_410);
-        }
-        return depProvDist;
-    }
 
     protected List<PerceptionItemObject> getPerceptionItems(List<SUNATPerceptionDocumentReferenceType> perceptionLines, BigDecimal porcentaje) throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getInvoiceItems() [" + this.docUUID + "] invoiceLines: " + perceptionLines);
-        }
         List<PerceptionItemObject> itemList = null;
 
         if (null != perceptionLines && 0 < perceptionLines.size()) {
@@ -360,21 +256,12 @@ public class PerceptionPDFBuilder implements PerceptionPDFGenerator {
                     itemList.add(invoiceItemObj);
                 }
             } catch (PDFReportException e) {
-                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
-                        + e.getMessage());
                 throw e;
             } catch (Exception e) {
-                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
-                        + IVenturaError.ERROR_415.getMessage());
                 throw new PDFReportException(IVenturaError.ERROR_415);
             }
         } else {
-            logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
-                    + IVenturaError.ERROR_411.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_411);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getInvoiceItems()");
         }
         return itemList;
     }

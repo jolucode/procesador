@@ -284,9 +284,6 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
             logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateInvoicePDF() [" + this.docUUID + "]");
-        }
         return boletaInBytes;
     } // generateBoletaPDF
 
@@ -389,70 +386,8 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 throw new PDFReportException(IVenturaError.ERROR_442);
             }
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-createBoletaPDF() [" + docUUID + "]");
-        }
+
         return pdfDocument;
     }
-
-    protected String getSunatTransactionInfo(
-            List<UBLExtensionType> ublExtensionList) throws PDFReportException {
-        String sunatTransactionInfo = null;
-        try {
-            String sunatTransCode = null;
-            NodeList nodeList = ublExtensionList.get(0).getExtensionContent()
-                    .getAny()
-                    .getElementsByTagName(IUBLConfig.UBL_SUNAT_TRANSACTION_TAG);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i).getNodeName()
-                        .equalsIgnoreCase(IUBLConfig.UBL_SUNAT_TRANSACTION_TAG)) {
-                    sunatTransCode = nodeList.item(i).getTextContent();
-                    break;
-                }
-            }
-
-            if (StringUtils.isNotBlank(sunatTransCode)) {
-                sunatTransCode = sunatTransCode.replace("\n", "").trim();
-
-                switch (sunatTransCode) {
-                    case IPDFCreatorConfig.SUNAT_TRANS_VENTA_INTERNA_ID:
-                        sunatTransactionInfo = IPDFCreatorConfig.SUNAT_TRANS_VENTA_INTERNA_DSC;
-                        break;
-                    case IPDFCreatorConfig.SUNAT_TRANS_EXPORTACION_ID:
-                        sunatTransactionInfo = IPDFCreatorConfig.SUNAT_TRANS_EXPORTACION_DSC;
-                        break;
-                    case IPDFCreatorConfig.SUNAT_TRANS_NO_DOMICILIADOS_ID:
-                        sunatTransactionInfo = IPDFCreatorConfig.SUNAT_TRANS_NO_DOMICILIADOS_DSC;
-                        break;
-                    case IPDFCreatorConfig.SUNAT_TRANS_VENTA_INTERNA_ANTICIPOS_ID:
-                        sunatTransactionInfo = IPDFCreatorConfig.SUNAT_TRANS_VENTA_INTERNA_ANTICIPOS_DSC;
-                        break;
-                    case IPDFCreatorConfig.SUNAT_TRANS_VENTA_ITINERANTE_ID:
-                        sunatTransactionInfo = IPDFCreatorConfig.SUNAT_TRANS_VENTA_ITINERANTE_DSC;
-                        break;
-                    case IPDFCreatorConfig.SUNAT_TRANS_FACTURA_GUIA_ID:
-                        sunatTransactionInfo = IPDFCreatorConfig.SUNAT_TRANS_FACTURA_GUIA_DSC;
-                        break;
-                    case IPDFCreatorConfig.SUNAT_TRANS_VENTA_ARROZ_PILADO_ID:
-                        sunatTransactionInfo = IPDFCreatorConfig.SUNAT_TRANS_VENTA_ARROZ_PILADO_DSC;
-                        break;
-                    case IPDFCreatorConfig.SUNAT_TRANS_FACTURA_COMP_PERCEPCION_ID:
-                        sunatTransactionInfo = IPDFCreatorConfig.SUNAT_TRANS_FACTURA_COMP_PERCEPCION_DSC;
-                        break;
-                    default:
-                        throw new PDFReportException(IVenturaError.ERROR_421);
-                }
-            }
-        } catch (PDFReportException e) {
-            logger.error("getSunatTransactionInfo() ["
-                    + "] ERROR: " + e.getError().getId() + "-"
-                    + e.getError().getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("getSunatTransactionInfo() ["
-                    + "] Exception -->" + e.getMessage());
-        }
-        return sunatTransactionInfo;
-    } // getSunatTransactionInfo
 
 }

@@ -116,9 +116,7 @@ public class ValidationHandler {
      * @throws ValidationException
      */
     public void checkBasicInformation(String docIdentifier, String senderIdentifier, Date issueDate, String correoElectronico, String ccorreoElctroinico, boolean isContingencia) throws ValidationException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+checkBasicInformation() [" + this.docUUID + "]");
-        }
+
         if (StringUtils.isBlank(docIdentifier)) {
             throw new ValidationException(IVenturaError.ERROR_514);
         }

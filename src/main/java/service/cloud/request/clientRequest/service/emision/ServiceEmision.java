@@ -285,9 +285,7 @@ public class ServiceEmision implements IServiceEmision {
     }
 
     public Object deserializeSignedDocument(byte[] signedXmlDocument, String documentCode) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-deserializeSignedDocument()");
-        }
+
 
         Class<?> documentClass = DocumentConfig.DOCUMENT_TYPE_MAP.get(documentCode);
 

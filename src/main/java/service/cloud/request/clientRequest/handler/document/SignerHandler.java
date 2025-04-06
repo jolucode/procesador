@@ -85,9 +85,6 @@ public class SignerHandler {
 
     public void setConfiguration(byte[] certificate, String certificatePwd, String keystoreType, String keystoreProvider, String signerName)
             throws SignerDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+setConfiguration()" + (null != this.identifier ? " [" + this.identifier + "]" : ""));
-        }
         this.certificate = certificate;
         this.password = certificatePwd;
         this.keystoreType = keystoreType;
@@ -96,17 +93,11 @@ public class SignerHandler {
 
         /* Cargando el certificado digital */
         loadDigitalCertificate();
-        if (logger.isDebugEnabled()) {
-            logger.debug("-setConfiguration()" + (null != this.identifier ? " [" + this.identifier + "]" : ""));
-        }
     } //setConfiguration
 
 
     @SuppressWarnings("unused")
     public File signDocument(String documentPath, String docUUID) throws SignerDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+signDocument()" + (null != this.identifier ? " [" + this.identifier + "]" : "") + " [" + docUUID + "]");
-        }
         File outputFile = null;
 
         try {
@@ -170,9 +161,6 @@ public class SignerHandler {
             logger.error("-signDocument()" + (null != this.identifier ? " [" + this.identifier + "]" : "") + " [" + docUUID + "] ERROR: " + e.getMessage());
             logger.error("-signDocument()" + (null != this.identifier ? " [" + this.identifier + "]" : "") + " [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             throw new SignerDocumentException(IVenturaError.ERROR_255);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-signDocument()" + (null != this.identifier ? " [" + this.identifier + "]" : "") + " [" + docUUID + "]");
         }
         return outputFile;
     } //signDocument
@@ -238,9 +226,6 @@ public class SignerHandler {
      * @throws SignerDocumentException
      */
     private void loadDigitalCertificate() throws SignerDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+loadDigitalCertificate()" + (null != this.identifier ? " [" + this.identifier + "]" : ""));
-        }
         try {
             /* Cargando el certificado */
             KeyStore keyStore = KeyStore.getInstance(keystoreType, keystoreProvider);
@@ -262,9 +247,6 @@ public class SignerHandler {
         } catch (Exception e) {
             logger.error("getAliasFromCertificate()" + (null != this.identifier ? " [" + this.identifier + "]" : "") + " ERROR: " + IVenturaError.ERROR_253.getMessage());
             throw new SignerDocumentException(IVenturaError.ERROR_253);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-loadDigitalCertificate()" + (null != this.identifier ? " [" + this.identifier + "]" : ""));
         }
     } //loadDigitalCertificate
 
@@ -300,9 +282,6 @@ public class SignerHandler {
      * @throws Exception
      */
     private Node getElementPositionToSign(Document document, String docUUID) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-getElementPositionToSign()" + (null != this.identifier ? " [" + this.identifier + "]" : "") + " [" + docUUID + "]");
-        }
         Node node = null;
         NodeList nodeList = document.getElementsByTagName(ISignerConfig.UBL_TAG_UBLEXTENSION);
         if (null != nodeList && 0 < nodeList.getLength()) {

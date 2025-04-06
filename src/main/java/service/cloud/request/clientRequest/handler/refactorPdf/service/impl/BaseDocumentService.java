@@ -32,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormatSymbols;
 import java.text.MessageFormat;
@@ -42,7 +43,7 @@ public abstract class BaseDocumentService {
 
     protected static final Logger logger = LoggerFactory.getLogger(BaseDocumentService.class);
 
-    public static InputStream generatePDF417Code(String qrCodeData, String filePath, int width, int height, int margin) {
+    protected InputStream generatePDF417Code(String qrCodeData, String filePath, int width, int height, int margin) {
 
         try {
             BitMatrix bitMatrixFromEncoder = null;
@@ -108,7 +109,7 @@ public abstract class BaseDocumentService {
         return output;
     }
 
-    private static byte[][] rotateArray(byte[][] bitarray) {
+    protected static byte[][] rotateArray(byte[][] bitarray) {
         byte[][] temp = new byte[bitarray[0].length][bitarray.length];
         for (int ii = 0; ii < bitarray.length; ii++) {
             // This makes the direction consistent on screen when rotating the
@@ -148,38 +149,6 @@ public abstract class BaseDocumentService {
         BitMatrix matrix = new MultiFormatWriter().encode(new String(qrCodeData.getBytes(charset), charset), BarcodeFormat.QR_CODE, qrCodewidth, qrCodeheight, hintMap);
         MatrixToImageWriter.writeToFile(matrix, filePath.substring(filePath.lastIndexOf('.') + 1), new File(filePath));
     }
-
-
-    protected BigDecimal getPricingReferenceValue(
-            List<PriceType> alternativeConditionPrice, String priceTypeCode)
-            throws PDFReportException {
-        BigDecimal value = null;
-
-        if (null != alternativeConditionPrice
-                && 0 < alternativeConditionPrice.size()) {
-            for (PriceType altCondPrice : alternativeConditionPrice) {
-                if (altCondPrice.getPriceTypeCode().getValue()
-                        .equalsIgnoreCase(priceTypeCode)) {
-                    value = altCondPrice.getPriceAmount().getValue();
-                }
-            }
-        } else {
-            throw new PDFReportException(IVenturaError.ERROR_416);
-        }
-        return value;
-    } // getPricingReferenceValue
-
-
-    protected BigDecimal getDiscountItem(
-            List<AllowanceChargeType> allowanceCharges) {
-        BigDecimal value = BigDecimal.ZERO;
-
-        if (null != allowanceCharges && 0 < allowanceCharges.size()) {
-            value = allowanceCharges.get(0).getAmount().getValue();
-        }
-        return value;
-    } // getDiscountItem
-
 
     protected BigDecimal getTaxTotalValueV21(List<TaxTotalType> taxTotalList) {
 
@@ -232,7 +201,7 @@ public abstract class BaseDocumentService {
         return legendsMap;
     }
 
-    private String getDigestValue(UBLExtensionsType ublExtensions)
+    protected String getDigestValue(UBLExtensionsType ublExtensions)
             throws Exception {
         String digestValue = null;
         try {
@@ -262,11 +231,8 @@ public abstract class BaseDocumentService {
         return digestValue;
     } // getDigestValue
 
-    public String generateDigestValue(UBLExtensionsType ublExtensions)
+    protected String generateDigestValue(UBLExtensionsType ublExtensions)
             throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateDigestValueInfo()");
-        }
 
         String digestValue = null;
         try {
@@ -280,13 +246,10 @@ public abstract class BaseDocumentService {
                     + IVenturaError.ERROR_418.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_418);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateBarcodeInfo()");
-        }
         return digestValue;
     }
 
-    public String generateBarCodeInfoString(String RUC_emisor_electronico, String documentType, String serie, String correlativo, List<TaxTotalType> taxTotalList, String issueDate, String Importe_total_venta, String Tipo_documento_adquiriente, String Numero_documento_adquiriente, UBLExtensionsType ublExtensions) throws PDFReportException {
+    protected String generateBarCodeInfoString(String RUC_emisor_electronico, String documentType, String serie, String correlativo, List<TaxTotalType> taxTotalList, String issueDate, String Importe_total_venta, String Tipo_documento_adquiriente, String Numero_documento_adquiriente, UBLExtensionsType ublExtensions) throws PDFReportException {
         String barcodeValue = "";
         try {
 
@@ -327,10 +290,6 @@ public abstract class BaseDocumentService {
         for (int i = 0; i < taxTotalList.size(); i++) {
             if (taxTotalList.get(i).getTaxSubtotal().get(0).getTaxCategory().getTaxScheme().getID().getValue().equalsIgnoreCase(taxTotalCode)) {
                 taxValue = taxTotalList.get(i).getTaxAmount().getValue();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("+-getTaxTotalValue() ["
-                            + "] taxValue: " + taxValue);
-                }
             }
         }
         return taxValue;
@@ -428,31 +387,8 @@ public abstract class BaseDocumentService {
         return moneyStr;
     } // getCurrency
 
-    /*protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
-            throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+formatIssueDate() [" + "]");
-        }
-        Date inputDate = xmlGregorianCal.toGregorianCalendar().getTime();
-
-        Locale locale = new Locale(IPDFCreatorConfig.LOCALE_ES,
-                IPDFCreatorConfig.LOCALE_PE);
-
-        SimpleDateFormat sdf = new SimpleDateFormat(
-                IPDFCreatorConfig.PATTERN_DATE, locale);
-        String issueDate = sdf.format(inputDate);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("-formatIssueDate() [" + "]");
-        }
-        return issueDate;
-    }*/
-
     protected String getRemissionGuides(
             List<DocumentReferenceType> despatchDocumentReferences) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-getRemissionGuides()");
-        }
         String remissionGuides = null;
 
         if (null != despatchDocumentReferences
@@ -554,9 +490,6 @@ public abstract class BaseDocumentService {
 
     protected String getDocumentReferenceValue(
             BillingReferenceType billingReference) throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-getDocumentReferenceValue() ["+ "]");
-        }
         String response = null;
 
         if (null != billingReference) {
@@ -621,4 +554,134 @@ public abstract class BaseDocumentService {
         }
         return contractDocRefResponse;
     } // getContractDocumentReference
+
+    protected String getSignatureValue(UBLExtensionsType ublExtensions)
+            throws Exception {
+        String signatureValue = null;
+        try {
+            int lastIndex = ublExtensions.getUBLExtension().size() - 1;
+            UBLExtensionType ublExtension = ublExtensions.getUBLExtension()
+                    .get(lastIndex);
+
+            NodeList nodeList = ublExtension.getExtensionContent().getAny()
+                    .getElementsByTagName(IUBLConfig.UBL_SIGNATUREVALUE_TAG);
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                if (nodeList.item(i).getNodeName()
+                        .equalsIgnoreCase(IUBLConfig.UBL_SIGNATUREVALUE_TAG)) {
+                    signatureValue = nodeList.item(i).getTextContent();
+                    break;
+                }
+            }
+
+            if (StringUtils.isBlank(signatureValue)) {
+                throw new PDFReportException(IVenturaError.ERROR_424);
+            }
+        } catch (PDFReportException e) {
+            throw e;
+        } catch (Exception e) {
+            throw e;
+        }
+        return signatureValue;
+    }
+
+    protected String generateGuiaBarcodeInfoV2(String identifier, String documentType, String issueDate, BigDecimal payableAmountVal, BigDecimal taxTotalList, SupplierPartyType accSupplierParty, CustomerPartyType accCustomerParty, UBLExtensionsType ublExtensions) throws PDFReportException {
+        String barcodeValue = null;
+        try {
+            /* a.) Numero de RUC del emisor electronico */
+            String senderRuc = accSupplierParty.getParty().getPartyIdentification().get(0).getID().getValue();
+            /* b.) Tipo de comprobante de pago electronico */
+            /* Parametro de entrada del metodo */
+            /* c.) Numeracion conformada por serie y numero correlativo */
+            String serie = identifier.substring(0, 4);
+            String correlative = Integer.valueOf(identifier.substring(5)).toString();
+            /* d.) Sumatoria IGV, de ser el caso */
+            String igvTax = null;
+            BigDecimal igvTaxBigDecimal = BigDecimal.ZERO;
+            igvTax = igvTaxBigDecimal.setScale(2, RoundingMode.HALF_UP).toString();
+            /* e.) Importe total de la venta, cesion en uso o servicio prestado */
+            String payableAmount = payableAmountVal.toString();
+            /* f.) Fecha de emision */
+            /* Parametro de entrada del metodo */
+            /* g,) Tipo de documento del adquiriente o usuario */
+            String receiverDocType = accCustomerParty.getParty().getPartyIdentification().get(0).getID().getSchemeID();
+            /* h.) Numero de documento del adquiriente */
+            String receiverDocNumber = accCustomerParty.getParty().getPartyIdentification().get(0).getID().getValue();
+            /* i.) Valor resumen <ds:DigestValue> */
+            String digestValue = getDigestValue(ublExtensions);
+            // String digestValue=null;
+            /* j.) Valor de la Firma digital <ds:SignatureValue> */
+            String signatureValue = getSignatureValue(ublExtensions);
+            /*
+             * Armando el codigo de barras
+             */
+            barcodeValue = MessageFormat.format(IPDFCreatorConfig.BARCODE_PATTERN, senderRuc, documentType, serie, correlative, igvTax, payableAmount, issueDate, receiverDocType, receiverDocNumber, digestValue, signatureValue);
+        } catch (PDFReportException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new PDFReportException(IVenturaError.ERROR_418);
+        }
+        return barcodeValue;
+    }
+
+    protected String formatDueDate(Date inputDueDate) throws Exception {
+        String dueDate = null;
+        try {
+
+            SimpleDateFormat sdf = null;
+            sdf = new SimpleDateFormat(IPDFCreatorConfig.PATTERN_DATE);
+            dueDate = sdf.format(inputDueDate);
+        } catch (Exception e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+        return dueDate;
+    }
+
+    protected String formatDepProvDist(AddressType postalAddress)
+            throws PDFReportException {
+        String depProvDist = null;
+        if (null != postalAddress) {
+            String department = postalAddress.getCountrySubentity().getValue();
+            String province = postalAddress.getCityName().getValue();
+            String district = postalAddress.getDistrict().getValue();
+
+            depProvDist = district + " - " + province + " - " + department;
+
+        } else {
+            throw new PDFReportException(IVenturaError.ERROR_410);
+        }
+        return depProvDist;
+    }
+
+    protected BigDecimal getPricingReferenceValue(
+            List<PriceType> alternativeConditionPrice, String priceTypeCode)
+            throws PDFReportException {
+        BigDecimal value = null;
+
+        if (null != alternativeConditionPrice
+                && 0 < alternativeConditionPrice.size()) {
+            for (PriceType altCondPrice : alternativeConditionPrice) {
+                if (altCondPrice.getPriceTypeCode().getValue()
+                        .equalsIgnoreCase(priceTypeCode)) {
+                    value = altCondPrice.getPriceAmount().getValue();
+                }
+            }
+        } else {
+            throw new PDFReportException(IVenturaError.ERROR_416);
+        }
+        return value;
+    } // getPricingReferenceValue
+
+    protected BigDecimal getDiscountItem(
+            List<AllowanceChargeType> allowanceCharges) {
+        BigDecimal value = BigDecimal.ZERO;
+
+        if (null != allowanceCharges && 0 < allowanceCharges.size()) {
+            /*
+             * Se entiende que en el caso exista una lista, solo debe tener un
+             * solo valor
+             */
+            value = allowanceCharges.get(0).getAmount().getValue();
+        }
+        return value;
+    }
 }

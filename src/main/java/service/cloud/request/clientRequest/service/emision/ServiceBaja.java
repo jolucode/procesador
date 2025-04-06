@@ -352,10 +352,6 @@ public class ServiceBaja implements IServiceBaja {
     }
 
     private byte[] compressUBLDocumentv2(byte[] document, String documentName) throws IOException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+compressUBLDocument() [" + this.docUUID + "]");
-        }
-
         byte[] zipDocument = null;
 
         try (ByteArrayInputStream bis = new ByteArrayInputStream(document);
@@ -373,17 +369,11 @@ public class ServiceBaja implements IServiceBaja {
             zos.closeEntry();
             zipDocument = bos.toByteArray();  // Devolver directamente los bytes comprimidos
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("compressUBLDocument() [" + this.docUUID + "] El documento UBL fue convertido a formato ZIP correctamente.");
-            }
         } catch (Exception e) {
             logger.error("compressUBLDocument() [" + this.docUUID + "] " + e.getMessage());
             throw new IOException(IVenturaError.ERROR_455.getMessage());
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("-compressUBLDocument() [" + this.docUUID + "]");
-        }
         return zipDocument; // Devuelve los bytes comprimidos directamente
     }
 

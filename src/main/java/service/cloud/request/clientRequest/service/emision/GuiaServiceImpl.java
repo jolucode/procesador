@@ -19,10 +19,10 @@ import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
 import service.cloud.request.clientRequest.extras.ISignerConfig;
 import service.cloud.request.clientRequest.extras.IUBLConfig;
 import service.cloud.request.clientRequest.handler.FileHandler;
-import service.cloud.request.clientRequest.handler.PDFBasicGenerateHandler;
 import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
+import service.cloud.request.clientRequest.handler.refactorPdf.service.impl.BaseDocumentService;
 import service.cloud.request.clientRequest.model.Client;
 import service.cloud.request.clientRequest.model.model.ResponseDTO;
 import service.cloud.request.clientRequest.model.model.ResponseDTOAuth;
@@ -53,7 +53,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Service
-public class GuiaServiceImpl implements GuiaInterface {
+public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterface {
 
     private static final Logger logger = Logger.getLogger(GuiaServiceImpl.class);
 
@@ -130,9 +130,7 @@ public class GuiaServiceImpl implements GuiaInterface {
 
         // Obtener el nombre del documento
         String documentName = DocumentNameHandler.getInstance().getRemissionGuideName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
-        if (logger.isDebugEnabled()) {
-            logger.debug("transactionRemissionGuideDocument() [" + this.docUUID + "] El nombre del documento: " + documentName);
-        }
+
 
         // Manejo de archivos
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
@@ -145,23 +143,14 @@ public class GuiaServiceImpl implements GuiaInterface {
         String attachmentPath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() +
                 File.separator + "anexo" + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
         fileHandler.setBaseDirectory(attachmentPath);
-        if (logger.isDebugEnabled()) {
-            logger.debug("transactionRemissionGuideDocument() [" + this.docUUID + "] Ruta para los archivos adjuntos: " + attachmentPath);
-        }
 
         // Guardar el documento XML en disco
         String documentPath = fileHandler.storeDocumentInDisk(despatchAdviceType, documentName);
-        if (logger.isInfoEnabled()) {
-            logger.info("transactionRemissionGuideDocument() [" + this.docUUID + "] El documento [" + documentName + "] fue guardado en DISCO en: " + documentPath);
-        }
 
         // Firmar el documento
         SignerHandler signerHandler = SignerHandler.newInstance();
         signerHandler.setConfiguration(certificado, certiPassword, ksType, ksProvider, signerName);
         File signedDocument = signerHandler.signDocument(documentPath, docUUID);
-        if (logger.isInfoEnabled()) {
-            logger.info("transactionRemissionGuideDocument() [" + this.docUUID + "] El documento [" + documentName + "] fue firmado correctamente en: " + signedDocument.getAbsolutePath());
-        }
 
         // Obtener el documento firmado en memoria
         Object ublDocument = fileHandler.getSignedDocument(signedDocument, transaction.getDOC_Codigo());
@@ -170,7 +159,6 @@ public class GuiaServiceImpl implements GuiaInterface {
         documentWRP.setAdviceType((DespatchAdviceType) ublDocument);
 
         // Generar el PDF
-        PDFBasicGenerateHandler pdfBasicHandler = new PDFBasicGenerateHandler(docUUID);
         String fechaVenc = transaction.getDOC_FechaVencimiento();
         DespatchAdviceType guia = documentWRP.getAdviceType();
 
@@ -220,8 +208,8 @@ public class GuiaServiceImpl implements GuiaInterface {
         logger.info("Client Secret: " + configuracion.getClientSecret());
 
         // Generar valores digest y barcode
-        String digestValue = pdfBasicHandler.generateDigestValue(documentWRP.getAdviceType().getUBLExtensions());
-        String barcodeValue = pdfBasicHandler.generateGuiaBarcodeInfoV2(
+        String digestValue = generateDigestValue(documentWRP.getAdviceType().getUBLExtensions());
+        String barcodeValue = generateGuiaBarcodeInfoV2(
                 guia.getID().getValue(),
                 IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE,
                 fechaVenc,
@@ -253,9 +241,6 @@ public class GuiaServiceImpl implements GuiaInterface {
 
         // Log de fecha de respuesta del servicio externo
         log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
-        if (logger.isDebugEnabled()) {
-            logger.debug("-transactionRemissionGuideDocument() [" + this.docUUID + "]");
-        }
 
         String errorPdf = "";
         // Generar PDF borrador

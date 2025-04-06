@@ -319,9 +319,6 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateInvoicePDF() [" + this.docUUID + "]");
-        }
         return creditNoteInBytes;
     } // generateCreditNotePDF
 
@@ -329,9 +326,6 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
         Map<String, Object> parameterMap;
         Map<String, Object> cuotasMap;
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("+createCreditNotePDF() [" + docUUID + "]");
-        }
         byte[] pdfDocument = null;
 
         if (null == creditNoteObj) {
@@ -449,32 +443,10 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
                 pdfDocument = outputStream.toByteArray();
             } catch (Exception e) {
-                logger.error("createCreditNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
-                logger.error("createCreditNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
                 throw new PDFReportException(IVenturaError.ERROR_443);
             }
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-createCreditNotePDF() [" + docUUID + "]");
-        }
         return pdfDocument;
     } //createCreditNotePDF
-
-
-    protected String formatDueDate(Date inputDueDate) throws Exception {
-        String dueDate = null;
-        try {
-
-            SimpleDateFormat sdf = null;
-            sdf = new SimpleDateFormat(IPDFCreatorConfig.PATTERN_DATE);
-            dueDate = sdf.format(inputDueDate);
-        } catch (Exception e) {
-            logger.error("formatDueDate() [" + this.docUUID + "] ERROR: "
-                    + e.getMessage());
-        }
-        return dueDate;
-    }
-
-
 
 }

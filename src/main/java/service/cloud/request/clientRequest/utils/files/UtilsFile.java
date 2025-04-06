@@ -90,9 +90,6 @@ public class UtilsFile {
             throw new Exception(IVenturaError.ERROR_454.getMessage());
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("-storeDocumentInDisk() ");
-        }
         return documentPath;
     }
 
@@ -121,9 +118,6 @@ public class UtilsFile {
             flag = true;
         } catch (IOException | VenturaExcepcion e) {
             logger.error("storePDFDocumentInDisk() [" + "] Exception(" + e.getClass().getName() + ") ERROR: " + e.getMessage());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-storePDFDocumentInDisk() [" + "]");
         }
         return flag;
     }

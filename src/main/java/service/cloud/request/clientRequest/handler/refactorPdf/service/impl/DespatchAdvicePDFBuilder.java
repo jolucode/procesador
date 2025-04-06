@@ -53,7 +53,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component
-public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
+public class DespatchAdvicePDFBuilder extends BaseDocumentService implements DespatchAdvicePDFGenerator {
 
     private static final Logger logger = Logger.getLogger(DespatchAdvicePDFBuilder.class);
 
@@ -65,17 +65,11 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
     @Override
     public synchronized byte[] generateDespatchAdvicePDF(UBLDocumentWRP despatchAdvice, ConfigData configData) throws PDFReportException {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateDespatchAdvicePDF() [" + this.docUUID + "]");
-        }
         byte[] despatchInBytes = null;
 
         try {
             DespatchAdviceObject despatchAdviceObject = new DespatchAdviceObject();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
-            }
             despatchAdviceObject.setCodigoEmbarque(despatchAdvice.getTransaccion().getTransactionGuias().getCodigoPuerto());
             despatchAdviceObject.setCodigoMotivoTraslado(despatchAdvice.getTransaccion().getTransactionGuias().getCodigoMotivo());
             despatchAdviceObject.setDescripcionMotivoTraslado(despatchAdvice.getTransaccion().getTransactionGuias().getDescripcionMotivo());
@@ -191,10 +185,6 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
                 itemObject3.setLstDinamicaItem(newlist2);
                 listaItem.add(itemObject3);
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo Campos Transacciones Lineas");
-                }
-
                 for (int i = 0; i < despatchAdvice.getTransaccion().getTransactionLineasDTOList().size(); i++) {
                     WrapperItemObject itemObject = new WrapperItemObject();
                     Map<String, String> itemObjectHash = new HashMap<>();
@@ -223,9 +213,6 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
             } else {
                 /** */
                 for (int i = 0; i < despatchAdvice.getTransaccion().getTransactionLineasDTOList().size(); i++) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("generateDespatchAdvicePDF() [" + this.docUUID + "] Agregando datos al HashMap");
-                    }
 
                     WrapperItemObject itemObject = new WrapperItemObject();
                     Map<String, String> itemObjectHash = new HashMap<>();
@@ -313,9 +300,6 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
         Map<String, Object> parameterMap;
         Map<String, Object> cuotasMap;
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("+createDespatchAdvicePDF() [" + docUUID + "]");
-        }
         byte[] pdfDocument = null;
 
         if (null == despatchAdviceObject) {
@@ -402,298 +386,10 @@ public class DespatchAdvicePDFBuilder implements DespatchAdvicePDFGenerator {
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
                 pdfDocument = outputStream.toByteArray();
             } catch (Exception e) {
-                logger.error("createDespatchAdvicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
-                logger.error("createDespatchAdvicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
                 throw new PDFReportException(e.getMessage());
             }
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-createDespatchAdvicePDF() [" + docUUID + "]");
-        }
         return pdfDocument;
     } //createInvoicePDF
-
-    protected List<InvoiceItemObject> getInvoiceItems(
-            List<InvoiceLineType> invoiceLines) throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getInvoiceItems() [" + this.docUUID
-                    + "] invoiceLines: " + invoiceLines);
-        }
-        List<InvoiceItemObject> itemList = null;
-
-        if (null != invoiceLines && 0 < invoiceLines.size()) {
-            /* Instanciando la lista de objetos */
-            itemList = new ArrayList<InvoiceItemObject>(invoiceLines.size());
-
-            try {
-                for (InvoiceLineType iLine : invoiceLines) {
-                    InvoiceItemObject invoiceItemObj = new InvoiceItemObject();
-
-                    invoiceItemObj.setQuantityItem(iLine.getInvoicedQuantity()
-                            .getValue());
-                    // invoiceItemObj.setQuantityItem(iLine.getInvoicedQuantity().getValue().setScale(IPDFCreatorConfig.DECIMAL_ITEM_QUANTITY,
-                    // RoundingMode.HALF_UP).toString());
-                    invoiceItemObj
-                            .setUnitMeasureItem((null != iLine.getNote()) ? iLine
-                                    .getNote().get(0).getValue() : "");
-                    invoiceItemObj.setDescriptionItem(iLine.getItem()
-                            .getDescription().get(0).getValue().toUpperCase());
-                    invoiceItemObj.setUnitValueItem(iLine.getPrice()
-                            .getPriceAmount().getValue());
-                    // invoiceItemObj.setUnitValueItem(getCurrencyV2(iLine.getPrice().getPriceAmount().getValue(),
-                    // null, IPDFCreatorConfig.PATTERN_FLOAT_DEC_3));
-
-                    BigDecimal unitPrice = getPricingReferenceValue(iLine
-                                    .getPricingReference()
-                                    .getAlternativeConditionPrice(),
-                            IPDFCreatorConfig.ALTERNATIVE_COND_UNIT_PRICE);
-                    invoiceItemObj.setUnitPriceItem(unitPrice);
-                    // invoiceItemObj.setUnitPriceItem(getCurrencyV2(unitPrice,
-                    // null, IPDFCreatorConfig.PATTERN_FLOAT_DEC_3));
-
-                    invoiceItemObj.setDiscountItem(getCurrency(
-                            getDiscountItem(iLine.getAllowanceCharge()), null));
-                    invoiceItemObj.setAmountItem(getCurrency(iLine
-                            .getLineExtensionAmount().getValue(), null));
-
-                    itemList.add(invoiceItemObj);
-                }
-            } catch (PDFReportException e) {
-                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
-                        + e.getMessage());
-                throw e;
-            } catch (Exception e) {
-                logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
-                        + IVenturaError.ERROR_415.getMessage());
-                throw new PDFReportException(IVenturaError.ERROR_415);
-            }
-        } else {
-            logger.error("getInvoiceItems() [" + this.docUUID + "] ERROR: "
-                    + IVenturaError.ERROR_411.getMessage());
-            throw new PDFReportException(IVenturaError.ERROR_411);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getInvoiceItems()");
-        }
-        return itemList;
-    } // getInvoiceItems
-
-    protected String getCurrency(BigDecimal value, String currencyCode)
-            throws Exception {
-        String moneyStr = null;
-
-        /*
-         * Obtener el objeto Locale de PERU
-         */
-        Locale locale = new Locale(IPDFCreatorConfig.LANG_PATTERN,
-                IPDFCreatorConfig.LOCALE_PE);
-
-        /*
-         * Obtener el formato de moneda local
-         */
-        java.text.NumberFormat format = java.text.NumberFormat
-                .getCurrencyInstance(locale);
-
-        if (StringUtils.isNotBlank(currencyCode)) {
-            Currency currency = Currency.getInstance(currencyCode);
-
-            /*
-             * Establecer el currency en el formato
-             */
-            format.setCurrency(currency);
-        }
-
-        if (null != value) {
-            Double money = value.doubleValue();
-
-            money = money * 100;
-            long tmp = Math.round(money);
-            money = (double) tmp / 100;
-
-            if (0 > money) {
-                String tempDesc = format.format(money);
-                java.text.DecimalFormat decF = new java.text.DecimalFormat(
-                        IPDFCreatorConfig.PATTERN_FLOAT_DEC);
-                //System.out.println(decF.format(money));
-                moneyStr = tempDesc.substring(1, 4) + " " + decF.format(money);
-            } else {
-                moneyStr = format.format(money);
-            }
-        }
-
-        if (null == currencyCode) {
-            moneyStr = moneyStr.substring(4);
-        }
-
-        return moneyStr;
-    } // getCurrency
-
-    public String generateBarCodeInfoString(String RUC_emisor_electronico, String documentType, String serie, String correlativo, List<TaxTotalType> taxTotalList, String issueDate, String Importe_total_venta, String Tipo_documento_adquiriente, String Numero_documento_adquiriente, UBLExtensionsType ublExtensions) throws PDFReportException {
-        String barcodeValue = "";
-        try {
-
-            /***/
-            String digestValue = getDigestValue(ublExtensions);
-            logger.debug("Digest Value" + digestValue);
-
-            /**El elemento opcional KeyInfo contiene información sobre la llave que se necesita para validar la firma, como lo muestra*/
-            String signatureValue = getSignatureValue(ublExtensions);
-            logger.debug("signatureValue" + signatureValue);
-
-            String Sumatoria_IGV = "";
-            if (taxTotalList != null) {
-                Sumatoria_IGV = getTaxTotalValueV21(taxTotalList).toString();
-                logger.debug("Sumatoria_IGV" + Sumatoria_IGV);
-            }
-            barcodeValue = MessageFormat.format(IPDFCreatorConfig.BARCODE_PATTERN, RUC_emisor_electronico, documentType, serie, correlativo, Sumatoria_IGV, Importe_total_venta, issueDate, Tipo_documento_adquiriente, Numero_documento_adquiriente, digestValue);
-
-        } catch (PDFReportException e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
-                    + e.getError().getId() + "-" + e.getError().getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
-                    + IVenturaError.ERROR_418.getMessage());
-            throw new PDFReportException(IVenturaError.ERROR_418);
-        }
-
-        return barcodeValue;
-    }
-
-    private String getDigestValue(UBLExtensionsType ublExtensions)
-            throws Exception {
-        String digestValue = null;
-        try {
-            int lastIndex = ublExtensions.getUBLExtension().size() - 1;
-            UBLExtensionType ublExtension = ublExtensions.getUBLExtension()
-                    .get(lastIndex);
-
-            NodeList nodeList = ublExtension.getExtensionContent().getAny()
-                    .getElementsByTagName(IUBLConfig.UBL_DIGESTVALUE_TAG);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i).getNodeName()
-                        .equalsIgnoreCase(IUBLConfig.UBL_DIGESTVALUE_TAG)) {
-                    digestValue = nodeList.item(i).getTextContent();
-                    break;
-                }
-            }
-
-            if (StringUtils.isBlank(digestValue)) {
-                throw new PDFReportException(IVenturaError.ERROR_423);
-            }
-        } catch (PDFReportException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("getDigestValue() Exception -->" + e.getMessage());
-            throw e;
-        }
-        return digestValue;
-    } // getDigestValue
-
-    private String getSignatureValue(UBLExtensionsType ublExtensions)
-            throws Exception {
-        String signatureValue = null;
-        try {
-            int lastIndex = ublExtensions.getUBLExtension().size() - 1;
-            UBLExtensionType ublExtension = ublExtensions.getUBLExtension()
-                    .get(lastIndex);
-
-            NodeList nodeList = ublExtension.getExtensionContent().getAny()
-                    .getElementsByTagName(IUBLConfig.UBL_SIGNATUREVALUE_TAG);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i).getNodeName()
-                        .equalsIgnoreCase(IUBLConfig.UBL_SIGNATUREVALUE_TAG)) {
-                    signatureValue = nodeList.item(i).getTextContent();
-                    break;
-                }
-            }
-
-            if (StringUtils.isBlank(signatureValue)) {
-                throw new PDFReportException(IVenturaError.ERROR_424);
-            }
-        } catch (PDFReportException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("getSignatureValue() Exception -->" + e.getMessage());
-            throw e;
-        }
-        return signatureValue;
-    } // getSignatureValue
-
-    protected BigDecimal getTaxTotalValueV21(List<TaxTotalType> taxTotalList) {
-
-        for (int i = 0; i < taxTotalList.size(); i++) {
-            for (int j = 0; j < taxTotalList.get(i).getTaxSubtotal().size(); j++) {
-                if (taxTotalList.get(i).getTaxSubtotal().get(j).getTaxCategory().getTaxScheme().getID().getValue().equalsIgnoreCase("1000")) {
-                    return taxTotalList.get(i).getTaxAmount().getValue();
-                }
-            }
-
-        }
-        return BigDecimal.ZERO;
-    }
-
-    private BigDecimal getDiscountItem(
-            List<AllowanceChargeType> allowanceCharges) {
-        BigDecimal value = BigDecimal.ZERO;
-
-        if (null != allowanceCharges && 0 < allowanceCharges.size()) {
-            /*
-             * Se entiende que en el caso exista una lista, solo debe tener un
-             * solo valor
-             */
-            value = allowanceCharges.get(0).getAmount().getValue();
-        }
-        return value;
-    } // getDiscountItem
-
-    private BigDecimal getPricingReferenceValue(
-            List<PriceType> alternativeConditionPrice, String priceTypeCode)
-            throws PDFReportException {
-        BigDecimal value = null;
-
-        if (null != alternativeConditionPrice
-                && 0 < alternativeConditionPrice.size()) {
-            for (PriceType altCondPrice : alternativeConditionPrice) {
-                if (altCondPrice.getPriceTypeCode().getValue()
-                        .equalsIgnoreCase(priceTypeCode)) {
-                    value = altCondPrice.getPriceAmount().getValue();
-                }
-            }
-
-            //if (null == value) {
-            //  throw new PDFReportException(IVenturaError.ERROR_417);
-            //}
-        } else {
-            throw new PDFReportException(IVenturaError.ERROR_416);
-        }
-        return value;
-    } // getPricingReferenceValue
-
-    public static InputStream generateQRCode(String qrCodeData, String filePath) {
-
-        try {
-
-            String charset = "utf-8"; // or "ISO-8859-1"
-            Map hintMap = new HashMap();
-
-            hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.Q);
-            createQRCode(qrCodeData, filePath, charset, hintMap, 200, 200);
-
-            FileInputStream fis = new FileInputStream(filePath);
-            InputStream is = fis;
-            return is;
-
-        } catch (WriterException | IOException ex) {
-            //java.util.logging.Logger.getLogger(PDFGenerateHandler.class.getName()).log(Level.SEVERE, null, ex);
-            logger.error(ex.getMessage());
-        }
-        return null;
-    }
-
-    public static void createQRCode(String qrCodeData, String filePath, String charset, Map hintMap, int qrCodeheight, int qrCodewidth) throws WriterException, IOException {
-        BitMatrix matrix = new MultiFormatWriter().encode(new String(qrCodeData.getBytes(charset), charset), BarcodeFormat.QR_CODE, qrCodewidth, qrCodeheight, hintMap);
-        MatrixToImageWriter.writeToFile(matrix, filePath.substring(filePath.lastIndexOf('.') + 1), new File(filePath));
-    }
 
 }

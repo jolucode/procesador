@@ -50,7 +50,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component
-public class RetentionPDFBuilder implements RetentionPDFGenerator {
+public class RetentionPDFBuilder extends BaseDocumentService implements RetentionPDFGenerator {
 
     private static final Logger logger = Logger.getLogger(RetentionPDFBuilder.class);
 
@@ -61,24 +61,14 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
 
     @Override
     public synchronized byte[] generateRetentionPDF(UBLDocumentWRP retentionType, ConfigData configData) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateRetentionPDF() [" + this.docUUID + "]");
-        }
         byte[] perceptionBytes = null;
 
         try {
 
             RetentionObject retentionObject = new RetentionObject();
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateRetentionPDF() [" + this.docUUID + "] Extrayendo informacion GENERAL del documento.");
-            }
             retentionObject.setDocumentIdentifier(retentionType.getRetentionType().getId().getValue());
             retentionObject.setIssueDate(DateUtil.formatIssueDate(retentionType.getRetentionType().getIssueDate().getValue()));
 
-            /* Informacion de SUNATTransaction */
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateRetentionPDF() [" + this.docUUID + "] Extrayendo informacion del EMISOR del documento.");
-            }
 
             retentionObject.setSenderSocialReason(retentionType.getRetentionType().getAgentParty().getPartyLegalEntity().get(0).getRegistrationName().getValue().toUpperCase());
             retentionObject.setSenderRuc(retentionType.getRetentionType().getAgentParty().getPartyIdentification().get(0).getID().getValue());
@@ -92,15 +82,9 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
             retentionObject.setSenderMail(retentionType.getTransaccion().getEMail());
             retentionObject.setWeb(retentionType.getTransaccion().getWeb());
             retentionObject.setRegimenRET(retentionType.getTransaccion().getRET_Tasa());
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateRetentionPDF() [" + this.docUUID + "] Extrayendo informacion del RECEPTOR del documento.");
-            }
             retentionObject.setReceiverSocialReason(retentionType.getRetentionType().getReceiverParty().getPartyLegalEntity().get(0).getRegistrationName().getValue().toUpperCase());
             retentionObject.setReceiverRuc(retentionType.getRetentionType().getReceiverParty().getPartyIdentification().get(0).getID().getValue());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion de los ITEMS.");
-            }
             retentionObject.setRetentionItems(getRetentionItems(retentionType.getRetentionType().getSunatRetentionDocumentReference(), retentionType.getRetentionType().getSunatRetentionPercent().getValue()));
 
             retentionObject.setTotalAmountValue(retentionType.getRetentionType().getTotalInvoiceAmount().getValue().toString());
@@ -123,9 +107,6 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
             retentionObject.setMontoTotalDoc(importeTotalDOC.toString());
             retentionObject.setTotal_doc_value(importeDocumento.toString());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando el importe en LETRAS.");
-            }
             for (int i = 0; i < retentionType.getTransaccion().getTransactionPropertiesDTOList().size(); i++) {
                 if (retentionType.getTransaccion().getTransactionPropertiesDTOList().get(i).getId().equalsIgnoreCase("1000")) {
                     retentionObject.setLetterAmountValue(retentionType.getTransaccion().getTransactionPropertiesDTOList().get(i).getValor());
@@ -156,9 +137,6 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
                             itemObjectHash.put(fieldName, value.toString());
                             newlist.add(value.toString());
 
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("generateRetentionPDF() [" + this.docUUID + "] Campo procesado: " + fieldName + " = " + value);
-                            }
                         }
 
                         // Conversiones específicas para fechas
@@ -181,20 +159,7 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
 
             retentionObject.setItemListDynamic(listaItem);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Colocando la lista de LEYENDAS.");
-            }
-            // retentionObject.setLegends(getLegendList(legendsMap));
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateInvoicePDF() [" + this.docUUID + "] Extrayendo informacion del CODIGO DE BARRAS.");
-            }
-
             String barcodeValue = generateBarcodeInfoV2(retentionType.getRetentionType().getId().getValue(), IUBLConfig.DOC_RETENTION_CODE, retentionObject.getIssueDate(), retentionType.getRetentionType().getTotalInvoiceAmount().getValue(), BigDecimal.ZERO, retentionType.getRetentionType().getAgentParty(), retentionType.getRetentionType().getReceiverParty(), retentionType.getRetentionType().getUblExtensions());
-
-            if (logger.isInfoEnabled()) {
-                logger.info("generateInvoicePDF() [" + this.docUUID + "] BARCODE: \n" + barcodeValue);
-            }
 
             InputStream inputStream;
             InputStream inputStreamPDF;
@@ -228,9 +193,6 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
 
             retentionObject.setResolutionCodeValue("resolutionCde");
 
-            /*
-             * Generando el PDF de la FACTURA con la informacion recopilada.
-             */
             perceptionBytes = createRetentionPDF(retentionObject, docUUID, configData);
 
         } catch (PDFReportException e) {
@@ -238,9 +200,6 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
         } catch (Exception e) {
             logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateInvoicePDF() [" + this.docUUID + "]");
         }
         return perceptionBytes;
 
@@ -250,11 +209,7 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
                                      String docUUID, ConfigData configData) throws PDFReportException {
 
         Map<String, Object> parameterMap;
-        Map<String, Object> cuotasMap;
-        String outputPath = "";
-        if (logger.isDebugEnabled()) {
-            logger.debug("+createRetentionPDF() [" + docUUID + "]");
-        }
+
         byte[] pdfDocument = null;
 
         if (null == retentionObject) {
@@ -323,253 +278,15 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
             }
 
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-createInvoicePDF() [" + docUUID + "]");
-        }
+
         return pdfDocument;
         // createInvoicePDF
     }
 
-    /*protected String formatIssueDate(XMLGregorianCalendar xmlGregorianCal)
-            throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+formatIssueDate() [" + this.docUUID + "]");
-        }
-        Date inputDate = xmlGregorianCal.toGregorianCalendar().getTime();
-
-        Locale locale = new Locale(IPDFCreatorConfig.LOCALE_ES,
-                IPDFCreatorConfig.LOCALE_PE);
-
-        SimpleDateFormat sdf = new SimpleDateFormat(
-                IPDFCreatorConfig.PATTERN_DATE, locale);
-        String issueDate = sdf.format(inputDate);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("-formatIssueDate() [" + this.docUUID + "]");
-        }
-        return issueDate;
-    }*/
-
-    public String generateDigestValue(UBLExtensionsType ublExtensions)
-            throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateDigestValueInfo()");
-        }
-
-        String digestValue = null;
-        try {
-
-
-            /* i.) Valor resumen <ds:DigestValue> */
-            digestValue = getDigestValue(ublExtensions);
-            // String digestValue=null;
-            /* j.) Valor de la Firma digital <ds:SignatureValue> */
-
-        } catch (PDFReportException e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
-                    + e.getError().getId() + "-" + e.getError().getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("generateBarcodeInfo() [" + this.docUUID + "] ERROR: "
-                    + IVenturaError.ERROR_418.getMessage());
-            throw new PDFReportException(IVenturaError.ERROR_418);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateBarcodeInfo()");
-        }
-        return digestValue;
-    }
-
-    private String getDigestValue(UBLExtensionsType ublExtensions)
-            throws Exception {
-        String digestValue = null;
-        try {
-            int lastIndex = ublExtensions.getUBLExtension().size() - 1;
-            UBLExtensionType ublExtension = ublExtensions.getUBLExtension()
-                    .get(lastIndex);
-
-            NodeList nodeList = ublExtension.getExtensionContent().getAny()
-                    .getElementsByTagName(IUBLConfig.UBL_DIGESTVALUE_TAG);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i).getNodeName()
-                        .equalsIgnoreCase(IUBLConfig.UBL_DIGESTVALUE_TAG)) {
-                    digestValue = nodeList.item(i).getTextContent();
-                    break;
-                }
-            }
-
-            if (StringUtils.isBlank(digestValue)) {
-                throw new PDFReportException(IVenturaError.ERROR_423);
-            }
-        } catch (PDFReportException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("getDigestValue() Exception -->" + e.getMessage());
-            throw e;
-        }
-        return digestValue;
-    } // getDigestValue
-
-    private String getSignatureValue(UBLExtensionsType ublExtensions)
-            throws Exception {
-        String signatureValue = null;
-        try {
-            int lastIndex = ublExtensions.getUBLExtension().size() - 1;
-            UBLExtensionType ublExtension = ublExtensions.getUBLExtension()
-                    .get(lastIndex);
-
-            NodeList nodeList = ublExtension.getExtensionContent().getAny()
-                    .getElementsByTagName(IUBLConfig.UBL_SIGNATUREVALUE_TAG);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i).getNodeName()
-                        .equalsIgnoreCase(IUBLConfig.UBL_SIGNATUREVALUE_TAG)) {
-                    signatureValue = nodeList.item(i).getTextContent();
-                    break;
-                }
-            }
-
-            if (StringUtils.isBlank(signatureValue)) {
-                throw new PDFReportException(IVenturaError.ERROR_424);
-            }
-        } catch (PDFReportException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("getSignatureValue() Exception -->" + e.getMessage());
-            throw e;
-        }
-        return signatureValue;
-    } // getSignatureValue
-
-    public static InputStream generateQRCode(String qrCodeData, String filePath) {
-
-        try {
-
-            String charset = "utf-8"; // or "ISO-8859-1"
-            Map hintMap = new HashMap();
-
-            hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.Q);
-            createQRCode(qrCodeData, filePath, charset, hintMap, 200, 200);
-
-            FileInputStream fis = new FileInputStream(filePath);
-            InputStream is = fis;
-            return is;
-
-        } catch (WriterException | IOException ex) {
-            logger.error(ex.getMessage());
-        }
-        return null;
-    }
-
-    public static void createQRCode(String qrCodeData, String filePath, String charset, Map hintMap, int qrCodeheight, int qrCodewidth) throws WriterException, IOException {
-        BitMatrix matrix = new MultiFormatWriter().encode(new String(qrCodeData.getBytes(charset), charset), BarcodeFormat.QR_CODE, qrCodewidth, qrCodeheight, hintMap);
-        MatrixToImageWriter.writeToFile(matrix, filePath.substring(filePath.lastIndexOf('.') + 1), new File(filePath));
-    }
-
-    public static InputStream generatePDF417Code(String qrCodeData, String filePath, int width, int height, int margin) {
-
-        try {
-            BitMatrix bitMatrixFromEncoder = null;
-            PDF417 objPdf417 = new PDF417();
-            objPdf417.generateBarcodeLogic(qrCodeData, 5);
-            objPdf417.setEncoding(StandardCharsets.UTF_8);
-            int aspectRatio = 4;
-            byte[][] originalScale = objPdf417.getBarcodeMatrix().getScaledMatrix(1, aspectRatio);
-
-            boolean rotated = false;
-            if ((height > width) != (originalScale[0].length < originalScale.length)) {
-                originalScale = rotateArray(originalScale);
-                rotated = true;
-            }
-
-            int scaleX = width / originalScale[0].length;
-            int scaleY = height / originalScale.length;
-
-            int scale;
-            if (scaleX < scaleY) {
-                scale = scaleX;
-            } else {
-                scale = scaleY;
-            }
-
-            if (scale > 1) {
-                byte[][] scaledMatrix = objPdf417.getBarcodeMatrix().getScaledMatrix(scale, scale * aspectRatio);
-                if (rotated) {
-                    scaledMatrix = rotateArray(scaledMatrix);
-                }
-                bitMatrixFromEncoder = bitMatrixFromBitArray(scaledMatrix, margin);
-            }
-            bitMatrixFromEncoder = bitMatrixFromBitArray(originalScale, margin);
-
-            MatrixToImageWriter.writeToFile(bitMatrixFromEncoder, filePath.substring(filePath.lastIndexOf('.') + 1), new File(filePath));
-
-            FileInputStream fis = new FileInputStream(filePath);
-            InputStream is = fis;
-            return is;
-
-        } catch (WriterException ex) {
-
-        } catch (IOException ex) {
-            logger.error(ex.getMessage());
-        }
-        return null;
-
-    }
-
-    private static BitMatrix bitMatrixFromBitArray(byte[][] input, int margin) {
-        // Creates the bit matrix with extra space for whitespace
-        BitMatrix output = new BitMatrix(input[0].length + 2 * margin, input.length + 2 * margin);
-        output.clear();
-        for (int y = 0, yOutput = output.getHeight() - margin - 1; y < input.length; y++, yOutput--) {
-            byte[] inputY = input[y];
-            for (int x = 0; x < input[0].length; x++) {
-                // Zero is white in the byte matrix
-                if (inputY[x] == 1) {
-                    output.set(x + margin, yOutput);
-                }
-            }
-        }
-        return output;
-    }
-
-    private static byte[][] rotateArray(byte[][] bitarray) {
-        byte[][] temp = new byte[bitarray[0].length][bitarray.length];
-        for (int ii = 0; ii < bitarray.length; ii++) {
-            // This makes the direction consistent on screen when rotating the
-            // screen;
-            int inverseii = bitarray.length - ii - 1;
-            for (int jj = 0; jj < bitarray[0].length; jj++) {
-                temp[jj][inverseii] = bitarray[ii][jj];
-            }
-        }
-        return temp;
-    }
-
-    protected String formatDepProvDist(AddressType postalAddress)
-            throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-formatDepProvDist() [" + this.docUUID + "]");
-        }
-        String depProvDist = null;
-        if (null != postalAddress) {
-            String department = postalAddress.getCountrySubentity().getValue();
-            String province = postalAddress.getCityName().getValue();
-            String district = postalAddress.getDistrict().getValue();
-
-            depProvDist = district + " - " + province + " - " + department;
-
-        } else {
-            throw new PDFReportException(IVenturaError.ERROR_410);
-        }
-        return depProvDist;
-    } // formatDepProvDist
-
     protected List<RetentionItemObject> getRetentionItems(
             List<SUNATRetentionDocumentReferenceType> retentionLines,
             String porcentaje) throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getInvoiceItems() [" + this.docUUID
-                    + "] invoiceLines: " + retentionLines);
-        }
+
         List<RetentionItemObject> itemList = null;
 
         if (null != retentionLines && 0 < retentionLines.size()) {
@@ -621,9 +338,7 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
                     + IVenturaError.ERROR_411.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_411);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getInvoiceItems()");
-        }
+
         return itemList;
     } // getInvoiceItems
 
@@ -633,9 +348,7 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
                                         PartyType accSupplierParty,
                                         PartyType accCustomerParty, UBLExtensionsType ublExtensions)
             throws PDFReportException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateBarcodeInfo()");
-        }
+
         String barcodeValue = null;
 
         try {
@@ -694,9 +407,7 @@ public class RetentionPDFBuilder implements RetentionPDFGenerator {
                     + IVenturaError.ERROR_418.getMessage());
             throw new PDFReportException(IVenturaError.ERROR_418);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateBarcodeInfo()");
-        }
+
         return barcodeValue;
     }// generateBarcodeInfo}
 }

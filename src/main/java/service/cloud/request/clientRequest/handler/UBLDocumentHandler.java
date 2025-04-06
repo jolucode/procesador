@@ -75,9 +75,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
 
     private UBLExtensionType getUBLExtensionTotalAndProperty(TransacctionDTO transaccion, List<TransactionTotalesDTO> transactionTotalList, List<TransactionPropertiesDTO> transactionPropertyList, String sunatTransactionID) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getUBLExtensionTotalAndProperty() [" + this.identifier + "] transactionTotalList: " + transactionTotalList + " transactionPropertyList: " + transactionPropertyList + " sunatTransactionID: " + sunatTransactionID);
-        }
         UBLExtensionType ublExtension = null;
 
         try {
@@ -89,9 +86,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 throw new UBLDocumentException(IVenturaError.ERROR_330);
             } else {
                 if (StringUtils.isNotBlank(sunatTransactionID)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getUBLExtensionTotalAndProperty() [" + this.identifier + "] Existe valor SUNATTransaction.");
-                    }
                     SUNATTransactionType sunatTransaction = new SUNATTransactionType();
                     IDType id = new IDType();
                     id.setValue(sunatTransactionID.trim());
@@ -99,18 +93,9 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                     additionalInformation.setSUNATTransaction(sunatTransaction);
                 }
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getUBLExtensionTotalAndProperty() [" + this.identifier + "] Agregando informacion de TOTALES.");
-                }
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getUBLExtensionTotalAndProperty() Se encontró un total de  [" + transactionTotalList.size() + "] Agregando informacion de TOTALES.");
-                }
             }
 
             if (transaccion.getTransactionContractDocRefListDTOS() != null && !transaccion.getTransactionContractDocRefListDTOS().isEmpty()) {
-
-                //Optional<TransaccionContractdocref> listTran = transaccion.getTransactionContractDocRefListDTOS().stream().filter(docRefer -> "incoterms".equalsIgnoreCase(docRefer.getUsuariocampos().getNombre())).findFirst();
 
                 //con Id vamos a la tabla transaccionContractDocRef
                 List<Map<String, String>> listContract = transaccion.getTransactionContractDocRefListDTOS();
@@ -196,9 +181,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             logger.error("getUBLExtensionTotalAndProperty() [" + this.identifier + "] ERROR: " + IVenturaError.ERROR_328.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_328);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getUBLExtensionTotalAndProperty() [" + this.identifier + "]");
-        }
         return ublExtension;
     } // getUBLExtensionTotalAndProperty
 
@@ -219,9 +201,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         } catch (Exception e) {
             logger.error("getUBLExtensionTotalAndProperty() [" + this.identifier + "] ERROR: " + IVenturaError.ERROR_328.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_328);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getUBLExtensionTotalAndProperty() [" + this.identifier + "]");
         }
         return ublExtension;
     } // getUBLExtensionTotalAndProperty
@@ -246,9 +225,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
     } // getExtensionContentNode
 
     public InvoiceType generateInvoiceType(TransacctionDTO transaction, String signerName) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateInvoiceType() [" + this.identifier + "]");
-        }
         InvoiceType invoiceType = null;
         try {
             /* Instanciar el objeto InvoiceType para la FACTURA */
@@ -565,9 +541,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             logger.error("generateInvoiceType() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
             throw new IllegalArgumentException(e.getMessage());
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateInvoiceType() [" + this.identifier + "]");
-        }
         return invoiceType;
     } //generateInvoiceType
 
@@ -632,9 +605,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
     }
 
     public CreditNoteType generateCreditNoteType(TransacctionDTO transaction, String signerName) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateCreditNoteType() [" + this.identifier + "]");
-        }
         CreditNoteType creditNoteType = null;
         try {
             /* Instanciar el objeto CreditNoteType para la NOTA DE CREDITO */
@@ -748,9 +718,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
     } //generateCreditNoteType
 
     public DebitNoteType generateDebitNoteType(TransacctionDTO transaction, String signerName) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateDebitNoteType() [" + this.identifier + "]");
-        }
         DebitNoteType debitNoteType = null;
         try {
             /* Instanciar el objeto DebitNoteType para la NOTA DE DEBITO */
@@ -822,16 +789,10 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             logger.error("generateDebitNoteType() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_344, e);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateDebitNoteType() [" + this.identifier + "]");
-        }
         return debitNoteType;
     } //generateDebitNoteType
 
     public PerceptionType generatePerceptionType(TransacctionDTO transaction, String signerName) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generatePerceptionType() [" + this.identifier + "]");
-        }
         PerceptionType perceptionType = null;
         try {
             /* Instanciar el objeto PerceptionType para la PERCEPCION */
@@ -899,9 +860,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
     } //generatePerceptionType
 
     public RetentionType generateRetentionType(TransacctionDTO transaction, String signerName) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateRetentionType() [" + this.identifier + "]");
-        }
         RetentionType retentionType = null;
         try {
             /* Instanciar el objeto RetentionType para la RETENCION */
@@ -974,9 +932,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
     } //generateRetentionType
 
     public DespatchAdviceType generateDespatchAdviceType(TransacctionDTO transaction, String signerName) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateDespatchAdviceType() [" + this.identifier + "]");
-        }
         DespatchAdviceType despatchAdviceType = null;
 
         /** JOSE LUIS <3*/
@@ -1198,9 +1153,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
     }
 
     private List<InvoiceLineType> getAllInvoiceLines(TransacctionDTO transaccion, List<TransactionLineasDTO> transaccionLineasList, List<TransactionPropertiesDTO> transaccionPropiedadesList, String currencyCode) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getAllInvoiceLines() [" + this.identifier + "] transaccionLineasList: " + transaccionLineasList + " currencyCode: " + currencyCode);
-        }
         if (null == transaccionLineasList || transaccionLineasList.isEmpty()) {
             logger.error("getAllInvoiceLines() [" + this.identifier + "] ERROR: " + IVenturaError.ERROR_319.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_319);
@@ -1211,12 +1163,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
         try {
             for (TransactionLineasDTO transaccionLinea : transaccionLineasList) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllInvoiceLines() [" + this.identifier + "] Extrayendo informacion del item...");
-                }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllInvoiceLines() [" + this.identifier + "]\n" + "NroOrden: " + transaccionLinea.getNroOrden() + "\n" + "Cantidad: " + transaccionLinea.getCantidad() + "\tUnidad: " + transaccionLinea.getUnidad() + "\tUnidadSunat: " + transaccionLinea.getUnidadSunat() + "\tTotalLineaSinIGV: " + transaccionLinea.getTotalLineaSinIGV() + "\n" + "PrecioRefCodigo: " + transaccionLinea.getPrecioRef_Codigo() + "\tPrecioIGV: " + transaccionLinea.getPrecioIGV() + "\tPrecioRefMonto: " + transaccionLinea.getPrecioRef_Monto() + "\n" + "DCTOMonto: " + transaccionLinea.getDSCTO_Monto() + "\tDescripcion: " + transaccionLinea.getDescripcion() + "\tCodArticulo: " + transaccionLinea.getCodArticulo());
-                }
                 InvoiceLineType invoiceLine = new InvoiceLineType();
                 /* Agregar <cac:InvoiceLine><cbc:ID> */
                 invoiceLine.setID(getID(String.valueOf(transaccionLinea.getNroOrden())));
@@ -1230,15 +1176,9 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                  * <cac:InvoiceLine><cbc:Note>
                  */
                 if (StringUtils.isNotBlank(transaccionLinea.getUnidad())) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando UNIDAD DE MEDIDA (VENTURA).");
-                    }
                     invoiceLine.getNote().add(getNote(transaccionLinea.getUnidad()));
                 }
                 /* Agregar <cac:InvoiceLine><cbc:LineExtensionAmount> */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando TOTAL_LINEA_SIN_IGV(" + transaccionLinea.getTotalLineaSinIGV() + ") - TAG LineExtensionAmount.");
-                }
                 invoiceLine.setLineExtensionAmount(getLineExtensionAmount(transaccionLinea.getTotalLineaSinIGV(), currencyCode));
                 /*
                  * Op. Onerosa:     tiene precio unitario
@@ -1248,19 +1188,10 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                  * <cac:InvoiceLine><cac:PricingReference>
                  */
                 if (transaccionLinea.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando PRECIO_IGV(" + transaccionLinea.getPrecioIGV() + ") - TAG PricingReference.");
-                    }
                     invoiceLine.setPricingReference(getPricingReference(transaccionLinea.getPrecioRef_Codigo(), transaccionLinea.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transaccionLinea));
                 } else if (transaccionLinea.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando PRECIO_REF_MONTO(" + transaccionLinea.getPrecioRef_Monto() + ") - TAG PricingReference.");
-                    }
                     invoiceLine.setPricingReference(getPricingReference(transaccionLinea.getPrecioRef_Codigo(), transaccionLinea.getPrecioRef_Monto().setScale(IUBLConfig.DECIMAL_LINE_UNIT_VALUE, RoundingMode.HALF_UP), currencyCode, transaccionLinea));
                 } else if (transaccionLinea.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REGULATED_RATES)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando Otro Precio de venta(" + transaccionLinea.getPrecioRef_Codigo() + ") - TAG PricingReference.");
-                    }
                     invoiceLine.setPricingReference(getPricingReference(transaccionLinea.getPrecioRef_Codigo(), transaccionLinea.getPrecioRef_Monto().setScale(IUBLConfig.DECIMAL_LINE_UNIT_VALUE, RoundingMode.HALF_UP), currencyCode, transaccionLinea));
                 }
                 /*
@@ -1270,9 +1201,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                  */
                 if (transaccion.getCodigoDetraccion() != null &&
                         transaccion.getCodigoDetraccion().equals("027")) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando DETRACCION - Servicio de Transporte de Carga.");
-                    }
                     invoiceLine.getDelivery().add(getDeliveryForLine(transaccionLinea.getCodUbigeoDestino(), transaccionLinea.getDirecDestino(), transaccionLinea.getCodUbigeoOrigen(), transaccionLinea.getDirecOrigen(), transaccionLinea.getDetalleViaje(), transaccionLinea.getValorCargaEfectiva(), transaccionLinea.getValorCargaUtil(), transaccionLinea.getValorTransporte(), transaccionLinea.getConfVehicular(), transaccionLinea.getCUtilVehiculo(), transaccionLinea.getCEfectivaVehiculo(), transaccionLinea.getValorRefTM(), transaccionLinea.getValorPreRef(), transaccionLinea.getFactorRetorno()));
                 }
 
@@ -1285,9 +1213,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                  * <cac:InvoiceLine><cac:AllowanceCharge>
                  */
                 if (null != transaccionLinea.getDSCTO_Monto() && transaccionLinea.getDSCTO_Monto().compareTo(BigDecimal.ZERO) == 1) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando DSCTO_MONTO(" + transaccionLinea.getDSCTO_Monto() + ") DSCTO_PORCENTAJE(" + transaccionLinea.getDSCTO_Porcentaje() + ") TOTAL_BRUTO(" + transaccionLinea.getTotalBruto() + ") - TAG AllowanceCharge.");
-                    }
                     BigDecimal montoCero = new BigDecimal("0.0");
                     invoiceLine.getAllowanceCharge().add(getAllowanceCharge(transaccionLinea.getDSCTO_Monto(), transaccionLinea.getDSCTO_Monto(), false, transaccionLinea.getDSCTO_Porcentaje(), transaccionLinea.getDSCTO_Monto(), transaccionLinea.getTotalBruto(), currencyCode, "00", montoCero, montoCero));
                 }
@@ -1296,10 +1221,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                  * Agregar IMPUESTOS DE LINEA
                  * <cac:InvoiceLine><cac:TaxTotal>
                  */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando IMPUESTOS DE LINEA.");
-                }
-
 
                 boolean existBolsa = false;
                 List<TransactionLineasImpuestoDTO> impuestoDTOList = new ArrayList<>();
@@ -1316,18 +1237,12 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 }
 
                 /* Agregar <cac:InvoiceLine><cac:Item> */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando DESCRIPCION[" + transaccionLinea.getDescripcion() + "] COD_ARTICULO[" + transaccionLinea.getCodArticulo() + "] COD_SUNAT[" + transaccionLinea.getCodSunat() + "] COD_PROD_GS1[" + transaccionLinea.getCodProdGS1() + "] - TAG Item.");
-                }
                 invoiceLine.setItem(getItemForLine(transaccion, transaccionLinea, transaccionLinea.getDescripcion(), transaccionLinea.getCodArticulo(), transaccionLinea.getCodSunat(), transaccionLinea.getCodProdGS1(), transaccionPropiedadesList));
 
                 /*
                  * Agregar VALOR UNITARIO
                  * <cac:InvoiceLine><cac:Price>
                  */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando VALOR UNITARIO - TAG Price.");
-                }
                 invoiceLine.setPrice(getPriceForLine(transaccionLinea.getTransaccionLineasBillrefListDTO(), currencyCode));
                 if (transaccionLinea.getItmBolsa() == null || !transaccionLinea.getItmBolsa().equals("I")) {
                     invoiceLineList.add(invoiceLine);
@@ -1335,9 +1250,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
             } //for
             for (int i = 0; i < IUBLConfig.lstImporteIGV.size(); i++) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllInvoiceLines() [" + this.identifier + "] Totales con IGV: " + IUBLConfig.lstImporteIGV.get(i));
-                }
             }
         } catch (UBLDocumentException e) {
             logger.error("getAllInvoiceLines() [" + this.identifier + "] UBLDocumentException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
@@ -1345,9 +1257,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         } catch (Exception e) {
             logger.error("getAllInvoiceLines() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") - ERROR: " + IVenturaError.ERROR_320.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_320);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getAllInvoiceLines() [" + this.identifier + "]");
         }
         return invoiceLineList;
     } //getAllInvoiceLines
@@ -1384,9 +1293,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
     }
 
     private List<CreditNoteLineType> getAllCreditNoteLines(TransacctionDTO transaccion, List<TransactionLineasDTO> transaccionLineasList, List<TransactionPropertiesDTO> transaccionPropiedadesList, String currencyCode) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getAllCreditNoteLines() [" + this.identifier + "] transaccionLineasList: " + transaccionLineasList + " currencyCode: " + currencyCode);
-        }
         if (null == transaccionLineasList || transaccionLineasList.isEmpty()) {
             logger.error("getAllCreditNoteLines() [" + this.identifier + "] ERROR: " + IVenturaError.ERROR_319.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_319);
@@ -1395,12 +1301,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         transaccionLineasList.sort(Comparator.comparing(linea -> linea.getNroOrden()));
         try {
             for (TransactionLineasDTO transaccionLinea : transaccionLineasList) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllCreditNoteLines() [" + this.identifier + "] Extrayendo informacion del item...");
-                }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllCreditNoteLines() [" + this.identifier + "]\n" + "NroOrden: " + transaccionLinea.getNroOrden() + "\n" + "Cantidad: " + transaccionLinea.getCantidad() + "\tUnidad: " + transaccionLinea.getUnidad() + "\tUnidadSunat: " + transaccionLinea.getUnidadSunat() + "\tTotalLineaSinIGV: " + transaccionLinea.getTotalLineaSinIGV() + "\n" + "PrecioRefCodigo: " + transaccionLinea.getPrecioRef_Codigo() + "\tPrecioIGV: " + transaccionLinea.getPrecioIGV() + "\tPrecioRefMonto: " + transaccionLinea.getPrecioRef_Monto() + "\n" + "DCTOMonto: " + transaccionLinea.getDSCTO_Monto() + "\tDescripcion: " + transaccionLinea.getDescripcion() + "\tCodArticulo: " + transaccionLinea.getCodArticulo());
-                }
                 CreditNoteLineType creditNoteLine = new CreditNoteLineType();
 
                 /* Agregar <cac:CreditNoteLine><cbc:ID> */
@@ -1417,16 +1317,10 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                  * <cac:CreditNoteLine><cbc:Note>
                  */
                 if (StringUtils.isNotBlank(transaccionLinea.getUnidad())) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllCreditNoteLines() [" + this.identifier + "] Agregando UNIDAD DE MEDIDA (VENTURA).");
-                    }
                     creditNoteLine.getNote().add(getNote(transaccionLinea.getUnidad()));
                 }
 
                 /* Agregar <cac:CreditNoteLine><cbc:LineExtensionAmount> */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllCreditNoteLines() [" + this.identifier + "] Agregando TOTAL_LINEA_SIN_IGV(" + transaccionLinea.getTotalLineaSinIGV() + ") - TAG LineExtensionAmount.");
-                }
                 creditNoteLine.setLineExtensionAmount(getLineExtensionAmount(transaccionLinea.getTotalLineaSinIGV(), currencyCode));
 
                 /*
@@ -1446,24 +1340,15 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                  * Agregar IMPUESTOS DE LINEA
                  * <cac:CreditNoteLine><cac:TaxTotal>
                  */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllCreditNoteLines() [" + this.identifier + "] Agregando IMPUESTOS DE LINEA.");
-                }
                 creditNoteLine.getTaxTotal().add(getTaxTotalLineV21(transaccionLinea.getTransactionLineasImpuestoListDTO(), transaccionLinea.getLineaImpuesto(), currencyCode));
 
                 /* Agregar <cac:CreditNoteLine><cac:Item> */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllCreditNoteLines() [" + this.identifier + "] Agregando DESCRIPCION[" + transaccionLinea.getDescripcion() + "] COD_ARTICULO[" + transaccionLinea.getCodArticulo() + "] COD_SUNAT[" + transaccionLinea.getCodSunat() + "] COD_PROD_GS1[" + transaccionLinea.getCodProdGS1() + "] - TAG Item.");
-                }
                 creditNoteLine.setItem(getItemForLine(transaccion, transaccionLinea, transaccionLinea.getDescripcion(), transaccionLinea.getCodArticulo(), transaccionLinea.getCodSunat(), transaccionLinea.getCodProdGS1(), transaccionPropiedadesList));
 
                 /*
                  * Agregar VALOR UNITARIO
                  * <cac:CreditNoteLine><cac:Price>
                  */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllCreditNoteLines() [" + this.identifier + "] Agregando VALOR UNITARIO - TAG Price.");
-                }
                 creditNoteLine.setPrice(getPriceForLine(transaccionLinea.getTransaccionLineasBillrefListDTO(), currencyCode));
                 creditNoteLineList.add(creditNoteLine);
             } //for
@@ -1475,16 +1360,10 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             logger.error("getAllCreditNoteLines() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             throw new UBLDocumentException(IVenturaError.ERROR_320);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getAllCreditNoteLines() [" + this.identifier + "]");
-        }
         return creditNoteLineList;
     } //getAllCreditNoteLines
 
     private List<DebitNoteLineType> getAllDebitNoteLines(TransacctionDTO transaccion, List<TransactionLineasDTO> transaccionLineasList, List<TransactionPropertiesDTO> transaccionPropiedadesList, String currencyCode) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getAllDebitNoteLines() [" + this.identifier + "] transaccionLineasList: " + transaccionLineasList + " currencyCode: " + currencyCode);
-        }
         if (null == transaccionLineasList || transaccionLineasList.isEmpty()) {
             logger.error("getAllDebitNoteLines() [" + this.identifier + "] ERROR: " + IVenturaError.ERROR_319.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_319);
@@ -1493,12 +1372,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         transaccionLineasList.sort(Comparator.comparing(linea -> linea.getNroOrden()));
         try {
             for (TransactionLineasDTO transaccionLinea : transaccionLineasList) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllDebitNoteLines() [" + this.identifier + "] Extrayendo informacion del item...");
-                }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllDebitNoteLines() [" + this.identifier + "]\n" + "NroOrden: " + transaccionLinea.getNroOrden() + "\n" + "Cantidad: " + transaccionLinea.getCantidad() + "\tUnidad: " + transaccionLinea.getUnidad() + "\tUnidadSunat: " + transaccionLinea.getUnidadSunat() + "\tTotalLineaSinIGV: " + transaccionLinea.getTotalLineaSinIGV() + "\n" + "PrecioRefCodigo: " + transaccionLinea.getPrecioRef_Codigo() + "\tPrecioIGV: " + transaccionLinea.getPrecioIGV() + "\tPrecioRefMonto: " + transaccionLinea.getPrecioRef_Monto() + "\n" + "DCTOMonto: " + transaccionLinea.getDSCTO_Monto() + "\tDescripcion: " + transaccionLinea.getDescripcion() + "\tCodArticulo: " + transaccionLinea.getCodArticulo());
-                }
                 DebitNoteLineType debitNoteLine = new DebitNoteLineType();
 
                 /* Agregar <cac:DebitNoteLine><cbc:ID> */
@@ -1515,16 +1388,10 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                  * <cac:DebitNoteLine><cbc:Note>
                  */
                 if (StringUtils.isNotBlank(transaccionLinea.getUnidad())) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllDebitNoteLines() [" + this.identifier + "] Agregando UNIDAD DE MEDIDA (VENTURA).");
-                    }
                     debitNoteLine.getNote().add(getNote(transaccionLinea.getUnidad()));
                 }
 
                 /* Agregar <cac:DebitNoteLine><cbc:LineExtensionAmount> */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllDebitNoteLines() [" + this.identifier + "] Agregando TOTAL_LINEA_SIN_IGV(" + transaccionLinea.getTotalLineaSinIGV() + ") - TAG LineExtensionAmount.");
-                }
                 debitNoteLine.setLineExtensionAmount(getLineExtensionAmount(transaccionLinea.getTotalLineaSinIGV(), currencyCode));
 
                 /*
@@ -1544,24 +1411,15 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                  * Agregar IMPUESTOS DE LINEA
                  * <cac:DebitNoteLine><cac:TaxTotal>
                  */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllDebitNoteLines() [" + this.identifier + "] Agregando IMPUESTOS DE LINEA.");
-                }
                 debitNoteLine.getTaxTotal().add(getTaxTotalLineV21(transaccionLinea.getTransactionLineasImpuestoListDTO(), transaccionLinea.getLineaImpuesto(), currencyCode));
 
                 /* Agregar <cac:DebitNoteLine><cac:Item> */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllDebitNoteLines() [" + this.identifier + "] Agregando DESCRIPCION[" + transaccionLinea.getDescripcion() + "] COD_ARTICULO[" + transaccionLinea.getCodArticulo() + "] COD_SUNAT[" + transaccionLinea.getCodSunat() + "] COD_PROD_GS1[" + transaccionLinea.getCodProdGS1() + "] - TAG Item.");
-                }
                 debitNoteLine.setItem(getItemForLine(transaccion, transaccionLinea, transaccionLinea.getDescripcion(), transaccionLinea.getCodArticulo(), transaccionLinea.getCodSunat(), transaccionLinea.getCodProdGS1(), transaccionPropiedadesList));
 
                 /*
                  * Agregar VALOR UNITARIO
                  * <cac:DebitNoteLine><cac:Price>
                  */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllDebitNoteLines() [" + this.identifier + "] Agregando VALOR UNITARIO - TAG Price.");
-                }
                 debitNoteLine.setPrice(getPriceForLine(transaccionLinea.getTransaccionLineasBillrefListDTO(), currencyCode));
                 debitNoteLineList.add(debitNoteLine);
             } //for
@@ -1573,16 +1431,10 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             logger.error("getAllDebitNoteLines() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             throw new UBLDocumentException(IVenturaError.ERROR_320);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getAllDebitNoteLines() [" + this.identifier + "]");
-        }
         return debitNoteLineList;
     } //getAllDebitNoteLines
 
     private List<SUNATPerceptionDocumentReferenceType> getAllSUNATPerceptionDocumentReferences(List<TransactionComprobantesDTO> transaccionComprobantePagoList) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] transaccionComprobantePagoList: " + transaccionComprobantePagoList);
-        }
         if (null == transaccionComprobantePagoList || transaccionComprobantePagoList.isEmpty()) {
             logger.error("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] ERROR: " + IVenturaError.ERROR_319.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_319);
@@ -1599,39 +1451,24 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 sunatPerceptionDocReference.setIssueDate(getIssueDate(DateUtil.parseDate(transaccionComprobantePago.getDOC_FechaEmision())));
 
                 /* Agregar <sac:SUNATPerceptionDocumentReference><cbc:TotalInvoiceAmount> */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando DOC_IMPORTE(" + transaccionComprobantePago.getDOC_Importe() + ") DOC_MONEDA(" + transaccionComprobantePago.getU_DOC_Moneda() + ") - TAG TotalInvoiceAmount.");
-                }
                 sunatPerceptionDocReference.setTotalInvoiceAmount(getTotalInvoiceAmount(transaccionComprobantePago.getDOC_Importe(), transaccionComprobantePago.getU_DOC_Moneda()));
 
                 /* Agregar <sac:SUNATPerceptionDocumentReference><cac:Payment> */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando PAGO_NUMERO(" + transaccionComprobantePago.getPagoNumero() + ") PAGO_IMPORTE_SR(" + transaccionComprobantePago.getU_PagoImporteSR() + ") PAGO_MONEDA(" + transaccionComprobantePago.getPagoMoneda() + ") PAGO_FECHA(" + transaccionComprobantePago.getPagoFecha() + ") - TAG Payment.");
-                }
                 sunatPerceptionDocReference.setPayment(getPaymentForLine(transaccionComprobantePago.getPagoNumero(), transaccionComprobantePago.getU_PagoImporteSR(), transaccionComprobantePago.getPagoMoneda(), DateUtil.parseDate(transaccionComprobantePago.getPagoFecha())));
 
                 /* Agregar <sac:SUNATPerceptionDocumentReference><sac:SUNATPerceptionInformation> */
                 SUNATPerceptionInformationType sunatPerceptionInformation = new SUNATPerceptionInformationType();
                 {
                     /* <sac:SUNATPerceptionDocumentReference><sac:SUNATPerceptionInformation><sac:SUNATPerceptionAmount> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando CP_IMPORTE(" + transaccionComprobantePago.getCP_Importe() + ") CP_MONEDA(" + transaccionComprobantePago.getCP_Moneda() + ") - TAG SUNATPerceptionInformation_SUNATPerceptionAmount.");
-                    }
                     SUNATPerceptionAmountType sunatPerceptionAmount = new SUNATPerceptionAmountType();
                     sunatPerceptionAmount.setValue(transaccionComprobantePago.getCP_Importe().setScale(2, RoundingMode.HALF_UP));
                     sunatPerceptionAmount.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getCP_Moneda()).value());
                     sunatPerceptionInformation.setPerceptionAmount(sunatPerceptionAmount);
 
                     /* <sac:SUNATPerceptionDocumentReference><sac:SUNATPerceptionInformation><sac:SUNATPerceptionDate> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando CP_FECHA(" + transaccionComprobantePago.getU_CP_Fecha() + ") - TAG SUNATPerceptionInformation_SUNATPerceptionDate.");
-                    }
                     sunatPerceptionInformation.setPerceptionDate(getSUNATPerceptionDate(DateUtil.parseDate(transaccionComprobantePago.getU_CP_Fecha())));
 
                     /* <sac:SUNATPerceptionDocumentReference><sac:SUNATPerceptionInformation><sac:SUNATNetTotalCashed> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando CP_IMPORTE_TOTAL(" + transaccionComprobantePago.getCP_ImporteTotal() + ") CP_MONEDA_MONTO_NETO(" + transaccionComprobantePago.getCP_MonedaMontoNeto() + ") - TAG SUNATPerceptionInformation_SUNATNetTotalCashed.");
-                    }
                     SUNATNetTotalCashedType sunatNetTotalCashed = new SUNATNetTotalCashedType();
                     sunatNetTotalCashed.setValue(transaccionComprobantePago.getCP_ImporteTotal().setScale(2, RoundingMode.HALF_UP));
                     sunatNetTotalCashed.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getCP_MonedaMontoNeto()).value());
@@ -1641,33 +1478,21 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                     ExchangeRateType exchangeRate = new ExchangeRateType();
 
                     /* <sac:SUNATPerceptionDocumentReference><sac:SUNATPerceptionInformation><cac:ExchangeRate><cbc:SourceCurrencyCode> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando TC_MONEDA_REF(" + transaccionComprobantePago.getTC_MonedaRef() + ") - TAG SUNATPerceptionInformation_ExchangeRate_SourceCurrencyCode.");
-                    }
                     SourceCurrencyCodeType sourceCurrencyCode = new SourceCurrencyCodeType();
                     sourceCurrencyCode.setValue(transaccionComprobantePago.getTC_MonedaRef());
                     exchangeRate.setSourceCurrencyCode(sourceCurrencyCode);
 
                     /* <sac:SUNATPerceptionDocumentReference><sac:SUNATPerceptionInformation><cac:ExchangeRate><cbc:TargetCurrencyCode> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando TC_MONEDA_OBJ(" + transaccionComprobantePago.getTC_MonedaObj() + ") - TAG SUNATPerceptionInformation_ExchangeRate_TargetCurrencyCode.");
-                    }
                     TargetCurrencyCodeType targetCurrencyCode = new TargetCurrencyCodeType();
                     targetCurrencyCode.setValue(transaccionComprobantePago.getTC_MonedaObj());
                     exchangeRate.setTargetCurrencyCode(targetCurrencyCode);
 
                     /* <sac:SUNATPerceptionDocumentReference><sac:SUNATPerceptionInformation><cac:ExchangeRate><cbc:CalculationRate> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando TC_FACTOR(" + transaccionComprobantePago.getU_TC_Factor() + ") - TAG SUNATPerceptionInformation_ExchangeRate_CalculationRate.");
-                    }
                     CalculationRateType calculationRate = new CalculationRateType();
                     calculationRate.setValue(transaccionComprobantePago.getU_TC_Factor());
                     exchangeRate.setCalculationRate(calculationRate);
 
                     /* <sac:SUNATPerceptionDocumentReference><sac:SUNATPerceptionInformation><cac:ExchangeRate><cbc:Date> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Agregando TC_FECHA(" + transaccionComprobantePago.getTC_Fecha() + ") - TAG SUNATPerceptionInformation_ExchangeRate_Date.");
-                    }
                     exchangeRate.setDate(getDate(DateUtil.parseDate(transaccionComprobantePago.getTC_Fecha())));
                     sunatPerceptionInformation.setExchangeRate(exchangeRate);
                 }
@@ -1682,16 +1507,10 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             logger.error("getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             throw new UBLDocumentException(IVenturaError.ERROR_320);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getAllSUNATPerceptionDocumentReferences() [" + this.identifier + "]");
-        }
         return sunatPerceptionDocReferenceList;
     } //getAllSUNATPerceptionDocumentReferences
 
     public List<SUNATRetentionDocumentReferenceType> getAllSUNATRetentionDocumentReferences(List<TransactionComprobantesDTO> transaccionComprobantePagoList) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] transaccionComprobantePagoList: " + transaccionComprobantePagoList);
-        }
         if (null == transaccionComprobantePagoList || transaccionComprobantePagoList.isEmpty()) {
             logger.error("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] ERROR: " + IVenturaError.ERROR_319.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_319);
@@ -1708,39 +1527,24 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 sunatRetentionDocReference.setIssueDate(getIssueDate(DateUtil.parseDate(transaccionComprobantePago.getDOC_FechaEmision())));
 
                 /* Agregar <sac:SUNATRetentionDocumentReference><cbc:TotalInvoiceAmount> */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando DOC_IMPORTE(" + transaccionComprobantePago.getDOC_Importe() + ") DOC_MONEDA(" + transaccionComprobantePago.getU_DOC_Moneda() + ") - TAG TotalInvoiceAmount.");
-                }
                 sunatRetentionDocReference.setTotalInvoiceAmount(getTotalInvoiceAmount(transaccionComprobantePago.getDOC_Importe(), transaccionComprobantePago.getU_DOC_Moneda()));
 
                 /* Agregar <sac:SUNATRetentionDocumentReference><cac:Payment> */
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando PAGO_NUMERO(" + transaccionComprobantePago.getPagoNumero() + ") PAGO_IMPORTE_SR(" + transaccionComprobantePago.getU_PagoImporteSR() + ") PAGO_MONEDA(" + transaccionComprobantePago.getPagoMoneda() + ") PAGO_FECHA(" + transaccionComprobantePago.getPagoFecha() + ") - TAG Payment.");
-                }
                 sunatRetentionDocReference.setPayment(getPaymentForLine(transaccionComprobantePago.getPagoNumero(), transaccionComprobantePago.getU_PagoImporteSR(), transaccionComprobantePago.getPagoMoneda(), DateUtil.parseDate(transaccionComprobantePago.getPagoFecha())));
 
                 /* Agregar <sac:SUNATRetentionDocumentReference><sac:SUNATRetentionInformation> */
                 SUNATRetentionInformationType sunatRetentionInformation = new SUNATRetentionInformationType();
                 {
                     /* <sac:SUNATRetentionDocumentReference><sac:SUNATRetentionInformation><sac:SUNATRetentionAmount> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando CP_IMPORTE(" + transaccionComprobantePago.getCP_Importe() + ") CP_MONEDA(" + transaccionComprobantePago.getCP_Moneda() + ") - TAG SUNATRetentionInformation_SUNATRetentionAmount.");
-                    }
                     SUNATRetentionAmountType sunatRetentionAmount = new SUNATRetentionAmountType();
                     sunatRetentionAmount.setValue(transaccionComprobantePago.getCP_Importe().setScale(2, RoundingMode.HALF_UP));
                     sunatRetentionAmount.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getCP_Moneda()).value());
                     sunatRetentionInformation.setSunatRetentionAmount(sunatRetentionAmount);
 
                     /* <sac:SUNATRetentionDocumentReference><sac:SUNATRetentionInformation><sac:SUNATRetentionDate> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando CP_FECHA(" + transaccionComprobantePago.getU_CP_Fecha() + ") - TAG SUNATRetentionInformation_SUNATRetentionDate.");
-                    }
                     sunatRetentionInformation.setSunatRetentionDate(getSUNATRetentionDate(DateUtil.parseDate(transaccionComprobantePago.getU_CP_Fecha())));
 
                     /* <sac:SUNATRetentionDocumentReference><sac:SUNATRetentionInformation><sac:SUNATNetTotalPaid> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando CP_IMPORTE_TOTAL(" + transaccionComprobantePago.getCP_ImporteTotal() + ") CP_MONEDA_MONTO_NETO(" + transaccionComprobantePago.getCP_MonedaMontoNeto() + ") - TAG SUNATRetentionInformation_SUNATNetTotalPaid.");
-                    }
                     SUNATNetTotalPaidType sunatNetTotalPaid = new SUNATNetTotalPaidType();
                     sunatNetTotalPaid.setValue(transaccionComprobantePago.getCP_ImporteTotal().setScale(2, RoundingMode.HALF_UP));
                     sunatNetTotalPaid.setCurrencyID(CurrencyCodeContentType.valueOf(transaccionComprobantePago.getCP_MonedaMontoNeto()).value());
@@ -1750,33 +1554,21 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                     ExchangeRateType exchangeRate = new ExchangeRateType();
 
                     /* <sac:SUNATRetentionDocumentReference><sac:SUNATRetentionInformation><cac:ExchangeRate><cbc:SourceCurrencyCode> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando TC_MONEDA_REF(" + transaccionComprobantePago.getTC_MonedaRef() + ") - TAG SUNATRetentionInformation_ExchangeRate_SourceCurrencyCode.");
-                    }
                     SourceCurrencyCodeType sourceCurrencyCode = new SourceCurrencyCodeType();
                     sourceCurrencyCode.setValue(transaccionComprobantePago.getTC_MonedaRef());
                     exchangeRate.setSourceCurrencyCode(sourceCurrencyCode);
 
                     /* <sac:SUNATRetentionDocumentReference><sac:SUNATRetentionInformation><cac:ExchangeRate><cbc:TargetCurrencyCode> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando TC_MONEDA_OBJ(" + transaccionComprobantePago.getTC_MonedaObj() + ") - TAG SUNATRetentionInformation_ExchangeRate_TargetCurrencyCode.");
-                    }
                     TargetCurrencyCodeType targetCurrencyCode = new TargetCurrencyCodeType();
                     targetCurrencyCode.setValue(transaccionComprobantePago.getTC_MonedaObj());
                     exchangeRate.setTargetCurrencyCode(targetCurrencyCode);
 
                     /* <sac:SUNATRetentionDocumentReference><sac:SUNATRetentionInformation><cac:ExchangeRate><cbc:CalculationRate> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando TC_FACTOR(" + transaccionComprobantePago.getU_TC_Factor() + ") - TAG SUNATRetentionInformation_ExchangeRate_CalculationRate.");
-                    }
                     CalculationRateType calculationRate = new CalculationRateType();
                     calculationRate.setValue(transaccionComprobantePago.getU_TC_Factor().setScale(3));
                     exchangeRate.setCalculationRate(calculationRate);
 
                     /* <sac:SUNATRetentionDocumentReference><sac:SUNATRetentionInformation><cac:ExchangeRate><cbc:Date> */
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Agregando TC_FECHA(" + transaccionComprobantePago.getTC_Fecha() + ") - TAG SUNATRetentionInformation_ExchangeRate_Date.");
-                    }
                     exchangeRate.setDate(getDate(DateUtil.parseDate(transaccionComprobantePago.getTC_Fecha())));
                     sunatRetentionInformation.setExchangeRate(exchangeRate);
                 }
@@ -1791,16 +1583,10 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             logger.error("getAllSUNATRetentionDocumentReferences() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             throw new UBLDocumentException(IVenturaError.ERROR_320);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getAllSUNATRetentionDocumentReferences() [" + this.identifier + "]");
-        }
         return sunatRetentionDocReferenceList;
     } //getAllSUNATRetentionDocumentReferences
 
     private List<DespatchLineType> getAllDespatchLines(List<TransactionLineasDTO> transaccionLineasList) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getAllDespatchLines() [" + this.identifier + "] transaccionLineasList: " + transaccionLineasList);
-        }
         if (null == transaccionLineasList || transaccionLineasList.isEmpty()) {
             logger.error("getAllDespatchLines() [" + this.identifier + "] ERROR: " + IVenturaError.ERROR_319.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_319);
@@ -1810,9 +1596,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         transaccionLineasList.sort(Comparator.comparing(linea -> linea.getNroOrden()));
         try {
             for (TransactionLineasDTO transaccionLinea : transaccionLineasList) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllDespatchLines() [" + this.identifier + "] Extrayendo informacion del item...");
-                }
                 DespatchLineType despatchLine = new DespatchLineType();
                 /* <cac:DespatchLine><cbc:ID> */
                 despatchLine.setID(getID(String.valueOf(transaccionLinea.getNroOrden())));
@@ -1823,18 +1606,12 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 /* <cac:DespatchLine><cac:Item> */
                 despatchLine.setItem(getItemForLineRest(transaccionLinea));
                 despatchLineList.add(despatchLine);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAllInvoiceLines() [" + this.identifier + "] Agregando DESCRIPCION[" + transaccionLinea.getDescripcion() + "] COD_ARTICULO[" + transaccionLinea.getCodArticulo() + "] - TAG Item.");
-                }
 
             } //for
         } catch (Exception e) {
             logger.error("getAllDespatchLines() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") - ERROR: " + IVenturaError.ERROR_320.getMessage());
             logger.error("getAllDespatchLines() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
             throw new UBLDocumentException(IVenturaError.ERROR_320);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getAllDespatchLines() [" + this.identifier + "]");
         }
         return despatchLineList;
     } //getAllDespatchLines
@@ -1902,9 +1679,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
 
     public VoidedDocumentsType generateVoidedDocumentType(TransacctionDTO transaction, String signerName) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateVoidedDocumentType() [" + this.identifier + "]");
-        }
         VoidedDocumentsType voidedDocumentType = null;
         try {
             /* Instanciar el objeto VoidedDocumentsType para la COMUNICACION DE BAJA */
@@ -1964,25 +1738,16 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             logger.error("generateVoidedDocumentType() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_345, e);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateVoidedDocumentType() [" + this.identifier + "]");
-        }
         return voidedDocumentType;
     } //generateVoidedDocumentType
 
     public SummaryDocumentsType generateSummaryDocumentsTypeV2(TransacctionDTO transaction, String signerName) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateSummaryDocumentsType() [" + this.identifier + "]");
-        }
         SummaryDocumentsType summaryDocumentsType = null;
         String idTransaccion = transaction.getANTICIPO_Id().replace("RA", "RC");
         try {
             /* Instanciar objeto SummaryDocumentsType para el resumen diario */
             summaryDocumentsType = new SummaryDocumentsType();
             /* Agregar <VoidedDocuments><ext:UBLExtensions> */
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateSummaryDocumentsType() [" + this.identifier + "] Agregando TAG para colocar la FIRMA.");
-            }
             UBLExtensionsType ublExtensions = new UBLExtensionsType();
 
             ublExtensions.getUBLExtension().add(getUBLExtensionSigner());
@@ -1996,9 +1761,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             summaryDocumentsType.setCustomizationID(getCustomizationID11());
 
             /* Agregar <SummaryDocuments><cbc:ID> */
-            if (logger.isDebugEnabled()) {
-                logger.debug("generateSummaryDocumentsType() [" + this.identifier + "] Agregando IdTransaccion: " + idTransaccion);
-            }
+
             IDType idDocIdentifier = new IDType();
             idDocIdentifier.setValue(idTransaccion);
             summaryDocumentsType.setID(idDocIdentifier);
@@ -2029,9 +1792,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             logger.error("generateSummaryDocumentsType() [" + this.identifier + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
             throw new UBLDocumentException("Error generación baja de documento");
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateSummaryDocumentsType() [" + this.identifier + "]");
-        }
+
         return summaryDocumentsType;
     } // generateSummaryDocumentsType
 
@@ -2054,36 +1815,18 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                                                              String district, String ubigeo, String countryCode,
                                                              String contactName, String electronicMail)
             throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateAccountingSupplierParty() ["
-                    + this.identifier + "]");
-        }
         SupplierPartyType accountingSupplierParty = null;
 
         try {
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("+CustomerAssignedAccountIDType() ["
-                        + this.identifier + "]");
-            }
 
             /* <cac:AccountingSupplierParty><cbc:CustomerAssignedAccountID> */
             CustomerAssignedAccountIDType customerAssignedAccountID = new CustomerAssignedAccountIDType();
             customerAssignedAccountID.setValue(identifier);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("+AdditionalAccountIDType() ["
-                        + this.identifier + "]");
-            }
-
             /* <cac:AccountingSupplierParty><cbc:AdditionalAccountID> */
             AdditionalAccountIDType additionalAccountID = new AdditionalAccountIDType();
             additionalAccountID.setValue(identifierType);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("+PartyType() ["
-                        + this.identifier + "]");
-            }
 
             /* <cac:AccountingSupplierParty><cac:Party> */
             PartyType party = generateParty(socialReason, commercialName,
@@ -2100,19 +1843,10 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                     additionalAccountID);
             accountingSupplierParty.setParty(party);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("-generateAccountingSupplierParty() ["
-                        + this.identifier + "] accountingSupplierParty: "
-                        + e.getMessage());
-            }
 
             throw new UBLDocumentException(IVenturaError.ERROR_302);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateAccountingSupplierParty() ["
-                    + this.identifier + "] accountingSupplierParty: "
-                    + accountingSupplierParty);
-        }
+
         return accountingSupplierParty;
     } // generateAccountingSupplierParty
 
@@ -2122,9 +1856,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                                     String ubigeoValue, String countryCodeValue,
                                     String contactNameValue, String electronicMailValue)
             throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+generateParty() [" + this.identifier + "]");
-        }
         PartyType party = new PartyType();
 
         /* <cac:Party><cac:PartyName> */
@@ -2213,55 +1944,31 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             party.setContact(contact);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("-generateParty() [" + this.identifier + "]");
-        }
         return party;
     } // generateParty
 
 
     private List<SummaryDocumentsLineType> getAllSummaryDocumentLinesV2(TransacctionDTO transaccion) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getAllSummaryDocumentLines() [" + this.identifier + "] ");
-        }
+
         List<SummaryDocumentsLineType> summaryDocumentLineList = null;
 
         try {
             summaryDocumentLineList = new ArrayList<>(1);
-            if (logger.isDebugEnabled()) {
-                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Extrayendo informacion del item...");
-            }
+
 
             SummaryDocumentsLineType summaryDocumentLine = new SummaryDocumentsLineType();
 
             /* Agregar <sac:SummaryDocumentsLine><cbc:LineID> */
-            if (logger.isDebugEnabled()) {
-                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando el LINEID.");
-            }
+
             LineIDType lineID = new LineIDType();
             lineID.setValue(String.valueOf(1));
             summaryDocumentLine.setLineID(lineID);
 
-            /*
-             * Agregar la SERIE a la que hace referencia los documentos
-             * de esta LINEA.
-             * <sac:SummaryDocumentsLine><sac:DocumentSerialID>
-             */
-            if (logger.isDebugEnabled()) {
-                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando la SERIE a la LINEA.");
-            }
 
             IDType iDType3 = new IDType();
             iDType3.setValue(transaccion.getDOC_Serie() + "-" + transaccion.getDOC_Numero());
             summaryDocumentLine.setiD(iDType3);
 
-            /*
-             * Agregar el codigo del tipo de documento de la LINEA
-             * <sac:SummaryDocumentsLine><cbc:DocumentTypeCode>
-             */
-            if (logger.isDebugEnabled()) {
-                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando el CODIGO del tipo de documento.");
-            }
             DocumentTypeCodeType documentTypeCode = new DocumentTypeCodeType();
             documentTypeCode.setValue(transaccion.getDOC_Codigo());
             summaryDocumentLine.setDocumentTypeCode(documentTypeCode);
@@ -2281,9 +1988,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             statusType.setConditionCode(conditionCodeType);
             summaryDocumentLine.setStatus(statusType);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando el MONTO TOTAL de la LINEA.");
-            }
 
             AmountType totalInvoiceAmountType = new AmountType();
             totalInvoiceAmountType.setValue(transaccion.getDOC_MontoTotal());
@@ -2292,9 +1996,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
             summaryDocumentLine.getBillingPayment().add(getBillingPayment(transaccion));
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("getAllSummaryDocumentLines() [" + this.identifier + "] Agregando sumatoria de OTROS CARGOS.");
-            }
             if (transaccion.getDOC_OtrosCargos() != null &&(transaccion.getDOC_OtrosCargos()).compareTo(BigDecimal.ZERO) > 0) {
                 summaryDocumentLine.getAllowanceCharge().add(getAllowanceCharge2(transaccion.getDOC_OtrosCargos(), transaccion.getDOC_MON_Codigo(), true));
             }
@@ -2313,9 +2014,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
     }
 
     private TaxTotalType getTaxTotalForSummary(BigDecimal taxAmountValue, String currencyCode, String schemeID, String schemeName, String schemeCode) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-getTaxTotalForSummary() [" + this.identifier + "] taxAmountValue: " + taxAmountValue + " schemeID: " + schemeID);
-        }
         TaxTotalType taxTotal = null;
         try {
             taxTotal = new TaxTotalType();
@@ -2344,9 +2042,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
     } // getTaxTotalForSummary
 
     private TaxSchemeType getTaxScheme(String taxTotalID, String taxTotalName, String taxTotalCode) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+-getTaxScheme() taxTotalID: " + taxTotalID + " taxTotalName: " + taxTotalName + " taxTotalCode: " + taxTotalCode);
-        }
+
         TaxSchemeType taxScheme = new TaxSchemeType();
         IDType id = new IDType();
         id.setValue(taxTotalID);
@@ -2363,9 +2059,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
     } // getTaxScheme
 
     private PaymentType getBillingPayment(TransacctionDTO transaccion) throws UBLDocumentException {
-        /*if (logger.isDebugEnabled()) {
-            logger.debug("+-getBillingPayment() [" + this.identifier + "] amount: " + amount + " operationType: " + operationType);
-        }*/
+
         PaymentType paymentType = null;
 
         try {
@@ -2398,9 +2092,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
 
     private AllowanceChargeType getAllowanceCharge2(BigDecimal amountVal, String currencyCode, boolean chargeIndicatorVal) throws UBLDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+getAllowanceCharge() [" + this.identifier + "]");
-        }
+
         AllowanceChargeType allowanceCharge = null;
         try {
             allowanceCharge = new AllowanceChargeType();
@@ -2425,9 +2117,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             logger.error("getAllowanceCharge() [" + this.identifier + "] ERROR: " + IVenturaError.ERROR_327.getMessage());
             throw new UBLDocumentException(IVenturaError.ERROR_327);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("-getAllowanceCharge() [" + this.identifier + "]");
-        }
+
         return allowanceCharge;
     } // getAllowanceCharge
 

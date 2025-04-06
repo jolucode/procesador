@@ -37,9 +37,6 @@ public class DocumentConverterUtils {
     }
 
     public static byte[] compressUBLDocument(byte[] document, String documentName) throws IOException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("+compressUBLDocument()");
-        }
 
         byte[] zipDocument;
 
@@ -60,16 +57,9 @@ public class DocumentConverterUtils {
             zos.finish(); // Forzar el cierre de la entrada ZIP antes de obtener los bytes
             zipDocument = bos.toByteArray(); // Devuelve directamente los bytes comprimidos
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("El documento UBL fue convertido a formato ZIP correctamente.");
-            }
         } catch (Exception e) {
             logger.error("Error al comprimir el documento: " + e.getMessage(), e);
             throw new IOException("Error al comprimir el documento UBL.", e);
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("-compressUBLDocument()");
         }
 
         return zipDocument;
