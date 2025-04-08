@@ -48,7 +48,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
 
 
     @Override
-    public byte[] generateBoletaPDF(UBLDocumentWRP boletaType, ConfigData configData) {
+    public byte[] generateBoletaPDF(UBLDocumentWRP boletaType, ConfigData configData) throws PDFReportException {
         byte[] boletaInBytes = null;
         try {
             BoletaObject boletaObj = new BoletaObject();
@@ -278,11 +278,8 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
             boletaObj.setLegends(getLegendList(legendsMap));
             boletaObj.setResolutionCodeValue("resolutionCde");
             boletaInBytes = createBoletaPDF(boletaObj, configData);
-        } catch (PDFReportException e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
-            ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
+            throw new PDFReportException(e.getMessage());
         }
         return boletaInBytes;
     } // generateBoletaPDF
@@ -381,9 +378,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
                 pdfDocument = outputStream.toByteArray();
             } catch (Exception e) {
-                logger.error("createBoletaPDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
-                logger.error("createBoletaPDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
-                throw new PDFReportException(IVenturaError.ERROR_442);
+                throw new PDFReportException(e.getMessage());
             }
         }
 

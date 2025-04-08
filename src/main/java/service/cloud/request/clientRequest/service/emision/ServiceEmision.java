@@ -137,20 +137,27 @@ public class ServiceEmision implements IServiceEmision {
         TransaccionRespuesta transactionResponse = handleTransactionStatus(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
         log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
 
-        if (client.getPdfBorrador().equals("true")) {
+        String errorPdf = "";
+        //if (client.getPdfBorrador().equals("true")) {
+        /*try {
             transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
-        }
-        transactionResponse.setIdentificador(documentName);
+        } catch (Exception e) {
+            errorPdf = e.getMessage();
+        }*/
+        if(transactionResponse.getPdf()!=null)
+            transactionResponse.setPdfBorrador(transactionResponse.getPdf());
 
+        transactionResponse.setIdentificador(documentName);
         log.setPathThirdPartyRequestXml(attachmentPath + "\\" + documentName + ".xml");
         log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
         log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
         log.setSeriesAndCorrelative(documentName);
-        log.setResponse((JsonUtils.toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (JsonUtils.toJson(transactionResponse.getSunat())));
+        //String messageResponse = (JsonUtils.toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (JsonUtils.toJson(transactionResponse.getSunat()));
+        log.setResponse(transactionResponse.getMensaje() );
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
         transactionResponse.setLogDTO(log);
         log.setPathBase(attachmentPath + "\\" + documentName + ".json");
-
+        transactionResponse.setMensaje(transactionResponse.getMensaje());
         return transactionResponse;
     }
 

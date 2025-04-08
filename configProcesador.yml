@@ -5,8 +5,8 @@ spring:
 scheduled:
   fixedDelay: 10000
 application:
-  env: dev
-  ambiente: 'test'
+  env: production
+  ambiente: 'production'
   rutas:
     rutaBaseDoc: 'C:\clientes\files\'
   soap-client:
@@ -15,7 +15,7 @@ application:
       base-url-consulta: 'https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService'
       base-url-retper: 'https://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService'
     ose:
-      base-url: 'https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl'
+      base-url: 'https://ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl'
     estela:
       base-url: 'https://ose-test.com/ol-ti-itcpe/billService3'
 
@@ -26,59 +26,467 @@ certificate:
 ventura:
   clientes:
     listaClientes:
-      "20510910517":
-        razonSocial: AGA
+      "20563656566":
+        razonSocial: "LIMA RESTAURANT DEPOT S.A.C."
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.limarestaurantdepot.com"
+        usuarioSol: "20563656566"
+        claveSol: "KXlFW8yi6y"
+        certificadoName: "LIMARESTAURANTDEPOT.PFX"
+        certificadoPassword: "20563656566"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://119.8.150.25:60082/"
+        clientId: "54d05a2d-63d7-44ed-8bb8-f8defdeffed3"
+        clientSecret: "JChTsDth1meKCx5OgMX7tQ=="
+        UserNameSunatGuias: "20563656566UNIV129T"
+        passwordSunatGuias: "Univ291T"
+      "20552572565":
+        razonSocial: "CLINICA EN CASA S.A.C."
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "http://clinicalhome.vsperufe.com/"
+        usuarioSol: "20552572565"
+        claveSol: "DTkXyEZi6v"
+        certificadoName: "C22091669603.pfx"
+        certificadoPassword: "CEC16092022"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://119.8.150.25:60083/"
+        clientId: "NoAplica"
+        clientSecret: "NoAplica"
+        UserNameSunatGuias: "NoAplica"
+        passwordSunatGuias: "NoAplica"
+      "20510014279":
+        razonSocial: "CLUB SPORTING CRISTAL S.A."
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://efact.clubsportingcristalsa.com/"
+        usuarioSol: "20510014279"
+        claveSol: "A2wRtfrqSM"
+        certificadoName: "C23071185908.pfx"
+        certificadoPassword: "fuerzacristal2023"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://119.8.150.25:60085/"
+        clientId: "NoAplica"
+        clientSecret: "NoAplica"
+        UserNameSunatGuias: "NoAplica"
+        passwordSunatGuias: "NoAplica"
+      "20502541944":
+        razonSocial: "PEGAMA INGENIEROS S.A.C."
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.pegamaingenieros.com/"
+        usuarioSol: "20502541944"
+        claveSol: "NgGKnPpSkR"
+        certificadoName: "CERTIFICATE_PEGAMA.pfx"
+        certificadoPassword: "4AHHdKUfXnU6vMQf"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://119.8.150.25:60086/"
+        clientId: "3fd5a553-3c19-4729-b32b-ff35af883078"
+        clientSecret: "ocp3yxYRqLeF0OURm3f6oA=="
+        UserNameSunatGuias: "20502541944ELIMAMAD"
+        passwordSunatGuias: "Zcet2579"
+      "20600617045":
+        razonSocial: "OPERACIONES MINERAS SAN PEDRO S.A.C"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.pegamaingenieros.com/"
+        usuarioSol: "20600617045"
+        claveSol: "zvKSvSn9DH"
+        certificadoName: "CERTIFICATE_MINERAS.pfx"
+        certificadoPassword: "mnX3MdvkvVEqvL7H"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://119.8.150.25:60087/"
+        clientId: "00a5539c-c0a4-4131-aa04-ac556da749ae"
+        clientSecret: "pjisGLaWX7HFk46rl/FfEg=="
+        UserNameSunatGuias: "20600617045EHANAMAD"
+        passwordSunatGuias: "Xars5068"
+      "20563394006":
+        razonSocial: "AROMATIC DEL PERU S.A.C"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.aromaticperu.com"
+        usuarioSol: "20563394006"
+        claveSol: "Ft9Dje9TVD"
+        certificadoName: "C24010296026.pfx"
+        certificadoPassword: "Aromaticdelperu1"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://119.8.150.25:60088/"
+        clientId: "5f93fcb7-fadc-4e78-9797-78a56d1e6fba"
+        clientSecret: "pNfhcf37qPDhF1z8W3I6ig=="
+        UserNameSunatGuias: "20563394006USUARSAP"
+        passwordSunatGuias: "Sap12345"
+      "20502044304":
+        razonSocial: "DIRC S.A.C"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://dircsa.aromaticperu.com"
+        usuarioSol: "20502044304"
+        claveSol: "kLIj6zLnd8"
+        certificadoName: "certificado_dirc.pfx"
+        certificadoPassword: "Dirc2020"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://119.8.150.25:60089/"
+        clientId: "d64fea9c-93ef-4e9f-96f5-5f333c9371f6"
+        clientSecret: "+pN0efrAyHhZcXth4nkvmw=="
+        UserNameSunatGuias: "20502044304USUARSAP"
+        passwordSunatGuias: "Sap12345"
+      "20510511906":
+        razonSocial: "MATERIALES / FIERROS E.I.R.L. "
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "http://factmafie.mafie-sap.com/"
+        usuarioSol: "20510511906"
+        claveSol: "u3XOTTDT0j"
+        certificadoName: "C23122695682.pfx"
+        certificadoPassword: "Cris12xll1"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://119.8.150.25:60081/"
+        clientId: "c847f332-b0b2-44e3-909d-8487f846b31c"
+        clientSecret: "g4Ol4BHGvPkQm2GuQ3JBoA=="
+        UserNameSunatGuias: "20510511906ALREYESC"
+        passwordSunatGuias: "Sap@55"
+      "20100313899":
+        razonSocial: "ZICSA SAC"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "http://facturacion.zicsa.com"
+        usuarioSol: "20100313899"
+        claveSol: "yX6HV3bx6z"
+        certificadoName: "DIGITAL_ZICSA_2023_2025.pfx"
+        certificadoPassword: "20100313899"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://119.8.150.25:60081/"
+        clientId: "c847f332-b0b2-44e3-909d-8487f846b31c"
+        clientSecret: "SOLICITAR CLIENTE"
+        UserNameSunatGuias: "20510511906ALREYESC"
+        passwordSunatGuias: "SOLICITAR CLIENTE"
+      "20106836451":
+        razonSocial: "Sego Seguridad Optima S a"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "http://facturacion.sego.com.pe"
+        usuarioSol: "20106836451"
+        claveSol: "FQMvRMV9bK"
+        certificadoName: "SEGOSEGURIDADOPTIMA.claveprivada.pfx"
+        certificadoPassword: "$3GO*2022"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://191.98.177.29:60099/"
+        clientId: "a3e23ef1-c6f5-42a7-8bc6-ec85c6dfc4da"
+        clientSecret: "r099VBDA1PAd56/+W+88AQ=="
+        UserNameSunatGuias: "20106836451SEGOGRE1"
+        passwordSunatGuias: "SeGOGRE1"
+      "20342339426":
+        razonSocial: "THIESSEN DEL PERU S.A"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.thiessenperu-fe.com/"
+        usuarioSol: "20342339426"
+        claveSol: "f9OsNdNcP3"
+        certificadoName: "CERTIFICADO_PRODUCCION.pfx"
+        certificadoPassword: "fPp39ZujTzcKfuUz"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://119.8.150.25:60097/"
+        clientId: "2f4e8f85-05fe-40bc-8509-cc9d05924bb5"
+        clientSecret: "fwQz7aFQ/AbTzTMVoAca5A=="
+        UserNameSunatGuias: "20342339426ESIBMAYO"
+        passwordSunatGuias: "Thiessen24@"
+      "20546747248":
+        razonSocial: "LAZZOS COMERCIALES S.A.C"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.lazzosfe.com.pe/"
+        usuarioSol: "20546747248"
+        claveSol: "ZdRFO2GhOq"
+        certificadoName: "CERTIFICATE_PROD.pfx"
+        certificadoPassword: "223115"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://168.121.46.19:60090/"
+        clientId: "b38d03f6-8a72-4242-94d3-f94f9cc3fc94"
+        clientSecret: "jPAAvR3AEXX9lLnDtZIQbw=="
+        UserNameSunatGuias: "20546747248JUST0DLL"
+        passwordSunatGuias: "L20546747248"
+      "20600330129":
+        razonSocial: "GRUPO JLB S.A."
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.grupojlb.com"
+        usuarioSol: "20600330129"
+        claveSol: "Y7hHb9yDHF"
+        certificadoName: "aUVEa1pqMldCYmRWSWh2UA==.p12"
+        certificadoPassword: "YhpSzT9c7zbeCzRD"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://159.138.119.20:60091/"
+        scope: "NoAplica"
+        clientId: "NoAplica"
+        clientSecret: "NoAplica"
+        UserNameSunatGuias: "NoAplica"
+        passwordSunatGuias: "NoAplica"
+      "20100151546":
+        razonSocial: "INDUSTRIAS DEL PAPEL S A"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.indupapel.com/"
+        usuarioSol: "20100151546"
+        claveSol: "Of8CSWbFRz"
+        certificadoName: "IPSA_20231003.pfx"
+        certificadoPassword: "pLEabDpif4czf5VR"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://159.138.119.20:60092/"
+        clientId: "854a1cef-8ba5-42c1-bbda-8633f91021da"
+        clientSecret: "le8DGEXSYTf87Y4sVbjEoQ=="
+        UserNameSunatGuias: "20100151546JANETMU1"
+        passwordSunatGuias: "Janetmu1"
+      "20100172624":
+        razonSocial: "CERUTI FABRICA DE ENVASES DE CARTON S A"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.ceruti-sa.com"
+        usuarioSol: "20100172624"
+        claveSol: "kcsNh6aQ3w"
+        certificadoName: "Certificado_Ceruti_New.pfx"
+        certificadoPassword: "z3CwzhgivJvQmJbE"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://159.138.119.20:60093/"
+        clientId: "ee428462-894f-4d9e-ac60-e7b858006633"
+        clientSecret: "rf/NLSA4WQGzxidei9I1Hg=="
+        UserNameSunatGuias: "20100172624FESPADA1"
+        passwordSunatGuias: "Espada2023"
+      "20537506131":
+        razonSocial: "ACINSA TUBOS S.A"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.acinsaperu.com"
+        usuarioSol: "20537506131"
+        claveSol: "OqOzcv4Iyg"
+        certificadoName: "acinsatubos.pfx"
+        certificadoPassword: "wsy6whZCD6HjH2Qw"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://159.138.119.20:60094/"
+        clientId: "ede88587-ec66-45ea-a869-1efd1e5f05cc"
+        clientSecret: "CxpZq26o16nnUGhP8lR5/w=="
+        UserNameSunatGuias: "20537506131DZAMUDIO"
+        passwordSunatGuias: "Acinsa123"
+      "20604769699":
+        razonSocial: "AC FACTORING S.A.C."
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.acfactoring.com"
+        usuarioSol: "20604769699"
+        claveSol: "jsNImoCmQ8"
+        certificadoName: "YVN4ZXRPaUtPU3g3SGRPZg==.pfx"
+        certificadoPassword: "Y7rdb9ShYBRyxuye"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://159.138.119.20:60095/"
+        clientId: "NoAplica"
+        clientSecret: "NoAplica"
+        UserNameSunatGuias: "NoAplica"
+        passwordSunatGuias: "NoAplica"
+      "20612456268":
+        razonSocial: Polimes S.A.C
         wsUsuario: admin
         wsClave: ventura
         wsLocation: "https://facturacion.venturafe.com/"
-        usuarioSol: "20510910517"
-        claveSol: "20510910517"
-        certificadoName: CERTIFICATE_TEST.pfx
-        certificadoPassword: "1234"
-        integracionWs: SUNAT
+        emisorElecRs: 205454844881/SUNAT
+        usuarioSol: "20612456268"
+        claveSol: "dgnDumLgx2"
+        certificadoName: sistema_de_facturacion.pfx
+        certificadoPassword: "20612456268"
+        integracionWs: OSE
         pdfBorrador: "true"
         impresion: Codigo QR
-        urlOnpremise: "http://104.208.219.120:60108/"
-        #urlOnpremise: http://190.119.245.254:60081/AZALAIA
-        #urlOnpremise: http://119.8.146.122:60089/
-        #urlOnpremise: http://104.208.219.120:60108/
-        clientId: a8a6c50a-d73c-4775-9ddc-6261df69fed8
-        clientSecret: 5yr+sp24Q1J+LeYhnCooEw==
-        UserNameSunatGuias: 20510910517JVENTUR1
-        passwordSunatGuias: JVasdsENTUR1
+        urlOnpremise: http://101.44.10.195:60082/
+        scope: https://api-cpe.sunat.gob.pe/
+        clientId: 95c4b729-1d8d-4644-a2cb-54a19b0b4bfa
+        clientSecret: pa1RiZ0jrwDU5uNNkF0HhA==
+        UserNameSunatGuias: 20612456268VENTUSAP
+        passwordSunatGuias: Poli2025
+      "20505688903":
+        razonSocial: "AGRÍCOLA ANDREA S.A.C"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.agricolaandrea.com"
+        usuarioSol: "20505688903"
+        claveSol: "a4Av69E6I4"
+        certificadoName: "CERTIFICADO-22AD02EBCCFE998E9E.pfx"
+        certificadoPassword: "E6YEvuVcir8TzqVm"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://104.208.219.120:60103/"
+        clientId: "e216a24a-7952-44b7-b15b-50d5557c759b"
+        clientSecret: "dbL8qFbYS+KQGsolf1z5MQ=="
+        UserNameSunatGuias: "20505688903VENTURA1"
+        passwordSunatGuias: "Vs12345"
+      "20607519391":
+        razonSocial: "Arenuva S.a.C"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.agricolaandrea.com"
+        usuarioSol: "20607519391"
+        claveSol: "3MM7QzJ7RQ"
+        certificadoName: "V0ZHZHViN29OSjVIMFRVNQ==.pfx"
+        certificadoPassword: "fXQ743s4qQG7xr7H"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://104.208.219.120:60104/"
+        clientId: "3c394711-fd4c-4d61-a86c-e999e9db7533"
+        clientSecret: "N/HYY7dh15NjhEq5An8hoA=="
+        UserNameSunatGuias: "2060751939148018828"
+        passwordSunatGuias: "ARENUVA2024v"
+      "20602371931":
+        razonSocial: "Agricola los Buenos Muchachos de Pisco S.a.C."
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.asgricolaandrsea.com"
+        usuarioSol: "20602371931"
+        claveSol: "69Cn01xWQt"
+        certificadoName: "CERTIFICADO-BMP.pfx"
+        certificadoPassword: "SfiLrXtW8DhcVjLA"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://104.208.219.120:60105/"
+        clientId: "2945f349-bf80-428b-9cfc-a124b0ba2281"
+        clientSecret: "pUwat1pUjDS5NajxRY1Hdg=="
+        UserNameSunatGuias: "20602371931VENTURA1"
+        passwordSunatGuias: "Vs12345"
+      "20602842739":
+        razonSocial: "Larama Berries S.a.C."
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.agricolaandrea.com"
+        usuarioSol: "20602842739"
+        claveSol: "1U1Gpkz1Ui"
+        certificadoName: "MzNnUXdidzZkQVhNN21HeQ==.pfx"
+        certificadoPassword: "qgCSwcPtg5saYiND"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://104.208.219.120:60106/"
+        clientId: "47223b7e-a530-430c-ae2d-a69d0ac59750"
+        clientSecret: "BxjIdovi4Hs5cxaTQ7j3eQ=="
+        UserNameSunatGuias: "20602842739VENTURA1"
+        passwordSunatGuias: "Vs12345"
+      "20610344314":
+        razonSocial: "Newterra S.a.C."
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.agricolaandrea.com"
+        usuarioSol: "20610344314"
+        claveSol: "ee9oQ4fRvW"
+        certificadoName: "SDl6UVlBM1ZWa1dIYVhHRw==.p12"
+        certificadoPassword: "z2ZGifckwR3cKjjK"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://104.208.219.120:60107/"
+        clientId: "9db3fa8d-5fe4-4c2d-bb86-39713c148142"
+        clientSecret: "+84jmzwQs+330uUNmNs0UA=="
+        UserNameSunatGuias: "2061034431472126297"
+        passwordSunatGuias: "NT2024sllv"
       "20100067596":
         razonSocial: "Fabrica de Cubiertos Sac "
         wsUsuario: "admin"
         wsClave: "ventura"
-        wsLocation: ""
+        wsLocation: "https://facturacion.facusafe-cloud.com/"
         usuarioSol: "20100067596"
-        claveSol: "20100067596"
+        claveSol: "GAmYdRoYli"
         certificadoName: "INSTALADOR2.pfx"
         certificadoPassword: "4443"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://101.44.10.195:60084/"
+        clientId: "d234c505-541c-4060-8e89-f6a547f7ecf8"
+        clientSecret: "xZJIhomKys4vQgXVP3zQ+Q=="
+        UserNameSunatGuias: "20100067596VENTUSAP"
+        passwordSunatGuias: "Facu2025"
+      "20510910517":
+        razonSocial: "VENTURA SOLUCIONES"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "http://portal.digital-fact.com/"
+        usuarioSol: "20510910517JVENTUR1"
+        claveSol: "JVENTUR1"
+        certificadoName: "VS_Certificado_Digital.pfx"
+        certificadoPassword: "ventura"
         integracionWs: SUNAT
         pdfBorrador: "true"
         impresion: "Codigo QR"
-        urlOnpremise: "http://101.44.10.195:60084/"
-        clientId: "d234c505-541c-4060-8e89-f6a547f7ecf8"
-        clientSecret: "xZJIhomKys4vQgXVP3zQ+Q=="
-        UserNameSunatGuias: "20100067596VENTUSAP"
-        passwordSunatGuias: "Facu2025"
+        urlOnpremise: "http://119.8.150.25:60084/"
+        clientId: "NoAplica"
+        clientSecret: "NoAplica"
+        UserNameSunatGuias: "NoAplica"
+        passwordSunatGuias: "NoAplica"
       "20520575236":
-        razonSocial: "PRUEBAS CLIENTE AGROMIGIVA"
+        razonSocial: "VENTANAS Y ESTILOS S.A.C"
         wsUsuario: "admin"
         wsClave: "ventura"
-        wsLocation: "https://facturacion.venturafe.com/"
-        usuarioSol: "20520575236MODDATOS"
-        claveSol: "YTBFW1YLUS"
-        certificadoName: "CERTIFICATE_TEST.pfx"
-        certificadoPassword: "4443"
-        integracionWs: ESTELA
+        wsLocation: "https://documentos.consultaventanasyestilos.com/"
+        usuarioSol: "20520575236"
+        claveSol: "kuz39PLnAi"
+        certificadoName: "CertificadoVyE.pfx"
+        certificadoPassword: "des1024r"
+        integracionWs: OSE
         pdfBorrador: "true"
         impresion: "Codigo QR"
-        urlOnpremise: "http://101.44.10.195:60084/"
-        clientId: "d234c505-541c-4060-8e89-f6a547f7ecf8"
-        clientSecret: "xZJIhomKys4vQgXVP3zQ+Q=="
-        UserNameSunatGuias: "20100067596VENTUSAP"
-        passwordSunatGuias: "Facu2025"
+        urlOnpremise: "http://181.177.241.13:6060/"
+        clientId: "4f0d9f8b-8e65-4503-88c6-567ff8bfa96c"
+        clientSecret: "rNLddmK4+AznWfUDcX8Rpw=="
+        UserNameSunatGuias: "20520575236MICHELAS"
+        passwordSunatGuias: "Ventanas2024"
+      "20538492028":
+        razonSocial: "INDUSTRIAS BASA S.A.C."
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://facturacion.basafe-cloud.com/"
+        usuarioSol: "20538492028"
+        claveSol: "CcljqtSNPF"
+        certificadoName: "INSTALADOR3.pfx"
+        certificadoPassword: "4443"
+        integracionWs: OSE
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://101.44.10.195:60083/"
+        clientId: "96f17bc0-8dec-438b-864d-a6982b512cf9"
+        clientSecret: "9n8JTJY0AAvXY/wzZGQPUA=="
+        UserNameSunatGuias: "20538492028VENTUSAP"
+        passwordSunatGuias: "Ventu2023"
 server:
   port: 8082

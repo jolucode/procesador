@@ -44,7 +44,7 @@ public class PerceptionPDFBuilder extends BaseDocumentService implements Percept
     String docUUID = "asd";
 
     @Override
-    public synchronized byte[] generatePerceptionPDF(UBLDocumentWRP perceptionType, ConfigData configData) {
+    public synchronized byte[] generatePerceptionPDF(UBLDocumentWRP perceptionType, ConfigData configData) throws PDFReportException {
 
         byte[] perceptionBytes = null;
 
@@ -131,10 +131,8 @@ public class PerceptionPDFBuilder extends BaseDocumentService implements Percept
             perceptionObj.setImporteTexto(perceptionType.getTransaccion().getTransactionPropertiesDTOList().get(0).getValor());
 
             perceptionBytes = createPerceptionPDF(perceptionObj, docUUID, configData);// PDFPerceptionCreator.getInstance(this.documentReportPath, this.legendSubReportPath).createPerceptionPDF(perceptionObj, docUUID);
-        } catch (PDFReportException e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {
-            ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
+            throw new PDFReportException(e.getMessage());
         }
         return perceptionBytes;
     } // generateInvoicePDF
@@ -211,13 +209,7 @@ public class PerceptionPDFBuilder extends BaseDocumentService implements Percept
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
                 pdfDocument = outputStream.toByteArray();
             } catch (Exception e) {
-                logger.error("createInvoicePDF() [" + docUUID + "] Exception("
-                        + e.getClass().getName() + ") - ERROR: "
-                        + e.getMessage());
-                logger.error("createInvoicePDF() [" + docUUID + "] Exception("
-                        + e.getClass().getName() + ") -->"
-                        + ExceptionUtils.getStackTrace(e));
-                throw new PDFReportException(IVenturaError.ERROR_441);
+                throw new PDFReportException(e.getMessage());
             }
         }
         return pdfDocument;

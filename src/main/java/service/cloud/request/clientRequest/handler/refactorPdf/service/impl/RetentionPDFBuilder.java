@@ -272,11 +272,8 @@ public class RetentionPDFBuilder extends BaseDocumentService implements Retentio
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
                 pdfDocument = outputStream.toByteArray();
             } catch (Exception e) {
-                logger.error("createInvoicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
-                logger.error("createInvoicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
-                throw new PDFReportException(IVenturaError.ERROR_441);
+                throw new PDFReportException(e.getMessage());
             }
-
         }
 
         return pdfDocument;

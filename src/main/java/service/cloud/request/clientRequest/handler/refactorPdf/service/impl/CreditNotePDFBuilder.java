@@ -44,7 +44,7 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
 
 
     @Override
-    public byte[] generateCreditNotePDF(UBLDocumentWRP creditNoteType, List<TransactionTotalesDTO> transaccionTotales, ConfigData configData) {
+    public byte[] generateCreditNotePDF(UBLDocumentWRP creditNoteType, List<TransactionTotalesDTO> transaccionTotales, ConfigData configData) throws PDFReportException {
         byte[] creditNoteInBytes = null;
         try {
             CreditNoteObject creditNoteObj = new CreditNoteObject();
@@ -313,11 +313,8 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             creditNoteObj.setLegends(getLegendList(legendsMap));
             creditNoteObj.setResolutionCodeValue("resolutionCde");
             creditNoteInBytes = createCreditNotePDF(creditNoteObj, docUUID, configData);
-        } catch (PDFReportException e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
-            ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
+            throw new PDFReportException(e.getMessage());
         }
         return creditNoteInBytes;
     } // generateCreditNotePDF
@@ -443,7 +440,7 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
                 pdfDocument = outputStream.toByteArray();
             } catch (Exception e) {
-                throw new PDFReportException(IVenturaError.ERROR_443);
+                throw new PDFReportException(e.getMessage());
             }
         }
         return pdfDocument;

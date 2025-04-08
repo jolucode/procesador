@@ -65,7 +65,7 @@ public class InvoicePDFBuilder extends BaseDocumentService implements InvoicePDF
 
 
     @Override
-    public byte[] generateInvoicePDF(UBLDocumentWRP invoiceType, ConfigData configuracion, String personalizacion) {
+    public byte[] generateInvoicePDF(UBLDocumentWRP invoiceType, ConfigData configuracion, String personalizacion) throws PDFReportException {
         byte[] invoiceInBytes = null;
         try {
             InvoiceObject invoiceObj = new InvoiceObject();
@@ -419,11 +419,8 @@ public class InvoicePDFBuilder extends BaseDocumentService implements InvoicePDF
              * Generando el PDF de la FACTURA con la informacion recopilada.
              */
             invoiceInBytes = createInvoicePDF(invoiceObj, docUUID, configuracion, personalizacion);
-        } catch (PDFReportException e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] PDFReportException - ERROR: " + e.getError().getId() + "-" + e.getError().getMessage());
         } catch (Exception e) {
-            logger.error("generateInvoicePDF() [" + this.docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
-            ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
+            throw new PDFReportException(e.getMessage());
         }
         return invoiceInBytes;
     } // generateInvoicePDF
@@ -564,9 +561,7 @@ public class InvoicePDFBuilder extends BaseDocumentService implements InvoicePDF
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
                 pdfDocument = outputStream.toByteArray();
             } catch (Exception e) {
-                logger.error("createInvoicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") - ERROR: " + e.getMessage());
-                logger.error("createInvoicePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
-                throw new PDFReportException(IVenturaError.ERROR_441);
+                throw new PDFReportException(e.getMessage());
             }
         }
         return pdfDocument;

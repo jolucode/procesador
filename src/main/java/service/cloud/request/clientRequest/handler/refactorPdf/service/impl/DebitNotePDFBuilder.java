@@ -41,7 +41,7 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
     String docUUID = "asd";
 
     @Override
-    public  byte[] generateDebitNotePDF(UBLDocumentWRP debitNoteType, List<TransactionTotalesDTO> transactionTotalList, ConfigData configData) {
+    public  byte[] generateDebitNotePDF(UBLDocumentWRP debitNoteType, List<TransactionTotalesDTO> transactionTotalList, ConfigData configData) throws PDFReportException {
         byte[] debitNoteInBytes = null;
 
         try {
@@ -257,9 +257,8 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
             debitNoteObj.setResolutionCodeValue("resolutionCde");
 
             debitNoteInBytes = createDebitNotePDF(debitNoteObj, docUUID, configData);
-        } catch (PDFReportException e) {
         } catch (Exception e) {
-            ErrorObj error = new ErrorObj(IVenturaError.ERROR_2.getId(), e.getMessage());
+            throw new PDFReportException(e.getMessage());
         }
         return debitNoteInBytes;
     } // generateDebitNotePDF
@@ -365,8 +364,7 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);
                 pdfDocument = outputStream.toByteArray();
             } catch (Exception e) {
-                logger.error("createDebitNotePDF() [" + docUUID + "] Exception(" + e.getClass().getName() + ") -->" + ExceptionUtils.getStackTrace(e));
-                throw new PDFReportException(IVenturaError.ERROR_444);
+                throw new PDFReportException(e.getMessage());
             }
         }
         return pdfDocument;

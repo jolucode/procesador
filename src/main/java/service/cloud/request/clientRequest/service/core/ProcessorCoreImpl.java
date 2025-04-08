@@ -36,15 +36,27 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
         TransaccionRespuesta.Sunat sunatResponse = SunatResponseUtils.proccessResponse(statusResponse, transaction, configuracion.getIntegracionWs());//proccessResponse(cdrConstancy, transaction, configuracion.getIntegracionWs());
 
         if ((IVenturaError.ERROR_0.getId() == sunatResponse.getCodigo()) || (4000 <= sunatResponse.getCodigo())) {
-            byte[] pdfBytes = documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion);
+
+            byte[] pdfBytes = null;
+            String errorPdf = null;
+            try {
+                pdfBytes = documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion);
+            } catch (Exception e) {
+                errorPdf = e.getMessage();
+            }
+
+
             transactionResponse = new TransaccionRespuesta();
             transactionResponse.setCodigo(TransaccionRespuesta.RQT_EMITDO_ESPERA);
 
-            transactionResponse.setMensaje(sunatResponse.getMensaje());
+            transactionResponse.setMensaje(sunatResponse.getMensaje() + " - " + errorPdf);
             transactionResponse.setSunat(sunatResponse);
             transactionResponse.setXml(signedDocument);
             transactionResponse.setZip(statusResponse);
-            transactionResponse.setPdf(pdfBytes);
+
+            if(pdfBytes!=null)
+                transactionResponse.setPdf(pdfBytes);
+
             transactionResponse.setDigestValue(SunatResponseUtils.extractDigestValue(statusResponse));
         } else {
             //documento rechazado
@@ -60,10 +72,12 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
     private void saveAllFiles(TransaccionRespuesta transactionResponse, String documentName, String attachmentPath) throws Exception {
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
         fileHandler.setBaseDirectory(attachmentPath);
-        fileHandler.storeDocumentInDisk(transactionResponse.getXml(), documentName, "xml");
-        fileHandler.storeDocumentInDisk(transactionResponse.getPdf(), documentName, "pdf");
-        fileHandler.storeDocumentInDisk(transactionResponse.getZip(), documentName, "zip");
-
+        if(transactionResponse.getXml()!=null)
+            fileHandler.storeDocumentInDisk(transactionResponse.getXml(), documentName, "xml");
+        if(transactionResponse.getPdf()!=null)
+            fileHandler.storeDocumentInDisk(transactionResponse.getPdf(), documentName, "pdf");
+        if(transactionResponse.getZip()!=null)
+            fileHandler.storeDocumentInDisk(transactionResponse.getZip(), documentName, "zip");
     }
 
     @Override
