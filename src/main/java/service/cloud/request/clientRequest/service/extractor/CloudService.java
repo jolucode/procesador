@@ -126,7 +126,7 @@ public class CloudService implements CloudInterface {
             RequestPost request = generateDataRequestHana(transaccion, tr);
 
             // Paso 3: Anexar documentos
-            //anexarDocumentos(request);
+            anexarDocumentos(request);
 
             // Paso 4: Limpieza de memoria (ayuda al GC)
             liberarRecursosPesados(tr, request);
