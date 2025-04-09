@@ -285,7 +285,11 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
         transactionResponse.setLogDTO(log);
         log.setPathBase(attachmentPath + "\\" + documentName + ".json");
-        transactionResponse.setMensaje(transactionResponse.getMensaje() + " - " + errorPdf);
+        if (errorPdf != null)
+            transactionResponse.setMensaje(transactionResponse.getMensaje() + " - " + errorPdf);
+        else {
+            transactionResponse.setMensaje(transactionResponse.getMensaje());
+        }
         return transactionResponse;
     }
 

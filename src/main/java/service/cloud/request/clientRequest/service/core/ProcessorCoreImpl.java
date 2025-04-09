@@ -49,7 +49,11 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
             transactionResponse = new TransaccionRespuesta();
             transactionResponse.setCodigo(TransaccionRespuesta.RQT_EMITDO_ESPERA);
 
-            transactionResponse.setMensaje(sunatResponse.getMensaje() + " - " + errorPdf);
+            if (errorPdf != null)
+                transactionResponse.setMensaje(sunatResponse.getMensaje() + " - " + errorPdf);
+            else {
+                transactionResponse.setMensaje(sunatResponse.getMensaje());
+            }
             transactionResponse.setSunat(sunatResponse);
             transactionResponse.setXml(signedDocument);
             transactionResponse.setZip(statusResponse);
