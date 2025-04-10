@@ -513,11 +513,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             }
 
 
-            if (transaction.getDOC_Descuento().compareTo(BigDecimal.ZERO) > 0){
-                taxInclusiveAmount= taxInclusiveAmount.add(transaction.getDOC_Descuento());
-                lineExtensionAmount = lineExtensionAmount.add(transaction.getDOC_Descuento());
-            }
-
             BigDecimal docDescuentoTotal = transaction.getDOC_DescuentoTotal();
             invoiceType.setLegalMonetaryTotal(getMonetaryTotal(transaction, lineExtensionAmount, taxInclusiveAmount, noContainsFreeItem, otrosCargosValue, transaction.getANTICIPO_Monto(), payableAmount, docDescuentoTotal, transaction.getDOC_MON_Codigo(), true));
 
