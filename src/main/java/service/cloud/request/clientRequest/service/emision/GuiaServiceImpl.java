@@ -326,7 +326,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
             ResponseDTO responseDTO = declareSunat(documentName, documentPath/*.replace(EXT_XML, EXT_ZIP)*/, responseDTOJWT.getAccess_token());
 
             // Guardar ticket en estado "EN PROCESO"
-            saveTicketRest(transaction, responseDTO);
+            //saveTicketRest(transaction, responseDTO);
 
             // Manejo 401
             if (responseDTO.getStatusCode() == 401) {
@@ -354,16 +354,28 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
             // Manejar respuestas de SUNAT
             transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
 
-            // Guardar en DB si aprobado
-            //if (transactionResponse != null && transactionResponse.getMensaje() != null && transactionResponse.getMensaje().contains("Documento aprobado")) {
-            //    saveTicketRest(transaction, responseDTO);
-            //}
-
             // Añadir XML firmado
             if (transactionResponse != null) {
                 byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
                 transactionResponse.setTicketRest(responseDTO.getNumTicket());
                 transactionResponse.setXml(documentBytes);
+            }
+
+            // ✅ SOLO guardar si fue aprobado
+            if (transactionResponse != null && transactionResponse.getMensaje().contains("Documento aprobado")) {
+
+                // Verificación final antes de guardar
+                GuiaTicket yaExiste = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
+                        transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
+                ).block();
+
+                boolean yaExisteAprobado = yaExiste != null &&
+                        "APROBADO".equalsIgnoreCase(yaExiste.getEstadoTicket()) &&
+                        !yaExiste.getTicketSunat().isEmpty();
+
+                if (!yaExisteAprobado) {
+                    saveTicketRest(transaction, responseDTO);
+                }
             }
         }
         return transactionResponse;
