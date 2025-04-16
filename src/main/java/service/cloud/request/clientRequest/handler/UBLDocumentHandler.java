@@ -1239,7 +1239,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                  * <cac:InvoiceLine><cac:Price>
                  */
                 invoiceLine.setPrice(getPriceForLine(transaccionLinea.getTransaccionLineasBillrefListDTO(), currencyCode));
-                if (transaccionLinea.getItmBolsa() == null || !transaccionLinea.getItmBolsa().equals("I")) {
+                if (transaccionLinea.getItmBolsa() == null || !transaccionLinea.getItmBolsa().equals("I") || transaccionLineasList.size() == 1 ) {
                     invoiceLineList.add(invoiceLine);
                 }
 
