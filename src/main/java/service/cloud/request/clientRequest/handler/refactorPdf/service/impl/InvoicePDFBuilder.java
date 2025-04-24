@@ -304,6 +304,26 @@ public class InvoicePDFBuilder extends BaseDocumentService implements InvoicePDF
                 listaItem.add(itemObject);
             }
 
+            if (listaItem != null && !listaItem.isEmpty()) {
+                WrapperItemObject ultimoItem = listaItem.getLast();
+
+                if (ultimoItem != null) {
+                    Map<String, String> itemMap = ultimoItem.getLstItemHashMap();
+
+                    if (itemMap != null) {
+                        String valor = itemMap.get("VALOR");
+
+                        if ("2".equals(valor)) {
+                            if (invoiceObj != null && invoiceObj.getComentarios() != null) {
+                                itemMap.put("Descripcion", invoiceObj.getComentarios());
+                            } else {
+                                itemMap.put("Descripcion", ""); // Valor por defecto si no hay comentario
+                            }
+                        }
+                    }
+                }
+            }
+
             invoiceObj.setItemListDynamic(listaItem);
             BigDecimal subtotalValue = getTransaccionTotales(invoiceType.getTransaccion().getTransactionTotalesDTOList(), IUBLConfig.ADDITIONAL_MONETARY_1005);
             if (null != invoiceType.getInvoiceType().getPrepaidPayment() && !invoiceType.getInvoiceType().getPrepaidPayment().isEmpty() && null != invoiceType.getInvoiceType().getPrepaidPayment().get(0).getPaidAmount()) {
