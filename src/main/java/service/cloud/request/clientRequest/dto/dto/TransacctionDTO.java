@@ -1,4 +1,5 @@
 package service.cloud.request.clientRequest.dto.dto;
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -28,7 +29,8 @@ public class TransacctionDTO {
     private String SN_DIR_Direccion;
     private String DocIdentidad_Nro;
     private String FE_FormSAP;
-    private BigDecimal DOC_ImpuestoTotal;
+    @SerializedName(value = "DOC_ImpuestoTotal", alternate = {"DOCImpuestoTotal"})
+    private BigDecimal DOC_ImpuestoTotal = new BigDecimal("0.0");
     private String SN_EMail_Secundario;
     private String DIR_Direccion;
     private String SN_RazonSocial;
