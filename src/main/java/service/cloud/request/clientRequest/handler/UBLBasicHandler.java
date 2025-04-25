@@ -2794,16 +2794,16 @@ public abstract class UBLBasicHandler {
 
 
         //</cac:Item><cac:AdditionalItemProperty>
-        if (transaccionLineas.getSubPartida() != null && !transaccionLineas.getSubPartida().isEmpty())
+        if (transaccionLineas.getSubPartida() != null && !transaccionLineas.getSubPartida().trim().isEmpty())
             item.getAdditionalItemProperty().add(getAdditionalItemPropertyRest(IUBLConfig.INDICATOR_SUBPART, "7020", transaccionLineas.getSubPartida()));
         //</cac:Item><cac:AdditionalItemProperty>
-        if (transaccionLineas.getIndicadorBien() != null && !transaccionLineas.getIndicadorBien().isEmpty())
+        if (transaccionLineas.getIndicadorBien() != null && !transaccionLineas.getIndicadorBien().trim().isEmpty())
             item.getAdditionalItemProperty().add(getAdditionalItemPropertyRest(IUBLConfig.INDICATOR_REGULADO_SUNAT, "7022", transaccionLineas.getIndicadorBien()));
         //</cac:Item><cac:AdditionalItemProperty>
-        if (transaccionLineas.getNumeracion() != null && !transaccionLineas.getNumeracion().isEmpty())
+        if (transaccionLineas.getNumeracion() != null && !transaccionLineas.getNumeracion().trim().isEmpty())
             item.getAdditionalItemProperty().add(getAdditionalItemPropertyRest(IUBLConfig.INDICATOR_NUMERACION_DAM_DS, "7021", transaccionLineas.getNumeracion()));
         //</cac:Item><cac:AdditionalItemProperty>
-        if (transaccionLineas.getNumeroSerie() != null && !transaccionLineas.getNumeroSerie().isEmpty())
+        if (transaccionLineas.getNumeroSerie() != null && !transaccionLineas.getNumeroSerie().trim().isEmpty())
             item.getAdditionalItemProperty().add(getAdditionalItemPropertyRest(IUBLConfig.INDICATOR_SERIE_DAM_DS, "7023", transaccionLineas.getNumeroSerie()));
 
         return item;
