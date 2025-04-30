@@ -166,7 +166,7 @@ ventura:
         razonSocial: "ZICSA SAC"
         wsUsuario: "admin"
         wsClave: "ventura"
-        wsLocation: "http://facturacion.zicsa.com"
+        wsLocation: "http://facturasdasdacion.zicsa.com"
         usuarioSol: "20100313899"
         claveSol: "yX6HV3bx6z"
         certificadoName: "DIGITAL_ZICSA_2023_2025.pfx"

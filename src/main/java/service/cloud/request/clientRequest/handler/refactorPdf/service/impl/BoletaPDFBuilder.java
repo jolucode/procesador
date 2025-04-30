@@ -92,6 +92,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
 
             boletaObj.setRemissionGuides(getRemissionGuides(boletaType.getInvoiceType().getDespatchDocumentReference()));
             boletaObj.setPaymentCondition(boletaType.getTransaccion().getDOC_CondPago());
+            boletaObj.setComentarios(boletaType.getTransaccion().getFE_Comentario());
 
             if (null != boletaType.getTransaccion().getTransactionContractDocRefListDTOS()
                     && !boletaType.getTransaccion().getTransactionContractDocRefListDTOS().isEmpty()) {
@@ -134,6 +135,25 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 listaItem.add(itemObject);
             }
 
+            if (listaItem != null && !listaItem.isEmpty()) {
+                WrapperItemObject ultimoItem = listaItem.getLast();
+
+                if (ultimoItem != null) {
+                    Map<String, String> itemMap = ultimoItem.getLstItemHashMap();
+
+                    if (itemMap != null) {
+                        String valor = itemMap.get("VALOR");
+
+                        if ("2".equals(valor)) {
+                            if (boletaObj != null && boletaObj.getComentarios() != null) {
+                                itemMap.put("Descripcion", boletaObj.getComentarios());
+                            } else {
+                                itemMap.put("Descripcion", ""); // Valor por defecto si no hay comentario
+                            }
+                        }
+                    }
+                }
+            }
 
             boletaObj.setItemsDynamic(listaItem);
             String currencyCode = boletaType.getInvoiceType().getDocumentCurrencyCode().getValue();
