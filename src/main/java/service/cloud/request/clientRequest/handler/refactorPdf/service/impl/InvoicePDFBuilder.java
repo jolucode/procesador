@@ -603,9 +603,13 @@ public class InvoicePDFBuilder extends BaseDocumentService implements InvoicePDF
                             .getValue());
                     // invoiceItemObj.setQuantityItem(iLine.getInvoicedQuantity().getValue().setScale(IPDFCreatorConfig.DECIMAL_ITEM_QUANTITY,
                     // RoundingMode.HALF_UP).toString());
+                    String unidadMedida = Optional.ofNullable(iLine.getNote())
+                            .filter(list -> !list.isEmpty())
+                            .map(list -> list.get(0))
+                            .map(NoteType::getValue)
+                            .orElse("");
                     invoiceItemObj
-                            .setUnitMeasureItem((null != iLine.getNote()) ? iLine
-                                    .getNote().get(0).getValue() : "");
+                            .setUnitMeasureItem(unidadMedida);
                     invoiceItemObj.setDescriptionItem(iLine.getItem()
                             .getDescription().get(0).getValue().toUpperCase());
                     invoiceItemObj.setUnitValueItem(iLine.getPrice()
