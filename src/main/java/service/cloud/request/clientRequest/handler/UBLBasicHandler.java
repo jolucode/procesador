@@ -2540,7 +2540,6 @@ public abstract class UBLBasicHandler {
         TaxTotalType taxTotal = new TaxTotalType();
         try {
             /* <cac:TaxTotal><cbc:TaxAmount> */
-
             BigDecimal taxAmountValue = BigDecimal.ZERO;
             boolean contieneGratificacion = transaccionLineaImpuestos.stream().map(TransactionLineasImpuestoDTO::getNombre).anyMatch(IUBLConfig.TAX_TOTAL_GRT_NAME::equalsIgnoreCase);
             if (!contieneGratificacion) {
@@ -2548,7 +2547,7 @@ public abstract class UBLBasicHandler {
             }
 
             TaxAmountType taxAmountTotal = new TaxAmountType();
-            taxAmountTotal.setValue(Utils.round(taxAmountValue, 2));
+            taxAmountTotal.setValue(taxAmountValue.setScale(2, RoundingMode.HALF_UP));
             taxAmountTotal.setCurrencyID(CurrencyCodeContentType.valueOf(currencyCode).value());
             taxTotal.setTaxAmount(taxAmountTotal);
 
@@ -2578,10 +2577,9 @@ public abstract class UBLBasicHandler {
                     /* <cac:TaxTotal><cac:TaxSubtotal><cbc:TaxAmount> */
 
                     TaxAmountType taxAmount = new TaxAmountType();
-                    //taxAmount.setValue(montoImpuestoRedondeado.setScale(2, RoundingMode.HALF_UP));
-                    taxAmount.setValue(Utils.round(montoImpuesto, 2));
+                    taxAmount.setValue(montoImpuestoRedondeado.setScale(2, BigDecimal.ROUND_HALF_UP));
                     if (!IUBLConfig.TAX_TOTAL_GRT_ID.equalsIgnoreCase(tributo)) {
-                        valoresImpuesto.add(montoImpuesto);
+                        valoresImpuesto.add(montoImpuestoRedondeado);
                     }
                     taxAmount.setCurrencyID(CurrencyCodeContentType.valueOf(lineaImpuesto.getMoneda()).value());
                     taxSubtotal.setTaxAmount(taxAmount);
