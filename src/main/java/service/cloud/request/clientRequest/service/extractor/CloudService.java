@@ -116,9 +116,18 @@ public class CloudService implements CloudInterface {
 
     }
 
+    public String limpiarTexto(String texto) {
+        if (texto == null) return null;
+        return texto
+                .replaceAll("[\\r\\n]", " ")   // Elimina \r y \n reales
+                .replaceAll("\\s{2,}", " ")    // Colapsa espacios múltiples
+                .trim();                       // Elimina espacios en extremos
+    }
+
     private Mono<RequestPost> processTransaction(TransacctionDTO transaccion, String requestOnPremise) {
         return Mono.fromCallable(() -> {
                     // Paso 1: Enviar transacción
+            String cleanString = limpiarTexto(transaccion.getFE_Comentario());
 
             TransaccionRespuesta tr = enviarTransaccion(transaccion);
 
