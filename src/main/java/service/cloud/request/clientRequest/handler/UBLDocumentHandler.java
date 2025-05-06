@@ -697,11 +697,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 }
             }
 
-            BigDecimal subtotalValue = getSubtotalValueFromTransaction(transaction.getTransactionTotalesDTOList());
-            if (subtotalValue == null) {
-                subtotalValue = BigDecimal.ZERO;
-            }
-
             /* Agregar <CreditNote><cac:CreditNoteLine> */
             creditNoteType.getCreditNoteLine().addAll(getAllCreditNoteLines(transaction, transaction.getTransactionLineasDTOList(), transaction.getTransactionPropertiesDTOList(), transaction.getDOC_MON_Codigo()));
         } catch (UBLDocumentException e) {
@@ -769,11 +764,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             BigDecimal docDescuentoTotal = transaction.getDOC_DescuentoTotal();
             /* Agregar <DebitNote><cac:RequestedMonetaryTotal> */
             debitNoteType.setRequestedMonetaryTotal(getMonetaryTotal(transaction, transaction.getDOC_Importe(), transaction.getDOC_SinPercepcion(), false,transaction.getDOC_OtrosCargos(), null, transaction.getDOC_MontoTotal(), docDescuentoTotal, transaction.getDOC_MON_Codigo(), false));
-
-            BigDecimal subtotalValue = getSubtotalValueFromTransaction(transaction.getTransactionTotalesDTOList());
-            if (subtotalValue == null) {
-                subtotalValue = BigDecimal.ZERO;
-            }
 
             /* Agregar items <DebitNote><cac:DebitNoteLine> */
             debitNoteType.getDebitNoteLine().addAll(getAllDebitNoteLines(transaction, transaction.getTransactionLineasDTOList(), transaction.getTransactionPropertiesDTOList(), transaction.getDOC_MON_Codigo()));

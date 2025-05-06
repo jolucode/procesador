@@ -44,7 +44,7 @@ public interface IVenturaError {
     ErrorObj ERROR_327 = new ErrorObj(327, "[UBL-DOCUMENT] Hubo un problema al extraer el DESCUENTO DE LINEA de un item de la transaccion.");
     ErrorObj ERROR_328 = new ErrorObj(328, "[UBL-DOCUMENT] Hubo un problema al generar el UBLExtension de TOTALES y PROPIEDADES.");
     ErrorObj ERROR_329 = new ErrorObj(329, "[UBL-DOCUMENT] Hubo un problema al generar el NODO con la informacion de TOTALES y PROPIEDADES.");
-    ErrorObj ERROR_330 = new ErrorObj(330, "[UBL-DOCUMENT] Ocurrio un problema al extraer la informacion de TOTALES. Lista nula o vacia.");
+    ErrorObj ERROR_330 = new ErrorObj(330, "[UBL-DOCUMENT] Ocurrio un problema al extraer la informacion de TOTALES. Lista nula o vacia, revisar el siguiente SP: bpvs_FE_FacturaTotales");
     ErrorObj ERROR_332 = new ErrorObj(332, "[UBL-DOCUMENT] Ocurrio un problema al extraer el VALOR UNITARIO de un item en la transaccion.");
     ErrorObj ERROR_333 = new ErrorObj(333, "[UBL-DOCUMENT] No se encontro una lista de BillReference de un item para extraer el VALOR UNITARIO.");
     ErrorObj ERROR_334 = new ErrorObj(334, "[UBL-DOCUMENT] No se encontro un VALOR UNITARIO para un item de la transaccion.");
