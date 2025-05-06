@@ -77,6 +77,7 @@ public class DocumentoPublicado {
 
         if(this.tipoTransaccion.equals("B")){
             this.docCdr = encodeFileToBase64Binary(transaccionRespuesta.getZip()).get();
+            this.estadoSunat = "P";
         }else {
             this.docPdf = encodeFileToBase64Binary(transaccionRespuesta.getPdf()).get();
             this.docXml = encodeFileToBase64Binary(transaccionRespuesta.getXml()).get();
