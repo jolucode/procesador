@@ -367,6 +367,7 @@ public class ServiceBaja implements IServiceBaja {
             }
 
             zos.closeEntry();
+            zos.finish(); // Forzar el cierre de la entrada ZIP antes de obtener los bytes
             zipDocument = bos.toByteArray();  // Devolver directamente los bytes comprimidos
 
         } catch (Exception e) {

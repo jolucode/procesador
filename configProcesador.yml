@@ -13,7 +13,7 @@ application:
     sunat:
       base-url-emision: 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService'
       base-url-consulta: 'https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService'
-      base-url-retper: 'https://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService'
+      base-url-retper: 'https://e-beta.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService'
     ose:
       base-url: 'https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl'
     estela:
@@ -30,12 +30,12 @@ ventura:
         razonSocial: AGA
         wsUsuario: admin
         wsClave: ventura
-        wsLocation: "https://facturacion.venturafe.com/"
-        usuarioSol: "20510910517MODDATOS"
-        claveSol: "QAEUW1YLSD"
+        wsLocation: "https://fasdsdcturacion.venturafe.com/"
+        usuarioSol: "20510910517"
+        claveSol: "20510910517"
         certificadoName: CERTIFICATE_TEST.pfx
         certificadoPassword: "1234"
-        integracionWs: ESTELA
+        integracionWs: SUNAT
         pdfBorrador: "true"
         impresion: Codigo QR
         urlOnpremise: http://190.119.245.254:60081/
