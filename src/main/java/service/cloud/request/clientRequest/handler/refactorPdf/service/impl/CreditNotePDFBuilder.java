@@ -175,6 +175,26 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
                 listaItem.add(itemObject);
             }
 
+            creditNoteObj.setComentarios(creditNoteType.getTransaccion().getFE_Comentario());
+            if (listaItem != null && !listaItem.isEmpty()) {
+                WrapperItemObject ultimoItem = listaItem.getLast();
+
+                if (ultimoItem != null) {
+                    Map<String, String> itemMap = ultimoItem.getLstItemHashMap();
+
+                    if (itemMap != null) {
+                        String valor = itemMap.get("VALOR");
+
+                        if ("2".equals(valor)) {
+                            if (creditNoteObj != null && creditNoteObj.getComentarios() != null) {
+                                itemMap.put("Descripcion", creditNoteObj.getComentarios());
+                            } else {
+                                itemMap.put("Descripcion", ""); // Valor por defecto si no hay comentario
+                            }
+                        }
+                    }
+                }
+            }
 
             creditNoteObj.setItemsListDynamic(listaItem);
 

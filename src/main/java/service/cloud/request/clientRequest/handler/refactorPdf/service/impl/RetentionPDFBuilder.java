@@ -157,6 +157,27 @@ public class RetentionPDFBuilder extends BaseDocumentService implements Retentio
                 listaItem.add(itemObject);
             }
 
+            retentionObject.setComentarios(retentionType.getTransaccion().getFE_Comentario());
+            if (listaItem != null && !listaItem.isEmpty()) {
+                WrapperItemObject ultimoItem = listaItem.getLast();
+
+                if (ultimoItem != null) {
+                    Map<String, String> itemMap = ultimoItem.getLstItemHashMap();
+
+                    if (itemMap != null) {
+                        String valor = itemMap.get("VALOR");
+
+                        if ("2".equals(valor)) {
+                            if (retentionObject != null && retentionObject.getComentarios() != null) {
+                                itemMap.put("Descripcion", retentionObject.getComentarios());
+                            } else {
+                                itemMap.put("Descripcion", ""); // Valor por defecto si no hay comentario
+                            }
+                        }
+                    }
+                }
+            }
+
             retentionObject.setItemListDynamic(listaItem);
 
             String barcodeValue = generateBarcodeInfoV2(retentionType.getRetentionType().getId().getValue(), IUBLConfig.DOC_RETENTION_CODE, retentionObject.getIssueDate(), retentionType.getRetentionType().getTotalInvoiceAmount().getValue(), BigDecimal.ZERO, retentionType.getRetentionType().getAgentParty(), retentionType.getRetentionType().getReceiverParty(), retentionType.getRetentionType().getUblExtensions());

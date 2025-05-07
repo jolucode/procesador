@@ -127,6 +127,27 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                 listaItem.add(itemObject);
             }
 
+            debitNoteObj.setComentarios(debitNoteType.getTransaccion().getFE_Comentario());
+            if (listaItem != null && !listaItem.isEmpty()) {
+                WrapperItemObject ultimoItem = listaItem.getLast();
+
+                if (ultimoItem != null) {
+                    Map<String, String> itemMap = ultimoItem.getLstItemHashMap();
+
+                    if (itemMap != null) {
+                        String valor = itemMap.get("VALOR");
+
+                        if ("2".equals(valor)) {
+                            if (debitNoteObj != null && debitNoteObj.getComentarios() != null) {
+                                itemMap.put("Descripcion", debitNoteObj.getComentarios());
+                            } else {
+                                itemMap.put("Descripcion", ""); // Valor por defecto si no hay comentario
+                            }
+                        }
+                    }
+                }
+            }
+
             debitNoteObj.setItemsListDynamic(listaItem);
 
             debitNoteObj.setReceiverRegistrationName(debitNoteType.getTransaccion().getSN_RazonSocial());
