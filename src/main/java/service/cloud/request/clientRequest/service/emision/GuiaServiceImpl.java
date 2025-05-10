@@ -116,7 +116,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
 
         // Obtención de datos del cliente y el certificado digital
         Client client = clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
-        String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
+        String certificatePath = applicationProperties.getRutaBaseDocConfig() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
         byte[] certificado = CertificateUtils.getCertificateInBytes(certificatePath);
 
         String certiPassword = client.getCertificadoPassword();
@@ -141,7 +141,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         int mes = fechaEmision.get(Calendar.MONTH) + 1;
         int dia = fechaEmision.get(Calendar.DAY_OF_MONTH);
 
-        String attachmentPath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() +
+        String attachmentPath = applicationProperties.getRutaBaseDocAnexos() + transaction.getDocIdentidad_Nro() +
                 File.separator + "anexo" + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
         fileHandler.setBaseDirectory(attachmentPath);
 
@@ -194,7 +194,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                 .clientSecret(client.getClientSecret())
                 .userNameSunatSunat(client.getUserNameSunatGuias())
                 .passwordSunatSunat(client.getPasswordSunatGuias())
-                .rutaBaseDoc(applicationProperties.getRutaBaseDoc())
+                //.rutaBaseDoc(applicationProperties.getRutaBaseDoc())
                 .build();
 
         logger.info("Se esta apuntando al ambiente : " + configuracion.getAmbiente() + " - " + configuracion.getIntegracionWs());

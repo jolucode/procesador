@@ -85,7 +85,7 @@ public class ServiceEmision implements IServiceEmision {
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
 
         // Configura la ruta de almacenamiento del archivo
-        String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDoc());
+        String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDocAnexos());
 
         String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
         byte[] xmlDocument = null;
@@ -109,7 +109,7 @@ public class ServiceEmision implements IServiceEmision {
         }
 
         /**PROCESAR CERTIFICADO*/
-        String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
+        String certificatePath = applicationProperties.getRutaBaseDocConfig() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
         byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
         CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), applicationProperties.getSupplierCertificate(), applicationProperties.getKeystoreCertificateType());
         SignerHandler signerHandler = SignerHandler.newInstance();
@@ -250,7 +250,7 @@ public class ServiceEmision implements IServiceEmision {
                 .ambiente(applicationProperties.getAmbiente())
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
-                .rutaBaseDoc(applicationProperties.getRutaBaseDoc())
+                .rutaBaseDoc(applicationProperties.getRutaBaseDocAnexos())
                 .pdfIngles(valorIngles)
                 .build();
     }

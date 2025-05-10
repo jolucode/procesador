@@ -21,8 +21,11 @@ public class ApplicationProperties {
     @Value("${application.ambiente}")
     public String ambiente;
 
-    @Value("${application.rutas.rutaBaseDoc}")
-    public String rutaBaseDoc;
+    @Value("${application.rutas.rutaBaseDoc-anexos}")
+    public String rutaBaseDocAnexos;
+
+    @Value("${application.rutas.rutaBaseDoc-config}")
+    public String rutaBaseDocConfig;
 
     @Value("${application.soap-client.sunat.base-url-emision}")
     public String urlSunatEmision;

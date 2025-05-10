@@ -88,7 +88,7 @@ public class ServiceBaja implements IServiceBaja {
         transaction.setANTICIPO_Id(generarIDyFecha(transaction));
 
         // 2. Obtener ruta y manejar archivos
-        String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDoc());
+        String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDocAnexos());
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
         fileHandler.setBaseDirectory(attachmentPath);
 
@@ -111,7 +111,7 @@ public class ServiceBaja implements IServiceBaja {
             }
 
             // 4. Cargar y validar certificado
-            String certificatePath = applicationProperties.getRutaBaseDoc() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
+            String certificatePath = applicationProperties.getRutaBaseDocConfig() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
             byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
             CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), applicationProperties.getSupplierCertificate(), applicationProperties.getKeystoreCertificateType());
 
@@ -301,7 +301,7 @@ public class ServiceBaja implements IServiceBaja {
 
             /**se realiza el anexo del documento de baja*/
             if (null != statusResponse && 0 < statusResponse.length) {
-                UtilsFile.storePDFDocumentInDisk(statusResponse, applicationProperties.getRutaBaseDoc(), documentName + "_SUNAT_CDR_BAJA", ISunatConnectorConfig.EE_ZIP);//fileHandler.storePDFDocumentInDisk(statusResponse, documentName + "_SUNAT_CDR_BAJA", ISunatConnectorConfig.EE_ZIP);
+                UtilsFile.storePDFDocumentInDisk(statusResponse, applicationProperties.getRutaBaseDocAnexos(), documentName + "_SUNAT_CDR_BAJA", ISunatConnectorConfig.EE_ZIP);//fileHandler.storePDFDocumentInDisk(statusResponse, documentName + "_SUNAT_CDR_BAJA", ISunatConnectorConfig.EE_ZIP);
             }
             transactionResponse.setMensaje(sunatResponse.getMensaje());
             transactionResponse.setZip(statusResponse);
@@ -327,7 +327,7 @@ public class ServiceBaja implements IServiceBaja {
                 .ambiente(applicationProperties.getAmbiente())
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
-                .rutaBaseDoc(applicationProperties.getRutaBaseDoc())
+                .rutaBaseDoc(applicationProperties.getRutaBaseDocAnexos())
                 .build();
     }
 

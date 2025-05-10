@@ -53,7 +53,7 @@ public class ServiceBajaConsulta implements IServiceBaja {
 
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
 
-        String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDoc());
+        String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDocAnexos());
 
         Client client = clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
         ConfigData configuracion = createConfigData(client);
@@ -119,7 +119,7 @@ public class ServiceBajaConsulta implements IServiceBaja {
                 .ambiente(applicationProperties.getAmbiente())
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
-                .rutaBaseDoc(applicationProperties.getRutaBaseDoc())
+                .rutaBaseDoc(applicationProperties.getRutaBaseDocAnexos())
                 .build();
     }
 }

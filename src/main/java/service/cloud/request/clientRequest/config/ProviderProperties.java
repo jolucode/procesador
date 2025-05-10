@@ -16,7 +16,7 @@ public class ProviderProperties {
     ClientProperties clientProperties;
 
     public String getRutaBaseDoc() {
-        return applicationProperties.getRutaBaseDoc();
+        return applicationProperties.getRutaBaseDocAnexos();
     }
 
     public String getUrlOnpremise(String ruc) {
