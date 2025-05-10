@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import service.cloud.request.clientRequest.config.ApplicationProperties;
 import service.cloud.request.clientRequest.config.ClientProperties;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
@@ -39,6 +40,7 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.voideddocuments_1.
 
 import javax.activation.DataHandler;
 import java.io.*;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -182,11 +184,31 @@ public class ServiceBaja implements IServiceBaja {
                 logger.error("Error al actualizar el ticket: " + e.getMessage(), e);
             }
 
-            Thread.sleep(1000); // Considera manejar mejor la espera
+
 
             // 12. Consultar estado del ticket
             soapRequest.setTicket(ticket);
-            Mono<FileResponseDTO> fileResponseDTOMono2 = documentBajaQueryService.processAndSaveFile(soapRequest.getService(), soapRequest);
+            Mono<FileResponseDTO> fileResponseDTOMono2 = Mono.defer(() ->
+                            Mono.delay(Duration.ofSeconds(5)) // Delay inicial
+                                    .flatMap(t -> documentBajaQueryService.processAndSaveFile(soapRequest.getService(), soapRequest))
+                                    .flatMap(response -> {
+                                        if (!response.getMessage().contains("98")) {
+                                            //System.out.println("reintento ahora if" + new Date());
+                                            //System.out.println("Response es : " + response);
+                                            return Mono.just(response); // Ya no es 98, terminamos
+                                        } else {
+                                            //System.out.println("reintento ahora else" + new Date());
+                                            return Mono.error(new IllegalStateException("SUNAT  aún está procesando (código 98)"));
+                                        }
+                                    })
+                    )
+                    .retryWhen(
+                            Retry.fixedDelay(5, Duration.ofSeconds(5)) // 4 reintentos adicionales = 5 intentos en total
+                                    .filter(ex -> ex.getMessage().contains("98"))
+                                    .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
+                                            new RuntimeException("SUNAT no procesó el ticket después de varios intentos."))
+                    );
+
             FileResponseDTO fileResponseDTO2 = fileResponseDTOMono2.block();
 
             if (fileResponseDTO2 == null) {
@@ -227,6 +249,11 @@ public class ServiceBaja implements IServiceBaja {
     // Método para convertir los bytes a base64
     private String convertToBase64(byte[] content) {
         return Base64.getEncoder().encodeToString(content);
+    }
+    private boolean isCodigo98(FileResponseDTO response) {
+        if (response == null || response.getMessage() == null) return false;
+        return response.getMessage().toString().contains("código") &&
+                response.getMessage().toString().contains("98");
     }
 
     public Mono<TransaccionBaja> updateTicketBajaIfNull(String rucEmpresa, String serie, String newTicketBaja, String docId) {

@@ -1,5 +1,6 @@
 package service.cloud.request.clientRequest.estela.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -12,6 +13,7 @@ import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 public class DocumentBajaQueryService {
 
@@ -26,9 +28,13 @@ public class DocumentBajaQueryService {
     }
 
     public Mono<FileResponseDTO> processAndSaveFile(String url, FileRequestDTO soapRequest) {
+        //log.info("Traza completa consulta : ") ;
+        //log.warn(soapRequestBuilder.buildConsultaBajasSoapRequest(soapRequest));
         return serviceClient.sendSoapRequest(url, soapRequestBuilder.buildConsultaBajasSoapRequest(soapRequest))
+
                 .flatMap(this::handleSoapResponse)
                 .onErrorResume(error -> {
+                    //System.out.println("Error en .onErrorResume(error -> { " + error.getMessage());
                     String errorMessage = extractErrorMessage(error.getMessage());
                     String cleanErrorMessage = errorMessage.replace("\\", "").replace("\"", "'");
                     return Mono.just(new FileResponseDTO("Error", cleanErrorMessage, null,null));
@@ -36,7 +42,9 @@ public class DocumentBajaQueryService {
     }
 
     private Mono<FileResponseDTO> handleSoapResponse(String soapResponse) {
-        if (soapResponse.contains("SOAP-ENV:Fault") || soapResponse.contains("<soap-env:Fault") || soapResponse.contains("<faultstring xml:lang=\"es-PE\">")) {
+        //System.out.println("handleSoapResponse() : " +  soapResponse);
+        if (soapResponse.contains("SOAP-ENV:Fault") || soapResponse.contains("<soap-env:Fault") || soapResponse.contains("<faultstring xml:lang=\"es-PE\">") ||
+                soapResponse.contains("<statusCode>98</statusCode>")) {
             return Mono.error(new RuntimeException("Error en SUNAT: " + soapResponse));
         }
         String base64Content = extractApplicationResponseWithRegex(soapResponse);
@@ -71,7 +79,14 @@ public class DocumentBajaQueryService {
             if (!faultString.isEmpty()) {
                 return faultString;
             }
-            return "Error no especificado en la respuesta";
+
+            // 3. Buscar <statusCode>
+            String statusCode = document.select("statusCode").text();
+            if ("98".equals(statusCode)) {
+                return "SUNAT aún está procesando el comprobante (código 98)";
+            }
+
+            return "";
 
         } catch (Exception e) {
             return "Error no especificado";
