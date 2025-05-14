@@ -532,10 +532,10 @@ public class InvoicePDFBuilder extends BaseDocumentService implements InvoicePDF
 
                 parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, invoiceObj.getLetterAmountValue());
 
-                parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DIR, "C:\\clientes\\files\\"+ invoiceObj.getSenderRuc() +"\\formatos\\InvoiceDocumentPaymentDetail.jasper"/*this.paymentDetailReportPath*/);
+                parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DIR, "C:\\clientes\\config\\"+ invoiceObj.getSenderRuc() +"\\formatos\\InvoiceDocumentPaymentDetail.jasper"/*this.paymentDetailReportPath*/);
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DATASOURCE, new JRBeanCollectionDataSource(new ArrayList<>(invoiceObj.getItemListDynamicC())));
 
-                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\files\\"+ invoiceObj.getSenderRuc() +"\\formatos\\legendReport.jasper"/*this.legendSubReportPath*/);
+                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\config\\"+ invoiceObj.getSenderRuc() +"\\formatos\\legendReport.jasper"/*this.legendSubReportPath*/);
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(new ArrayList<>(invoiceObj.getLegends())));
 
                 Map<String, String> legendMap = new HashMap<>();

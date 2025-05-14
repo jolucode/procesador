@@ -49,7 +49,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
         byte[] pdfBytes = null;
         List<TransactionTotalesDTO> transaccionTotales = new ArrayList<>(transaction.getTransactionTotalesDTOList());
 
-        String dirLogo = "C:\\clientes\\files\\" + transaction.getDocIdentidad_Nro() + "\\COMPANY_LOGO.jpg";
+        String dirLogo = "C:\\clientes\\config\\" + transaction.getDocIdentidad_Nro() + "\\COMPANY_LOGO.jpg";
         configuracion.setCompletePathLogo(dirLogo);
 
         String personalizacion = transaction.getTransactionContractDocRefListDTOS().stream()

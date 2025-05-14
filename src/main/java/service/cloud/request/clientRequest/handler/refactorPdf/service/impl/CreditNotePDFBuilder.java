@@ -423,9 +423,9 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
                 }
 
                 parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, creditNoteObj.getLetterAmountValue());
-                parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DIR, "C:\\clientes\\files\\" + creditNoteObj.getSenderRuc() + "\\formatos\\InvoiceDocumentPaymentDetail.jasper"/*this.paymentDetailReportPath*/);
+                parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DIR, "C:\\clientes\\config\\" + creditNoteObj.getSenderRuc() + "\\formatos\\InvoiceDocumentPaymentDetail.jasper"/*this.paymentDetailReportPath*/);
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_PAYMENTS_DATASOURCE, new JRBeanCollectionDataSource(creditNoteObj.getItemListDynamicC()));
-                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\files\\"+ creditNoteObj.getSenderRuc() +"\\formatos\\legendReport.jasper"/*this.legendSubReportPath*/); /*this.legendSubReportPath*/
+                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\config\\"+ creditNoteObj.getSenderRuc() +"\\formatos\\legendReport.jasper"/*this.legendSubReportPath*/); /*this.legendSubReportPath*/
                 ;
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(creditNoteObj.getLegends()));
 

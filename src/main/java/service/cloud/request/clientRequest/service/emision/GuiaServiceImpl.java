@@ -194,7 +194,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                 .clientSecret(client.getClientSecret())
                 .userNameSunatSunat(client.getUserNameSunatGuias())
                 .passwordSunatSunat(client.getPasswordSunatGuias())
-                //.rutaBaseDoc(applicationProperties.getRutaBaseDoc())
+                .rutaBaseDoc(applicationProperties.getRutaBaseDocAnexos())
                 .build();
 
         logger.info("Se esta apuntando al ambiente : " + configuracion.getAmbiente() + " - " + configuracion.getIntegracionWs());

@@ -382,7 +382,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 }
 
                 parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, boletaObj.getLetterAmountValue());
-                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\files\\" + boletaObj.getSenderRuc() + "\\formatos\\legendReport.jasper");
+                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\config\\" + boletaObj.getSenderRuc() + "\\formatos\\legendReport.jasper");
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(boletaObj.getLegends()));
                 Map<String, String> legendMap = new HashMap<String, String>();
                 legendMap.put(IPDFCreatorConfig.LEGEND_DOCUMENT_TYPE, IPDFCreatorConfig.LEGEND_BOLETA_DOCUMENT);

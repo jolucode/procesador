@@ -11,8 +11,8 @@ application:
   env: dev
   ambiente: 'test'
   rutas:
-    rutaBaseDoc-anexos: 'C:\clientes\anexos\files\'
-    rutaBaseDoc-config: 'C:\clientes\config\files\'
+    rutaBaseDoc-anexos: 'C:\clientes\files\'
+    rutaBaseDoc-config: 'C:\clientes\config\'
   soap-client:
     sunat:
       base-url-emision: 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService'

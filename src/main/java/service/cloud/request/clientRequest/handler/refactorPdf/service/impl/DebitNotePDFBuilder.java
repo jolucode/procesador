@@ -369,7 +369,7 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                 }
 
                 parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, debitNoteObj.getLetterAmountValue());
-                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\files\\"+ debitNoteObj.getSenderRuc() +"\\formatos\\legendReport.jasper"/*this.legendSubReportPath*/); /*this.legendSubReportPath);*/
+                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\config\\"+ debitNoteObj.getSenderRuc() +"\\formatos\\legendReport.jasper"/*this.legendSubReportPath*/); /*this.legendSubReportPath);*/
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(debitNoteObj.getLegends()));
 
                 Map<String, String> legendMap = new HashMap<String, String>();
