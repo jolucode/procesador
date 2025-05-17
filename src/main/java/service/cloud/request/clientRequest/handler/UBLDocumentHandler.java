@@ -233,7 +233,8 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             /* Agregar <Invoice><ext:UBLExtensions> */
             UBLExtensionsType ublExtensions = new UBLExtensionsType();
 
-            ublExtensions.getUBLExtension().add(getUBLExtensionTotalAndProperty(transaction, transaction.getTransactionTotalesDTOList(), transaction.getTransactionPropertiesDTOList(), transaction.getSUNAT_Transact()));
+            UBLExtensionType ublExtensionTypeAdditional = getUBLExtensionTotalAndProperty(transaction, transaction.getTransactionTotalesDTOList(), transaction.getTransactionPropertiesDTOList(), transaction.getSUNAT_Transact());
+            ublExtensions.getUBLExtension().add(ublExtensionTypeAdditional.getID() != null ? ublExtensionTypeAdditional : null);
 
             List<Map<String, String>> contractdocrefs = transaction.getTransactionContractDocRefListDTOS();
             for (Map<String, String> contractMap : transaction.getTransactionContractDocRefListDTOS()) {
@@ -280,7 +281,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             invoiceType.setID(getID(transaction.getDOC_Id()));
 
             /* Agregar <Invoice><cbc:UUID> */
-            invoiceType.setUUID(getUUID(this.identifier));
+            invoiceType.setUUID(getUUID(transaction.getFE_Id()));
 
             /* Agregar <Invoice><cbc:IssueDate> */
             invoiceType.setIssueDate(getIssueDate(transaction.getDOC_FechaEmision()));
@@ -619,7 +620,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             creditNoteType.setID(getID(transaction.getDOC_Id()));
 
             /* Agregar <CreditNote><cbc:UUID> */
-            creditNoteType.setUUID(getUUID(this.identifier));
+            creditNoteType.setUUID(getUUID(transaction.getFE_Id()));
 
             /* Agregar <CreditNote><cbc:IssueDate> */
             creditNoteType.setIssueDate(getIssueDate(transaction.getDOC_FechaEmision()));
@@ -728,7 +729,7 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             debitNoteType.setID(getID(transaction.getDOC_Id()));
 
             /* Agregar <DebitNote><cbc:UUID> */
-            debitNoteType.setUUID(getUUID(this.identifier));
+            debitNoteType.setUUID(getUUID(transaction.getFE_Id()));
 
             /* Agregar <DebitNote><cbc:IssueDate> */
             debitNoteType.setIssueDate(getIssueDate(transaction.getDOC_FechaEmision()));

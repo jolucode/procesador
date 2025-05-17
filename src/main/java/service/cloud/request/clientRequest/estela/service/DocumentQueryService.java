@@ -26,6 +26,8 @@ public class DocumentQueryService {
     }
 
     public Mono<FileResponseDTO> processAndSaveFile(String url, FileRequestDTO soapRequest) {
+        //System.out.println("URL : " +url);
+        //System.out.println(soapRequestBuilder.buildConsultaSoapRequest(soapRequest));
         return serviceClient.sendSoapRequest(url, soapRequestBuilder.buildConsultaSoapRequest(soapRequest))
                 .flatMap(this::handleSoapResponse)
                 .onErrorResume(error -> {
