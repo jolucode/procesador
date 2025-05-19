@@ -2,9 +2,17 @@ package service.cloud.request.clientRequest.utils.files;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,9 +34,22 @@ public class DocumentConverterUtils {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(documentClass);
             Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE); // activa indentación
+
+            // Marshal a un DOM en memoria
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.newDocument();
+            marshaller.marshal(document, doc);
+
+            // Aplica pretty-print con indentación (Transformer)
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            marshaller.marshal(document, baos);
+            transformer.transform(new DOMSource(doc), new StreamResult(baos));
 
             return baos.toByteArray();
         } catch (Exception e) {
