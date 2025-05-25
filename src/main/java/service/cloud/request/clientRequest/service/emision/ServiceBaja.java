@@ -303,7 +303,15 @@ public class ServiceBaja implements IServiceBaja {
             if (null != statusResponse && 0 < statusResponse.length) {
                 UtilsFile.storePDFDocumentInDisk(statusResponse, applicationProperties.getRutaBaseDocAnexos(), documentName + "_SUNAT_CDR_BAJA", ISunatConnectorConfig.EE_ZIP);//fileHandler.storePDFDocumentInDisk(statusResponse, documentName + "_SUNAT_CDR_BAJA", ISunatConnectorConfig.EE_ZIP);
             }
-            transactionResponse.setMensaje(sunatResponse.getMensaje());
+
+            String mensaje = sunatResponse.getMensaje();
+
+            if (mensaje != null) {
+                mensaje = mensaje.replace("La Comunicacion de baja", "La Comunicación de Baja");
+                mensaje = mensaje.replace("El Resumen diario", "El Resumen de Boletas");
+            }
+
+            transactionResponse.setMensaje(mensaje);
             transactionResponse.setZip(statusResponse);
 
         } else {

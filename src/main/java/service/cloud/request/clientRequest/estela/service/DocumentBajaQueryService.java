@@ -28,8 +28,13 @@ public class DocumentBajaQueryService {
     }
 
     public Mono<FileResponseDTO> processAndSaveFile(String url, FileRequestDTO soapRequest) {
-        //log.info("Traza completa consulta : ") ;
-        //log.warn(soapRequestBuilder.buildConsultaBajasSoapRequest(soapRequest));
+
+        System.out.println("");
+        System.out.println("EMISION BAJA CONSULTA: " + soapRequest.getRucComprobante() + "-" + soapRequest.getTipoComprobante() + "-" +soapRequest.getSerieComprobante() + "-" + soapRequest.getNumeroComprobante());
+        String soapRequestXml = soapRequestBuilder.buildConsultaBajasSoapRequest(soapRequest).replaceAll("\\s+", " "); // Elimina saltos de línea, tabs, etc., y los reemplaza por un espacio
+        System.out.println(soapRequestXml);
+        System.out.println("");
+
         return serviceClient.sendSoapRequest(url, soapRequestBuilder.buildConsultaBajasSoapRequest(soapRequest))
 
                 .flatMap(this::handleSoapResponse)

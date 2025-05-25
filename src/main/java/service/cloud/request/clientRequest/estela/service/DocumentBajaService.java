@@ -25,6 +25,13 @@ public class DocumentBajaService {
     }
 
     public Mono<FileResponseDTO> processBajaRequest(String url, FileRequestDTO soapRequest) {
+
+        System.out.println("");
+        System.out.println("EMISION BAJA EMSIION: " + soapRequest.getRucComprobante() + "-" + soapRequest.getTipoComprobante() + "-" +soapRequest.getSerieComprobante() + "-" + soapRequest.getNumeroComprobante());
+        String soapRequestXml = soapRequestBuilder.buildEmisionBajaSoapRequest(soapRequest).replaceAll("\\s+", " "); // Elimina saltos de línea, tabs, etc., y los reemplaza por un espacio
+        System.out.println(soapRequestXml);
+        System.out.println("");
+
         return serviceClient.sendSoapRequest(url, soapRequestBuilder.buildEmisionBajaSoapRequest(soapRequest))
                 .flatMap(this::handleBajaResponse)
                 .onErrorResume(error -> {
