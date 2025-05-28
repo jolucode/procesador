@@ -172,15 +172,15 @@ public class ServiceEmision implements IServiceEmision {
                                                          String attachmentPath) throws Exception {
 
         String estado = transaction.getFE_Estado().toUpperCase();
-        switch (estado) {
-            case "N":
-                return processNewTransaction(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
-            case "C":
-                return processCancelledTransaction(transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
-            default:
-                logger.error("Error: Unknown transaction status");
-                return null;
+        TransaccionRespuesta transaccionRespuesta = null;
+        if( estado.equals("N")) {
+            transaccionRespuesta = processNewTransaction(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
         }
+
+        if (estado.equals("C") || (transaccionRespuesta != null && transaccionRespuesta.getMensaje().contains("El comprobante fue registrado previamente ")))
+            transaccionRespuesta =  processCancelledTransaction(transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
+
+        return transaccionRespuesta;
     }
 
     private TransaccionRespuesta processNewTransaction(String base64Content, TransacctionDTO transaction, byte[] signedXmlDocument, UBLDocumentWRP documentWRP, ConfigData configuracion, String documentName, String attachmentPath) throws Exception {
