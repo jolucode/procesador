@@ -94,6 +94,7 @@ public class DocumentFormatImpl implements DocumentFormatInterface {
         } catch (ConfigurationException e) {
             logger.error(e.getMessage());
         } catch (PDFReportException e) {
+            logger.error( transaction.getDocIdentidad_Nro() + "-" + transaction.getDOC_Codigo()+"-" + transaction.getDOC_Id() + " ERROR PDF: "+ e.getMessage());
             throw new PDFReportException(e.getMessage());
         }
         return pdfBytes;

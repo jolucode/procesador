@@ -111,7 +111,7 @@ public class CloudService implements CloudInterface {
             logger.info("Estado de la respuesta del servidor OnPremise: " + response.getStatus());
         } catch (Exception e) {
             logger.error("Error de conexión con el servidor destino: " + e.getMessage());
-            logger.info("No se pudo dejar los doucmentos en la ruta ruta del servitor: " + request.getUrlOnpremise());
+            logger.error("No se pudo dejar los doucmentos en la ruta ruta del servitor: " + request.getUrlOnpremise());
         }
 
     }
