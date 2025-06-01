@@ -11,8 +11,8 @@ import java.io.*;
 public class JasperReportConfig {
 
     // Método genérico para obtener un reporte según RUC y tipo de documento
-    public JasperReport getJasperReportForRuc(String ruc, String documentName) throws Exception {
-        String reportPath = "C:\\clientes\\config\\" + ruc + "\\formatos\\" + documentName /*+ "Document.jrxml"*/; // Ruta dinámica con RUC y tipo de documento
+    public JasperReport getJasperReportForRuc(String ruc, String documentName, String pathConfigBase) throws Exception {
+        String reportPath = pathConfigBase + ruc + "\\formatos\\" + documentName /*+ "Document.jrxml"*/; // Ruta dinámica con RUC y tipo de documento
 
         File reportTemplate = new File(reportPath);
         if (!reportTemplate.isFile()) {

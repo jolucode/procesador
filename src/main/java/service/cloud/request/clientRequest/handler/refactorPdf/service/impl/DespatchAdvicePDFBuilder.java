@@ -378,7 +378,7 @@ public class DespatchAdvicePDFBuilder extends BaseDocumentService implements Des
                     documentName = (configuracion.getPdfIngles() != null && configuracion.getPdfIngles().equals("Si")) ? "carrierguideDocument_Ing.jrxml" : "carrierguideDocument.jrxml";
                 }
 
-                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(despatchAdviceObject.getNumeroDocEmisor(), documentName);
+                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(despatchAdviceObject.getNumeroDocEmisor(), documentName, configuracion.getRutaBaseConfig());
 
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap,
                         new JRBeanCollectionDataSource(despatchAdviceObject.getItemListDynamic()));

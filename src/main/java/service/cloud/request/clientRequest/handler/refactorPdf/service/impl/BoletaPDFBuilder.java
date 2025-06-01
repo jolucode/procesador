@@ -382,7 +382,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 }
 
                 parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, boletaObj.getLetterAmountValue());
-                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\config\\" + boletaObj.getSenderRuc() + "\\formatos\\legendReport.jasper");
+                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, configData.getRutaBaseConfig() + boletaObj.getSenderRuc() + "\\formatos\\legendReport.jasper");
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(boletaObj.getLegends()));
                 Map<String, String> legendMap = new HashMap<String, String>();
                 legendMap.put(IPDFCreatorConfig.LEGEND_DOCUMENT_TYPE, IPDFCreatorConfig.LEGEND_BOLETA_DOCUMENT);
@@ -390,7 +390,7 @@ public class BoletaPDFBuilder extends BaseDocumentService  implements BoletaPDFG
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_MAP, legendMap);
 
                 String documentName = (configData.getPdfIngles() != null && configData.getPdfIngles().equals("Si")) ? "boletaDocument_Ing.jrxml" : "boletaDocument.jrxml";
-                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(boletaObj.getSenderRuc(), documentName);
+                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(boletaObj.getSenderRuc(), documentName, configData.getRutaBaseConfig());
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap,
                         new JRBeanCollectionDataSource(boletaObj.getItemsDynamic()));
 

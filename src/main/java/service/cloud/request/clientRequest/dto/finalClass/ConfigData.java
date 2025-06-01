@@ -19,6 +19,7 @@ public class ConfigData {
     private String pdfBorrador;
     private String impresionPDF;
     private String rutaBaseDoc;
+    private String rutaBaseConfig;
     private String impresion;
     private String clientId;
     private String clientSecret;

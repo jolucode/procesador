@@ -198,7 +198,7 @@ public class PerceptionPDFBuilder extends BaseDocumentService implements Percept
                         perceptionObj.getResolutionCodeValue());
 
                 String documentName = (configData.getPdfIngles() != null && configData.getPdfIngles().equals("Si")) ? "perceptionDocument_Ing.jrxml" : "perceptionDocument.jrxml";
-                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(perceptionObj.getSenderRuc(), documentName);
+                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(perceptionObj.getSenderRuc(), documentName, configData.getRutaBaseConfig());
 
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(
                         jasperReport,

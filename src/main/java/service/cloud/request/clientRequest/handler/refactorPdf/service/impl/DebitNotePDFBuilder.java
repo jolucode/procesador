@@ -369,7 +369,7 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                 }
 
                 parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, debitNoteObj.getLetterAmountValue());
-                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, "C:\\clientes\\config\\"+ debitNoteObj.getSenderRuc() +"\\formatos\\legendReport.jasper"/*this.legendSubReportPath*/); /*this.legendSubReportPath);*/
+                parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DIR, configData.getRutaBaseConfig() + debitNoteObj.getSenderRuc() +"\\formatos\\legendReport.jasper"/*this.legendSubReportPath*/); /*this.legendSubReportPath);*/
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_DATASOURCE, new JRBeanCollectionDataSource(debitNoteObj.getLegends()));
 
                 Map<String, String> legendMap = new HashMap<String, String>();
@@ -378,7 +378,7 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
                 parameterMap.put(IPDFCreatorConfig.SUBREPORT_LEGENDS_MAP, legendMap);
 
                 String documentName = (configData.getPdfIngles() != null && configData.getPdfIngles().equals("Si")) ? "debitNoteDocument_Ing.jrxml" : "debitNoteDocument.jrxml";
-                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(debitNoteObj.getSenderRuc(), documentName);
+                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(debitNoteObj.getSenderRuc(), documentName, configData.getRutaBaseConfig());
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap,
                         new JRBeanCollectionDataSource(debitNoteObj.getItemsListDynamic()));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

@@ -287,7 +287,7 @@ public class RetentionPDFBuilder extends BaseDocumentService implements Retentio
                 parameterMap.put(IPDFCreatorConfig.LETTER_AMOUNT_VALUE, retentionObject.getLetterAmountValue());
 
                 String documentName = (configData.getPdfIngles() != null && configData.getPdfIngles().equals("Si")) ? "retentionDocument_Ing.jrxml" : "retentionDocument.jrxml";
-                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(retentionObject.getSenderRuc(), documentName);
+                JasperReport jasperReport = jasperReportConfig.getJasperReportForRuc(retentionObject.getSenderRuc(), documentName, configData.getRutaBaseConfig());
                 JasperPrint iJasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, new JRBeanCollectionDataSource(retentionObject.getItemListDynamic()));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 JasperExportManager.exportReportToPdfStream(iJasperPrint, outputStream);

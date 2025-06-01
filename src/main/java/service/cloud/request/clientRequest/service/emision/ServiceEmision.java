@@ -251,6 +251,7 @@ public class ServiceEmision implements IServiceEmision {
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
                 .rutaBaseDoc(applicationProperties.getRutaBaseDocAnexos())
+                .rutaBaseConfig(applicationProperties.getRutaBaseDocConfig())
                 .pdfIngles(valorIngles)
                 .build();
     }
