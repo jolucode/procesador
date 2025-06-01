@@ -209,7 +209,7 @@ public class ServiceEmision implements IServiceEmision {
         if (responseDTO.getContent() != null) {
             return processorCoreInterface.processCDRResponseV2(responseDTO.getContent(), signedXmlDocument, documentWRP, transaction, configuracion, documentName, attachmentPath);
         } else {
-            return processorCoreInterface.processResponseSinCDR(transaction, responseDTO);
+            return processorCoreInterface.processResponseSinCDR(documentWRP, transaction, configuracion, responseDTO);
         }
     }
 
@@ -231,7 +231,7 @@ public class ServiceEmision implements IServiceEmision {
         if (responseDTO.getContent() != null) {
             return processorCoreInterface.processCDRResponseV2(responseDTO.getContent(), signedXmlDocument, documentWRP, transaction, configuracion, documentName, attachmentPath);
         } else {
-            return processorCoreInterface.processResponseSinCDR(transaction, responseDTO);
+            return processorCoreInterface.processResponseSinCDR(documentWRP, transaction, configuracion, responseDTO);
         }
     }
 

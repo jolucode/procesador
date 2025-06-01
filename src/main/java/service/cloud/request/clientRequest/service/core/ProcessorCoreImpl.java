@@ -85,9 +85,16 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
     }
 
     @Override
-    public TransaccionRespuesta processResponseSinCDR(TransacctionDTO transaction, FileResponseDTO responseDTO) {
+    public TransaccionRespuesta processResponseSinCDR(UBLDocumentWRP documentWRP, TransacctionDTO transaction, ConfigData configuracion,FileResponseDTO responseDTO) {
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
         transactionResponse.setMensaje(responseDTO.getMessage());
+        byte[] pdfBytes = null;
+        try {
+            pdfBytes = documentFormatInterface.createPDFDocument( documentWRP, transaction, configuracion);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        transactionResponse.setPdf(pdfBytes);
         return transactionResponse;
     }
 

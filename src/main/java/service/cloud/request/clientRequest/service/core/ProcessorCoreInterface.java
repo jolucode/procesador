@@ -12,7 +12,7 @@ public interface ProcessorCoreInterface {
 
     TransaccionRespuesta processCDRResponseV2(byte[] cdrConstancy, byte[] signedDocument, UBLDocumentWRP documentWRP, TransacctionDTO transaction, ConfigData configuracion, String documentName, String attachmentPath) throws Exception;
 
-    TransaccionRespuesta processResponseSinCDR(TransacctionDTO transaction, FileResponseDTO cdrStatusResponse);
+    TransaccionRespuesta processResponseSinCDR( UBLDocumentWRP documentWRP, TransacctionDTO transaction,ConfigData configuracion, FileResponseDTO cdrStatusResponse);
 
     public byte[] processCDRResponseContigencia(byte[] cdrConstancy,
                                                 FileHandler fileHandler, String documentName,
