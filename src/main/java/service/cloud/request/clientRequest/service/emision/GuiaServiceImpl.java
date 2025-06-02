@@ -195,6 +195,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                 .userNameSunatSunat(client.getUserNameSunatGuias())
                 .passwordSunatSunat(client.getPasswordSunatGuias())
                 .rutaBaseDoc(applicationProperties.getRutaBaseDocAnexos())
+                .rutaBaseDoc(applicationProperties.getRutaBaseDocAnexos())
                 .build();
 
         logger.info("Se esta apuntando al ambiente : " + configuracion.getAmbiente() + " - " + configuracion.getIntegracionWs());
@@ -324,7 +325,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
 
             // DECLARE GENERA TICKET
             ResponseDTO responseDTO = declareSunat(documentName, documentPath/*.replace(EXT_XML, EXT_ZIP)*/, responseDTOJWT.getAccess_token());
-
+            logger.info( transaction.getDocIdentidad_Nro() + "-" + transaction.getDOC_Codigo()+"-" + transaction.getDOC_Id() + "Ticket Guia : " + responseDTO.getNumTicket());
             // Guardar ticket en estado "EN PROCESO"
             //saveTicketRest(transaction, responseDTO);
 
