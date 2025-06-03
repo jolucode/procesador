@@ -336,7 +336,7 @@ public class ServiceBaja implements IServiceBaja {
                 .pdfBorrador(client.getPdfBorrador())
                 .impresionPDF(client.getImpresion())
                 .rutaBaseDoc(applicationProperties.getRutaBaseDocAnexos())
-                .rutaBaseDoc(applicationProperties.getRutaBaseDocAnexos())
+                .rutaBaseConfig(applicationProperties.getRutaBaseDocConfig())
                 .build();
     }
 
