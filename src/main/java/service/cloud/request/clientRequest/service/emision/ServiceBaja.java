@@ -323,11 +323,6 @@ public class ServiceBaja implements IServiceBaja {
     }
 
     private ConfigData createConfigData(Client client) {
-        /*String valor = transaction.getTransaccionContractdocrefList().stream()
-                .filter(x -> x.getUsuariocampos().getNombre().equals("pdfadicional"))
-                .map(x -> x.getValor())
-                .findFirst()
-                .orElse("No");*/
         return ConfigData.builder()
                 .usuarioSol(client.getUsuarioSol())
                 .claveSol(client.getClaveSol())

@@ -39,8 +39,6 @@ import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import java.io.IOException;
 import java.util.*;
 
-import static java.math.BigDecimal.valueOf;
-
 @Service
 public class CloudService implements CloudInterface {
 

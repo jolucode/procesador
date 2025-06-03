@@ -1081,44 +1081,9 @@ public class UBLDocumentHandler extends UBLBasicHandler {
         return documentReferenceType;
     }
 
-    /*public List<NoteType> getDespatchAdviceNote(TransacctionDTO transaccion) {
-        List<NoteType> noteTypeList = new ArrayList<>();
-        //
-        NoteType noteType = new NoteType();
-        boolean texto = false;
-        for (int i = 0; i < transaccion.getTransaccionContractdocrefList().size(); i++) {
-            if ("guia_comentarios".equals(transaccion.getTransaccionContractdocrefList().get(i).getUsuariocampos().getNombre())) {
-                TransaccionContractdocref objecto = transaccion.getTransaccionContractdocrefList().get(i);
-                if (objecto != null && !objecto.getValor().isEmpty()) {
-                    noteType.setValue(objecto.getValor());
-                    noteTypeList.add(noteType);
-                    texto = true;
-                    break;
-                }
-            }
-        }
-        return noteTypeList;
-    }*/
     public List<NoteType> getDespatchAdviceNote(TransacctionDTO transaccion) {
         List<NoteType> noteTypeList = new ArrayList<>();
         NoteType noteType = new NoteType();
-        boolean texto = false;
-
-        //List<Map<String, String>> contractdocrefs = transaccion.getTransactionContractDocRefListDTOS();
-
-        /*for (Map<String, String> contractdocref : contractdocrefs) {
-            if ("guia_comentarios".equalsIgnoreCase(contractdocref.get("nombre"))) {
-                String valor = contractdocref.get("valor");
-                if (valor != null && !valor.isEmpty()) {
-                    noteType.setValue(valor);
-                    noteTypeList.add(noteType);
-                    texto = true;
-                    break;
-                }
-            }
-        }*/
-
-
         Optional<Map<String, String>> optional = transaccion.getTransactionContractDocRefListDTOS().parallelStream()
                 .filter(docRef -> docRef.containsKey("guia_comentarios")) // Verifica si el mapa tiene la clave "cu01"
                 .findAny();
@@ -1128,12 +1093,8 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             if (value != null && !value.isEmpty()) {
                 noteType.setValue(value);
                 noteTypeList.add(noteType);
-                texto = true;
             }
         }
-
-
-
 
         return noteTypeList;
     }
@@ -1152,27 +1113,13 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 InvoiceLineType invoiceLine = new InvoiceLineType();
                 /* Agregar <cac:InvoiceLine><cbc:ID> */
                 invoiceLine.setID(getID(String.valueOf(transaccionLinea.getNroOrden())));
-                /*
-                 * Agregar UNIDAD DE MEDIDA segun SUNAT
-                 * <cac:InvoiceLine><cbc:InvoicedQuantity>
-                 */
                 invoiceLine.setInvoicedQuantity(getInvoicedQuantity(transaccionLinea.getCantidad(), transaccionLinea.getUnidadSunat()));
-                /*
-                 * Agregar UNIDAD DE MEDIDA segun VENTURA
-                 * <cac:InvoiceLine><cbc:Note>
-                 */
                 if (StringUtils.isNotBlank(transaccionLinea.getUnidad())) {
                     invoiceLine.getNote().add(getNote(transaccionLinea.getUnidad()));
                 }
                 /* Agregar <cac:InvoiceLine><cbc:LineExtensionAmount> */
                 invoiceLine.setLineExtensionAmount(getLineExtensionAmount(transaccionLinea.getTotalLineaSinIGV(), currencyCode));
-                /*
-                 * Op. Onerosa:     tiene precio unitario
-                 * Op. No Onerosa:  tiene valor referencial
-                 *
-                 * Agregar PRECIO UNITARIO / VALOR REFERENCIAL
-                 * <cac:InvoiceLine><cac:PricingReference>
-                 */
+
                 if (transaccionLinea.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
                     invoiceLine.setPricingReference(getPricingReference(transaccionLinea.getPrecioRef_Codigo(), transaccionLinea.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transaccionLinea));
                 } else if (transaccionLinea.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
@@ -1180,39 +1127,17 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 } else if (transaccionLinea.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REGULATED_RATES)) {
                     invoiceLine.setPricingReference(getPricingReference(transaccionLinea.getPrecioRef_Codigo(), transaccionLinea.getPrecioRef_Monto().setScale(IUBLConfig.DECIMAL_LINE_UNIT_VALUE, RoundingMode.HALF_UP), currencyCode, transaccionLinea));
                 }
-                /*
-                 * Agregar DETRACCIONES
-                 *
-                 * SERVICIO DE TRANSPORTE DE CARGA
-                 */
                 if (transaccion.getCodigoDetraccion() != null &&
                         transaccion.getCodigoDetraccion().equals("027")) {
                     invoiceLine.getDelivery().add(getDeliveryForLine(transaccionLinea.getCodUbigeoDestino(), transaccionLinea.getDirecDestino(), transaccionLinea.getCodUbigeoOrigen(), transaccionLinea.getDirecOrigen(), transaccionLinea.getDetalleViaje(), transaccionLinea.getValorCargaEfectiva(), transaccionLinea.getValorCargaUtil(), transaccionLinea.getValorTransporte(), transaccionLinea.getConfVehicular(), transaccionLinea.getCUtilVehiculo(), transaccionLinea.getCEfectivaVehiculo(), transaccionLinea.getValorRefTM(), transaccionLinea.getValorPreRef(), transaccionLinea.getFactorRetorno()));
                 }
 
-                /*
-                 * Agregar DESCUENTO DE LINEA
-                 *
-                 * ChargeIndicatorType:
-                 *      El valor FALSE representa que es un DESCUENTO DE LINEA
-                 *
-                 * <cac:InvoiceLine><cac:AllowanceCharge>
-                 */
                 if (null != transaccionLinea.getDSCTO_Monto() && transaccionLinea.getDSCTO_Monto().compareTo(BigDecimal.ZERO) == 1) {
                     BigDecimal montoCero = new BigDecimal("0.0");
                     invoiceLine.getAllowanceCharge().add(getAllowanceCharge(transaccionLinea.getDSCTO_Monto(), transaccionLinea.getDSCTO_Monto(), false, transaccionLinea.getDSCTO_Porcentaje(), transaccionLinea.getDSCTO_Monto(), transaccionLinea.getTotalBruto(), currencyCode, "00", montoCero, montoCero));
                 }
 
-                /*
-                 * Agregar IMPUESTOS DE LINEA
-                 * <cac:InvoiceLine><cac:TaxTotal>
-                 */
-
-                boolean existBolsa = false;
-                List<TransactionLineasImpuestoDTO> impuestoDTOList = new ArrayList<>();
-
                 if ("A".equals(transaccionLinea.getItmBolsa())) {
-                    existBolsa = true;
                     if(insertarImpuestoBolsa(transaccion.getTransactionLineasDTOList(), transaccion) !=null ) {
                         transaccionLinea.getTransactionLineasImpuestoListDTO().add(insertarImpuestoBolsa(transaccion.getTransactionLineasDTOList(), transaccion));
                         invoiceLine.getTaxTotal().add(getTaxTotalLineV21(transaccionLinea.getTransactionLineasImpuestoListDTO(), transaccionLinea.getLineaImpuesto(), currencyCode));
@@ -1225,10 +1150,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 /* Agregar <cac:InvoiceLine><cac:Item> */
                 invoiceLine.setItem(getItemForLine(transaccion, transaccionLinea, transaccionLinea.getDescripcion(), transaccionLinea.getCodArticulo(), transaccionLinea.getCodSunat(), transaccionLinea.getCodProdGS1(), transaccionPropiedadesList));
 
-                /*
-                 * Agregar VALOR UNITARIO
-                 * <cac:InvoiceLine><cac:Price>
-                 */
                 invoiceLine.setPrice(getPriceForLine(transaccionLinea.getTransaccionLineasBillrefListDTO(), currencyCode));
                 if (transaccionLinea.getItmBolsa() == null || !transaccionLinea.getItmBolsa().equals("I") || transaccionLineasList.size() == 1 ) {
                     invoiceLineList.add(invoiceLine);
@@ -1292,16 +1213,8 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 /* Agregar <cac:CreditNoteLine><cbc:ID> */
                 creditNoteLine.setID(getID(String.valueOf(transaccionLinea.getNroOrden())));
 
-                /*
-                 * Agregar UNIDAD DE MEDIDA segun SUNAT
-                 * <cac:CreditNoteLine><cbc:CreditedQuantity>
-                 */
                 creditNoteLine.setCreditedQuantity(getCreditedQuantity(transaccionLinea.getCantidad(), transaccionLinea.getUnidadSunat()));
 
-                /*
-                 * Agregar UNIDAD DE MEDIDA segun VENTURA
-                 * <cac:CreditNoteLine><cbc:Note>
-                 */
                 if (StringUtils.isNotBlank(transaccionLinea.getUnidad())) {
                     creditNoteLine.getNote().add(getNote(transaccionLinea.getUnidad()));
                 }
@@ -1309,32 +1222,17 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 /* Agregar <cac:CreditNoteLine><cbc:LineExtensionAmount> */
                 creditNoteLine.setLineExtensionAmount(getLineExtensionAmount(transaccionLinea.getTotalLineaSinIGV(), currencyCode));
 
-                /*
-                 * Op. Onerosa:     tiene precio unitario
-                 * Op. No Onerosa:  tiene valor referencial
-                 *
-                 * Agregar PRECIO UNITARIO / VALOR REFERENCIAL
-                 * <cac:CreditNoteLine><cac:PricingReference>
-                 */
                 if (transaccionLinea.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
                     creditNoteLine.setPricingReference(getPricingReference(transaccionLinea.getPrecioRef_Codigo(), transaccionLinea.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transaccionLinea));
                 } else if (transaccionLinea.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
                     creditNoteLine.setPricingReference(getPricingReference(transaccionLinea.getPrecioRef_Codigo(), transaccionLinea.getPrecioRef_Monto().setScale(IUBLConfig.DECIMAL_LINE_REFERENCE_VALUE, RoundingMode.HALF_UP), currencyCode, transaccionLinea));
                 }
 
-                /*
-                 * Agregar IMPUESTOS DE LINEA
-                 * <cac:CreditNoteLine><cac:TaxTotal>
-                 */
                 creditNoteLine.getTaxTotal().add(getTaxTotalLineV21(transaccionLinea.getTransactionLineasImpuestoListDTO(), transaccionLinea.getLineaImpuesto(), currencyCode));
 
                 /* Agregar <cac:CreditNoteLine><cac:Item> */
                 creditNoteLine.setItem(getItemForLine(transaccion, transaccionLinea, transaccionLinea.getDescripcion(), transaccionLinea.getCodArticulo(), transaccionLinea.getCodSunat(), transaccionLinea.getCodProdGS1(), transaccionPropiedadesList));
 
-                /*
-                 * Agregar VALOR UNITARIO
-                 * <cac:CreditNoteLine><cac:Price>
-                 */
                 creditNoteLine.setPrice(getPriceForLine(transaccionLinea.getTransaccionLineasBillrefListDTO(), currencyCode));
                 creditNoteLineList.add(creditNoteLine);
             } //for
@@ -1363,16 +1261,8 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 /* Agregar <cac:DebitNoteLine><cbc:ID> */
                 debitNoteLine.setID(getID(String.valueOf(transaccionLinea.getNroOrden())));
 
-                /*
-                 * Agregar UNIDAD DE MEDIDA segun SUNAT
-                 * <cac:DebitNoteLine><cbc:DebitedQuantity>
-                 */
                 debitNoteLine.setDebitedQuantity(getDebitedQuantity(transaccionLinea.getCantidad(), transaccionLinea.getUnidadSunat()));
 
-                /*
-                 * Agregar UNIDAD DE MEDIDA segun VENTURA
-                 * <cac:DebitNoteLine><cbc:Note>
-                 */
                 if (StringUtils.isNotBlank(transaccionLinea.getUnidad())) {
                     debitNoteLine.getNote().add(getNote(transaccionLinea.getUnidad()));
                 }
@@ -1380,32 +1270,14 @@ public class UBLDocumentHandler extends UBLBasicHandler {
                 /* Agregar <cac:DebitNoteLine><cbc:LineExtensionAmount> */
                 debitNoteLine.setLineExtensionAmount(getLineExtensionAmount(transaccionLinea.getTotalLineaSinIGV(), currencyCode));
 
-                /*
-                 * Op. Onerosa:     tiene precio unitario
-                 * Op. No Onerosa:  tiene valor referencial
-                 *
-                 * Agregar PRECIO UNITARIO / VALOR REFERENCIAL
-                 * <cac:DebitNoteLine><cac:PricingReference>
-                 */
                 if (transaccionLinea.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_UNIT_PRICE)) {
                     debitNoteLine.setPricingReference(getPricingReference(transaccionLinea.getPrecioRef_Codigo(), transaccionLinea.getPrecioIGV().setScale(IUBLConfig.DECIMAL_LINE_UNIT_PRICE, RoundingMode.HALF_UP), currencyCode, transaccionLinea));
                 } else if (transaccionLinea.getPrecioRef_Codigo().equalsIgnoreCase(IUBLConfig.ALTERNATIVE_CONDICION_REFERENCE_VALUE)) {
                     debitNoteLine.setPricingReference(getPricingReference(transaccionLinea.getPrecioRef_Codigo(), transaccionLinea.getPrecioRef_Monto().setScale(IUBLConfig.DECIMAL_LINE_REFERENCE_VALUE, RoundingMode.HALF_UP), currencyCode, transaccionLinea));
                 }
 
-                /*
-                 * Agregar IMPUESTOS DE LINEA
-                 * <cac:DebitNoteLine><cac:TaxTotal>
-                 */
                 debitNoteLine.getTaxTotal().add(getTaxTotalLineV21(transaccionLinea.getTransactionLineasImpuestoListDTO(), transaccionLinea.getLineaImpuesto(), currencyCode));
-
-                /* Agregar <cac:DebitNoteLine><cac:Item> */
                 debitNoteLine.setItem(getItemForLine(transaccion, transaccionLinea, transaccionLinea.getDescripcion(), transaccionLinea.getCodArticulo(), transaccionLinea.getCodSunat(), transaccionLinea.getCodProdGS1(), transaccionPropiedadesList));
-
-                /*
-                 * Agregar VALOR UNITARIO
-                 * <cac:DebitNoteLine><cac:Price>
-                 */
                 debitNoteLine.setPrice(getPriceForLine(transaccionLinea.getTransaccionLineasBillrefListDTO(), currencyCode));
                 debitNoteLineList.add(debitNoteLine);
             } //for
@@ -1690,10 +1562,6 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             voidedDocumentType.setAccountingSupplierParty(accountingSupplierParty);
             /* Agregar item <VoidedDocuments><sac:VoidedDocumentsLine> */
             {
-                /*
-                 * Para este caso solo se agrega un solo ITEM, porque se esta
-                 * dando de BAJA una transaccion.
-                 */
                 VoidedDocumentsLineType voidedDocumentLine = new VoidedDocumentsLineType();
                 /* Agregar <VoidedDocuments><sac:VoidedDocumentsLine><cbc:LineID> */
                 LineIDType lineID = new LineIDType();
