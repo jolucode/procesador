@@ -89,6 +89,16 @@ public class ServiceBajaConsulta implements IServiceBaja {
         transactionResponse.setLogDTO(log);
         log.setPathBase(attachmentPath + "\\" + documentName + ".json");
 
+        if (transactionResponse.getMensaje() != null) {
+            String mensaje = transactionResponse.getMensaje();
+            if (mensaje.contains("Comunicacion de baja")) {
+                mensaje = mensaje.replace("La Comunicacion de baja", "La Comunicación de Baja");
+            }
+
+            transactionResponse.setMensaje(mensaje);
+        }
+
+        transactionResponse.setTicketRest(transaction.getTicket_Baja());
         return transactionResponse;
     }
 
