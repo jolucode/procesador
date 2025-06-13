@@ -5,20 +5,20 @@ spring:
 scheduled:
   fixedDelay: 10000
 application:
-  env: dev
-  ambiente: 'test'
+  env: production
+  ambiente: 'production'
   rutas:
     rutaBaseDoc-anexos: 'C:\clientes\files\'
     rutaBaseDoc-config: 'C:\clientes\config\'
   soap-client:
     sunat:
-      base-url-emision: 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService'
+      base-url-emision: 'https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService'
       base-url-consulta: 'https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService'
       base-url-retper: 'https://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService'
     ose:
-      base-url: 'https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl'
+      base-url: 'https://ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl'
     estela:
-      base-url: 'https://ose-test.com/ol-ti-itcpe/billService3'
+      base-url: 'https://ose.pe/ol-ti-itcpe/billService3'
 
 certificate:
   supplierCertificate: SunJSSE
@@ -27,60 +27,141 @@ certificate:
 ventura:
   clientes:
     listaClientes:
-      "20510910517":
-        razonSocial: AGA
-        wsUsuario: admin
-        wsClave: ventura
-        wsLocation: "https://factsuracion.venturafe.com/"
-        usuarioSol: "20510910517MODDATOS"
-        claveSol: "QAEUW1YLSD"
-        certificadoName: CERTIFICATE_TEST.pfx
-        certificadoPassword: "1234"
-        integracionWs: ESTELA
-        pdfBorrador: "true"
-        impresion: Codigo QR
-        #urlOnpremise: http://190.119.245.254:60081/
-        #urlOnpremise: "http://104.208.219.120:60108/"
-        #urlOnpremise: http://190.119.245.254:60081/AZALAIA
-        #urlOnpremise: http://119.8.146.122:60089/
-        urlOnpremise: http://104.208.219.1s20:60108/
-        clientId: a8a6c50a-d73c-4775-9ddc-6261df69fed8
-        clientSecret: 5yr+sp24Q1J+LeYhnCooEw==
-        UserNameSunatGuias: 20510910517JVENTUR1
-        passwordSunatGuias: JVsENTUR1
-      "20100067596":
-        razonSocial: "Fabrica de Cubiertos Sac "
+      "20131872233":
+        razonSocial: "Agrobex S.a.C. | Enrique Cassinelli e Hijos S.a"
         wsUsuario: "admin"
         wsClave: "ventura"
-        wsLocation: ""
-        usuarioSol: "20100067596"
-        claveSol: "20100067596"
-        certificadoName: "INSTALADOR2.pfx"
-        certificadoPassword: "4443"
-        integracionWs: SUNAT
-        pdfBorrador: "true"
-        impresion: "Codigo QR"
-        urlOnpremise: "http://101.44.10.195:60084/"
-        clientId: "d234c505-541c-4060-8e89-f6a547f7ecf8"
-        clientSecret: "xZJIhomKys4vQgXVP3zQ+Q=="
-        UserNameSunatGuias: "20100067596VENTUSAP"
-        passwordSunatGuias: "Facu2025"
-      "20520575236":
-        razonSocial: "PRUEBAS CLIENTE AGROMIGIVA"
-        wsUsuario: "admin"
-        wsClave: "ventura"
-        wsLocation: "https://facturacion.venturafe.com/"
-        usuarioSol: "20520575236MODDATOS"
-        claveSol: "YTBFW1YLUS"
-        certificadoName: "CERTIFICATE_TEST.pfx"
-        certificadoPassword: "4443"
+        wsLocation: "https://facturacion.cassinelli.pe/"
+        usuarioSol: "20131872233TCIV"
+        claveSol: "NJ1SOVLUK5"
+        certificadoName: "CertificadoPFX_2021.pfx"
+        certificadoPassword: "Ventura2024"
         integracionWs: ESTELA
         pdfBorrador: "true"
         impresion: "Codigo QR"
-        urlOnpremise: "http://101.44.10.195:60084/"
-        clientId: "d234c505-541c-4060-8e89-f6a547f7ecf8"
-        clientSecret: "xZJIhomKys4vQgXVP3zQ+Q=="
-        UserNameSunatGuias: "20100067596VENTUSAP"
-        passwordSunatGuias: "Facu2025"
+        urlOnpremise: "http://134.65.239.221:60120/"
+        clientId: "b81ed102-1e5f-41a3-854f-b1ce9e6bdd5a"
+        clientSecret: "9lEOLTjwQSpfY8/1R38Y0g=="
+        UserNameSunatGuias: "20131872233FEZAPATA"
+        passwordSunatGuias: "FVentas01"
+      "20100011884":
+        razonSocial: "Certificaciones del Peru S a Cerper"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://cpe.cerperfe.com/"
+        usuarioSol: "20100011884TCIV"
+        claveSol: "XA5MFLINTZ"
+        certificadoName: "CERPER.pfx"
+        certificadoPassword: "aFZwBiqu=Vm6Y"
+        integracionWs: ESTELA
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://101.44.2.197:60151/"
+        clientId: "NO APLICA"
+        clientSecret: "NO APLICA"
+        UserNameSunatGuias: "NO APLICA"
+        passwordSunatGuias: "NO APLICA"
+      "20532830126":
+        razonSocial: "importaciones - transportes san calibu eirl"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://tscfe.sancalibu.com/"
+        usuarioSol: "20532830126TCIV"
+        claveSol: "4CTN0326I8"
+        certificadoName: "CertificadoPFX.pfx"
+        certificadoPassword: "TSCEIRL2025tsceirl"
+        integracionWs: ESTELA
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://190.119.146.4:60148/"
+        clientId: "77865d67-8210-404d-8b1d-9c787c64dbbc"
+        clientSecret: "3XuWVETOAENaidX4/BGgiA=="
+        UserNameSunatGuias: "20532830126VENTURAS"
+        passwordSunatGuias: "VSperu24"
+      "20532613028":
+        razonSocial: "Ladrillera Maxx SAC - Datos Perú"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "http://maxxfe.ladrillosmaxx.com"
+        usuarioSol: "20532613028TCIV"
+        claveSol: "F7KAE9PBTX"
+        certificadoName: "CertificadoPFX.pfx"
+        certificadoPassword: "LMXSAC2025lmxsac"
+        integracionWs: ESTELA
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://190.119.146.4:60149/"
+        clientId: "075eddf0-be87-4a3f-96c1-13ffefe6f030"
+        clientSecret: "KZwmUbfUVCKlwrclPw3rYw=="
+        UserNameSunatGuias: "20532613028VENTURAS"
+        passwordSunatGuias: "VSperu22"
+      "20532822883":
+        razonSocial: "MINA LAS VEGAS E.I.R.L."
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "https://lasvegasfe.ladrillosmaxx.com"
+        usuarioSol: "20532822883TCIV"
+        claveSol: "MRJ1T320X4"
+        certificadoName: "CertificadoPFX.pfx"
+        certificadoPassword: "MLV2025mlv"
+        integracionWs: ESTELA
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://190.119.146.4:60150/"
+        clientId: "c9fc3e3e-c1ea-4903-aae6-e7302839d0ca"
+        clientSecret: "fyFQDXpKUj96qrS8zENFOg=="
+        UserNameSunatGuias: "20532822883VENTURAS"
+        passwordSunatGuias: "VSperu23"
+      "20101200125":
+        razonSocial: "Quimex S a"
+        wsUsuario: "adminquimex"
+        wsClave: "adminquimex"
+        wsLocation: "https://docs.quimex-fe.com/"
+        usuarioSol: "20101200125TCIV"
+        claveSol: "LPAC4KM1ZT"
+        certificadoName: "CertificadoPFX.pfx"
+        certificadoPassword: "Wp7nLKPZ4wgch8H8"
+        integracionWs: ESTELA
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://190.119.146.4:60150/"
+        clientId: "bab9ea06-5ac5-45e8-ab46-a8a0d7d039c9"
+        clientSecret: "MVqI/bmg265W2wVqcw2ulA=="
+        UserNameSunatGuias: "20101200125YOE00001"
+        passwordSunatGuias: "Yo123456"
+      "20101281966":
+        razonSocial: "Dent Import S a"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "http://facturacion.dentimport.net/"
+        usuarioSol: "20101281966TCIV"
+        claveSol: "J3HLT0WSD9"
+        certificadoName: "llaveprivada.pfx"
+        certificadoPassword: "7sYMZt2bNqchCKxU"
+        integracionWs: ESTELA
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://190.102.144.11:60118/"
+        clientId: "be66dd6f-2d49-46ee-9dde-3f15b1333aae"
+        clientSecret: "Terr0Ifpl8MtR7QO4PMbgw=="
+        UserNameSunatGuias: "20101281966CONSULT2"
+        passwordSunatGuias: "Consultadi2"
+      "20100997810":
+        razonSocial: "Tecnomina S.a.C"
+        wsUsuario: "admin"
+        wsClave: "ventura"
+        wsLocation: "http://portal.tecnomina.site/"
+        usuarioSol: "20100997810TCIV"
+        claveSol: "SAK6LIOVGD"
+        certificadoName: "CertificadoPFX.pfx"
+        certificadoPassword: "Tecnomina"
+        integracionWs: ESTELA
+        pdfBorrador: "true"
+        impresion: "Codigo QR"
+        urlOnpremise: "http://200.123.23.84:60122/"
+        clientId: "0df88fa7-fca0-4a53-accf-1c5cef3e6994"
+        clientSecret: "V8VqNvi3Pr6Tn4HM3X0esQ=="
+        UserNameSunatGuias: "20100997810TECN2022"
+        passwordSunatGuias: "INICIOt22"
 server:
   port: 8082

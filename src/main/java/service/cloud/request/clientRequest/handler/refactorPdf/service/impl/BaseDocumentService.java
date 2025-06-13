@@ -522,7 +522,8 @@ public abstract class BaseDocumentService {
                             + IPDFCreatorConfig.DOC_ISSUED_BY_AFP_DESC + ")";
                     break;
                 default:
-                    throw new PDFReportException(IVenturaError.ERROR_430);
+                    response = identifier + " ("
+                            + type+ ")";
             }
         } else {
             logger.error("getDocumentReferenceValue() ["
