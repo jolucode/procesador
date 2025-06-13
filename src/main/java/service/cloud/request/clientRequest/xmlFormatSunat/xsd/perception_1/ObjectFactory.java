@@ -37,7 +37,7 @@ public class ObjectFactory implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    private final static QName _Perception_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:Perception-1", "Perception");
+    private final static QName _Perception_QNAME = new QName("urn:sunat:names:specification:ubl:peru:schema:xsd:Perception-1", "Perception");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: service.cloud.request.clientRequest.xmlFormatSunat.xsd.perception_1
@@ -55,7 +55,7 @@ public class ObjectFactory implements Serializable {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link PerceptionType }{@code >}}
      */
-    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:Perception-1", name = "Perception")
+    @XmlElementDecl(namespace = "urn:sunat:names:specification:ubl:peru:schema:xsd:Perception-1", name = "Perception")
     public JAXBElement<PerceptionType> createInvoice(PerceptionType value) {
         return new JAXBElement<PerceptionType>(_Perception_QNAME, PerceptionType.class, null, value);
     }

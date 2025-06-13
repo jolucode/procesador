@@ -1,5 +1,7 @@
 package service.cloud.request.clientRequest.estela.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -14,6 +16,9 @@ import java.util.regex.Pattern;
 @Service
 public class DocumentBajaService {
 
+
+    Logger logger = LoggerFactory.getLogger(DocumentBajaService.class);
+
     private final ServiceProxy serviceClient;
 
     private final DocumentBuilder soapRequestBuilder;
@@ -27,9 +32,9 @@ public class DocumentBajaService {
     public Mono<FileResponseDTO> processBajaRequest(String url, FileRequestDTO soapRequest) {
 
         System.out.println("");
-        System.out.println("EMISION BAJA EMSIION: " + soapRequest.getRucComprobante() + "-" + soapRequest.getTipoComprobante() + "-" +soapRequest.getSerieComprobante() + "-" + soapRequest.getNumeroComprobante());
+        logger.info("EMISION BAJA EMSIION: " + soapRequest.getRucComprobante() + "-" + soapRequest.getTipoComprobante() + "-" +soapRequest.getSerieComprobante() + "-" + soapRequest.getNumeroComprobante());
         String soapRequestXml = soapRequestBuilder.buildEmisionBajaSoapRequest(soapRequest).replaceAll("\\s+", " "); // Elimina saltos de línea, tabs, etc., y los reemplaza por un espacio
-        System.out.println(soapRequestXml);
+        logger.info(soapRequestXml);
         System.out.println("");
 
         return serviceClient.sendSoapRequest(url, soapRequestBuilder.buildEmisionBajaSoapRequest(soapRequest))

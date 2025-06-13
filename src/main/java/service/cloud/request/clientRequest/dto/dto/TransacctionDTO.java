@@ -23,7 +23,7 @@ public class TransacctionDTO {
     private String REFDOC_MotivCode;
     private String SUNAT_Transact;
     private String FE_Estado;
-    private BigDecimal DOC_SinPercepcion;
+    private BigDecimal DOC_SinPercepcion = new BigDecimal("0.0");
     private String DocIdentidad_Tipo;
     private String DIR_Distrito;
     private String SN_DIR_Direccion;

@@ -28,6 +28,7 @@ import service.cloud.request.clientRequest.mongo.service.ILogService;
 import service.cloud.request.clientRequest.mongo.service.IDocumentPublicationService;
 import service.cloud.request.clientRequest.service.emision.ServiceBaja;
 import service.cloud.request.clientRequest.service.emision.ServiceBajaConsulta;
+import service.cloud.request.clientRequest.service.emision.ServiceBajaTest;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
 import service.cloud.request.clientRequest.service.publicar.PublicacionManager;
@@ -61,7 +62,7 @@ public class CloudService implements CloudInterface {
     IServiceEmision iServiceEmision;
 
     @Autowired
-    ServiceBajaConsulta serviceBajaConsulta;
+    ServiceBajaTest serviceBajaTest;
 
     @Autowired
     private ILogService logEntryService;
@@ -133,7 +134,7 @@ public class CloudService implements CloudInterface {
             RequestPost request = generateDataRequestHana(transaccion, tr);
 
             // Paso 3: Anexar documentos
-            anexarDocumentos(request);
+            //anexarDocumentos(request);
 
             // Paso 4: Limpieza de memoria (ayuda al GC)
             liberarRecursosPesados(tr, request);
@@ -210,9 +211,9 @@ public class CloudService implements CloudInterface {
 
                 return iServiceEmision.transactionDocument(transaction, codigoDocumento);
             case ISunatConnectorConfig.FE_TIPO_TRANS_BAJA:
-                if (transaction.getFE_Estado().equals("C") || transaction.getFE_Estado().equals("G"))
-                    return serviceBajaConsulta.transactionVoidedDocument(transaction, codigoDocumento);
-                else return iServiceBaja.transactionVoidedDocument(transaction, codigoDocumento);
+                //if (transaction.getFE_Estado().equals("C") || transaction.getFE_Estado().equals("G"))
+                return serviceBajaTest.transactionVoidedDocument(transaction, codigoDocumento);
+                //else return iServiceBaja.transactionVoidedDocument(transaction, codigoDocumento);
             default:
                 return new TransaccionRespuesta();
         }
