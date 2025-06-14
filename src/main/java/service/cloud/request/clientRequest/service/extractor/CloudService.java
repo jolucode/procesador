@@ -1,6 +1,5 @@
 package service.cloud.request.clientRequest.service.extractor;
 
-import com.google.gson.Gson;
 import io.joshworks.restclient.http.HttpResponse;
 import io.joshworks.restclient.http.Unirest;
 import org.modelmapper.ModelMapper;
@@ -26,10 +25,8 @@ import service.cloud.request.clientRequest.mongo.model.LogDTO;
 import service.cloud.request.clientRequest.mongo.model.DocumentPublication;
 import service.cloud.request.clientRequest.mongo.service.ILogService;
 import service.cloud.request.clientRequest.mongo.service.IDocumentPublicationService;
-import service.cloud.request.clientRequest.service.emision.ServiceBaja;
-import service.cloud.request.clientRequest.service.emision.ServiceBajaConsulta;
-import service.cloud.request.clientRequest.service.emision.ServiceBajaTest;
 import service.cloud.request.clientRequest.service.emision.interfac.GuiaInterface;
+import service.cloud.request.clientRequest.service.emision.interfac.IServiceBaja;
 import service.cloud.request.clientRequest.service.emision.interfac.IServiceEmision;
 import service.cloud.request.clientRequest.service.publicar.PublicacionManager;
 import service.cloud.request.clientRequest.utils.Constants;
@@ -56,13 +53,10 @@ public class CloudService implements CloudInterface {
     GuiaInterface iServiceEmisionGuia;
 
     @Autowired
-    ServiceBaja iServiceBaja;
-
-    @Autowired
     IServiceEmision iServiceEmision;
 
     @Autowired
-    ServiceBajaTest serviceBajaTest;
+    IServiceBaja serviceBaja;
 
     @Autowired
     private ILogService logEntryService;
@@ -134,7 +128,7 @@ public class CloudService implements CloudInterface {
             RequestPost request = generateDataRequestHana(transaccion, tr);
 
             // Paso 3: Anexar documentos
-            //anexarDocumentos(request);
+            anexarDocumentos(request);
 
             // Paso 4: Limpieza de memoria (ayuda al GC)
             liberarRecursosPesados(tr, request);
@@ -208,12 +202,9 @@ public class CloudService implements CloudInterface {
                 if (IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE.equalsIgnoreCase(codigoDocumento) || IUBLConfig.DOC_SENDER_CARRIER_GUIDE_CODE.equalsIgnoreCase(codigoDocumento)) {
                     return iServiceEmisionGuia.transactionRemissionGuideDocumentRest(transaction, IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE);
                 }
-
                 return iServiceEmision.transactionDocument(transaction, codigoDocumento);
             case ISunatConnectorConfig.FE_TIPO_TRANS_BAJA:
-                //if (transaction.getFE_Estado().equals("C") || transaction.getFE_Estado().equals("G"))
-                return serviceBajaTest.transactionVoidedDocument(transaction, codigoDocumento);
-                //else return iServiceBaja.transactionVoidedDocument(transaction, codigoDocumento);
+                return serviceBaja.transactionVoidedDocument(transaction, codigoDocumento);
             default:
                 return new TransaccionRespuesta();
         }
