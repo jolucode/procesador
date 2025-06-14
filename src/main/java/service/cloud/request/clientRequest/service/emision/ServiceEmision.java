@@ -137,13 +137,6 @@ public class ServiceEmision implements IServiceEmision {
         TransaccionRespuesta transactionResponse = handleTransactionStatus(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
         log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
 
-        String errorPdf = "";
-        //if (client.getPdfBorrador().equals("true")) {
-        /*try {
-            transactionResponse.setPdfBorrador(documentFormatInterface.createPDFDocument(documentWRP, transaction, configuracion));
-        } catch (Exception e) {
-            errorPdf = e.getMessage();
-        }*/
         if(transactionResponse.getPdf()!=null)
             transactionResponse.setPdfBorrador(transactionResponse.getPdf());
 
@@ -152,7 +145,6 @@ public class ServiceEmision implements IServiceEmision {
         log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
         log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
         log.setSeriesAndCorrelative(documentName);
-        //String messageResponse = (JsonUtils.toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (JsonUtils.toJson(transactionResponse.getSunat()));
         log.setResponse(transactionResponse.getMensaje() );
         log.setResponseDate(DateUtils.formatDateToString(new Date()));
         transactionResponse.setLogDTO(log);
@@ -177,7 +169,7 @@ public class ServiceEmision implements IServiceEmision {
             transaccionRespuesta = processNewTransaction(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
         }
 
-        if (estado.equals("C") || (transaccionRespuesta != null && transaccionRespuesta.getMensaje().contains("El comprobante fue registrado previamente ")))
+        if (estado.equals("C") || (transaccionRespuesta != null && transaccionRespuesta.getMensaje().contains("1033")))
             transaccionRespuesta =  processCancelledTransaction(transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
 
         return transaccionRespuesta;
