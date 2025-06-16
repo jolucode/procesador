@@ -169,7 +169,7 @@ public class ServiceEmision implements IServiceEmision {
             transaccionRespuesta = processNewTransaction(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
         }
 
-        if (estado.equals("C") || (transaccionRespuesta != null && transaccionRespuesta.getMensaje().contains("1033")))
+        if (estado.equals("C") || (transaccionRespuesta != null && (transaccionRespuesta.getMensaje().contains("1033") || transaccionRespuesta.getMensaje().contains("1032"))))
             transaccionRespuesta =  processCancelledTransaction(transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
 
         return transaccionRespuesta;

@@ -56,7 +56,7 @@ public class CloudService implements CloudInterface {
     IServiceEmision iServiceEmision;
 
     @Autowired
-    IServiceBaja serviceBaja;
+    IServiceBaja iServiceBaja;
 
     @Autowired
     private ILogService logEntryService;
@@ -204,7 +204,7 @@ public class CloudService implements CloudInterface {
                 }
                 return iServiceEmision.transactionDocument(transaction, codigoDocumento);
             case ISunatConnectorConfig.FE_TIPO_TRANS_BAJA:
-                return serviceBaja.transactionVoidedDocument(transaction, codigoDocumento);
+                return iServiceBaja.transactionVoidedDocument(transaction, codigoDocumento);
             default:
                 return new TransaccionRespuesta();
         }
