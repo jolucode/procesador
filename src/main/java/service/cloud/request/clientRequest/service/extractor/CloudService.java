@@ -230,7 +230,7 @@ public class CloudService implements CloudInterface {
                 tr.setEstado("V"); //Aprobado
 
                 Map<String, Data.ResponseDocument> listMapDocuments = new HashMap<>();
-                if (tr.getMensaje().contains("Baja") || tr.getMensaje().contains("El Resumen diario RC-") || tr.getMensaje().contains("El Resumen de Boletas número RC")) {
+                if (tr.getMensaje().contains("Baja") || tr.getMensaje().contains("El Resumen diario RC-") || tr.getMensaje().contains("El Resumen de Boletas número RC") || (tr.getMensaje().contains("El Resumen de Boletas numero"))) {
                     Data.ResponseDocument document4 = new Data.ResponseDocument("zip", tr.getZip());
                     listMapDocuments.put("cdr_baja", document4);
                 } else {
