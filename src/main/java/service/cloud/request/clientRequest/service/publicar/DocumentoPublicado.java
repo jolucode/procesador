@@ -55,6 +55,7 @@ public class DocumentoPublicado {
 
     private String serie;
 
+
     public DocumentoPublicado(Client client, TransacctionDTO docPublicar, TransaccionRespuesta transaccionRespuesta) {
         this.usuarioSesion = client.getWsUsuario();
         this.claveSesion = client.getWsClave();
@@ -77,37 +78,16 @@ public class DocumentoPublicado {
         this.rsRuc = docPublicar.getSN_DocIdentidad_Nro();
         this.rsDescripcion = docPublicar.getSN_RazonSocial();
 
-        if ("B".equals(this.tipoTransaccion)) {
-            if (transaccionRespuesta.getZip() != null) {
-                this.docCdr = encodeFileToBase64Binary(transaccionRespuesta.getZip()).orElse(null);
-                this.estadoSunat = "P";
-            } else {
-                log.error("Transacción tipo 'B' no contiene archivo ZIP. No se puede codificar.");
-            }
+        if(this.tipoTransaccion.equals("B")){
+            this.docCdr = encodeFileToBase64Binary(transaccionRespuesta.getZip()).get();
+            this.estadoSunat = "P";
         }else {
-            boolean datosFaltantes = false;
-
-            if (transaccionRespuesta.getPdf() == null) {
-                log.error("No se publica el documento: archivo PDF es null");
-                datosFaltantes = true;
-            }
-            if (transaccionRespuesta.getXml() == null) {
-                log.error("No se publica el documento: archivo XML es null");
-                datosFaltantes = true;
-            }
-            if (transaccionRespuesta.getZip() == null) {
-                log.error("No se publica el documento: archivo ZIP es null");
-                datosFaltantes = true;
-            }
-
-            if (!datosFaltantes) {
-                this.docPdf = encodeFileToBase64Binary(transaccionRespuesta.getPdf()).orElse(null);
-                this.docXml = encodeFileToBase64Binary(transaccionRespuesta.getXml()).orElse(null);
-                this.docCdr = encodeFileToBase64Binary(transaccionRespuesta.getZip()).orElse(null);
-            } else {
-                log.warn("Documento no publicado porque faltan archivos requeridos.");
-            }
+            this.docPdf = encodeFileToBase64Binary(transaccionRespuesta.getPdf()).get();
+            this.docXml = encodeFileToBase64Binary(transaccionRespuesta.getXml()).get();
+            this.docCdr = encodeFileToBase64Binary(transaccionRespuesta.getZip()).get();
         }
+
+
     }
 
     private Optional<String> encodeFileToBase64Binary(byte[] byteDocument) {
