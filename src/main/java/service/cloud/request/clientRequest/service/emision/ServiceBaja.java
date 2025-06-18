@@ -271,6 +271,7 @@ public class ServiceBaja implements IServiceBaja {
             if (mensaje != null) {
                 mensaje = mensaje.replace("La Comunicacion de baja", "La Comunicación de Baja");
                 mensaje = mensaje.replace("El Resumen diario", "El Resumen de Boletas");
+                mensaje = mensaje.replace("El resumen de reversion", "La Comunicación de Baja");
             }
 
             transactionResponse.setMensaje(mensaje);
