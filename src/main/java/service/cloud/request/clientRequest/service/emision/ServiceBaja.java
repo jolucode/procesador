@@ -176,7 +176,7 @@ public class ServiceBaja implements IServiceBaja {
         String docNameFinal = tx.getDOC_Serie().startsWith("B") ? docNameRaw.replace("RA", "RC") : docNameRaw;
         byte[] xmlDocument;
 
-        if (tx.getDOC_Serie().startsWith("B")) {
+        if (tx.getDOC_Serie().startsWith("B") || tx.getDOC_Codigo().equals("03")) {
             SummaryDocumentsType summary = ublHandler.generateSummaryDocumentsTypeV2(tx, signerName);
             xmlDocument = DocumentConverterUtils.convertDocumentToBytes(summary);
             fileHandler.storeDocumentInDisk(summary, docNameFinal);
