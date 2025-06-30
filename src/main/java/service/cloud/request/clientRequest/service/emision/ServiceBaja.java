@@ -115,7 +115,7 @@ public class ServiceBaja implements IServiceBaja {
             response.setTicketRest(ticket);
         } catch (Exception ex) {
             logger.error("Error en transactionVoidedDocument", ex);
-            response.setMensaje("Ocurrió un error en el proceso de anulación.");
+            response.setMensaje("Ocurrió un error en el proceso de anulación: " + ex.getMessage());
         }
 
         completarLog(log, response, transaction, attachmentPath);
@@ -156,12 +156,12 @@ public class ServiceBaja implements IServiceBaja {
             return transBaja.getTicketBaja();
         }
 
-        TransaccionBaja transaccionBaja = generarIDyFecha(tx);
-        tx.setANTICIPO_Id(transaccionBaja.getSerie());
-
         if (tx.getFE_Comentario() == null || tx.getFE_Comentario().isEmpty()) {
             throw new IllegalArgumentException("Ingresar razón de anulación, y colocar APROBADO y volver a consultar.");
         }
+
+        TransaccionBaja transaccionBaja = generarIDyFecha(tx);
+        tx.setANTICIPO_Id(transaccionBaja.getSerie());
 
         String certPath = applicationProperties.getRutaBaseDocConfig() + tx.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
         byte[] certificado = CertificateUtils.loadCertificate(certPath);
