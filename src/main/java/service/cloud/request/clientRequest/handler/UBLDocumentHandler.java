@@ -969,7 +969,12 @@ public class UBLDocumentHandler extends UBLBasicHandler {
 
             /* Agregar <DespatchAdvice><cac:BuyerCustomerParty> */
             if (transaction.getTransactionGuias().getCodigoMotivo() != null && (transaction.getTransactionGuias().getCodigoMotivo().equals("03") || transaction.getTransactionGuias().getCodigoMotivo().equals("13")))
-                despatchAdviceType.setBuyerCustomerParty(getBuyerCustomerParty(transaction.getSN_DocIdentidad_Nro(), transaction.getSN_DocIdentidad_Tipo(), transaction.getSN_RazonSocial()));
+                if (transaction.getTransactionGuias().getCodigoMotivo().equals("03")) {
+                    despatchAdviceType.setBuyerCustomerParty(getBuyerCustomerParty(transaction.getTransactionGuias().getGRT_DocumentoDestinatario(), transaction.getTransactionGuias().getGRT_TipoDocDestinatario(), transaction.getTransactionGuias().getGRT_NombreRazonDestinatario()));
+                }else {
+                    despatchAdviceType.setBuyerCustomerParty(getBuyerCustomerParty(transaction.getSN_DocIdentidad_Nro(), transaction.getSN_DocIdentidad_Tipo(), transaction.getSN_RazonSocial()));
+                }
+
             /***/
 
 
