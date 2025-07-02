@@ -58,7 +58,7 @@ public class TransacctionDTO {
     private String RET_Regimen;
     private String RET_Tasa;
     private String Observacione;
-    private String FechaDOCRe;
+    private String FechaDOCRef;
     private BigDecimal DOC_OtrosCargos;
     private BigDecimal DOC_Descuento;
     private String DOC_Codigo;

@@ -70,7 +70,7 @@ public class CreditNotePDFBuilder extends BaseDocumentService implements CreditN
             }
             creditNoteObj.setRemissionGuides(getRemissionGuides(creditNoteType.getCreditNoteType().getDespatchDocumentReference()));
             creditNoteObj.setPaymentCondition(creditNoteType.getTransaccion().getDOC_CondPago());
-            creditNoteObj.setDateDocumentReference(creditNoteType.getTransaccion().getFechaDOCRe());
+            creditNoteObj.setDateDocumentReference(creditNoteType.getTransaccion().getFechaDOCRef());
             if (creditNoteType.getTransaccion().getTransactionContractDocRefListDTOS() != null
                     && !creditNoteType.getTransaccion().getTransactionContractDocRefListDTOS().isEmpty()) {
                 Map<String, String> hashedMap = new HashMap<>();

@@ -66,7 +66,7 @@ public class DebitNotePDFBuilder extends BaseDocumentService implements DebitNot
             debitNoteObj.setTypeOfDebitNote(debitNoteType.getTransaccion().getREFDOC_MotivCode());
             debitNoteObj.setDescOfDebitNote(debitNoteType.getDebitNoteType().getDiscrepancyResponse().get(0).getDescription().get(0).getValue().toUpperCase());
             debitNoteObj.setDocumentReferenceToCn(getDocumentReferenceValue(debitNoteType.getDebitNoteType().getBillingReference().get(0)));
-            debitNoteObj.setDateDocumentReference(debitNoteType.getTransaccion().getFechaDOCRe());
+            debitNoteObj.setDateDocumentReference(debitNoteType.getTransaccion().getFechaDOCRef());
             debitNoteObj.setSenderSocialReason(debitNoteType.getTransaccion().getRazonSocial());
             debitNoteObj.setSenderRuc(debitNoteType.getTransaccion().getDocIdentidad_Nro());
             debitNoteObj.setSenderFiscalAddress(debitNoteType.getTransaccion().getDIR_NomCalle());
