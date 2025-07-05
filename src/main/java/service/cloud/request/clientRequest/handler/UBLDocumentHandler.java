@@ -1841,12 +1841,25 @@ public class UBLDocumentHandler extends UBLBasicHandler {
             customerPartyType.getAdditionalAccountID().add(additionalAccountIDType);
             summaryDocumentLine.setCustomerParty(customerPartyType);
 
+            /**AQUI DEBO AGREGAR*/
+            if (transaccion.getDOC_Codigo().equals("07") || transaccion.getDOC_Codigo().equals("08")) {
+                BillingReferenceType billingReference = new BillingReferenceType();
+                DocumentReferenceType invoiceReference = new DocumentReferenceType();
+                IDType referencedID = new IDType();
+                referencedID.setValue(transaccion.getREFDOC_Id());
+                invoiceReference.setID(referencedID);
+                DocumentTypeCodeType referencedDocType = new DocumentTypeCodeType();
+                referencedDocType.setValue(transaccion.getREFDOC_Tipo()); // debería ser "03" si es boleta
+                invoiceReference.setDocumentTypeCode(referencedDocType);
+                billingReference.setInvoiceDocumentReference(invoiceReference);
+                summaryDocumentLine.setBillingReference(billingReference);
+            }/***/
+
             StatusType statusType = new StatusType();
             ConditionCodeType conditionCodeType = new ConditionCodeType();
             conditionCodeType.setValue("3");
             statusType.setConditionCode(conditionCodeType);
             summaryDocumentLine.setStatus(statusType);
-
 
             AmountType totalInvoiceAmountType = new AmountType();
             totalInvoiceAmountType.setValue(transaccion.getDOC_MontoTotal());

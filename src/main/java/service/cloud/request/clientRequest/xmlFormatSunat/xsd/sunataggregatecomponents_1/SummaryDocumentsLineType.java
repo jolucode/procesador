@@ -61,6 +61,7 @@ import java.util.List;
         "iD",
         "documentSerialID",
         "customerParty",
+        "billingReference",
         "startDocumentNumberID",
         "endDocumentNumberID",
         "status",
@@ -82,6 +83,9 @@ public class SummaryDocumentsLineType implements Serializable {
 
     @XmlElement(name = "Status", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2")
     protected StatusType status;
+
+    @XmlElement(name = "BillingReference", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2")
+    protected BillingReferenceType billingReference;
 
     @XmlElement(name = "DocumentSerialID", required = true)
     protected IdentifierType documentSerialID;
@@ -370,4 +374,11 @@ public class SummaryDocumentsLineType implements Serializable {
         this.status = status;
     }
 
+    public BillingReferenceType getBillingReference() {
+        return billingReference;
+    }
+
+    public void setBillingReference(BillingReferenceType billingReference) {
+        this.billingReference = billingReference;
+    }
 }

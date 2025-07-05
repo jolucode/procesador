@@ -11,6 +11,7 @@ import service.cloud.request.clientRequest.config.ClientProperties;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
+import service.cloud.request.clientRequest.estela.dto.BajaData;
 import service.cloud.request.clientRequest.estela.dto.FileRequestDTO;
 import service.cloud.request.clientRequest.estela.dto.FileResponseDTO;
 import service.cloud.request.clientRequest.estela.service.DocumentBajaQueryService;
@@ -86,8 +87,8 @@ public class ServiceBaja implements IServiceBaja {
             TransaccionBaja transBaja = findByRucEmpresaAndDocId(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
             FileRequestDTO soapRequest = buildSoapRequest(transaction, client, config);
 
-            String ticket = obtenerOTramitarTicket(transBaja, transaction, client, fileHandler, config, soapRequest, attachmentPath);
-            soapRequest.setTicket(ticket);
+            BajaData bajaData = obtenerOTramitarTicket(transBaja, transaction, client, fileHandler, config, soapRequest, attachmentPath);
+            soapRequest.setTicket(bajaData.getTicket());
 
             log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
             FileResponseDTO sunatResponse = consultarEstadoConReintentos(soapRequest).block();
@@ -97,22 +98,21 @@ public class ServiceBaja implements IServiceBaja {
 
             cdrResponse.setContent(sunatResponse.getContent());
             cdrResponse.setStatusMessage(sunatResponse.getMessage());
-            response.setTicketRest(ticket);
+            response.setTicketRest(bajaData.getTicket());
 
-            logger.info("Ticket baja: {}| Ruc-Tipo-Serie-Correlativo: {}-{}-{}-{}", ticket,
+            logger.info("Ticket baja: {}| Ruc-Tipo-Serie-Correlativo: {}-{}-{}-{}", bajaData.getTicket(),
                     transaction.getDocIdentidad_Nro(), transaction.getDOC_Codigo(),
                     transaction.getDOC_Serie(), transaction.getDOC_Numero());
 
             if (cdrResponse.getContent() != null) {
-                documentName = DocumentNameHandler.getInstance().getVoidedDocumentName(
-                        transaction.getDocIdentidad_Nro(), transaction.getANTICIPO_Id());
+                documentName = bajaData.getNameBaja();
                 response = processOseResponseBAJA(cdrResponse.getContent(), transaction, documentName, config);
             } else {
                 response.setMensaje(cdrResponse.getStatusMessage());
             }
 
             response.setIdentificador(documentName);
-            response.setTicketRest(ticket);
+            response.setTicketRest(bajaData.getTicket());
         } catch (Exception ex) {
             logger.error("Error en transactionVoidedDocument", ex);
             response.setMensaje("Ocurrió un error en el proceso de anulación: " + ex.getMessage());
@@ -150,10 +150,12 @@ public class ServiceBaja implements IServiceBaja {
         return request;
     }
 
-    private String obtenerOTramitarTicket(TransaccionBaja transBaja, TransacctionDTO tx, Client client,
+    private BajaData obtenerOTramitarTicket(TransaccionBaja transBaja, TransacctionDTO tx, Client client,
                                           FileHandler fileHandler, ConfigData config, FileRequestDTO soapRequest, String attachmentPath) throws Exception {
         if (transBaja != null && transBaja.getTicketBaja() != null && !transBaja.getTicketBaja().isEmpty()) {
-            return transBaja.getTicketBaja();
+            BajaData bajaData = new BajaData();
+            bajaData.setTicket(transBaja.getTicketBaja());
+            return bajaData;
         }
 
         if (tx.getFE_Comentario() == null || tx.getFE_Comentario().isEmpty()) {
@@ -205,7 +207,10 @@ public class ServiceBaja implements IServiceBaja {
         transaccionBaja.setTicketBaja(fileResponse.getTicket());
         iTransaccionBajaRepository.save(transaccionBaja).block();
 
-        return fileResponse.getTicket();
+        BajaData bajaData = new BajaData();
+        bajaData.setTicket(fileResponse.getTicket());
+        bajaData.setNameBaja(transaccionBaja.getSerie());
+        return bajaData;
     }
 
     private void completarLog(LogDTO log, TransaccionRespuesta txResp, TransacctionDTO tx, String path) {

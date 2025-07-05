@@ -306,8 +306,13 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                 transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
         ).block();
 
+        if (ticketMongoSave == null) {
+            logger.warn("No se encontró ticket previo en la BD para RUC: " + transaction.getDocIdentidad_Nro()
+                    + " y FE_Id: " + transaction.getFE_Id() + " (estado N)");
+        }
+
         // Ticket ya aprobado
-        if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ("APROBADO".equals(ticketMongoSave.getEstadoTicket()) || "PROCESO".equals(ticketMongoSave.getEstadoTicket()))) {
+        if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty()) {
             String ticketToUse = ticketMongoSave.getTicketSunat();
             if (ticketToUse != null && !ticketToUse.isEmpty()) {
                 ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
@@ -324,18 +329,33 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
             }
 
             // DECLARE GENERA TICKET
-            ResponseDTO responseDTO = declareSunat(documentName, documentPath/*.replace(EXT_XML, EXT_ZIP)*/, responseDTOJWT.getAccess_token());
-            logger.info( transaction.getDocIdentidad_Nro() + "-" + transaction.getDOC_Codigo()+"-" + transaction.getDOC_Id() + "Ticket Guia : " + responseDTO.getNumTicket());
-            // Guardar ticket en estado "EN PROCESO"
-            //saveTicketRest(transaction, responseDTO);
+            ResponseDTO responseDTO = declareSunat(documentName, documentPath, responseDTOJWT.getAccess_token());
+            logger.info(transaction.getDocIdentidad_Nro() + "-" + transaction.getDOC_Codigo() + "-" + transaction.getDOC_Id() + " Ticket Guia : " + responseDTO.getNumTicket());
 
-            // Manejo 401
-            if (responseDTO.getStatusCode() == 401) {
-                responseDTOJWT = getJwtSunat(configuracion);
-                responseDTO = declareSunat(documentName, documentPath/*.replace(EXT_XML, EXT_ZIP)*/, responseDTOJWT.getAccess_token());
+            logger.info("Ticket baja: " + responseDTO.getNumTicket() +
+                    "| Ruc-Tipo-Serie-Correlativo: " +
+                    transaction.getDocIdentidad_Nro() + "-" +
+                    transaction.getDOC_Codigo() + "-" +
+                    transaction.getDOC_Serie() + "-" +
+                    transaction.getDOC_Numero());
+
+            // ✅ Persistir inmediatamente
+            if (responseDTO.getNumTicket() != null && !responseDTO.getNumTicket().isEmpty()) {
+                saveTicketRest(transaction, responseDTO);
             }
 
-            // Esperar 5s
+            // Manejo 401 (renovar token y volver a declarar)
+            if (responseDTO.getStatusCode() == 401) {
+                responseDTOJWT = getJwtSunat(configuracion);
+                responseDTO = declareSunat(documentName, documentPath, responseDTOJWT.getAccess_token());
+
+                // Persistir nuevamente si nuevo ticket
+                if (responseDTO.getNumTicket() != null && !responseDTO.getNumTicket().isEmpty()) {
+                    saveTicketRest(transaction, responseDTO);
+                }
+            }
+
+            // Esperar 5 segundos para consultar el estado del ticket
             Thread.sleep(5000);
 
             // CONSULT
@@ -394,18 +414,27 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                 transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
         ).block();
 
-        String ticketToUse = (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ("APROBADO".equals(ticketMongoSave.getEstadoTicket()) || "PROCESO".equals(ticketMongoSave.getEstadoTicket())))
-                ? ticketMongoSave.getTicketSunat()
-                : transaction.getTransactionGuias().getTicketRest();
+        if (ticketMongoSave == null) {
+            logger.warn("No se encontró ticket previo en la BD para RUC: " + transaction.getDocIdentidad_Nro()
+                    + " y FE_Id: " + transaction.getFE_Id() + " (estado N)");
+        }
 
-        if (ticketToUse != null && !ticketToUse.isEmpty()) {
-            ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
+        if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty()) {
+            ResponseDTO responseDTO = consultarTicketEnSunat(ticketMongoSave.getTicketSunat(), configuracion);
             transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
             if (transactionResponse != null) {
                 byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
                 transactionResponse.setXml(documentBytes);
             }
         }
+
+        logger.info("Ticket baja: " + ticketMongoSave.getEstadoTicket() +
+                "| Ruc-Tipo-Serie-Correlativo: " +
+                transaction.getDocIdentidad_Nro() + "-" +
+                transaction.getDOC_Codigo() + "-" +
+                transaction.getDOC_Serie() + "-" +
+                transaction.getDOC_Numero());
+
         return transactionResponse;
     }
 
@@ -561,16 +590,25 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
     }
 
     public void saveTicketRest(TransacctionDTO transaccion, ResponseDTO responseDTO) {
-        GuiaTicket guiaTicket = new GuiaTicket();
-        guiaTicket.setRucEmisor(transaccion.getDocIdentidad_Nro());
-        guiaTicket.setFeId(transaccion.getFE_Id());
-        guiaTicket.setTicketSunat(responseDTO.getNumTicket());
-        guiaTicket.setCreadoEn(DateUtils.formatDateToString(new Date()));
-        if("98".equals(responseDTO.getCodRespuesta()))
-            guiaTicket.setEstadoTicket("PROCESO");
-        else if("0".equals(responseDTO.getCodRespuesta()))
-            guiaTicket.setEstadoTicket("APROBADO");
-        guiaTicketRepo.save(guiaTicket).subscribe();
+        guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
+                transaccion.getDocIdentidad_Nro(),
+                transaccion.getFE_Id()
+        ).hasElement().subscribe(exists -> {
+            if (!exists) {
+                GuiaTicket guiaTicket = new GuiaTicket();
+                guiaTicket.setRucEmisor(transaccion.getDocIdentidad_Nro());
+                guiaTicket.setFeId(transaccion.getFE_Id());
+                guiaTicket.setTicketSunat(responseDTO.getNumTicket());
+                guiaTicket.setCreadoEn(DateUtils.formatDateToString(new Date()));
+                if ("98".equals(responseDTO.getCodRespuesta()))
+                    guiaTicket.setEstadoTicket("PROCESO");
+                else if ("0".equals(responseDTO.getCodRespuesta()))
+                    guiaTicket.setEstadoTicket("APROBADO");
+                guiaTicketRepo.save(guiaTicket).subscribe();
+            } else {
+                logger.warn("Ya existe ticket para esta guía, no se vuelve a guardar.");
+            }
+        });
     }
 
     private ResponseDTO consultarTicketEnSunat(String ticket, ConfigData configuracion) throws IOException {
