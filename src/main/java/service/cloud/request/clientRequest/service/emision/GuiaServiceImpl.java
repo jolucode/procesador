@@ -10,6 +10,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 import service.cloud.request.clientRequest.config.ApplicationProperties;
 import service.cloud.request.clientRequest.config.ClientProperties;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
@@ -224,21 +225,24 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
 
         // Log de fecha de invocación a servicio externo
         log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
-
-        if (zipDocument != null) {
-            String feEstado = transaction.getFE_Estado();
-            if (ESTADO_NUEVO.equalsIgnoreCase(feEstado)) {
-                // Estado "N", se declara o se consulta si ya está aprobado
-                transactionResponse = processEstadoN(transaction, configuracion, fileHandler, signedDocument,
-                        signedXmlDocument, documentName, documentWRP);
-            } else if (ESTADO_CONTINGENCIA.equalsIgnoreCase(feEstado)) {
-                // Estado "C", se consulta ticket
-                transactionResponse = processEstadoC(transaction, configuracion, fileHandler, signedDocument,
-                        documentName, documentWRP);
+        try {
+            if (zipDocument != null) {
+                String feEstado = transaction.getFE_Estado();
+                if (ESTADO_NUEVO.equalsIgnoreCase(feEstado)) {
+                    // Estado "N", se declara o se consulta si ya está aprobado
+                    transactionResponse = processEstadoN(transaction, configuracion, fileHandler, signedDocument,
+                            signedXmlDocument, documentName, documentWRP);
+                } else if (ESTADO_CONTINGENCIA.equalsIgnoreCase(feEstado)) {
+                    // Estado "C", se consulta ticket
+                    transactionResponse = processEstadoC(transaction, configuracion, fileHandler, signedDocument,
+                            documentName, documentWRP);
+                }
+            } else {
+                logger.error("transactionRemissionGuideDocument() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_457.getMessage());
+                throw new NullPointerException(IVenturaError.ERROR_457.getMessage());
             }
-        } else {
-            logger.error("transactionRemissionGuideDocument() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_457.getMessage());
-            throw new NullPointerException(IVenturaError.ERROR_457.getMessage());
+        } catch (Exception e) {
+            transactionResponse.setMensaje("Error : " + e.getMessage());
         }
 
         // Log de fecha de respuesta del servicio externo
@@ -312,10 +316,12 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         }
 
         // Ticket ya aprobado
-        if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty()) {
+        if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ("APROBADO".equals(ticketMongoSave.getEstadoTicket()) || "PROCESO".equals(ticketMongoSave.getEstadoTicket()))) {
             String ticketToUse = ticketMongoSave.getTicketSunat();
             if (ticketToUse != null && !ticketToUse.isEmpty()) {
                 ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
+                // ✅ Actualizar/eliminar en base al resultado
+                updateTicketStatusFromConsulta(transaction, responseDTO);
                 transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
                 if (transactionResponse != null) {
                     byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
@@ -332,7 +338,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
             ResponseDTO responseDTO = declareSunat(documentName, documentPath, responseDTOJWT.getAccess_token());
             logger.info(transaction.getDocIdentidad_Nro() + "-" + transaction.getDOC_Codigo() + "-" + transaction.getDOC_Id() + " Ticket Guia : " + responseDTO.getNumTicket());
 
-            logger.info("Ticket baja: " + responseDTO.getNumTicket() +
+            logger.info("Ticket Guia: " + responseDTO.getNumTicket() +
                     "| Ruc-Tipo-Serie-Correlativo: " +
                     transaction.getDocIdentidad_Nro() + "-" +
                     transaction.getDOC_Codigo() + "-" +
@@ -360,6 +366,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
 
             // CONSULT
             responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
+
             if (responseDTO.getStatusCode() == 401) {
                 responseDTOJWT = getJwtSunat(configuracion);
                 responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
@@ -371,6 +378,9 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                 if (contador.incrementAndGet() == 5) break;
                 responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
             }
+
+            // ✅ Actualizar/eliminar en base al resultado
+            updateTicketStatusFromConsulta(transaction, responseDTO);
 
             // Manejar respuestas de SUNAT
             transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
@@ -402,13 +412,41 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         return transactionResponse;
     }
 
+    public void updateTicketStatusFromConsulta(TransacctionDTO transaccion, ResponseDTO responseDTO) {
+        guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
+                transaccion.getDocIdentidad_Nro(),
+                transaccion.getFE_Id()
+        ).flatMap(existing -> {
+            if (existing == null) {
+                logger.warn("No se encontró ticket para actualizar luego de consulta SUNAT.");
+                return Mono.empty();
+            }
+
+            String cod = responseDTO.getCodRespuesta();
+            if ("99".equals(cod)) {
+                logger.warn("Respuesta 99 en consulta SUNAT. Eliminando ticket...");
+                return guiaTicketRepo.delete(existing)
+                        .doOnSuccess(v -> logger.info("Ticket eliminado tras codRespuesta 99"));
+            } else {
+                if ("98".equals(cod))
+                    existing.setEstadoTicket("PROCESO");
+                else if ("0".equals(cod))
+                    existing.setEstadoTicket("APROBADO");
+                existing.setCreadoEn(DateUtils.formatDateToString(new Date()));
+                return guiaTicketRepo.save(existing)
+                        .doOnSuccess(v -> logger.info("Ticket actualizado a estado: " + existing.getEstadoTicket()));
+            }
+        }).subscribe();
+    }
+
+
     private TransaccionRespuesta processEstadoC(TransacctionDTO transaction,
                                                 ConfigData configuracion,
                                                 FileHandler fileHandler,
                                                 File signedDocument,
                                                 String documentName,
                                                 UBLDocumentWRP documentWRP) throws IOException {
-        TransaccionRespuesta transactionResponse = null;
+        TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
 
         GuiaTicket ticketMongoSave = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
                 transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
@@ -421,19 +459,28 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
 
         if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty()) {
             ResponseDTO responseDTO = consultarTicketEnSunat(ticketMongoSave.getTicketSunat(), configuracion);
+
+            // ✅ Actualizar/eliminar en base al resultado
+            updateTicketStatusFromConsulta(transaction, responseDTO);
             transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
+
             if (transactionResponse != null) {
                 byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
                 transactionResponse.setXml(documentBytes);
             }
         }
 
-        logger.info("Ticket baja: " + ticketMongoSave.getEstadoTicket() +
-                "| Ruc-Tipo-Serie-Correlativo: " +
-                transaction.getDocIdentidad_Nro() + "-" +
-                transaction.getDOC_Codigo() + "-" +
-                transaction.getDOC_Serie() + "-" +
-                transaction.getDOC_Numero());
+        if (ticketMongoSave != null && ticketMongoSave.getEstadoTicket() !=null) {
+            logger.info("Ticket guia: " + ticketMongoSave.getEstadoTicket() +
+                    "| Ruc-Tipo-Serie-Correlativo: " +
+                    transaction.getDocIdentidad_Nro() + "-" +
+                    transaction.getDOC_Codigo() + "-" +
+                    transaction.getDOC_Serie() + "-" +
+                    transaction.getDOC_Numero());
+        } else {
+            logger.error("El ticket que se quiere consultar no existe en la base datos");
+        }
+
 
         return transactionResponse;
     }
@@ -600,10 +647,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                 guiaTicket.setFeId(transaccion.getFE_Id());
                 guiaTicket.setTicketSunat(responseDTO.getNumTicket());
                 guiaTicket.setCreadoEn(DateUtils.formatDateToString(new Date()));
-                if ("98".equals(responseDTO.getCodRespuesta()))
-                    guiaTicket.setEstadoTicket("PROCESO");
-                else if ("0".equals(responseDTO.getCodRespuesta()))
-                    guiaTicket.setEstadoTicket("APROBADO");
+
                 guiaTicketRepo.save(guiaTicket).subscribe();
             } else {
                 logger.warn("Ya existe ticket para esta guía, no se vuelve a guardar.");
