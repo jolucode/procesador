@@ -52,6 +52,19 @@ import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * -----------------------------------------------------------------------------
+
+ * Proyecto          : facturación SAAS
+
+ *                     conforme a las especificaciones de SUNAT.
+ *
+ * Autor             : Jose Luis Becerra
+ * Rol               : Software Developer Senior
+ * Fecha de creación : 09/07/2025
+ * -----------------------------------------------------------------------------
+ */
+
 @Service
 public class ServiceBaja implements IServiceBaja {
 

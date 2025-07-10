@@ -41,6 +41,19 @@ import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.util.*;
 
+/**
+ * -----------------------------------------------------------------------------
+
+ * Proyecto          : facturación SAAS
+
+ *                     conforme a las especificaciones de SUNAT.
+ *
+ * Autor             : Jose Luis Becerra
+ * Rol               : Software Developer Senior
+ * Fecha de creación : 09/07/2025
+ * -----------------------------------------------------------------------------
+ */
+
 @Service
 public class ServiceEmision implements IServiceEmision {
 
@@ -89,24 +102,32 @@ public class ServiceEmision implements IServiceEmision {
 
         String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
         byte[] xmlDocument = null;
-        if (doctype.equals("07")) {
-            CreditNoteType creditNoteType = ublHandler.generateCreditNoteType(transaction, signerName);
-            xmlDocument = DocumentConverterUtils.convertDocumentToBytes(creditNoteType); //generico
-        } else if (doctype.equals("08")) {
-            DebitNoteType debitNoteType = ublHandler.generateDebitNoteType(transaction, signerName);
-            xmlDocument = DocumentConverterUtils.convertDocumentToBytes(debitNoteType);
-        } else if (doctype.equals("01") || (doctype.equals("03"))) {
-            InvoiceType invoiceType = ublHandler.generateInvoiceType(transaction, signerName);
-            xmlDocument = DocumentConverterUtils.convertDocumentToBytes(invoiceType);
-        } else if (doctype.equals("40")) {
-            PerceptionType perceptionType = ublHandler.generatePerceptionType(transaction, signerName);
-            validationHandler.checkPerceptionDocument(perceptionType);
-            xmlDocument = DocumentConverterUtils.convertDocumentToBytes(perceptionType);
-        } else if (doctype.equals("20")) {
-            RetentionType retentionType = ublHandler.generateRetentionType(transaction, signerName);
-            validationHandler.checkRetentionDocument(retentionType);
-            xmlDocument = DocumentConverterUtils.convertDocumentToBytes(retentionType);
+
+        TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
+
+        try {
+            if (doctype.equals("07")) {
+                CreditNoteType creditNoteType = ublHandler.generateCreditNoteType(transaction, signerName);
+                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(creditNoteType); //generico
+            } else if (doctype.equals("08")) {
+                DebitNoteType debitNoteType = ublHandler.generateDebitNoteType(transaction, signerName);
+                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(debitNoteType);
+            } else if (doctype.equals("01") || (doctype.equals("03"))) {
+                InvoiceType invoiceType = ublHandler.generateInvoiceType(transaction, signerName);
+                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(invoiceType);
+            } else if (doctype.equals("40")) {
+                PerceptionType perceptionType = ublHandler.generatePerceptionType(transaction, signerName);
+                validationHandler.checkPerceptionDocument(perceptionType);
+                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(perceptionType);
+            } else if (doctype.equals("20")) {
+                RetentionType retentionType = ublHandler.generateRetentionType(transaction, signerName);
+                validationHandler.checkRetentionDocument(retentionType);
+                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(retentionType);
+            }
+        } catch (Exception e) {
+            transactionResponse.setMensaje("error :" + e.getMessage());
         }
+
 
         /**PROCESAR CERTIFICADO*/
         String certificatePath = applicationProperties.getRutaBaseDocConfig() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
@@ -114,31 +135,33 @@ public class ServiceEmision implements IServiceEmision {
         CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), applicationProperties.getSupplierCertificate(), applicationProperties.getKeystoreCertificateType());
         SignerHandler signerHandler = SignerHandler.newInstance();
         signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), applicationProperties.getKeystoreCertificateType(), applicationProperties.getSupplierCertificate(), signerName);
-        byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+
         String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
 
-        try {
-            UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, "xml", attachmentPath);
-            logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
-        } catch (IOException e) {
-            logger.error("Error al guardar el archivo: " + e.getMessage());
+        if(xmlDocument != null) {
+            byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+            try {
+                UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, "xml", attachmentPath);
+                logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
+            } catch (IOException e) {
+                logger.error("Error al guardar el archivo: " + e.getMessage());
+            }
+            UBLDocumentWRP documentWRP = configureDocumentWRP(signedXmlDocument, transaction.getDOC_Codigo(), doctype);
+            documentWRP.setTransaccion(transaction);
+
+            ConfigData configuracion = createConfigData(client, transaction);
+
+            byte[] zipBytes = DocumentConverterUtils.compressUBLDocument(signedXmlDocument, documentName + ".xml");
+            String base64Content = convertToBase64(zipBytes);
+
+            log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
+            transactionResponse = handleTransactionStatus(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
+            log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
+
+            if(transactionResponse.getPdf()!=null)
+                transactionResponse.setPdfBorrador(transactionResponse.getPdf());
+
         }
-
-
-        UBLDocumentWRP documentWRP = configureDocumentWRP(signedXmlDocument, transaction.getDOC_Codigo(), doctype);
-        documentWRP.setTransaccion(transaction);
-
-        ConfigData configuracion = createConfigData(client, transaction);
-
-        byte[] zipBytes = DocumentConverterUtils.compressUBLDocument(signedXmlDocument, documentName + ".xml");
-        String base64Content = convertToBase64(zipBytes);
-
-        log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
-        TransaccionRespuesta transactionResponse = handleTransactionStatus(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
-        log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
-
-        if(transactionResponse.getPdf()!=null)
-            transactionResponse.setPdfBorrador(transactionResponse.getPdf());
 
         transactionResponse.setIdentificador(documentName);
         log.setPathThirdPartyRequestXml(attachmentPath + "\\" + documentName + ".xml");

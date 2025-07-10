@@ -54,6 +54,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * -----------------------------------------------------------------------------
+
+ * Proyecto          : facturación SAAS
+
+ *                     conforme a las especificaciones de SUNAT.
+ *
+ * Autor             : Jose Luis Becerra
+ * Rol               : Software Developer Senior
+ * Fecha de creación : 09/07/2025
+ * -----------------------------------------------------------------------------
+ */
+
 @Service
 public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterface {
 
@@ -92,7 +105,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         log.setRuc(transaction.getDocIdentidad_Nro());
         log.setBusinessName(transaction.getSN_RazonSocial());
 
-        TransaccionRespuesta transactionResponse = null;
+        TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
         String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
 
         // Determinar si es contingencia
