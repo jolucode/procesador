@@ -192,8 +192,9 @@ public class ServiceEmision implements IServiceEmision {
             transaccionRespuesta = processNewTransaction(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
         }
 
-        if (estado.equals("C") || (transaccionRespuesta != null && (transaccionRespuesta.getMensaje().contains("1033") || transaccionRespuesta.getMensaje().contains("1032") || transaccionRespuesta.getMensaje().contains("fue registrado previamente"))))
+        if (estado.equals("C") || (transaccionRespuesta != null && (transaccionRespuesta.getMensaje().contains("1033")  || transaccionRespuesta.getMensaje().contains("fue registrado previamente")))) {
             transaccionRespuesta =  processCancelledTransaction(transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
+        }
 
         return transaccionRespuesta;
     }
@@ -231,6 +232,7 @@ public class ServiceEmision implements IServiceEmision {
     private TransaccionRespuesta processCancelledTransaction(TransacctionDTO transaction, byte[] signedXmlDocument, UBLDocumentWRP documentWRP, ConfigData configuracion, String documentName, String attachmentPath) throws Exception {
 
         FileRequestDTO soapRequest = new FileRequestDTO();
+        transaction.setFE_Estado("C");
         String urlClient = applicationProperties.obtenerUrl(configuracion.getIntegracionWs(), transaction.getFE_Estado(), transaction.getFE_TipoTrans(), transaction.getDOC_Codigo());
         soapRequest.setService(urlClient);
         soapRequest.setUsername(configuracion.getUsuarioSol());

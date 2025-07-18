@@ -64,6 +64,9 @@ public class ProcessorCoreImpl implements ProcessorCoreInterface {
             transactionResponse.setDigestValue(SunatResponseUtils.extractDigestValue(statusResponse));
         } else {
             //documento rechazado
+            transactionResponse = new TransaccionRespuesta();
+            transactionResponse.setMensaje(sunatResponse.getMensaje());
+            transactionResponse.setSunat(sunatResponse);
             transactionResponse.setXml(signedDocument);
             transactionResponse.setZip(statusResponse);
         }

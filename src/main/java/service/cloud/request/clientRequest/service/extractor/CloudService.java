@@ -276,6 +276,16 @@ public class CloudService implements CloudInterface {
                 error.setErrorRequest(errorRequest);
                 request.setResponseError(error);
                 request.setStatus(500);
+
+                if ( tr.getZip() !=null ) {
+                    Map<String, Data.ResponseDocument> listMapDocuments = new HashMap<>();
+                    Data.ResponseDocument document1 = new Data.ResponseDocument("zip", tr.getZip());
+                    listMapDocuments.put("zip", document1);
+                    Data.ResponseRequest responseRequest = new Data.ResponseRequest();
+                    responseRequest.setServiceResponse(tr.getMensaje());
+                    responseRequest.setListMapDocuments(listMapDocuments);
+                    request.setResponseRequest(responseRequest);
+                }
             }
         } catch (Exception e) {
             logger.error("Error : " + e.getMessage());
