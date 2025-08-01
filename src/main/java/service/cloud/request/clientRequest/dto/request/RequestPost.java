@@ -9,6 +9,7 @@ import service.cloud.request.clientRequest.mongo.model.Log;
 public class RequestPost {
     private int status;
     private String ruc;
+    private String rucClient;
     private String docObject;
     private String docEntry;
     private String docType;

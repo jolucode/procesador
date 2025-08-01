@@ -243,6 +243,8 @@ public class ServiceEmision implements IServiceEmision {
         soapRequest.setNumeroComprobante(transaction.getDOC_Numero());
 
         Mono<FileResponseDTO> monoResponse = documentQueryService.processAndSaveFile(soapRequest.getService(), soapRequest);
+//        Mono<FileResponseDTO> monoResponse = documentQueryService.processAndSaveFile(soapRequest.getService(), soapRequest).doOnError(e -> logger.error("Error en processAndSaveFile: ", e));
+
         FileResponseDTO responseDTO = monoResponse.block();
 
         if (responseDTO.getContent() != null) {

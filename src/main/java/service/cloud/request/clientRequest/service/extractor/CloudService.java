@@ -1,5 +1,6 @@
 package service.cloud.request.clientRequest.service.extractor;
 
+import com.google.gson.Gson;
 import io.joshworks.restclient.http.HttpResponse;
 import io.joshworks.restclient.http.Unirest;
 import org.modelmapper.ModelMapper;
@@ -92,6 +93,7 @@ public class CloudService implements CloudInterface {
     }
 
     public void anexarDocumentos(RequestPost request) {
+
         try {
             String jsonBody = JsonUtils.toJson(request);
 
@@ -221,6 +223,7 @@ public class CloudService implements CloudInterface {
             request.setDocObject(tc.getFE_ObjectType());
             request.setDocumentName(tr.getIdentificador());
             request.setTicketBaja(tr.getTicketRest());
+            request.setRucClient(tc.getSN_DocIdentidad_Nro());
 
 
             request.setUrlOnpremise(providerProperties.getUrlOnpremise(tc.getDocIdentidad_Nro()));
