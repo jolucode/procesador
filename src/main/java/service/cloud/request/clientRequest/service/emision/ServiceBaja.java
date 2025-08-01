@@ -3,6 +3,8 @@ package service.cloud.request.clientRequest.service.emision;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -38,7 +40,10 @@ import service.cloud.request.clientRequest.utils.files.DocumentConverterUtils;
 import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.summarydocuments_1.SummaryDocumentsType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.voideddocuments_1.VoidedDocumentsType;
-
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -75,6 +80,8 @@ public class ServiceBaja implements IServiceBaja {
     @Autowired private ITransaccionBajaRepository iTransaccionBajaRepository;
     @Autowired private DocumentBajaQueryService documentBajaQueryService;
     @Autowired private DocumentBajaService documentBajaService;
+    @Autowired
+    private ReactiveMongoTemplate reactiveMongoTemplate;
 
     private static final String docUUID = "123123";
 
@@ -164,7 +171,7 @@ public class ServiceBaja implements IServiceBaja {
     }
 
     private BajaData obtenerOTramitarTicket(TransaccionBaja transBaja, TransacctionDTO tx, Client client,
-                                          FileHandler fileHandler, ConfigData config, FileRequestDTO soapRequest, String attachmentPath) throws Exception {
+                                            FileHandler fileHandler, ConfigData config, FileRequestDTO soapRequest, String attachmentPath) throws Exception {
         if (transBaja != null && transBaja.getTicketBaja() != null && !transBaja.getTicketBaja().isEmpty()) {
             BajaData bajaData = new BajaData();
             bajaData.setTicket(transBaja.getTicketBaja());
@@ -175,7 +182,7 @@ public class ServiceBaja implements IServiceBaja {
             throw new IllegalArgumentException("Ingresar razón de anulación, y colocar APROBADO y volver a consultar.");
         }
 
-        TransaccionBaja transaccionBaja = generarIDyFecha(tx);
+        TransaccionBaja transaccionBaja = generarIDyFecha(tx).block();
         tx.setANTICIPO_Id(transaccionBaja.getSerie());
 
         String certPath = applicationProperties.getRutaBaseDocConfig() + tx.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
@@ -303,59 +310,47 @@ public class ServiceBaja implements IServiceBaja {
         return transactionResponse;
     }
 
-    public TransaccionBaja generarIDyFecha(TransacctionDTO tr) {
-        String serie = "";
-        TransaccionBaja trb = new TransaccionBaja();
+    public Mono<TransaccionBaja> generarIDyFecha(TransacctionDTO tr) {
         try {
-
-            // Determinar prefijo basado en el valor de DOC_Codigo
+            String fechaActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             String prefijo;
+
             if (Arrays.asList("20", "40").contains(tr.getDOC_Codigo())) {
-                prefijo = "RR-";  // Si DOC_Codigo es 20 o 40, el prefijo es "RR-"
+                prefijo = "RR";
+            } else if (tr.getDOC_Codigo().equals("03") || tr.getDOC_Serie().startsWith("B")) {
+                prefijo = "RC";
             } else {
-                prefijo = "RA-";  // Para otros tipos de documentos, el prefijo es "RA-"
+                prefijo = "RA";
             }
 
-            // Obtener el último registro para la empresa especificada
-            Mono<TransaccionBaja> trbb = iTransaccionBajaRepository.findFirstByRucEmpresaOrderByFechaDescIddDesc(tr.getDocIdentidad_Nro());
-            trb = trbb.block();
+            String ruc = tr.getDocIdentidad_Nro();
 
-            LocalDateTime date = LocalDateTime.now();
-            String fechaActual = date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            Query query = Query.query(Criteria.where("rucEmpresa").is(ruc).and("fecha").is(fechaActual));
+            Update update = new Update()
+                    .inc("idd", 1)
+                    .setOnInsert("rucEmpresa", ruc)
+                    .setOnInsert("fecha", fechaActual);
 
-            if (trb != null) {
-                String fechaUltimoRegistro = trb.getFecha();
-                if (fechaActual.equals(fechaUltimoRegistro)) {
-                    // Actualizar el último registro
-                    String nuevoId = generarNuevoId(trb.getSerie());
-                    serie = Utils.construirSerie(prefijo, fechaActual, nuevoId);
+            FindAndModifyOptions options = FindAndModifyOptions.options().upsert(true).returnNew(true);
 
-                    //actualizarRegistro(trb, fechaActual, nuevoId);
-                    trb = crearNuevoRegistro(tr.getDocIdentidad_Nro(), trb.getIdd(), fechaActual, serie);
-                } else {
-                    // Crear un nuevo registro
-                    serie = Utils.construirSerie(prefijo, fechaActual, "00001");
-                    trb.setIdd(0);
-                    trb = crearNuevoRegistro(tr.getDocIdentidad_Nro(), trb.getIdd(), fechaActual, serie);
-                }
-                //trb.setTicketBaja(tr.getTicket_Baja());
-            } else {
-                // Crear el primer registro para la empresa
-                serie = Utils.construirSerie(prefijo, fechaActual, "00001");
-                trb = crearNuevoRegistro(tr.getDocIdentidad_Nro(), 0, fechaActual, serie);
-            }
+            return reactiveMongoTemplate
+                    .findAndModify(query, update, options, TransaccionBaja.class)
+                    .map(baja -> {
+                        String correlativo = String.format("%05d", baja.getIdd());
+                        String serie = prefijo + "-" + fechaActual + "-" + correlativo;
 
-            tr.setANTICIPO_Id(serie);
-            trb.setDocId(tr.getDOC_Id());
-            //trb = iTransaccionBajaRepository.save(trb).block();
-            //iTransaccionBajaRepository.save(trb);
+                        baja.setSerie(serie);
+                        baja.setDocId(tr.getDOC_Id());
+                        tr.setANTICIPO_Id(serie);
+                        return baja;
+                    });
 
-        } catch (Exception ex) {
-            // Manejo de excepciones
-            System.err.println(ex.getMessage());
+        } catch (Exception e) {
+            return Mono.error(new RuntimeException("Error generando serie RC: " + e.getMessage(), e));
         }
-        return trb;
     }
+
+
 
     private TransaccionBaja crearNuevoRegistro(String rucEmpresa, Integer idd, String fecha, String serie) {
         TransaccionBaja nuevaBaja = new TransaccionBaja();
