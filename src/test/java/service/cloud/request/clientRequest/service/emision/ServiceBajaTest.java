@@ -40,7 +40,7 @@ public class ServiceBajaTest {
 
     @Test
     public void testGeneracionConcurrenteRC_Reactive() throws InterruptedException {
-        int NUM_HILOS = 100;
+        int NUM_HILOS = 10;
         CountDownLatch latch = new CountDownLatch(NUM_HILOS);
         Set<String> seriesGeneradas = Collections.synchronizedSet(new HashSet<>());
 

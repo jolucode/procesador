@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,5 +25,7 @@ public class TransaccionBaja {
     private String serie;
     private String ticketBaja;
     private String docId;
+    // Nuevo campo para fecha y hora exacta
+    private LocalDateTime fechaHora;
 
 }

@@ -25,6 +25,7 @@ import service.cloud.request.clientRequest.handler.UBLDocumentHandler;
 import service.cloud.request.clientRequest.handler.document.DocumentNameHandler;
 import service.cloud.request.clientRequest.handler.document.SignerHandler;
 import service.cloud.request.clientRequest.model.Client;
+import service.cloud.request.clientRequest.mongo.model.Counter;
 import service.cloud.request.clientRequest.mongo.model.LogDTO;
 import service.cloud.request.clientRequest.mongo.model.TransaccionBaja;
 import service.cloud.request.clientRequest.mongo.repo.ITransaccionBajaRepository;
@@ -73,6 +74,8 @@ public class ServiceBaja implements IServiceBaja {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceBaja.class);
 
+    private static final TransaccionBaja EMPTY_BAJA = new TransaccionBaja();
+
     @Autowired private ClientProperties clientProperties;
     @Autowired private ApplicationProperties applicationProperties;
     @Autowired private ITransaccionBajaRepository iTransaccionBajaRepository;
@@ -101,8 +104,15 @@ public class ServiceBaja implements IServiceBaja {
         ConfigData config = createConfigData(client);
 
         return findByRucEmpresaAndDocIdReactive(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id())
-                .switchIfEmpty(Mono.defer(() -> Mono.just((TransaccionBaja) null))) // CLAVE!!
+                .defaultIfEmpty(EMPTY_BAJA)
                 .flatMap(transBaja -> {
+                    if (transBaja == EMPTY_BAJA) {
+                        logger.info("No existe TransaccionBaja previa, se generará una nueva para el documento {}-{}",
+                                transaction.getDOC_Serie(), transaction.getDOC_Numero());
+                    } else {
+                        logger.info("TransaccionBaja previa encontrada: {} (ticket: {})",
+                                transBaja.getSerie(), transBaja.getTicketBaja());
+                    }
                     FileRequestDTO soapRequest = buildSoapRequest(transaction, client, config);
                     return obtenerOTramitarTicketReactive(transBaja, transaction, client, fileHandler, config, soapRequest, attachmentPath)
                             .flatMap(bajaData -> {
@@ -111,13 +121,13 @@ public class ServiceBaja implements IServiceBaja {
 
                                 // Consulta a SUNAT/OSE con reintentos
                                 return consultarEstadoConReintentos(soapRequest)
-                                        .map(sunatResponse -> {
+                                        .flatMap(sunatResponse -> {
                                             CdrStatusResponse cdrResponse = new CdrStatusResponse();
                                             TransaccionRespuesta response = new TransaccionRespuesta();
                                             log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
 
                                             if (sunatResponse == null) {
-                                                return mensajeError("Error al consultar el estado del ticket.", response);
+                                                return Mono.just(mensajeError("Error al consultar el estado del ticket.", response));
                                             }
                                             cdrResponse.setContent(sunatResponse.getContent());
                                             cdrResponse.setStatusMessage(sunatResponse.getMessage());
@@ -139,7 +149,11 @@ public class ServiceBaja implements IServiceBaja {
 
                                             completarLog(log, response, transaction, attachmentPath);
                                             response.setLogDTO(log);
-                                            return response;
+
+                                            // --- GUARDAR LOG EN MONGO DE MANERA REACTIVA ---
+                                            return reactiveMongoTemplate.save(log)
+                                                    .thenReturn(response);
+
                                         })
                                         .onErrorResume(ex -> {
                                             logger.error("Error en transactionVoidedDocument", ex);
@@ -147,7 +161,10 @@ public class ServiceBaja implements IServiceBaja {
                                             errResp.setMensaje("Ocurrió un error en el proceso de anulación: " + ex.getMessage());
                                             completarLog(log, errResp, transaction, attachmentPath);
                                             errResp.setLogDTO(log);
-                                            return Mono.just(errResp);
+
+                                            // --- GUARDAR LOG DE ERROR EN MONGO ---
+                                            return reactiveMongoTemplate.save(log)
+                                                    .thenReturn(errResp);
                                         });
                             });
                 });
@@ -180,77 +197,82 @@ public class ServiceBaja implements IServiceBaja {
             return Mono.error(new IllegalArgumentException("Ingresar razón de anulación, y colocar APROBADO y volver a consultar."));
         }
 
-        // 3. Generar serie RC y continuar el flujo reactivo
+        // *** FLUJO SEGURO ***
         return generarIDyFecha(tx)
                 .flatMap(transaccionBaja ->
                         Mono.fromCallable(() -> {
-                            try {
-                                tx.setANTICIPO_Id(transaccionBaja.getSerie());
-                                String certPath = applicationProperties.getRutaBaseDocConfig() + tx.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
-                                byte[] certificado = CertificateUtils.loadCertificate(certPath);
-                                CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), applicationProperties.getSupplierCertificate(), applicationProperties.getKeystoreCertificateType());
+                            // ---- ARMADO DE DOCUMENTO Y PREPARACIÓN ----
+                            tx.setANTICIPO_Id(transaccionBaja.getSerie());
+                            String certPath = applicationProperties.getRutaBaseDocConfig() + tx.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
+                            byte[] certificado = CertificateUtils.loadCertificate(certPath);
+                            CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), applicationProperties.getSupplierCertificate(), applicationProperties.getKeystoreCertificateType());
 
-                                String signerName = ISignerConfig.SIGNER_PREFIX + tx.getDocIdentidad_Nro();
-                                SignerHandler signer = SignerHandler.newInstance();
-                                signer.setConfiguration(certificado, client.getCertificadoPassword(), applicationProperties.getKeystoreCertificateType(), applicationProperties.getSupplierCertificate(), signerName);
+                            String signerName = ISignerConfig.SIGNER_PREFIX + tx.getDocIdentidad_Nro();
+                            SignerHandler signer = SignerHandler.newInstance();
+                            signer.setConfiguration(certificado, client.getCertificadoPassword(), applicationProperties.getKeystoreCertificateType(), applicationProperties.getSupplierCertificate(), signerName);
 
-                                UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(docUUID);
-                                String docNameRaw = DocumentNameHandler.getInstance().getVoidedDocumentName(tx.getDocIdentidad_Nro(), tx.getANTICIPO_Id());
-                                String docNameFinal = tx.getDOC_Serie().startsWith("B") ? docNameRaw.replace("RA", "RC") : docNameRaw;
-                                byte[] xmlDocument;
+                            UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(docUUID);
+                            String docNameRaw = DocumentNameHandler.getInstance().getVoidedDocumentName(tx.getDocIdentidad_Nro(), tx.getANTICIPO_Id());
+                            String docNameFinal = tx.getDOC_Serie().startsWith("B") ? docNameRaw.replace("RA", "RC") : docNameRaw;
+                            byte[] xmlDocument;
 
-                                if (tx.getDOC_Serie().startsWith("B") || tx.getDOC_Codigo().equals("03")) {
-                                    SummaryDocumentsType summary = ublHandler.generateSummaryDocumentsTypeV2(tx, signerName);
-                                    xmlDocument = DocumentConverterUtils.convertDocumentToBytes(summary);
-                                    fileHandler.storeDocumentInDisk(summary, docNameFinal);
-                                } else {
-                                    VoidedDocumentsType voided = ublHandler.generateVoidedDocumentType(tx, signerName);
-                                    xmlDocument = DocumentConverterUtils.convertDocumentToBytes(voided);
-                                    fileHandler.storeDocumentInDisk(voided, docNameFinal);
-                                }
-
-                                // Firmar y almacenar
-                                byte[] signed = signer.signDocumentv2(xmlDocument, docUUID);
-                                UtilsFile.storeDocumentInDisk(signed, docNameFinal, "xml", attachmentPath);
-
-                                // Comprimir y codificar
-                                byte[] zipBytes = compressUBLDocumentv2(signed, docNameFinal + ".xml");
-                                soapRequest.setContentFile(convertToBase64(zipBytes));
-
-                                // IMPORTANTE: ahora sí, con nombre correcto
-                                soapRequest.setFileName(DocumentNameHandler.getInstance().getZipName(docNameFinal));
-
-                                // Devolver el estado intermedio para siguiente paso
-                                return new Object[] { transaccionBaja, soapRequest, docNameFinal };
-
-                            } catch (Exception e) {
-                                throw new RuntimeException("Error preparando datos de baja SUNAT: " + e.getMessage(), e);
+                            if (tx.getDOC_Serie().startsWith("B") || tx.getDOC_Codigo().equals("03")) {
+                                SummaryDocumentsType summary = ublHandler.generateSummaryDocumentsTypeV2(tx, signerName);
+                                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(summary);
+                                fileHandler.storeDocumentInDisk(summary, docNameFinal);
+                            } else {
+                                VoidedDocumentsType voided = ublHandler.generateVoidedDocumentType(tx, signerName);
+                                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(voided);
+                                fileHandler.storeDocumentInDisk(voided, docNameFinal);
                             }
-                        }).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic()) // Por si hay operaciones bloqueantes
+
+                            // Firmar y almacenar
+                            byte[] signed = signer.signDocumentv2(xmlDocument, docUUID);
+                            UtilsFile.storeDocumentInDisk(signed, docNameFinal, "xml", attachmentPath);
+
+                            // Comprimir y codificar
+                            byte[] zipBytes = compressUBLDocumentv2(signed, docNameFinal + ".xml");
+                            soapRequest.setContentFile(convertToBase64(zipBytes));
+
+                            // IMPORTANTE: ahora sí, con nombre correcto
+                            soapRequest.setFileName(DocumentNameHandler.getInstance().getZipName(docNameFinal));
+
+                            // Preparamos un registro completamente NUEVO
+                            TransaccionBaja nuevoRegistro = new TransaccionBaja();
+                            nuevoRegistro.setRucEmpresa(transaccionBaja.getRucEmpresa());
+                            nuevoRegistro.setFecha(transaccionBaja.getFecha());
+                            nuevoRegistro.setIdd(transaccionBaja.getIdd());
+                            nuevoRegistro.setSerie(transaccionBaja.getSerie());
+                            nuevoRegistro.setDocId(transaccionBaja.getDocId());
+                            nuevoRegistro.setFechaHora(LocalDateTime.now());
+
+                            return new Object[] {nuevoRegistro, soapRequest, docNameFinal};
+                        }).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())
                 )
                 .flatMap(arr -> {
-                    TransaccionBaja transaccionBaja = (TransaccionBaja) arr[0];
+                    TransaccionBaja nuevoRegistro = (TransaccionBaja) arr[0];
                     FileRequestDTO soapReq = (FileRequestDTO) arr[1];
-                    String docNameFinal = (String) arr[2];
 
-                    // Enviar a SUNAT y persistir el ticket de respuesta
+                    // Enviar a SUNAT
                     return documentBajaService.processBajaRequest(soapReq.getService(), soapReq)
                             .flatMap(fileResponse -> {
                                 if (fileResponse == null || fileResponse.getTicket() == null) {
                                     return Mono.error(new IllegalStateException("No se recibió ticket de SUNAT."));
                                 }
-                                transaccionBaja.setTicketBaja(fileResponse.getTicket());
-                                return iTransaccionBajaRepository.save(transaccionBaja)
+                                // Guardar el ticket recién recibido
+                                nuevoRegistro.setTicketBaja(fileResponse.getTicket());
+                                // Guardar SIEMPRE un registro nuevo
+                                nuevoRegistro.setId(null);
+                                return iTransaccionBajaRepository.save(nuevoRegistro)
                                         .then(Mono.fromCallable(() -> {
                                             BajaData bajaData = new BajaData();
                                             bajaData.setTicket(fileResponse.getTicket());
-                                            bajaData.setNameBaja(transaccionBaja.getSerie());
+                                            bajaData.setNameBaja(nuevoRegistro.getSerie());
                                             return bajaData;
                                         }));
                             });
                 });
     }
-
 
     private LogDTO inicializarLog(TransacctionDTO tx) {
         LogDTO log = new LogDTO();
@@ -351,43 +373,39 @@ public class ServiceBaja implements IServiceBaja {
     }
 
     public Mono<TransaccionBaja> generarIDyFecha(TransacctionDTO tr) {
-        try {
-            String fechaActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            String prefijo;
-
-            if (Arrays.asList("20", "40").contains(tr.getDOC_Codigo())) {
-                prefijo = "RR";
-            } else if (tr.getDOC_Codigo().equals("03") || tr.getDOC_Serie().startsWith("B")) {
-                prefijo = "RC";
-            } else {
-                prefijo = "RA";
-            }
-
-            String ruc = tr.getDocIdentidad_Nro();
-
-            Query query = Query.query(Criteria.where("rucEmpresa").is(ruc).and("fecha").is(fechaActual));
-            Update update = new Update()
-                    .inc("idd", 1)
-                    .setOnInsert("rucEmpresa", ruc)
-                    .setOnInsert("fecha", fechaActual);
-
-            FindAndModifyOptions options = FindAndModifyOptions.options().upsert(true).returnNew(true);
-
-            return reactiveMongoTemplate
-                    .findAndModify(query, update, options, TransaccionBaja.class)
-                    .map(baja -> {
-                        String correlativo = String.format("%05d", baja.getIdd());
-                        String serie = prefijo + "-" + fechaActual + "-" + correlativo;
-
-                        baja.setSerie(serie);
-                        baja.setDocId(tr.getDOC_Id());
-                        tr.setANTICIPO_Id(serie);
-                        return baja;
-                    });
-
-        } catch (Exception e) {
-            return Mono.error(new RuntimeException("Error generando serie RC: " + e.getMessage(), e));
+        String fechaActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String prefijo;
+        if (Arrays.asList("20", "40").contains(tr.getDOC_Codigo())) {
+            prefijo = "RR";
+        } else if (tr.getDOC_Codigo().equals("03") || tr.getDOC_Serie().startsWith("B")) {
+            prefijo = "RC";
+        } else {
+            prefijo = "RA";
         }
+        String ruc = tr.getDocIdentidad_Nro();
+        return getNextSequence(ruc, fechaActual, prefijo)
+                .map(seq -> {
+                    String correlativo = String.format("%05d", seq);
+                    String serie = prefijo + "-" + fechaActual + "-" + correlativo;
+                    TransaccionBaja baja = new TransaccionBaja();
+                    baja.setRucEmpresa(ruc);
+                    baja.setFecha(fechaActual);
+                    baja.setIdd(seq.intValue());
+                    baja.setSerie(serie);
+                    baja.setDocId(tr.getDOC_Id());
+                    tr.setANTICIPO_Id(serie);
+                    return baja;
+                });
+    }
+
+    public Mono<Long> getNextSequence(String ruc, String fecha, String prefijo) {
+        String key = prefijo + "-" + ruc + "-" + fecha;
+        Query query = Query.query(Criteria.where("_id").is(key));
+        Update update = new Update().inc("seq", 1);
+        FindAndModifyOptions options = FindAndModifyOptions.options().upsert(true).returnNew(true);
+        return reactiveMongoTemplate
+                .findAndModify(query, update, options, Counter.class)
+                .map(Counter::getSeq);
     }
 
     private byte[] compressUBLDocumentv2(byte[] document, String documentName) throws IOException {
