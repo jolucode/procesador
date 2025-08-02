@@ -1,6 +1,7 @@
 package service.cloud.request.clientRequest.service.emision.interfac;
 
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 
@@ -22,7 +23,8 @@ public interface IServiceEmision {
 
 
     /**emision*/
-    TransaccionRespuesta transactionDocument(TransacctionDTO transaction, String doctype) throws Exception;
+    public Mono<TransaccionRespuesta> transactionDocument(TransacctionDTO transaction, String doctype);
+
 
 
 }

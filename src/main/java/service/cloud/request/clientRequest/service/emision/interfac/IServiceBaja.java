@@ -1,6 +1,7 @@
 package service.cloud.request.clientRequest.service.emision.interfac;
 
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 
@@ -22,6 +23,8 @@ public interface IServiceBaja {
 
 
     /**dar de baja*/
-    TransaccionRespuesta transactionVoidedDocument(TransacctionDTO transaction, String doctype) throws Exception ;
+    // INTERFAZ (IServiceBaja.java)
+    Mono<TransaccionRespuesta> transactionVoidedDocument(TransacctionDTO transaction, String doctype);
+
 
 }

@@ -47,6 +47,7 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.D
 import javax.activation.DataHandler;
 import java.io.*;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -98,27 +99,18 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
     private String docUUID;
 
     @Override
-    public TransaccionRespuesta transactionRemissionGuideDocumentRest(TransacctionDTO transaction, String doctype) throws Exception {
-        // Se inicializa el log con la fecha y algunos datos del emisor
+    public Mono<TransaccionRespuesta> transactionRemissionGuideDocumentRestReactive(TransacctionDTO transaction, String doctype) throws Exception {
         LogDTO log = new LogDTO();
         log.setRequestDate(DateUtils.formatDateToString(new Date()));
         log.setRuc(transaction.getDocIdentidad_Nro());
         log.setBusinessName(transaction.getSN_RazonSocial());
 
-        TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
+        TransaccionRespuesta response = new TransaccionRespuesta();
         String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
 
-        // Determinar si es contingencia
-        boolean isContingencia = false;
-        for (Map<String, String> contractMap : transaction.getTransactionContractDocRefListDTOS()) {
-            String valor = contractMap.get("cu31");
-            if (valor != null && !valor.isEmpty()) {
-                isContingencia = VALOR_CONTINGENCIA.equalsIgnoreCase(valor);
-                break;
-            }
-        }
+        boolean isContingencia = transaction.getTransactionContractDocRefListDTOS().stream()
+                .anyMatch(map -> VALOR_CONTINGENCIA.equalsIgnoreCase(map.get("cu31")));
 
-        // Validaciones iniciales
         ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
         validationHandler.checkBasicInformation(
                 transaction.getDOC_Id(),
@@ -128,76 +120,80 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                 transaction.getEMail(),
                 isContingencia);
 
-        // Obtención de datos del cliente y el certificado digital
         Client client = clientProperties.listaClientesOf(transaction.getDocIdentidad_Nro());
         String certificatePath = applicationProperties.getRutaBaseDocConfig() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
         byte[] certificado = CertificateUtils.getCertificateInBytes(certificatePath);
+        CertificateUtils.checkDigitalCertificateV2(certificado, client.getCertificadoPassword(), applicationProperties.getSupplierCertificate(), applicationProperties.getKeystoreCertificateType());
 
-        String certiPassword = client.getCertificadoPassword();
-        String ksProvider = applicationProperties.getSupplierCertificate();
-        String ksType = applicationProperties.getKeystoreCertificateType();
-
-        CertificateUtils.checkDigitalCertificateV2(certificado, certiPassword, ksProvider, ksType);
-
-        // Generar la guía
         UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
         DespatchAdviceType despatchAdviceType = ublHandler.generateDespatchAdviceType(transaction, signerName);
-
-        // Obtener el nombre del documento
         String documentName = DocumentNameHandler.getInstance().getRemissionGuideName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id());
 
-
-        // Manejo de archivos
         FileHandler fileHandler = FileHandler.newInstance(this.docUUID);
         Calendar fechaEmision = Calendar.getInstance();
         fechaEmision.setTime(transaction.getDOC_FechaEmision());
-        int anio = fechaEmision.get(Calendar.YEAR);
-        int mes = fechaEmision.get(Calendar.MONTH) + 1;
-        int dia = fechaEmision.get(Calendar.DAY_OF_MONTH);
-
         String attachmentPath = applicationProperties.getRutaBaseDocAnexos() + transaction.getDocIdentidad_Nro() +
-                File.separator + "anexo" + File.separator + anio + File.separator + mes + File.separator + dia + File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
+                File.separator + "anexo" + File.separator + fechaEmision.get(Calendar.YEAR) + File.separator + (fechaEmision.get(Calendar.MONTH)+1) + File.separator + fechaEmision.get(Calendar.DAY_OF_MONTH) +
+                File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
         fileHandler.setBaseDirectory(attachmentPath);
 
-        // Guardar el documento XML en disco
         String documentPath = fileHandler.storeDocumentInDisk(despatchAdviceType, documentName);
-
-        // Firmar el documento
         SignerHandler signerHandler = SignerHandler.newInstance();
-        signerHandler.setConfiguration(certificado, certiPassword, ksType, ksProvider, signerName);
+        signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), applicationProperties.getKeystoreCertificateType(), applicationProperties.getSupplierCertificate(), signerName);
         File signedDocument = signerHandler.signDocument(documentPath, docUUID);
 
-        // Obtener el documento firmado en memoria
         Object ublDocument = fileHandler.getSignedDocument(signedDocument, transaction.getDOC_Codigo());
-        UBLDocumentWRP documentWRP = new UBLDocumentWRP();
-        documentWRP.setTransaccion(transaction);
-        documentWRP.setAdviceType((DespatchAdviceType) ublDocument);
+        UBLDocumentWRP wrp = new UBLDocumentWRP();
+        wrp.setTransaccion(transaction);
+        wrp.setAdviceType((DespatchAdviceType) ublDocument);
 
-        // Generar el PDF
-        String fechaVenc = transaction.getDOC_FechaVencimiento();
-        DespatchAdviceType guia = documentWRP.getAdviceType();
+        byte[] xmlDoc = DocumentConverterUtils.convertDocumentToBytes(despatchAdviceType);
+        byte[] signedXml = signerHandler.signDocumentv2(xmlDoc, docUUID);
+        UtilsFile.storeDocumentInDisk(signedXml, documentName, EXT_XML, attachmentPath);
 
-        // Generar XML firmado en memoria
-        byte[] xmlDocument = DocumentConverterUtils.convertDocumentToBytes(despatchAdviceType);
-        byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
-
-        // Guardar el XML firmado en disco
-        try {
-            UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, EXT_XML, attachmentPath);
-            logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
-        } catch (IOException e) {
-            logger.error("Error al guardar el archivo: " + e.getMessage());
+        DataHandler zipDocument = UtilsFile.compressUBLDocument(signedXml, documentName + ".xml");
+        if (zipDocument == null) {
+            return Mono.error(new NullPointerException(IVenturaError.ERROR_457.getMessage()));
         }
 
-        // Comprimir el documento
-        DataHandler zipDocument = UtilsFile.compressUBLDocument(signedXmlDocument, documentName + "." + EXT_XML);
-        if (logger.isInfoEnabled()) {
-            logger.info("transactionRemissionGuideDocument() [" + this.docUUID + "] El documento UBL fue convertido a formato ZIP.");
-        }
-        logger.error("ERRROR +++++++++ ==========" + zipDocument.toString());
+        ConfigData config = createConfigData(client);
+        log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
 
-        // Configuración para conectarse a SUNAT / OSE
-        ConfigData configuracion = ConfigData.builder()
+        Mono<TransaccionRespuesta> resultado;
+        if (ESTADO_NUEVO.equalsIgnoreCase(transaction.getFE_Estado())) {
+            resultado = processEstadoNReactive(transaction, config, fileHandler, signedDocument, signedXml, documentName, wrp);
+        } else if (ESTADO_CONTINGENCIA.equalsIgnoreCase(transaction.getFE_Estado())) {
+            resultado = Mono.fromCallable(() -> processEstadoC(transaction, config, fileHandler, signedDocument, documentName, wrp));
+        } else {
+            resultado = Mono.error(new IllegalStateException("Estado no reconocido: " + transaction.getFE_Estado()));
+        }
+
+        String digestValue = generateDigestValue(wrp.getAdviceType().getUBLExtensions());
+        String barcodeValue = generateGuiaBarcodeInfoV2(wrp.getAdviceType().getID().getValue(), IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE,
+                transaction.getDOC_FechaVencimiento(), BigDecimal.ZERO, BigDecimal.ZERO,
+                wrp.getAdviceType().getDespatchSupplierParty(), wrp.getAdviceType().getDeliveryCustomerParty(),
+                wrp.getAdviceType().getUBLExtensions());
+
+        return resultado.map(trxResp -> {
+            trxResp.setDigestValue(digestValue);
+            trxResp.setBarcodeValue(barcodeValue);
+            trxResp.setIdentificador(documentName);
+
+            log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
+            log.setPathThirdPartyRequestXml(attachmentPath + "\\" + documentName + ".xml");
+            log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
+            log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
+            log.setSeriesAndCorrelative(documentName);
+            log.setResponse(JsonUtils.toJson(trxResp.getSunat()).equals("null") ? trxResp.getMensaje() : JsonUtils.toJson(trxResp.getSunat()));
+            log.setResponseDate(DateUtils.formatDateToString(new Date()));
+            log.setPathBase(attachmentPath + "\\" + documentName + ".json");
+            trxResp.setLogDTO(log);
+            return trxResp;
+        });
+    }
+
+    private ConfigData createConfigData(Client client) {
+        return ConfigData.builder()
                 .usuarioSol(client.getUsuarioSol())
                 .claveSol(client.getClaveSol())
                 .integracionWs(client.getIntegracionWs())
@@ -211,219 +207,111 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                 .rutaBaseDoc(applicationProperties.getRutaBaseDocAnexos())
                 .rutaBaseConfig(applicationProperties.getRutaBaseDocConfig())
                 .build();
-
-        logger.info("Se esta apuntando al ambiente : " + configuracion.getAmbiente() + " - " + configuracion.getIntegracionWs());
-        if ("OSE".equals(configuracion.getIntegracionWs())) {
-            logger.info("Url Service: " + applicationProperties.getUrlOse());
-        } else if ("SUNAT".equals(configuracion.getIntegracionWs())) {
-            logger.info("Url Service: " + applicationProperties.getUrlSunatEmision());
-        }
-        logger.info("Usuario Sol: " + configuracion.getUserNameSunatSunat());
-        logger.info("Clave Sol: " + configuracion.getPasswordSunatSunat());
-        logger.info("Client id: " + configuracion.getClientId());
-        logger.info("Client Secret: " + configuracion.getClientSecret());
-
-        // Generar valores digest y barcode
-        String digestValue = generateDigestValue(documentWRP.getAdviceType().getUBLExtensions());
-        String barcodeValue = generateGuiaBarcodeInfoV2(
-                guia.getID().getValue(),
-                IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE,
-                fechaVenc,
-                BigDecimal.ZERO,
-                BigDecimal.ZERO,
-                guia.getDespatchSupplierParty(),
-                guia.getDeliveryCustomerParty(),
-                guia.getUBLExtensions()
-        );
-
-        // Log de fecha de invocación a servicio externo
-        log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
-        try {
-            if (zipDocument != null) {
-                String feEstado = transaction.getFE_Estado();
-                if (ESTADO_NUEVO.equalsIgnoreCase(feEstado)) {
-                    // Estado "N", se declara o se consulta si ya está aprobado
-                    transactionResponse = processEstadoN(transaction, configuracion, fileHandler, signedDocument,
-                            signedXmlDocument, documentName, documentWRP);
-                } else if (ESTADO_CONTINGENCIA.equalsIgnoreCase(feEstado)) {
-                    // Estado "C", se consulta ticket
-                    transactionResponse = processEstadoC(transaction, configuracion, fileHandler, signedDocument,
-                            documentName, documentWRP);
-                }
-            } else {
-                logger.error("transactionRemissionGuideDocument() [" + this.docUUID + "] ERROR: " + IVenturaError.ERROR_457.getMessage());
-                throw new NullPointerException(IVenturaError.ERROR_457.getMessage());
-            }
-        } catch (Exception e) {
-            transactionResponse.setMensaje("Error : " + e.getMessage());
-        }
-
-        // Log de fecha de respuesta del servicio externo
-        log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
-
-        String errorPdf = "";
-        // Generar PDF borrador
-        if ("true".equals(client.getPdfBorrador())) {
-            if (transactionResponse != null && transactionResponse.getPdf() != null) {
-                transactionResponse.setPdfBorrador(transactionResponse.getPdf());
-            } else {
-                try {
-                    byte[] pdf = processorCoreInterface.processCDRResponseContigencia(null,
-                            fileHandler,
-                            documentName,
-                            transaction.getDOC_Codigo(),
-                            documentWRP,
-                            transaction,
-                            configuracion);
-                    transactionResponse.setPdfBorrador(pdf);
-                } catch (Exception e) {
-                    errorPdf = e.getMessage();
-                }
-            }
-        }
-
-        //guardar .zip
-        if(transactionResponse.getZip()!= null)
-            UtilsFile.storeDocumentInDisk(transactionResponse.getZip(), documentName, EXT_ZIP, attachmentPath);
-
-        // Asignar valores de digest y barcode a la respuesta
-        if (transactionResponse != null) {
-            transactionResponse.setDigestValue(digestValue);
-            transactionResponse.setBarcodeValue(barcodeValue);
-            transactionResponse.setIdentificador(documentName);
-        }
-
-        // Log de detalles en DB
-        log.setPathThirdPartyRequestXml(attachmentPath + "\\" + documentName + ".xml");
-        log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
-        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
-        log.setSeriesAndCorrelative(documentName);
-        String messageResponse = (JsonUtils.toJson(transactionResponse.getSunat())).equals("null") ? transactionResponse.getMensaje() : (JsonUtils.toJson(transactionResponse.getSunat()));
-        log.setResponse(messageResponse + " - " + transactionResponse.getTicketRest() + " " + errorPdf );
-        log.setResponseDate(DateUtils.formatDateToString(new Date()));
-        transactionResponse.setLogDTO(log);
-        log.setPathBase(attachmentPath + "\\" + documentName + ".json");
-        if (errorPdf != null)
-            transactionResponse.setMensaje(transactionResponse.getMensaje() + " - " + errorPdf);
-        else {
-            transactionResponse.setMensaje(transactionResponse.getMensaje());
-        }
-        return transactionResponse;
     }
 
-    private TransaccionRespuesta processEstadoN(TransacctionDTO transaction,
-                                                ConfigData configuracion,
-                                                FileHandler fileHandler,
-                                                File signedDocument,
-                                                byte[] documentPath,
-                                                String documentName,
-                                                UBLDocumentWRP documentWRP) throws InterruptedException, IOException {
-        TransaccionRespuesta transactionResponse = null;
-        GuiaTicket ticketMongoSave = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
-                transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
-        ).block();
 
-        if (ticketMongoSave == null) {
-            logger.warn("No se encontró ticket previo en la BD para RUC: " + transaction.getDocIdentidad_Nro()
-                    + " y FE_Id: " + transaction.getFE_Id() + " (estado N)");
-        }
 
-        // Ticket ya aprobado
-        if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty() && ("APROBADO".equals(ticketMongoSave.getEstadoTicket()) || "PROCESO".equals(ticketMongoSave.getEstadoTicket()))) {
-            String ticketToUse = ticketMongoSave.getTicketSunat();
-            if (ticketToUse != null && !ticketToUse.isEmpty()) {
-                ResponseDTO responseDTO = consultarTicketEnSunat(ticketToUse, configuracion);
-                // ✅ Actualizar/eliminar en base al resultado
-                updateTicketStatusFromConsulta(transaction, responseDTO);
-                transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
-                if (transactionResponse != null) {
-                    byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
-                    transactionResponse.setXml(documentBytes);
-                }
-            }
-        } else {
-            ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
-            if (responseDTOJWT.getStatusCode() == 400 || responseDTOJWT.getStatusCode() == 401) {
-                return generateResponseRest(documentWRP, responseDTOJWT);
-            }
+    public Mono<TransaccionRespuesta> processEstadoNReactive(TransacctionDTO tx,
+                                                             ConfigData config,
+                                                             FileHandler fileHandler,
+                                                             File signedDoc,
+                                                             byte[] docBytes,
+                                                             String docName,
+                                                             UBLDocumentWRP wrp) {
+        return guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(tx.getDocIdentidad_Nro(), tx.getFE_Id())
+                .flatMap(existingTicket -> {
+                    // Si ya está aprobado o en proceso, solo consultamos
+                    if (existingTicket != null &&
+                            !existingTicket.getTicketSunat().isEmpty() &&
+                            ("APROBADO".equals(existingTicket.getEstadoTicket()) || "PROCESO".equals(existingTicket.getEstadoTicket()))) {
 
-            // DECLARE GENERA TICKET
-            ResponseDTO responseDTO = declareSunat(documentName, documentPath, responseDTOJWT.getAccess_token());
-            logger.info(transaction.getDocIdentidad_Nro() + "-" + transaction.getDOC_Codigo() + "-" + transaction.getDOC_Id() + " Ticket Guia : " + responseDTO.getNumTicket());
+                        return consultarYProcesar(existingTicket.getTicketSunat(), tx, config, wrp, fileHandler, signedDoc, docName);
+                    }
 
-            logger.info("Ticket Guia: " + responseDTO.getNumTicket() +
-                    "| Ruc-Tipo-Serie-Correlativo: " +
-                    transaction.getDocIdentidad_Nro() + "-" +
-                    transaction.getDOC_Codigo() + "-" +
-                    transaction.getDOC_Serie() + "-" +
-                    transaction.getDOC_Numero());
-
-            // ✅ Persistir inmediatamente
-            if (responseDTO.getNumTicket() != null && !responseDTO.getNumTicket().isEmpty()) {
-                saveTicketRest(transaction, responseDTO);
-            }
-
-            // Manejo 401 (renovar token y volver a declarar)
-            if (responseDTO.getStatusCode() == 401) {
-                responseDTOJWT = getJwtSunat(configuracion);
-                responseDTO = declareSunat(documentName, documentPath, responseDTOJWT.getAccess_token());
-
-                // Persistir nuevamente si nuevo ticket
-                if (responseDTO.getNumTicket() != null && !responseDTO.getNumTicket().isEmpty()) {
-                    saveTicketRest(transaction, responseDTO);
-                }
-            }
-
-            // Esperar 5 segundos para consultar el estado del ticket
-            Thread.sleep(5000);
-
-            // CONSULT
-            responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-
-            if (responseDTO.getStatusCode() == 401) {
-                responseDTOJWT = getJwtSunat(configuracion);
-                responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-            }
-
-            AtomicInteger contador = new AtomicInteger(0);
-            while ("98".equals(responseDTO.getCodRespuesta())) {
-                Thread.sleep(5000);
-                if (contador.incrementAndGet() == 5) break;
-                responseDTO = consult(responseDTO.getNumTicket(), responseDTOJWT.getAccess_token());
-            }
-
-            // ✅ Actualizar/eliminar en base al resultado
-            updateTicketStatusFromConsulta(transaction, responseDTO);
-
-            // Manejar respuestas de SUNAT
-            transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
-
-            // Añadir XML firmado
-            if (transactionResponse != null) {
-                byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
-                transactionResponse.setTicketRest(responseDTO.getNumTicket());
-                transactionResponse.setXml(documentBytes);
-            }
-
-            // ✅ SOLO guardar si fue aprobado
-            if (transactionResponse != null && transactionResponse.getMensaje().contains("Documento aprobado")) {
-
-                // Verificación final antes de guardar
-                GuiaTicket yaExiste = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
-                        transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
-                ).block();
-
-                boolean yaExisteAprobado = yaExiste != null &&
-                        "APROBADO".equalsIgnoreCase(yaExiste.getEstadoTicket()) &&
-                        !yaExiste.getTicketSunat().isEmpty();
-
-                if (!yaExisteAprobado) {
-                    saveTicketRest(transaction, responseDTO);
-                }
-            }
-        }
-        return transactionResponse;
+                    // Si no existe ticket previo, declaramos uno
+                    return Mono.fromCallable(() -> getJwtSunat(config))
+                            .flatMap(token -> Mono.fromCallable(() -> declareSunat(docName, docBytes, token.getAccess_token())))
+                            .doOnNext(resp -> saveTicketRest(tx, resp)) // guardar ticket apenas se obtiene
+                            .flatMap(resp -> consultarTicketConReintentos(resp.getNumTicket(), config))
+                            .flatMap(respFinal -> manejarRespuestaSunatReactive(respFinal, wrp, fileHandler, docName, tx, config, signedDoc));
+                });
     }
+
+    public Mono<TransaccionRespuesta> manejarRespuestaSunatReactive(ResponseDTO responseDTO,
+                                                                    UBLDocumentWRP wrp,
+                                                                    FileHandler fileHandler,
+                                                                    String docName,
+                                                                    TransacctionDTO tx,
+                                                                    ConfigData config,
+                                                                    File signedDoc) {
+        return Mono.fromCallable(() -> {
+            TransaccionRespuesta respuesta = generateResponseRest(wrp, responseDTO);
+
+            if ("0".equals(responseDTO.getCodRespuesta())) {
+                // Aprobado → decodificar CDR
+                String rptBase64 = responseDTO.getArcCdr();
+                byte[] zipBytes = Base64.decodeBase64(rptBase64);
+                respuesta.setZip(zipBytes);
+                respuesta.setTicketRest(responseDTO.getNumTicket());
+
+                // Actualiza URL PDF (opcional)
+                String urlPdf = SunatResponseUtils.proccessResponseUrlPdfGuia(zipBytes);
+                config.setUrlGuias(urlPdf);
+            }
+
+            // Generar PDF
+            byte[] pdf = processorCoreInterface.processCDRResponseContigencia(
+                    null, fileHandler, docName, tx.getDOC_Codigo(), wrp, tx, config
+            );
+            respuesta.setPdf(pdf);
+
+            // Adjuntar XML firmado
+            byte[] xmlBytes = fileHandler.convertFileToBytes(signedDoc);
+            respuesta.setXml(xmlBytes);
+
+            return respuesta;
+        });
+    }
+
+
+    public Mono<TransaccionRespuesta> consultarYProcesar(String ticket,
+                                                         TransacctionDTO tx,
+                                                         ConfigData config,
+                                                         UBLDocumentWRP wrp,
+                                                         FileHandler fileHandler,
+                                                         File signedDoc,
+                                                         String docName) {
+
+        return Mono.fromCallable(() -> consultarTicketEnSunat(ticket, config))
+                .flatMap(responseDTO -> {
+                    updateTicketStatusFromConsulta(tx, responseDTO);
+
+                    return manejarRespuestaSunatReactive(
+                            responseDTO, wrp, fileHandler, docName, tx, config, signedDoc
+                    );
+                });
+    }
+
+
+    public Mono<ResponseDTO> consultarTicketConReintentos(String ticket, ConfigData config) {
+        return Mono.defer(() -> Mono.fromCallable(() -> getJwtSunat(config)))
+                .flatMap(jwt -> Mono.fromCallable(() -> consult(ticket, jwt.getAccess_token())))
+                .delayElement(Duration.ofSeconds(5)) // espera inicial
+                .expand(resp -> {
+                    if ("98".equals(resp.getCodRespuesta())) {
+                        return Mono.delay(Duration.ofSeconds(5))
+                                .then(Mono.fromCallable(() -> {
+                                    ResponseDTO jwtNew = getJwtSunat(config);
+                                    return consult(ticket, jwtNew.getAccess_token());
+                                }));
+                    }
+                    return Mono.empty();
+                })
+                .take(5)
+                .last()
+                .onErrorResume(e -> Mono.error(new RuntimeException("Error consultando ticket SUNAT", e)));
+    }
+
 
     public void updateTicketStatusFromConsulta(TransacctionDTO transaccion, ResponseDTO responseDTO) {
         guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(

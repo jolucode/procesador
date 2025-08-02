@@ -75,22 +75,34 @@ public class CloudService implements CloudInterface {
         String updatedJson = stringRequestOnpremise.replaceAll(datePattern, "$1\"");
 
         return Mono.fromCallable(() -> {
-                    return JsonUtils.fromJson(updatedJson, TransacctionDTO[].class);
+                    try {
+                        return JsonUtils.fromJson(updatedJson, TransacctionDTO[].class);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error parseando JSON de la transacción", e);
+                    }
                 })
-                .flatMapMany(Flux::fromArray) // Convertir el array en un flujo
+                .flatMapMany(Flux::fromArray) // Convertir el array en flujo reactivo
                 .flatMap(transaccion ->
-                                processTransaction(transaccion, stringRequestOnpremise) // Procesar cada transacción
-                                        .subscribeOn(Schedulers.boundedElastic()) // Ejecución en hilos aptos para operaciones bloqueantes
-                                        .doOnError(error -> logger.error("Error procesando transacción: {}", error.getMessage()))
-                        , 100) // Paralelismo: procesa hasta 5 transacciones simultáneamente
-                .onErrorContinue((error, obj) -> logger.warn("Continuando tras error: {} en transacción: {}", error.getMessage(), obj))
-                .then() // Completar después de procesar todas las transacciones
-                .map(ignored -> ResponseEntity.ok().build()) // Devolver ResponseEntity<Void>
+                        {
+                            try {
+                                return processTransaction(transaccion, stringRequestOnpremise)
+                                        .subscribeOn(Schedulers.boundedElastic())
+                                        .doOnError(error -> logger.error("Error procesando transacción: {}", error.getMessage()));
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        },
+                        100) // paralelismo
+                .onErrorContinue((error, obj) ->
+                        logger.warn("Continuando tras error: {} en transacción: {}", error.getMessage(), obj))
+                .then() // Ignorar resultados, solo esperar a que termine
+                .map(ignored -> ResponseEntity.ok().build()) // HTTP 200 OK
                 .onErrorResume(error -> {
                     logger.error("Error general al procesar documentos: {}", error.getMessage());
-                    return Mono.just(ResponseEntity.<Void>status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
                 });
     }
+
 
     public void anexarDocumentos(RequestPost request) {
 
@@ -119,30 +131,27 @@ public class CloudService implements CloudInterface {
                 .trim();                       // Elimina espacios en extremos
     }
 
-    private Mono<RequestPost> processTransaction(TransacctionDTO transaccion, String requestOnPremise) {
-        return Mono.fromCallable(() -> {
-                    // Paso 1: Enviar transacción
-            String cleanString = limpiarTexto(transaccion.getFE_Comentario());
+    private Mono<RequestPost> processTransaction(TransacctionDTO transaccion, String requestOnPremise) throws Exception {
+        return enviarTransaccion(transaccion) // Paso 1: Enviar transacción
+                .flatMap(tr -> {
+                    // Paso 2: Generar datos de solicitud
+                    String cleanString = limpiarTexto(transaccion.getFE_Comentario());
+                    RequestPost request = generateDataRequestHana(transaccion, tr);
 
-            TransaccionRespuesta tr = enviarTransaccion(transaccion);
+                    // Paso 3: Anexar documentos
+                    anexarDocumentos(request);
 
-            // Paso 2: Generar datos de solicitud
-            RequestPost request = generateDataRequestHana(transaccion, tr);
+                    // Paso 4: Limpieza de memoria (ayuda al GC)
+                    liberarRecursosPesados(tr, request);
 
-            // Paso 3: Anexar documentos
-            anexarDocumentos(request);
+                    // Paso 5: Log de seguimiento
+                    logTransaccionExitosa(request, tr);
 
-            // Paso 4: Limpieza de memoria (ayuda al GC)
-            liberarRecursosPesados(tr, request);
+                    // Paso 6: Guardado en Mongo / Publicación
+                    handleLogsAndDocuments(tr, requestOnPremise);
 
-            // Paso 5: Log de seguimiento
-            logTransaccionExitosa(request, tr);
-
-            // Paso 6: Guardado en Mongo / Publicación
-            handleLogsAndDocuments(tr, requestOnPremise);
-
-            return request;
-        }).subscribeOn(Schedulers.boundedElastic());
+                    return Mono.just(request);
+                });
     }
 
     private void handleLogsAndDocuments(TransaccionRespuesta tr, String requestOnPremise) {
@@ -191,9 +200,9 @@ public class CloudService implements CloudInterface {
         return mapper.map(dto, Log.class);
     }
 
-    public TransaccionRespuesta enviarTransaccion(TransacctionDTO transaction) throws Exception {
+    public Mono<TransaccionRespuesta> enviarTransaccion(TransacctionDTO transaction) throws Exception {
         if (transaction == null) {
-            return new TransaccionRespuesta();
+            return Mono.just(new TransaccionRespuesta());
         }
 
         String tipoTransaccion = transaction.getFE_TipoTrans();
@@ -201,16 +210,21 @@ public class CloudService implements CloudInterface {
 
         switch (tipoTransaccion.toUpperCase()) {
             case ISunatConnectorConfig.FE_TIPO_TRANS_EMISION:
-                if (IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE.equalsIgnoreCase(codigoDocumento) || IUBLConfig.DOC_SENDER_CARRIER_GUIDE_CODE.equalsIgnoreCase(codigoDocumento)) {
-                    return iServiceEmisionGuia.transactionRemissionGuideDocumentRest(transaction, IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE);
+                if (IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE.equalsIgnoreCase(codigoDocumento)
+                        || IUBLConfig.DOC_SENDER_CARRIER_GUIDE_CODE.equalsIgnoreCase(codigoDocumento)) {
+                    return iServiceEmisionGuia.transactionRemissionGuideDocumentRestReactive(
+                            transaction, IUBLConfig.DOC_SENDER_REMISSION_GUIDE_CODE);
                 }
                 return iServiceEmision.transactionDocument(transaction, codigoDocumento);
+
             case ISunatConnectorConfig.FE_TIPO_TRANS_BAJA:
                 return iServiceBaja.transactionVoidedDocument(transaction, codigoDocumento);
+
             default:
-                return new TransaccionRespuesta();
+                return Mono.just(new TransaccionRespuesta());
         }
     }
+
 
 
     public RequestPost generateDataRequestHana(TransacctionDTO tc, TransaccionRespuesta tr) {

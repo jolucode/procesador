@@ -1,5 +1,6 @@
 package service.cloud.request.clientRequest.service.emision.interfac;
 
+import reactor.core.publisher.Mono;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
 import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 
@@ -19,6 +20,6 @@ import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 public interface GuiaInterface {
 
 
-    TransaccionRespuesta transactionRemissionGuideDocumentRest(TransacctionDTO transaction, String docType) throws Exception;
+    public Mono<TransaccionRespuesta> transactionRemissionGuideDocumentRestReactive(TransacctionDTO transaction, String docType) throws Exception;
 
 }

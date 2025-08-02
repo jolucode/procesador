@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuples;
 import service.cloud.request.clientRequest.config.ApplicationProperties;
 import service.cloud.request.clientRequest.config.ClientProperties;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
@@ -80,101 +82,111 @@ public class ServiceEmision implements IServiceEmision {
     private DocumentQueryService documentQueryService;
 
     @Override
-    public TransaccionRespuesta transactionDocument(TransacctionDTO transaction, String doctype) throws Exception {
+    public Mono<TransaccionRespuesta> transactionDocument(TransacctionDTO transaction, String doctype) {
+        return Mono.fromCallable(() -> {
+                    LogDTO log = new LogDTO();
+                    log.setRequestDate(DateUtils.formatDateToString(new Date()));
+                    log.setRuc(transaction.getDocIdentidad_Nro());
+                    log.setBusinessName(transaction.getRazonSocial());
 
-        /***/
-        LogDTO log = new LogDTO();
-        log.setRequestDate(DateUtils.formatDateToString(new Date()));
-        log.setRuc(transaction.getDocIdentidad_Nro());
-        log.setBusinessName(transaction.getRazonSocial());
-        /***/
+                    boolean isContingencia = isContingencia(transaction);
+                    ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
+                    validationHandler.checkBasicInformation(transaction.getDOC_Id(), transaction.getDocIdentidad_Nro(), transaction.getDOC_FechaEmision(), transaction.getSN_EMail(), transaction.getEMail(), isContingencia);
 
-        boolean isContingencia = isContingencia(transaction);
-        ValidationHandler validationHandler = ValidationHandler.newInstance(this.docUUID);
-        validationHandler.checkBasicInformation(transaction.getDOC_Id(), transaction.getDocIdentidad_Nro(), transaction.getDOC_FechaEmision(), transaction.getSN_EMail(), transaction.getEMail(), isContingencia);
+                    Client client = getClientData(transaction);
+                    UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
+                    String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDocAnexos());
+                    String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
 
-        // Obtiene datos del cliente y valida certificado
-        Client client = getClientData(transaction);
-        UBLDocumentHandler ublHandler = UBLDocumentHandler.newInstance(this.docUUID);
+                    return Tuples.of(log, client, ublHandler, attachmentPath, signerName, validationHandler);
+                })
+                .flatMap(tuple -> {
+                    LogDTO log = tuple.getT1();
+                    Client client = tuple.getT2();
+                    UBLDocumentHandler ublHandler = tuple.getT3();
+                    String attachmentPath = tuple.getT4();
+                    String signerName = tuple.getT5();
+                    ValidationHandler validationHandler = tuple.getT6();
 
-        // Configura la ruta de almacenamiento del archivo
-        String attachmentPath = UtilsFile.getAttachmentPath(transaction, doctype, applicationProperties.getRutaBaseDocAnexos());
+                    return Mono.fromCallable(() -> {
+                        byte[] xmlDocument = null;
+                        TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
 
-        String signerName = ISignerConfig.SIGNER_PREFIX + transaction.getDocIdentidad_Nro();
-        byte[] xmlDocument = null;
+                        try {
+                            switch (doctype) {
+                                case "07" -> {
+                                    CreditNoteType creditNoteType = ublHandler.generateCreditNoteType(transaction, signerName);
+                                    xmlDocument = DocumentConverterUtils.convertDocumentToBytes(creditNoteType);
+                                }
+                                case "08" -> {
+                                    DebitNoteType debitNoteType = ublHandler.generateDebitNoteType(transaction, signerName);
+                                    xmlDocument = DocumentConverterUtils.convertDocumentToBytes(debitNoteType);
+                                }
+                                case "01", "03" -> {
+                                    InvoiceType invoiceType = ublHandler.generateInvoiceType(transaction, signerName);
+                                    xmlDocument = DocumentConverterUtils.convertDocumentToBytes(invoiceType);
+                                }
+                                case "40" -> {
+                                    PerceptionType perceptionType = ublHandler.generatePerceptionType(transaction, signerName);
+                                    validationHandler.checkPerceptionDocument(perceptionType);
+                                    xmlDocument = DocumentConverterUtils.convertDocumentToBytes(perceptionType);
+                                }
+                                case "20" -> {
+                                    RetentionType retentionType = ublHandler.generateRetentionType(transaction, signerName);
+                                    validationHandler.checkRetentionDocument(retentionType);
+                                    xmlDocument = DocumentConverterUtils.convertDocumentToBytes(retentionType);
+                                }
+                            }
+                        } catch (Exception e) {
+                            transactionResponse.setMensaje("error :" + e.getMessage());
+                        }
 
-        TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
+                        String certificatePath = applicationProperties.getRutaBaseDocConfig() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
+                        byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
+                        CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), applicationProperties.getSupplierCertificate(), applicationProperties.getKeystoreCertificateType());
+                        SignerHandler signerHandler = SignerHandler.newInstance();
+                        signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), applicationProperties.getKeystoreCertificateType(), applicationProperties.getSupplierCertificate(), signerName);
 
-        try {
-            if (doctype.equals("07")) {
-                CreditNoteType creditNoteType = ublHandler.generateCreditNoteType(transaction, signerName);
-                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(creditNoteType); //generico
-            } else if (doctype.equals("08")) {
-                DebitNoteType debitNoteType = ublHandler.generateDebitNoteType(transaction, signerName);
-                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(debitNoteType);
-            } else if (doctype.equals("01") || (doctype.equals("03"))) {
-                InvoiceType invoiceType = ublHandler.generateInvoiceType(transaction, signerName);
-                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(invoiceType);
-            } else if (doctype.equals("40")) {
-                PerceptionType perceptionType = ublHandler.generatePerceptionType(transaction, signerName);
-                validationHandler.checkPerceptionDocument(perceptionType);
-                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(perceptionType);
-            } else if (doctype.equals("20")) {
-                RetentionType retentionType = ublHandler.generateRetentionType(transaction, signerName);
-                validationHandler.checkRetentionDocument(retentionType);
-                xmlDocument = DocumentConverterUtils.convertDocumentToBytes(retentionType);
-            }
-        } catch (Exception e) {
-            transactionResponse.setMensaje("error :" + e.getMessage());
-        }
+                        String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
 
+                        if (xmlDocument != null) {
+                            byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
+                            try {
+                                UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, "xml", attachmentPath);
+                                logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
+                            } catch (IOException e) {
+                                logger.error("Error al guardar el archivo: " + e.getMessage());
+                            }
 
-        /**PROCESAR CERTIFICADO*/
-        String certificatePath = applicationProperties.getRutaBaseDocConfig() + transaction.getDocIdentidad_Nro() + File.separator + client.getCertificadoName();
-        byte[] certificado = CertificateUtils.loadCertificate(certificatePath);
-        CertificateUtils.validateCertificate(certificado, client.getCertificadoPassword(), applicationProperties.getSupplierCertificate(), applicationProperties.getKeystoreCertificateType());
-        SignerHandler signerHandler = SignerHandler.newInstance();
-        signerHandler.setConfiguration(certificado, client.getCertificadoPassword(), applicationProperties.getKeystoreCertificateType(), applicationProperties.getSupplierCertificate(), signerName);
+                            UBLDocumentWRP documentWRP = configureDocumentWRP(signedXmlDocument, transaction.getDOC_Codigo(), doctype);
+                            documentWRP.setTransaccion(transaction);
+                            ConfigData configuracion = createConfigData(client, transaction);
+                            byte[] zipBytes = DocumentConverterUtils.compressUBLDocument(signedXmlDocument, documentName + ".xml");
+                            String base64Content = convertToBase64(zipBytes);
 
-        String documentName = DocumentNameUtils.getDocumentName(transaction.getDocIdentidad_Nro(), transaction.getDOC_Id(), doctype);
+                            log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
+                            transactionResponse = handleTransactionStatus(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
+                            log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
 
-        if(xmlDocument != null) {
-            byte[] signedXmlDocument = signerHandler.signDocumentv2(xmlDocument, docUUID);
-            try {
-                UtilsFile.storeDocumentInDisk(signedXmlDocument, documentName, "xml", attachmentPath);
-                logger.info("Archivo firmado guardado exitosamente en: " + attachmentPath);
-            } catch (IOException e) {
-                logger.error("Error al guardar el archivo: " + e.getMessage());
-            }
-            UBLDocumentWRP documentWRP = configureDocumentWRP(signedXmlDocument, transaction.getDOC_Codigo(), doctype);
-            documentWRP.setTransaccion(transaction);
+                            if (transactionResponse.getPdf() != null)
+                                transactionResponse.setPdfBorrador(transactionResponse.getPdf());
 
-            ConfigData configuracion = createConfigData(client, transaction);
+                            transactionResponse.setIdentificador(documentName);
+                            log.setPathThirdPartyRequestXml(attachmentPath + "\\" + documentName + ".xml");
+                            log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
+                            log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
+                            log.setSeriesAndCorrelative(documentName);
+                            log.setResponse(transactionResponse.getMensaje());
+                            log.setResponseDate(DateUtils.formatDateToString(new Date()));
+                            log.setPathBase(attachmentPath + "\\" + documentName + ".json");
+                            transactionResponse.setLogDTO(log);
+                        }
 
-            byte[] zipBytes = DocumentConverterUtils.compressUBLDocument(signedXmlDocument, documentName + ".xml");
-            String base64Content = convertToBase64(zipBytes);
-
-            log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
-            transactionResponse = handleTransactionStatus(base64Content, transaction, signedXmlDocument, documentWRP, configuracion, documentName, attachmentPath);
-            log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
-
-            if(transactionResponse.getPdf()!=null)
-                transactionResponse.setPdfBorrador(transactionResponse.getPdf());
-
-        }
-
-        transactionResponse.setIdentificador(documentName);
-        log.setPathThirdPartyRequestXml(attachmentPath + "\\" + documentName + ".xml");
-        log.setPathThirdPartyResponseXml(attachmentPath + "\\" + documentName + ".zip");
-        log.setObjectTypeAndDocEntry(transaction.getFE_ObjectType() + " - " + transaction.getFE_DocEntry());
-        log.setSeriesAndCorrelative(documentName);
-        log.setResponse(transactionResponse.getMensaje() );
-        log.setResponseDate(DateUtils.formatDateToString(new Date()));
-        transactionResponse.setLogDTO(log);
-        log.setPathBase(attachmentPath + "\\" + documentName + ".json");
-        transactionResponse.setMensaje(transactionResponse.getMensaje());
-        return transactionResponse;
+                        return transactionResponse;
+                    }).subscribeOn(Schedulers.boundedElastic());
+                });
     }
+
 
     // Método para convertir los bytes a base64
     private String convertToBase64(byte[] content) {
