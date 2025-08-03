@@ -6,10 +6,8 @@ import java.math.BigDecimal;
 
 @Data
 public class TransactionImpuestosDTO {
-
     private String Nombre;
     private String Abreviatura;
-
     private String Moneda;
     private String TipoTributo;
     private Integer LineId;
@@ -19,5 +17,4 @@ public class TransactionImpuestosDTO {
     private BigDecimal ValorVenta;
     private BigDecimal Porcentaje;
     private String TipoAfectacion;
-
 }

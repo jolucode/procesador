@@ -8,6 +8,5 @@ import java.math.BigDecimal;
 public class TransactionTotalesDTO {
     private BigDecimal Monto;
     private String Id;
-    private BigDecimal Prcnt;
-
+    private BigDecimal Prcnt = BigDecimal.ZERO;
 }

@@ -1,32 +1,21 @@
 package service.cloud.request.clientRequest.service.core;
 
-import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
-import service.cloud.request.clientRequest.dto.finalClass.Response;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
+import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
+import service.cloud.request.clientRequest.dto.finalClass.ConfigData;
 import service.cloud.request.clientRequest.dto.wrapper.UBLDocumentWRP;
-import service.cloud.request.clientRequest.entity.Transaccion;
+import service.cloud.request.clientRequest.estela.dto.FileResponseDTO;
 import service.cloud.request.clientRequest.handler.FileHandler;
-import service.cloud.request.clientRequest.proxy.object.StatusResponse;
-
-import java.io.File;
-import java.io.IOException;
+import service.cloud.request.clientRequest.utils.exception.PDFReportException;
 
 public interface ProcessorCoreInterface {
 
-    public byte[] processCDRResponseContigencia(byte[] cdrConstancy, File signedDocument,
+    TransaccionRespuesta processCDRResponseV2(byte[] cdrConstancy, byte[] signedDocument, UBLDocumentWRP documentWRP, TransacctionDTO transaction, ConfigData configuracion, String documentName, String attachmentPath) throws Exception;
+
+    TransaccionRespuesta processResponseSinCDR( UBLDocumentWRP documentWRP, TransacctionDTO transaction,ConfigData configuracion, FileResponseDTO cdrStatusResponse);
+
+    public byte[] processCDRResponseContigencia(byte[] cdrConstancy,
                                                 FileHandler fileHandler, String documentName,
                                                 String documentCode, UBLDocumentWRP documentWRP,
-                                                Transaccion transaccion, ConfigData configuracion);
-
-    public TransaccionRespuesta processCDRResponse(byte[] cdrConstancy, File signedDocument, FileHandler fileHandler,
-                                                   String documentName, String documentCode, UBLDocumentWRP documentWRP,
-                                                   Transaccion transaction, ConfigData configuracion) throws IOException;
-
-    public TransaccionRespuesta processResponseSinCDR(Transaccion transaction);
-
-
-    public TransaccionRespuesta.Sunat proccessResponse(byte[] cdrConstancy, Transaccion transaction, String sunatType);
-
-    public TransaccionRespuesta processResponseService(Transaccion transaction , Response response) ;
-
+                                                TransacctionDTO transaccion, ConfigData configuracion) throws PDFReportException;
 }

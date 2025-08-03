@@ -1,10 +1,10 @@
 package service.cloud.request.clientRequest.service.extractor;
 
 import org.springframework.http.ResponseEntity;
-import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
+import reactor.core.publisher.Mono;
 
 public interface CloudInterface {
 
-    ResponseEntity<TransacctionDTO[]> proccessDocument(String ejemploString);
+    Mono<ResponseEntity<Object>> proccessDocument(String ejemploString);
 
 }

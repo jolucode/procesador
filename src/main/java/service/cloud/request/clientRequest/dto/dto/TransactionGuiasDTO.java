@@ -12,7 +12,6 @@ public class TransactionGuiasDTO {
     private String DocumentoConductor;
     private String LicenciaConductor;
     private String FechaInicioTraslado;
-    private String IndicadorTransbordoProgramado;
     private String ModalidadTraslado;
     private String NombreRazonTransportista;
     private BigDecimal NumeroBultos;
@@ -47,6 +46,21 @@ public class TransactionGuiasDTO {
     private String DescripcionPuerto;
     private String CodigoAereopuerto;
     private String DescripcionAereopuerto;
-
     private String TicketRest;
+
+
+    /** Harol 29-03-2024 llenado de data*/
+    private String GRT_TipoDocRemitente;
+    private String GRT_DocumentoRemitente;
+    private String GRT_NombreRazonRemitente;
+    private String GRT_IndicadorPagadorFlete;
+    private String GRT_TipoDocDestinatario;
+    private String GRT_DocumentoDestinatario;
+    private String GRT_NombreRazonDestinatario;
+    private String GRT_NumeroTUCEPrincipal;
+    private String GRT_EntidadEmisoraPrincipal;
+    private String GRT_PlacaVehiculoSecundario;
+    private String GRT_NumeroTUCESecuendario;
+    private String GRT_EntidadEmisoraSecundario;
+
 }

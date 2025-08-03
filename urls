@@ -1,0 +1,23 @@
+==========================================================================================================
+| Documento                  | Ambiente Beta URL                                                         |
+==========================================================================================================
+| Facturas, Boletas, Notas   | https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService              |
+----------------------------------------------------------------------------------------------------------
+| Retenciones y Percepciones | https://e-beta.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService |
+----------------------------------------------------------------------------------------------------------
+| Guías de Remisión          | https://e-beta.sunat.gob.pe/ol-ti-itemision-guia-gem-beta/billService     |
+----------------------------------------------------------------------------------------------------------
+| Comunicaciones de Baja     | https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService              |
+==========================================================================================================
+
+==========================================================================================================
+| Documento                  | Ambiente Producción URL                                                   |
+==========================================================================================================
+| Facturas, Boletas, Notas   |  https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService               |
+----------------------------------------------------------------------------------------------------------
+| Retenciones y Percepciones |  https://e-factura.sunat.gob.pe/ol-ti-itemision-otroscpe-gem/billService  |
+----------------------------------------------------------------------------------------------------------
+| Guías de Remisión          |  https://e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService |
+----------------------------------------------------------------------------------------------------------
+| Comunicaciones de Baja     |  https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService               |
+==========================================================================================================

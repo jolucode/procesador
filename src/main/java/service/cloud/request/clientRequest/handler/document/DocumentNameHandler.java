@@ -17,7 +17,6 @@ public class DocumentNameHandler {
 
     private final String DOCUMENT_PATTERN = "{0}-{1}-{2}";
 
-    private final String CDR_RESPONSE_NAME = "R-{0}";
 
     private final String EE_ZIP = ".zip";
 
@@ -40,17 +39,6 @@ public class DocumentNameHandler {
     } // newInstance
 
     /**
-     * Este metodo obtiene el nombre de un documento de tipo PERCEPCION.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento (Serie y correlativo).
-     * @return Retorna el nombre del documento de tipo PERCEPCION.
-     */
-    public String getPerceptionName(String senderRUC, String docIdentifier) {
-        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC, IUBLConfig.DOC_PERCEPTION_CODE, docIdentifier);
-    } // getPerceptionName
-
-    /**
      * Este metodo obtiene el nombre de un documento de tipo RETENCION.
      *
      * @param senderRUC     Numero de RUC del emisor.
@@ -69,58 +57,10 @@ public class DocumentNameHandler {
      * @param docIdentifier Identificador del documento (Serie y correlativo).
      * @return Retorna el nombre del documento de tipo RETENCION.
      */
-    public String getRetentionName(String senderRUC, String docIdentifier) {
+    public String getRemissionGuideTransportName(String senderRUC, String docIdentifier) {
         return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
-                IUBLConfig.DOC_RETENTION_CODE, docIdentifier);
+                IUBLConfig.DOC_SENDER_CARRIER_GUIDE_CODE, docIdentifier);
     }
-
-    /**
-     * Este metodo obtiene el nombre de un documento de tipo FACTURA.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento (Serie y correlativo).
-     * @return Retorna el nombre del documento de tipo FACTURA.
-     */
-    public String getInvoiceName(String senderRUC, String docIdentifier, String docType) {
-        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
-                docType, docIdentifier);
-    } // getInvoiceName
-
-    /**
-     * Este metodo obtiene el nombre de un documento de tipo BOLETA.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento (Serie y correlativo).
-     * @return Retorna el nombre del documento de tipo BOLETA.
-     */
-    public String getBoletaName(String senderRUC, String docIdentifier) {
-        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
-                IUBLConfig.DOC_BOLETA_CODE, docIdentifier);
-    } // getBoletaName
-
-    /**
-     * Este metodo obtiene el nombre de un documento de tipo NOTA DE CREDITO.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento (Serie y correlativo).
-     * @return Retorna el nombre del documento de tipo NOTA DE CREDITO.
-     */
-    public String getCreditNoteName(String senderRUC, String docIdentifier) {
-        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
-                IUBLConfig.DOC_CREDIT_NOTE_CODE, docIdentifier);
-    } // getCreditNoteName
-
-    /**
-     * Este metodo obtiene el nombre de un documento de tipo NOTA DE DEBITO.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento (Serie y correlativo).
-     * @return Retorna el nombre del documento de tipo NOTA DE DEBITO.
-     */
-    public String getDebitNoteName(String senderRUC, String docIdentifier) {
-        return MessageFormat.format(DOCUMENT_PATTERN, senderRUC,
-                IUBLConfig.DOC_DEBIT_NOTE_CODE, docIdentifier);
-    } // getDebitNoteName
 
     /**
      * Este metodo obtiene el nombre de un documento de tipo COMUNICACION DE
@@ -134,22 +74,6 @@ public class DocumentNameHandler {
         return senderRUC + "-" + docIdentifier;
     } // getVoidedDocumentName
 
-    public String getVoidedCPEDocumentName(String senderRUC,
-                                           String docIdentifier) {
-        return senderRUC + "-" + docIdentifier;
-    } // getVoidedDocumentName
-
-    /**
-     * Este metodo obtiene el nombre de un documento de tipo RESUMEN DIARIO.
-     *
-     * @param senderRUC     Numero de RUC del emisor.
-     * @param docIdentifier Identificador del documento.
-     * @return Retorna el nombre del documento de tipo RESUMEN DIARIO.
-     */
-    public String getSummaryDocumentName(String senderRUC, String docIdentifier) {
-        return senderRUC + "-" + docIdentifier;
-    } // getSummaryDocumentName
-
     /**
      * Este metodo retorna el nombre del documento concatenando el valor .zip
      *
@@ -160,14 +84,6 @@ public class DocumentNameHandler {
         return documentName + EE_ZIP;
     } // formatZipName
 
-    /**
-     * Este metodo retorna el nombre del documento en formato de respuesta CDR.
-     *
-     * @param documentName El nombre del documento UBL.
-     * @return Retorna el nombre de la constancia CDR de respuesta.
-     */
-    public String getCDRConstancyName(String documentName) {
-        return MessageFormat.format(CDR_RESPONSE_NAME, documentName);
-    } // getCDRConstancyName
+
 
 } // DocumentNameHandler

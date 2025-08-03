@@ -10,19 +10,7 @@ package service.cloud.request.clientRequest.utils.exceptions;
  */
 public class VenturaExcepcion extends Exception {
 
-    public VenturaExcepcion() {
-    }
-
-    public VenturaExcepcion(Throwable thrwbl) {
-        super(thrwbl);
-    }
-
     public VenturaExcepcion(String mensaje) {
         super(mensaje);
     }
-
-    public VenturaExcepcion(String mensaje, Exception ex) {
-        super(mensaje, ex.getCause());
-    }
-
 }

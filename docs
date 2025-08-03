@@ -1,0 +1,170 @@
+ROLES:
+//  acarranza@vsperu.com - SUPPORT
+//  jnano@vsperu.com - FINANCE
+
+
+_______________________________________________________________________________________________________________________
+//LOGIN
+
+1. Se necesita loguear con un usuario y contraseña -> POST http://<ip>:<port>/login
+
+OK -> 200
+REQUEST
+{
+    "username": "jnano@vsperu.com",
+    "password": "123"
+}
+RESPONSE
+{
+    "token": "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlcyI6WyJGSU5BTkNFIl0sInBhc3N3b3JkLWRlbW8iOiJzYW1wbGUiLCJ1c2VybmFtZSI6ImpuYW5vQHZzcGVydS5jb20iLCJzdWIiOiJqbmFub0B2c3BlcnUuY29tIiwiaWF0IjoxNzA2MDgxMjI3LCJleHAiOjE3MDYwODQwMjd9.nkQQR8tyauyEDwnJ2xD9WWoxPtN6qtPHgAmOtbMPxaWVBTPNae6U79MNIGOe3InexJlZyNZVIbwbMzhlbAnKTw",
+    "expiration": "2024-01-24T08:13:47.000+00:00"
+}
+
+ERROR 401 | 403
+
+--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.base/java.math=ALL-UNNAMED
+
+_______________________________________________________________________________________________________________________
+//FINANCE
+
+1. Se necesita listar los clientes -> GET http://<ip>:<port>/customers
+2. Habilitar/ deshabilitar un cliente -> PATCH http://<ip>:<port>/customers/{id}
+3. Se necesita filtrar por ruc, businessName -> se hara la busca dinamica por el front con el filtrado de la tabla (no importa la posicion, solo que contenga el texto de la busqueda)
+
+GET OK -> 200
+[
+    {
+        "id": "65b0a587cab1fa681c9532ec",
+        "ruc": "20510910517 ",
+        "businessName": " VENTURA SOLUCIONES",
+        "phone": "(01) 2432545",
+        "email": "contacto@vsperu.com",
+        "status": false
+    },
+    {
+        "id": "65b0a659cab1fa681c9532ed",
+        "ruc": "30876543210",
+        "businessName": "INNOVATECH SERVICES",
+        "phone": "(02) 9876543",
+        "email": "info@innovatech.com",
+        "status": true
+    }
+]
+_______________________________________________________________________________________________________________________
+//SUPPORT
+1. Se necesita listar los logs -> http://<ip>:<port>/logs
+2. Se necesita filtrar por ruc, objectTypeAndDocEntry, seriesAndCorrelative -> se hara la busca dinamica por el front con el filtrado de la tabla (no importa la posicion, solo que contenga el texto de la busqueda)
+
+
+
+MONGO DB
+1. consulta de manera ordenada con query
+db.logs.find().sort({requestDate: 1})
+
+2. consulta todos los registros de tabla
+db.getCollection("logs").find({})
+
+
+
+https://dashboard.heroku.com/apps/ventura-flux2024
+https://cloud.mongodb.com/v2/65b3123fd93c9a625854ee61#/clusters
+
+PARA COMMITS EN HEROKU
+git remote -v
+git add .
+git commit -m "commit"
+heroku git:remote -a ventura-flux2024
+git push heroku master
+
+HEROKU
+lbecerra@vsperu.com
+Lima4040$$12
+
+GITHUB VENTURA FRONT BAK
+jolucode
+Lima40401010
+
+Lima4040$$12
+
+MONGO ACCESOS
+lbecerra@vsperu.com
+Lima4040$$12
+
+DB ACCESS MONGO
+lbecerra
+Lima40401010
+
+
+becerra.j@pucp.edu.pe
+Lima40401010
+
+
+HEROKU
+heroku login
+git init
+git status
+git remote -v
+heroku git:remote -a back2
+
+git add .
+git commit -m 'message'
+git push heroku master
+
+
+
+DESPLIEUGE ANGULAR
+https://www.youtube.com/watch?v=D2oOWgCuBIY
+
+DESPLIEUGE BACK
+
+
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/ventura2024
+scheduled:
+  fixedDelay: 10000
+application:
+  env: dev
+  ambiente: 'test'
+  rutas:
+    rutaBaseDoc: 'C:\clientes\files\'
+  soap-client:
+    sunat:
+      base-url-emision: 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService'
+      base-url-consulta: 'https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService'
+      base-url-retper: 'https://www.sunat.gob.pe/ol-ti-itemision-otroscpe-gem-beta/billService'
+    ose:
+      base-url: 'https://proy.ose.tci.net.pe/ol-ti-itcpe-2/ws/billService?wsdl'
+    estela:
+      base-url: 'https://ose-test.com/ol-ti-itcpe/billService3'
+ventura:
+  clientes:
+    listaClientes:
+      '20510910517':
+
+        razonSocial: 'Ventura Soluciones1'
+
+        wsUsuario: 'admin'
+        wsClave: 'ventura'
+        wsLocation: 'http://facturacion.vsperufe.com/'
+
+        usuarioSol: '20510910517'
+        claveSol: '20510910517'
+
+        certificadoName: "CERTIFICATE_TEST.pfx"
+        certificadoPassword: '1234'
+
+        integracionWs: SUNAT
+        pdfBorrador: 'true'
+        impresion: 'Codigo QR'
+
+        urlOnpremise: 'http://localhost:8101/'
+
+        clientId: 'a8a6c50a-d73c-4775-9ddc-6261df69fe2d8'
+        clientSecret: '5yr+sp24Q1J+LeYhnCooEw2=='
+        UserNameSunatGuias: '20510910517JVENTUR21'
+        passwordSunatGuias: 'JVENTUR21'
+server:
+  port: 8081

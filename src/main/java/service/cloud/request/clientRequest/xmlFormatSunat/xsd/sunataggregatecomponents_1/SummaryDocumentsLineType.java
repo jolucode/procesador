@@ -9,11 +9,10 @@
 package service.cloud.request.clientRequest.xmlFormatSunat.xsd.sunataggregatecomponents_1;
 
 import service.cloud.request.clientRequest.xmlFormatSunat.uncefact.data.specification.unqualifieddatatypesschemamodule._2.IdentifierType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.AllowanceChargeType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.PaymentType;
-import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.TaxTotalType;
+import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonaggregatecomponents_2.*;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.AmountType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.DocumentTypeCodeType;
+import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.IDType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.LineIDType;
 
 import javax.xml.bind.annotation.*;
@@ -59,21 +58,34 @@ import java.util.List;
 @XmlType(name = "SummaryDocumentsLineType", propOrder = {
         "lineID",
         "documentTypeCode",
+        "iD",
         "documentSerialID",
+        "customerParty",
+        "billingReference",
         "startDocumentNumberID",
         "endDocumentNumberID",
-        "totalAmount",
-        "billingPayment",
+        "status",
+        "totalAmount",//
+        "billingPayment",//
         "allowanceCharge",
-        "taxTotal"
+        "taxTotal"//
 })
 public class SummaryDocumentsLineType implements Serializable {
 
     @XmlElement(name = "LineID", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2", required = true)
     protected LineIDType lineID;
 
+    @XmlElement(name = "ID", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2", required = true)
+    protected IDType iD;
+
     @XmlElement(name = "DocumentTypeCode", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2", required = true)
     protected DocumentTypeCodeType documentTypeCode;
+
+    @XmlElement(name = "Status", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2")
+    protected StatusType status;
+
+    @XmlElement(name = "BillingReference", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2")
+    protected BillingReferenceType billingReference;
 
     @XmlElement(name = "DocumentSerialID", required = true)
     protected IdentifierType documentSerialID;
@@ -84,6 +96,8 @@ public class SummaryDocumentsLineType implements Serializable {
     @XmlElement(name = "EndDocumentNumberID", required = true)
     protected IdentifierType endDocumentNumberID;
 
+    @XmlElement(name = "AccountingCustomerParty", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2", required = true)
+    protected CustomerPartyType customerParty;
     @XmlElement(name = "TotalAmount", required = true)
     protected AmountType totalAmount;
 
@@ -330,4 +344,41 @@ public class SummaryDocumentsLineType implements Serializable {
         return this.taxTotal;
     }
 
+
+    public IDType getiD() {
+        return iD;
+    }
+
+    public void setiD(IDType iD) {
+        this.iD = iD;
+    }
+
+    public CustomerPartyType getCustomerParty() {
+        return customerParty;
+    }
+
+    public void setCustomerParty(CustomerPartyType customerParty) {
+        this.customerParty = customerParty;
+    }
+
+    public void setBillingPayment(List<PaymentType> billingPayment) {
+        this.billingPayment = billingPayment;
+    }
+
+
+    public StatusType getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusType status) {
+        this.status = status;
+    }
+
+    public BillingReferenceType getBillingReference() {
+        return billingReference;
+    }
+
+    public void setBillingReference(BillingReferenceType billingReference) {
+        this.billingReference = billingReference;
+    }
 }

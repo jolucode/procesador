@@ -1,9 +1,10 @@
 package service.cloud.request.clientRequest.service.publicar;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import service.cloud.request.clientRequest.dto.TransaccionRespuesta;
-import service.cloud.request.clientRequest.entity.PublicardocWs;
-import service.cloud.request.clientRequest.prueba.Client;
+import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
+import service.cloud.request.clientRequest.model.Client;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -11,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Optional;
 
+@Slf4j
 @Data
 public class DocumentoPublicado {
     private String usuarioSesion;
@@ -53,30 +55,32 @@ public class DocumentoPublicado {
 
     private String serie;
 
-    public DocumentoPublicado(Client client, PublicardocWs docPublicar, TransaccionRespuesta transaccionRespuesta) {
+
+    public DocumentoPublicado(Client client, TransacctionDTO docPublicar, TransaccionRespuesta transaccionRespuesta) {
         this.usuarioSesion = client.getWsUsuario();
         this.claveSesion = client.getWsClave();
-        this.rucClient = docPublicar.getSNDocIdentidadNro();
-        this.nombreClient = docPublicar.getSNRazonSocial();
-        this.email = docPublicar.getSNEMail();
-        String docId = docPublicar.getDOCId();
-        this.numSerie = docPublicar.getRSRuc() + "-" + docId;
+        this.rucClient = docPublicar.getSN_DocIdentidad_Nro();
+        this.nombreClient = docPublicar.getSN_RazonSocial();
+        this.email = docPublicar.getSN_EMail();
+        String docId = docPublicar.getDOC_Id();
+        this.numSerie = docPublicar.getDocIdentidad_Nro() + "-"+ docId;
         String[] split = docId.split("[-]");
         this.serie = (split.length > 0) ? split[0] : "";
-        this.fecEmisionDoc = new SimpleDateFormat("dd/MM/yyyy").format(docPublicar.getDOCFechaEmision());
-        this.tipoDoc = docPublicar.getDOCCodigo();
-        BigDecimal montoTotal = docPublicar.getDOCMontoTotal().setScale(2, RoundingMode.HALF_UP);
+        this.fecEmisionDoc = new SimpleDateFormat("dd/MM/yyyy").format(docPublicar.getDOC_FechaEmision());
+        this.tipoDoc = docPublicar.getDOC_Codigo();
+        BigDecimal montoTotal = docPublicar.getDOC_MontoTotal() == null ? BigDecimal.ZERO : docPublicar.getDOC_MontoTotal().setScale(2, RoundingMode.HALF_UP);
         this.total = montoTotal.toString();
-        this.estadoSunat = String.valueOf(docPublicar.getEstadoSUNAT());
-        this.monedaTransaccion = docPublicar.getDOCMONCodigo();
-        this.emailEmisor = docPublicar.getEMailEmisor();
-        this.tipoTransaccion = docPublicar.getFETipoTrans();
-        this.correoSecundario = docPublicar.getSNEMailSecundario();
-        this.rsRuc = docPublicar.getRSRuc();
-        this.rsDescripcion = docPublicar.getRSDescripcion();
+        this.estadoSunat = transaccionRespuesta.getEstado(); //"V" - aprobado
+        this.monedaTransaccion = docPublicar.getDOC_MON_Codigo();
+        this.emailEmisor = docPublicar.getEMail();
+        this.tipoTransaccion = docPublicar.getFE_TipoTrans();
+        this.correoSecundario = docPublicar.getSN_EMail_Secundario();
+        this.rsRuc = docPublicar.getSN_DocIdentidad_Nro();
+        this.rsDescripcion = docPublicar.getSN_RazonSocial();
 
         if(this.tipoTransaccion.equals("B")){
             this.docCdr = encodeFileToBase64Binary(transaccionRespuesta.getZip()).get();
+            this.estadoSunat = "P";
         }else {
             this.docPdf = encodeFileToBase64Binary(transaccionRespuesta.getPdf()).get();
             this.docXml = encodeFileToBase64Binary(transaccionRespuesta.getXml()).get();

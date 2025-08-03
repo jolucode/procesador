@@ -2,80 +2,24 @@ package service.cloud.request.clientRequest.extras.pdf;
 
 public interface IPDFCreatorConfig {
 
-    // Datos Subreporte Cuotas
-
-
-    // fin Datos Subreporte Cuotas
-
-
-    /**
-     * Ruta del archivo *.properties
-     */
-    String PROPERTIES_PATH = "org/ventura/soluciones/pdfcreator/resources/pdf_creator";
-
-    /**
-     * Valores seleccionables del TAG ContactType
-     */
-    String CONTACT_NAME_VALUE = "contact_name";
-    String CONTACT_MAIL_VALUE = "contact_mail";
     String CAMPOS_USUARIO_CAB = "CamposUsuarioCab";
 
-    /**
-     * Valor por defecto para los TAG's vacios
-     */
+
     String EMPTY_VALUE = "-";
-
-    int DECIMAL_ITEM_QUANTITY = 3;
-
-    String UBL_ADDITIONAL_MONETARY_TOTAL = "AdditionalMonetaryTotal";
-    String UBL_ADDITIONAL_PROPERTY = "AdditionalProperty";
-    String UBL_ID = "ID";
-    String UBL_PAYABLE_AMOUNT = "PayableAmount";
-    String UBL_VALUE = "Value";
-
-    /**
-     * Codigo y nombre de los tipos de monedas.
-     */
-    String CURRENCY_CODE_PEN = "PEN";
-    String CURRENCY_CODE_PEN_VALUE = "NUEVOS SOLES";
-    String CURRENCY_CODE_USD = "USD";
-    String CURRENCY_CODE_USD_VALUE = "D\u00D3LAR ESTADOUNIDENSE";
-    String CURRENCY_CODE_EUR = "EUR";
-    String CURRENCY_CODE_EUR_VALUE = "EUROS";
 
     String LOCALE_ES = "es";
     String LOCALE_PE = "PE";
     String PATTERN_DATE = "dd/MM/yyyy";
-    String PATTER_UBL_DATE = "yyyy-MM-dd";
     String LANG_PATTERN = "llll";
 
-    /**
-     * Regex and format patterns
-     */
     String PATTERN_FLOAT_DEC = "###,###.00";
-    String PATTERN_FLOAT_DEC_3 = "###,###.000";
 
     String ALTERNATIVE_COND_UNIT_PRICE = "01";
-    String ALTERNATIVE_COND_REF_VALUE = "02";
 
-    /**
-     * Formato de CODIGO DE BARRAS
-     */
     String BARCODE_PATTERN = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}";
 
-    /**
-     * Extensiones
-     */
-    String EE_PDF = ".pdf";
-
-    /**
-     * Valor cuando no hay LEYENDAS
-     */
     String LEGEND_DEFAULT_EMPTY = "NINGUNA";
 
-    /**
-     * SUNATTransaction values
-     */
     String SUNAT_TRANS_VENTA_INTERNA_ID = "01";
     String SUNAT_TRANS_VENTA_INTERNA_DSC = "Venta Interna";
     String SUNAT_TRANS_EXPORTACION_ID = "02";
@@ -92,37 +36,6 @@ public interface IPDFCreatorConfig {
     String SUNAT_TRANS_VENTA_ARROZ_PILADO_DSC = "Venta Arroz Pilado";
     String SUNAT_TRANS_FACTURA_COMP_PERCEPCION_ID = "08";
     String SUNAT_TRANS_FACTURA_COMP_PERCEPCION_DSC = "Factura - Comprobante de Percepci\u00F3n";
-
-    /**
-     * Abreviatura del tipo de documento
-     */
-    String ID_DOC_WITHOUT_RUC_DSC = "N.A.";
-    String ID_DOC_DNI_DSC = "DNI";
-    String ID_DOC_FOREIGN_CARD_DSC = "CE";
-    String ID_DOC_RUC_DSC = "RUC";
-    String ID_DOC_PASSPORT_DSC = "PAS";
-    String ID_DOC_DIPLOMATIC_ID_DSC = "CDI";
-
-    /**
-     * Descripcion de los codigos de tipo de Nota de Credito
-     */
-    String CREDIT_NOTE_TYPE_01_DSC = "Anulaci\u00F3n de la Operaci\u00F3n";
-    String CREDIT_NOTE_TYPE_02_DSC = "Anulaci\u00F3n por error en el RUC";
-    String CREDIT_NOTE_TYPE_03_DSC = "Correcci\u00F3n por error en la Descripci\u00F3n";
-    String CREDIT_NOTE_TYPE_04_DSC = "Descuento Global";
-    String CREDIT_NOTE_TYPE_05_DSC = "Descuento por Item";
-    String CREDIT_NOTE_TYPE_06_DSC = "Devoluci\u00F3n Total";
-    String CREDIT_NOTE_TYPE_07_DSC = "Devoluci\u00F3n por Item";
-    String CREDIT_NOTE_TYPE_08_DSC = "Bonificaci\u00F3n";
-    String CREDIT_NOTE_TYPE_09_DSC = "Disminuci\u00F3n en el Valor";
-    String CREDIT_NOTE_TYPE_10_DSC = "Otros Conceptos";
-
-    /**
-     * Descripcion de los codigos de tipo de Nota de Debito
-     */
-    String DEBIT_NOTE_TYPE_01_DSC = "Intereses por Mora";
-    String DEBIT_NOTE_TYPE_02_DSC = "Aumento en el Valor";
-    String DEBIT_NOTE_TYPE_03_DSC = "Penalidades / Otros Conceptos";
 
     /**
      * Documentos afectados por las Notas electronicas
@@ -155,7 +68,9 @@ public interface IPDFCreatorConfig {
     String NUMERO_BULTOS = "NUMERO_BULTOS";
     String PLACA_VEHICULO = "PLACA_VEHICULO";
     String UNIDAD_MEDIDA_PESONETO = "UNIDAD_MEDIDA_PESONETO";
-
+    /** Harol 29-03-2024*/
+    String PESONETO = "PESONETO";
+    /** */
 
     String DOCUMENT_IDENTIFIER = "DOCUMENT_IDENTIFIER";
     String ISSUE_DATE = "ISSUE_DATE";
@@ -196,6 +111,28 @@ public interface IPDFCreatorConfig {
     String DIGESTVALUE = "DIGESTVALUE";
     String CODEQR = "CODEQR";
 
+    /** 29-02-2024 Harol Guia Transportista */
+    String GRT_DOCUMENTO_REMITENTE = "GRT_DOCUMENTO_REMITENTE";
+    String GRT_NOMBRE_RAZON_REMITENTE = "GRT_NOMBRE_RAZON_REMITENTE";
+    String GRT_TIPO_DOC_DESTINATARIO = "GRT_TIPO_DOC_DESTINATARIO";
+    String GRT_DOCUMENTO_DESTINATARIO = "GRT_DOCUMENTO_DESTINATARIO";
+    String GRT_NOMBRE_RAZON_DESTINATARIO = "GRT_NOMBRE_RAZON_DESTINATARIO";
+    String NRO_REGISTRO_MTC = "NRO_REGISTRO_MTC";
+    String SN_RAZON_SOCIAL = "SN_RAZON_SOCIAL";
+    String SN_DOC_IDENTIDAD_NRO = "SN_DOC_IDENTIDAD_NRO";
+    String NOMBRE_CONDUCTOR = "NOMBRE_CONDUCTOR";
+    String INDICADOR_TRANSBORDO_PROGRAMADO = "INDICADOR_TRANSBORDO_PROGRAMADO";
+    String INDICADOR_RETORNO_VEHICULO_VACIO = "INDICADOR_RETORNO_VEHICULO_VACIO";
+    String INDICADOR_TRANSPORTE_SUBCONTRATADO = "INDICADOR_TRANSPORTE_SUBCONTRATADO";
+    String INDICADOR_RETORNO_VEHICULO_ENVASES_VACIO = "INDICADOR_RETORNO_VEHICULO_ENVASES_VACIO";
+    String GRT_INDICADOR_PAGADOR_FLETE = "GRT_INDICADOR_PAGADOR_FLETE";
+    String GRT_NUMERO_TUCE_PRINCIPAL = "GRT_NUMERO_TUCE_PRINCIPAL";
+    String GRT_ENTIDAD_EMISORA_PRINCIPAL = "GRT_ENTIDAD_EMISORA_PRINCIPAL";
+    String GRT_PLACA_VEHICULO_SECUNDARIO = "GRT_PLACA_VEHICULO_SECUNDARIO";
+    String GRT_NUMERO_TUCE_SECUNDARIO = "GRT_NUMERO_TUCE_SECUNDARIO";
+    String GRT_ENTIDAD_EMISORA_SECUNDARIO = "GRT_ENTIDAD_EMISORA_SECUNDARIO";
+    /** */
+
 
     String RUC_CONSUMIDOR = "RUC_CONSUMIDOR";
     String RUC_EMISOR = "RUC_EMISOR";
@@ -232,7 +169,6 @@ public interface IPDFCreatorConfig {
     String NEW_TOTAL_VALUE = "NEW_TOTAL";
     String IMPUESTO_BOLSA = "IMPUESTO_BOLSA";
     String IMPUESTO_BOLSA_MONEDA = "IMPUESTO_BOLSA_MONEDA";
-    String IMPORTE_TEXTO = "IMPORTE_TEXTO";
 
     String BARCODE_VALUE = "BARCODE_VALUE";
     String LETTER_AMOUNT_VALUE = "LETTER_AMOUNT_VALUE";
@@ -249,9 +185,9 @@ public interface IPDFCreatorConfig {
     String LEGEND_DOCUMENT_TYPE = "LEGEND_DOCUMENT_TYPE";
     String RESOLUTION_CODE_VALUE = "RESOLUTION_CODE_VALUE";
 
-    /* Valores agregados a la leyenda del TEMPLATE */ String LEGEND_INVOICE_DOCUMENT = "factura electr\u00F3nica";
+    String LEGEND_INVOICE_DOCUMENT = "factura electr\u00F3nica";
     String LEGEND_BOLETA_DOCUMENT = "boleta de venta electr\u00F3nica";
     String LEGEND_CREDIT_NOTE_DOCUMENT = "nota de cr\u00E9dito electr\u00F3nica";
     String LEGEND_DEBIT_NOTE_DOCUMENT = "nota de d\u00E9bito electr\u00F3nica";
     String LEGEND_PERCEPTION_DOCUMENT = "comprobante de percepcion";
-} // IPDFCreatorConfig
+}

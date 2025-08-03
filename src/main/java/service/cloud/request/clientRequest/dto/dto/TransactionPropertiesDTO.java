@@ -7,5 +7,4 @@ public class TransactionPropertiesDTO {
     private String Description;
     private String Id;
     private String Valor;
-
 }

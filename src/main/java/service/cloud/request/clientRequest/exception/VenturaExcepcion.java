@@ -8,16 +8,7 @@ package service.cloud.request.clientRequest.exception;
 
 public class VenturaExcepcion extends RuntimeException {
 
-    public VenturaExcepcion(Throwable thrwbl) {
-        super(thrwbl);
-    }
-
     public VenturaExcepcion(String mensaje) {
         super(mensaje);
     }
-
-    public VenturaExcepcion(String mensaje, Exception ex) {
-        super(mensaje, ex.getCause());
-    }
-
 }

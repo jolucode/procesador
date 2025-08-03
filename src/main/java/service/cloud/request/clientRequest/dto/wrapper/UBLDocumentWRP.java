@@ -1,6 +1,6 @@
 package service.cloud.request.clientRequest.dto.wrapper;
 
-import service.cloud.request.clientRequest.entity.Transaccion;
+import service.cloud.request.clientRequest.dto.dto.TransacctionDTO;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.creditnote_2.CreditNoteType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.debitnote_2.DebitNoteType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
@@ -10,56 +10,21 @@ import service.cloud.request.clientRequest.xmlFormatSunat.xsd.retention_1.Retent
 
 public class UBLDocumentWRP {
 
-    /**
-     * ************
-     * <p>
-     * Patron Singleton
-     * <p>
-     * **********************
-     */
-    private static UBLDocumentWRP instance = null;
-
-    protected UBLDocumentWRP() {
-
-    }
-
-    public static UBLDocumentWRP getInstance() {
-        if (instance == null) {
-            instance = new UBLDocumentWRP();
-        }
-        return instance;
-    }
-
-    private Transaccion transaccion;
-
+    private TransacctionDTO transaccion;
     private InvoiceType invoiceType;
-
     private InvoiceType boletaType;
-
     private CreditNoteType creditNoteType;
-
     private DebitNoteType debitNoteType;
-
     private PerceptionType perceptionType;
-
     private RetentionType retentionType;
-
     private DespatchAdviceType adviceType;
 
-
-    public DespatchAdviceType getAdviceType() {
-        return adviceType;
-    }
-
-    public void setAdviceType(DespatchAdviceType adviceType) {
-        this.adviceType = adviceType;
-    }
-
-    public Transaccion getTransaccion() {
+    // Getters y Setters
+    public TransacctionDTO getTransaccion() {
         return transaccion;
     }
 
-    public void setTransaccion(Transaccion transaccion) {
+    public void setTransaccion(TransacctionDTO transaccion) {
         this.transaccion = transaccion;
     }
 
@@ -109,6 +74,14 @@ public class UBLDocumentWRP {
 
     public void setRetentionType(RetentionType retentionType) {
         this.retentionType = retentionType;
+    }
+
+    public DespatchAdviceType getAdviceType() {
+        return adviceType;
+    }
+
+    public void setAdviceType(DespatchAdviceType adviceType) {
+        this.adviceType = adviceType;
     }
 
 }

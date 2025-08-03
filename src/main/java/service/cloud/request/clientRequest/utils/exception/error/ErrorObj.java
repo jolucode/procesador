@@ -107,7 +107,7 @@ public class ErrorObj {
      */
     public List<String> getNoteList() {
         return noteList;
-    } // getNoteList
+    }
 
     /**
      * Este metodo establece la lista de notas agregadas al error.
@@ -116,7 +116,7 @@ public class ErrorObj {
      */
     public void setNoteList(List<String> noteList) {
         this.noteList = noteList;
-    } // setNoteList
+    }
 
     /**
      * Este metodo obtiene el objeto adjunto.
@@ -125,7 +125,7 @@ public class ErrorObj {
      */
     public Object getAttachment() {
         return attachment;
-    } // getAttachment
+    }
 
     /**
      * Este metodo establece el objeto adjunto.
@@ -134,7 +134,7 @@ public class ErrorObj {
      */
     public void setAttachment(Object attachment) {
         this.attachment = attachment;
-    } // setAttachment
+    }
 
     /**
      * Este metodo obtiene la causa del error.
@@ -143,7 +143,7 @@ public class ErrorObj {
      */
     public Throwable getCause() {
         return cause;
-    } // getCause
+    }
 
     /**
      * Este metodo establece la causa del error.
@@ -152,6 +152,6 @@ public class ErrorObj {
      */
     public void setCause(Throwable cause) {
         this.cause = cause;
-    } // setCause
+    }
 
-} // ErrorObj
+}

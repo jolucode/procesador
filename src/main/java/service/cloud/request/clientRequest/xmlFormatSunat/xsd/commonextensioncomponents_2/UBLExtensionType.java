@@ -10,6 +10,7 @@ package service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonextensionco
 
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.IDType;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.NameType;
+import service.cloud.request.clientRequest.xmlFormatSunat.xsd.commonbasiccomponents_2.NoteType;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -57,7 +58,7 @@ import javax.xml.bind.annotation.XmlType;
         "extensionURI",
         "extensionReasonCode",
         "extensionReason",
-
+        "note",
         "extensionContent"
 })
 public class UBLExtensionType {
@@ -92,7 +93,8 @@ public class UBLExtensionType {
     @XmlElement(name = "ExtensionContent", required = true)
     protected ExtensionContentType extensionContent;
 
-
+    @XmlElement(name = "Note", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2")
+    protected NoteType note;
     /**
      * An identifier for the Extension assigned by the creator of the extension.
      *
@@ -293,5 +295,29 @@ public class UBLExtensionType {
         this.extensionContent = value;
     }
 
+    public NoteType getNote() {
 
+        return note;
+
+    }
+
+
+
+    /**
+
+     * Sets the value of the note property.
+
+     *
+
+     * @param value allowed object is
+
+     *              {@link NoteType }
+
+     */
+
+    public void setNote(NoteType value) {
+
+        this.note = value;
+
+    }
 }

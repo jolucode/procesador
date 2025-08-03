@@ -4,9 +4,7 @@ import lombok.Data;
 
 @Data
 public class TransactionDocReferDTO {
-
     private Integer LineId;
     private String Tipo;
-    private Integer Id;
-
+    private String Id;
 }

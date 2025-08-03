@@ -5,5 +5,5 @@
 // Generated on: 2012.06.21 at 10:15:08 AM PET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "urn:oasis:names:specification:ubl:schema:xsd:Perception-1", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED, xmlns = {@javax.xml.bind.annotation.XmlNs(namespaceURI = "urn:oasis:names:specification:ubl:schema:xsd:Perception-1", prefix = ""), @javax.xml.bind.annotation.XmlNs(namespaceURI = "urn:oasis:names:specification:ubl:schema:xsd:Perception-1", prefix = "")})
+@javax.xml.bind.annotation.XmlSchema(namespace = "urn:sunat:names:specification:ubl:peru:schema:xsd:Perception-1", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED, xmlns = {@javax.xml.bind.annotation.XmlNs(namespaceURI = "urn:oasis:names:specification:ubl:schema:xsd:Perception-1", prefix = ""), @javax.xml.bind.annotation.XmlNs(namespaceURI = "urn:oasis:names:specification:ubl:schema:xsd:Perception-1", prefix = "")})
 package service.cloud.request.clientRequest.xmlFormatSunat.xsd.perception_1;
