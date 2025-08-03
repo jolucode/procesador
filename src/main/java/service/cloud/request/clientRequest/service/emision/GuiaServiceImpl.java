@@ -189,6 +189,19 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
             log.setResponseDate(DateUtils.formatDateToString(new Date()));
             log.setPathBase(attachmentPath + "\\" + documentName + ".json");
             trxResp.setLogDTO(log);
+
+            // *** GUARDAR EL ZIP EN DISCO SI EXISTE ***
+            if (trxResp.getZip() != null) {
+                try {
+                    // Define aquí la ruta donde quieres que se guarde el ZIP
+                    UtilsFile.storeDocumentInDisk(trxResp.getZip(), documentName, "zip", attachmentPath);
+                    logger.info("ZIP del CDR guardado en: " + attachmentPath + "\\" + documentName + ".zip");
+                } catch (IOException e) {
+                    logger.error("Error al guardar el ZIP del CDR: " + e.getMessage());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
             return trxResp;
         });
     }
@@ -231,10 +244,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                                 tx.getDocIdentidad_Nro(), tx.getFE_Id());
                     }
 
-                    if (existingTicket != EMPTY_TICKET &&
-                            existingTicket.getTicketSunat() != null &&
-                            !existingTicket.getTicketSunat().isEmpty() &&
-                            ("APROBADO".equals(existingTicket.getEstadoTicket()) || "PROCESO".equals(existingTicket.getEstadoTicket()))) {
+                    if (existingTicket != EMPTY_TICKET) {
 
                         logger.info("Ticket guía: {} (ticket: {}) | RUC-Tipo-Serie-Correlativo: {}-{}-{}-{}",
                                 existingTicket.getEstadoTicket(), existingTicket.getTicketSunat(),
