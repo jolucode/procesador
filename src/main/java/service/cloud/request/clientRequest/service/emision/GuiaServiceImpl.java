@@ -1,5 +1,6 @@
 package service.cloud.request.clientRequest.service.emision;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -7,7 +8,6 @@ import io.joshworks.restclient.http.HttpResponse;
 import io.joshworks.restclient.http.Unirest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -43,7 +43,8 @@ import service.cloud.request.clientRequest.utils.files.CertificateUtils;
 import service.cloud.request.clientRequest.utils.files.DocumentConverterUtils;
 import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.activation.DataHandler;
 import java.io.*;
 import java.math.BigDecimal;
@@ -71,7 +72,7 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterface {
 
-    private static final Logger logger = Logger.getLogger(GuiaServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(GuiaServiceImpl.class);
 
     //Estados
     private static final String ESTADO_NUEVO = "N";
@@ -80,7 +81,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
     private static final String EXT_XML = "xml";
     private static final String EXT_ZIP = "zip";
     private static final String EMPTY = "";
-
+    private static final GuiaTicket EMPTY_TICKET = new GuiaTicket();
     @Autowired
     private ClientProperties clientProperties;
 
@@ -163,7 +164,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         if (ESTADO_NUEVO.equalsIgnoreCase(transaction.getFE_Estado())) {
             resultado = processEstadoNReactive(transaction, config, fileHandler, signedDocument, signedXml, documentName, wrp);
         } else if (ESTADO_CONTINGENCIA.equalsIgnoreCase(transaction.getFE_Estado())) {
-            resultado = Mono.fromCallable(() -> processEstadoC(transaction, config, fileHandler, signedDocument, documentName, wrp));
+            resultado = processEstadoCReactive(transaction, config, fileHandler, signedDocument, documentName, wrp);
         } else {
             resultado = Mono.error(new IllegalStateException("Estado no reconocido: " + transaction.getFE_Estado()));
         }
@@ -209,8 +210,6 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                 .build();
     }
 
-
-
     public Mono<TransaccionRespuesta> processEstadoNReactive(TransacctionDTO tx,
                                                              ConfigData config,
                                                              FileHandler fileHandler,
@@ -218,24 +217,47 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
                                                              byte[] docBytes,
                                                              String docName,
                                                              UBLDocumentWRP wrp) {
+
         return guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(tx.getDocIdentidad_Nro(), tx.getFE_Id())
+                .defaultIfEmpty(EMPTY_TICKET)
                 .flatMap(existingTicket -> {
-                    // Si ya está aprobado o en proceso, solo consultamos
-                    if (existingTicket != null &&
+
+                    if (existingTicket != EMPTY_TICKET) {
+                        logger.info("Ticket previo encontrado para RUC {} y FE_Id {}: ticket={}, estado={}",
+                                tx.getDocIdentidad_Nro(), tx.getFE_Id(),
+                                existingTicket.getTicketSunat(), existingTicket.getEstadoTicket());
+                    } else {
+                        logger.info("⚠️ No se encontró ticket previo para RUC {} y FE_Id {}. Se procederá a declarar uno nuevo.",
+                                tx.getDocIdentidad_Nro(), tx.getFE_Id());
+                    }
+
+                    if (existingTicket != EMPTY_TICKET &&
+                            existingTicket.getTicketSunat() != null &&
                             !existingTicket.getTicketSunat().isEmpty() &&
                             ("APROBADO".equals(existingTicket.getEstadoTicket()) || "PROCESO".equals(existingTicket.getEstadoTicket()))) {
+
+                        logger.info("Ticket guía: {} (ticket: {}) | RUC-Tipo-Serie-Correlativo: {}-{}-{}-{}",
+                                existingTicket.getEstadoTicket(), existingTicket.getTicketSunat(),
+                                tx.getDocIdentidad_Nro(), tx.getDOC_Codigo(), tx.getDOC_Serie(), tx.getDOC_Numero());
 
                         return consultarYProcesar(existingTicket.getTicketSunat(), tx, config, wrp, fileHandler, signedDoc, docName);
                     }
 
-                    // Si no existe ticket previo, declaramos uno
+                    logger.info("Se declarará un nuevo ticket para el documento {} con RUC {}", docName, tx.getDocIdentidad_Nro());
+
                     return Mono.fromCallable(() -> getJwtSunat(config))
                             .flatMap(token -> Mono.fromCallable(() -> declareSunat(docName, docBytes, token.getAccess_token())))
-                            .doOnNext(resp -> saveTicketRest(tx, resp)) // guardar ticket apenas se obtiene
+                            .doOnNext(resp -> {
+                                logger.info("✅ Nuevo ticket creado en SUNAT: {} | RUC-Tipo-Serie-Correlativo: {}-{}-{}-{}",
+                                        resp.getNumTicket(),
+                                        tx.getDocIdentidad_Nro(), tx.getDOC_Codigo(), tx.getDOC_Serie(), tx.getDOC_Numero());
+                                saveTicketRest(tx, resp);
+                            })
                             .flatMap(resp -> consultarTicketConReintentos(resp.getNumTicket(), config))
                             .flatMap(respFinal -> manejarRespuestaSunatReactive(respFinal, wrp, fileHandler, docName, tx, config, signedDoc));
                 });
     }
+
 
     public Mono<TransaccionRespuesta> manejarRespuestaSunatReactive(ResponseDTO responseDTO,
                                                                     UBLDocumentWRP wrp,
@@ -341,52 +363,46 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
     }
 
 
-    private TransaccionRespuesta processEstadoC(TransacctionDTO transaction,
-                                                ConfigData configuracion,
-                                                FileHandler fileHandler,
-                                                File signedDocument,
-                                                String documentName,
-                                                UBLDocumentWRP documentWRP) throws IOException {
-        TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
+    public Mono<TransaccionRespuesta> processEstadoCReactive(TransacctionDTO tx,
+                                                             ConfigData config,
+                                                             FileHandler fileHandler,
+                                                             File signedDoc,
+                                                             String docName,
+                                                             UBLDocumentWRP wrp) {
 
-        GuiaTicket ticketMongoSave = guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(
-                transaction.getDocIdentidad_Nro(), transaction.getFE_Id()
-        ).block();
+        return guiaTicketRepo.findGuiaTicketByRucEmisorAndFeId(tx.getDocIdentidad_Nro(), tx.getFE_Id())
+                .defaultIfEmpty(new GuiaTicket()) // o usa un EMPTY_TICKET
+                .flatMap(ticket -> {
+                    if (ticket.getTicketSunat() == null || ticket.getTicketSunat().isEmpty()) {
+                        logger.warn("No se encontró ticket previo en la BD para RUC: {} y FE_Id: {}", tx.getDocIdentidad_Nro(), tx.getFE_Id());
+                        return Mono.just(new TransaccionRespuesta());
+                    }
 
-        if (ticketMongoSave == null) {
-            logger.warn("No se encontró ticket previo en la BD para RUC: " + transaction.getDocIdentidad_Nro()
-                    + " y FE_Id: " + transaction.getFE_Id() + " (estado N)");
-        }
+                    ResponseDTO responseDTO = null;
+                    try {
+                        responseDTO = consultarTicketEnSunat(ticket.getTicketSunat(), config);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
 
-        if (ticketMongoSave != null && !ticketMongoSave.getTicketSunat().isEmpty()) {
-            ResponseDTO responseDTO = consultarTicketEnSunat(ticketMongoSave.getTicketSunat(), configuracion);
+                    updateTicketStatusFromConsulta(tx, responseDTO); // si esto no tiene efectos colaterales está bien
 
-            // ✅ Actualizar/eliminar en base al resultado
-            updateTicketStatusFromConsulta(transaction, responseDTO);
-            transactionResponse = manejarRespuestaSunat(responseDTO, documentWRP, fileHandler, documentName, transaction, configuracion);
+                    TransaccionRespuesta response = manejarRespuestaSunat(responseDTO, wrp, fileHandler, docName, tx, config);
+                    if (response != null) {
+                        byte[] xmlBytes = fileHandler.convertFileToBytes(signedDoc);
+                        response.setXml(xmlBytes);
+                    }
 
-            if (transactionResponse != null) {
-                byte[] documentBytes = fileHandler.convertFileToBytes(signedDocument);
-                transactionResponse.setXml(documentBytes);
-            }
-        }
+                    logger.info("Ticket guía: {} | RUC-Tipo-Serie-Correlativo: {}-{}-{}-{}",
+                            ticket.getEstadoTicket(),
+                            tx.getDocIdentidad_Nro(), tx.getDOC_Codigo(), tx.getDOC_Serie(), tx.getDOC_Numero());
 
-        if (ticketMongoSave != null && ticketMongoSave.getEstadoTicket() !=null) {
-            logger.info("Ticket guia: " + ticketMongoSave.getEstadoTicket() +
-                    "| Ruc-Tipo-Serie-Correlativo: " +
-                    transaction.getDocIdentidad_Nro() + "-" +
-                    transaction.getDOC_Codigo() + "-" +
-                    transaction.getDOC_Serie() + "-" +
-                    transaction.getDOC_Numero());
-        } else {
-            logger.error("El ticket que se quiere consultar no existe en la base datos");
-        }
-
-
-        return transactionResponse;
+                    return Mono.just(response);
+                });
     }
 
-    public ResponseDTO consult(String numTicket, String token) throws IOException {
+
+    public ResponseDTO consult(String numTicket, String token) throws JsonProcessingException {
         HttpResponse<String> response = Unirest.get("https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes/envios/" + numTicket)
                 .header("Authorization", "Bearer " + token)
                 .asString();
@@ -461,7 +477,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         return new String(Base64.encodeBase64(fileContent));
     }
 
-    public ResponseDTO getJwtSunat(ConfigData configuracion) throws IOException {
+    public ResponseDTO getJwtSunat(ConfigData configuracion) throws JsonProcessingException {
 
         HttpResponse<String> response = Unirest.post("https://api-seguridad.sunat.gob.pe/v1/clientessol/" + configuracion.getClientId() + "/oauth2/token/")
                 .header("Content-Type", "application/x-www-form-urlencoded")
@@ -556,7 +572,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         });
     }
 
-    private ResponseDTO consultarTicketEnSunat(String ticket, ConfigData configuracion) throws IOException {
+    private ResponseDTO consultarTicketEnSunat(String ticket, ConfigData configuracion) throws JsonProcessingException {
         ResponseDTO responseDTOJWT = getJwtSunat(configuracion);
         ResponseDTO responseDTO = consult(ticket, responseDTOJWT.getAccess_token());
         if (responseDTO.getStatusCode() == 401) {
