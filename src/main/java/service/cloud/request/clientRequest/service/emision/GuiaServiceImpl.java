@@ -45,6 +45,7 @@ import service.cloud.request.clientRequest.utils.files.UtilsFile;
 import service.cloud.request.clientRequest.xmlFormatSunat.xsd.despatchadvice_2.DespatchAdviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import javax.activation.DataHandler;
 import java.io.*;
 import java.math.BigDecimal;
@@ -58,11 +59,11 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * -----------------------------------------------------------------------------
-
+ * <p>
  * Proyecto          : facturación SAAS
-
- *                     conforme a las especificaciones de SUNAT.
- *
+ * <p>
+ * conforme a las especificaciones de SUNAT.
+ * <p>
  * Autor             : Jose Luis Becerra
  * Rol               : Software Developer Senior
  * Fecha de creación : 09/07/2025
@@ -134,7 +135,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         Calendar fechaEmision = Calendar.getInstance();
         fechaEmision.setTime(transaction.getDOC_FechaEmision());
         String attachmentPath = applicationProperties.getRutaBaseDocAnexos() + transaction.getDocIdentidad_Nro() +
-                File.separator + "anexo" + File.separator + fechaEmision.get(Calendar.YEAR) + File.separator + (fechaEmision.get(Calendar.MONTH)+1) + File.separator + fechaEmision.get(Calendar.DAY_OF_MONTH) +
+                File.separator + "anexo" + File.separator + fechaEmision.get(Calendar.YEAR) + File.separator + (fechaEmision.get(Calendar.MONTH) + 1) + File.separator + fechaEmision.get(Calendar.DAY_OF_MONTH) +
                 File.separator + transaction.getSN_DocIdentidad_Nro() + File.separator + doctype;
         fileHandler.setBaseDirectory(attachmentPath);
 
@@ -160,6 +161,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         ConfigData config = createConfigData(client);
         log.setThirdPartyServiceInvocationDate(DateUtils.formatDateToString(new Date()));
 
+
         Mono<TransaccionRespuesta> resultado;
         if (ESTADO_NUEVO.equalsIgnoreCase(transaction.getFE_Estado())) {
             resultado = processEstadoNReactive(transaction, config, fileHandler, signedDocument, signedXml, documentName, wrp);
@@ -179,6 +181,12 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
             trxResp.setDigestValue(digestValue);
             trxResp.setBarcodeValue(barcodeValue);
             trxResp.setIdentificador(documentName);
+
+            // ✅ Verificas si el PDF es borrador y lo seteas explícitamente
+            if (config.getPdfBorrador() != null && config.getPdfBorrador().equals("true")) {
+                trxResp.setPdfBorrador(trxResp.getPdf()); // (esto puede parecer redundante, pero garantiza que se mantenga)
+                logger.info("PDF borrador detectado y mantenido en la respuesta");
+            }
 
             log.setThirdPartyServiceResponseDate(DateUtils.formatDateToString(new Date()));
             log.setPathThirdPartyRequestXml(attachmentPath + "\\" + documentName + ".xml");
@@ -506,10 +514,12 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         ResponseDTOAuth responseDTO400;
 
         if (response.getStatus() == 400) {
-            responseDTO400 = objectMapper.readValue(response.body(), new TypeReference<ResponseDTOAuth>() {});
+            responseDTO400 = objectMapper.readValue(response.body(), new TypeReference<ResponseDTOAuth>() {
+            });
             responseDTO.setResponseDTO400(responseDTO400);
         } else {
-            responseDTO = objectMapper.readValue(response.body(), new TypeReference<ResponseDTO>() {});
+            responseDTO = objectMapper.readValue(response.body(), new TypeReference<ResponseDTO>() {
+            });
         }
         responseDTO.setStatusCode(response.getStatus());
         return responseDTO;
@@ -522,7 +532,7 @@ public class GuiaServiceImpl extends BaseDocumentService implements GuiaInterfac
         TransaccionRespuesta transactionResponse = new TransaccionRespuesta();
         if (responseDTO.getStatusCode() == 400 || responseDTO.getStatusCode() == 401) {
             // Error de token o credenciales
-            if(responseDTO.getResponseDTO400() != null) {
+            if (responseDTO.getResponseDTO400() != null) {
                 transactionResponse.setMensaje(responseDTO.getResponseDTO400().getError() + " - " + responseDTO.getResponseDTO400().getError_description());
             } else {
                 transactionResponse.setMensaje("Error no especificado");
